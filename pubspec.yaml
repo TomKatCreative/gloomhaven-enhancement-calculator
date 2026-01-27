@@ -78,18 +78,9 @@ flutter:
     - family: PirataOne
       fonts:
         - asset: fonts/pirata_one.ttf
-    - family: HighTower
-      fonts:
-        - asset: fonts/high_tower.ttf
     - family: Nyala
       fonts:
         - asset: fonts/nyala.ttf
-    - family: Roboto
-      fonts:
-        - asset: fonts/roboto/Roboto-Regular.ttf
-    - family: OpenSans
-      fonts:
-        - asset: fonts/open_sans/OpenSans-Regular.ttf
     - family: Inter
       fonts:
         - asset: fonts/inter/Inter-Regular.ttf
