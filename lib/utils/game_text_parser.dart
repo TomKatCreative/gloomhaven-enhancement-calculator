@@ -13,19 +13,28 @@ import 'package:gloomhaven_enhancement_calc/utils/asset_config.dart';
 /// - **Italic Text**: `*text*` - Text within single asterisks becomes italic
 ///   Example: `*Reviving Ether*` becomes italic
 ///
-/// - **Icons**: Uppercase words that match asset names
+/// - **Icons**: Uppercase words that match asset names in `asset_config.dart`
 ///   Example: `ATTACK`, `MOVE`, `HEAL`, `FIRE`, `ICE`
+///
+/// - **Attack Modifiers**: Signed numbers that match modifier assets
+///   Example: `+1`, `+2`, `-1`, `+0`, `2x`, `NULL`
+///   These render as the colored attack modifier card icons.
+///
+/// - **Action Icons with +1 Overlay**: Action icon followed by `+1` suffix
+///   Example: `MOVE+1`, `ATTACK+1`, `RANGE+1`
+///   These render the base icon with a small green +1 badge overlaid.
+///   Note: This is different from standalone `+1` which renders as a modifier.
 ///
 /// - **XP Values**: `xpN` where N is a number
 ///   Example: `xp8` renders as XP icon with "8" overlay
 ///
 /// - **Stacked Elements**: `ELEMENT&ELEMENT`
-///   Example: `FIRE&ICE` renders two element icons stacked
+///   Example: `FIRE&ICE` renders two element icons stacked diagonally
 ///
-/// - **Text Replacements**: Special words converted to symbols
-///   - `plusone` → `+1`
-///   - `plustwo` → `+2`
-///   - `pluszero` → `+0`
+/// - **Text Replacements**: Special words converted to plain text symbols
+///   - `plusone` → `+1` (as text, not icon)
+///   - `plustwo` → `+2` (as text, not icon)
+///   - `pluszero` → `+0` (as text, not icon)
 ///
 /// - **Plain Text**: Any other text renders normally
 
@@ -292,13 +301,32 @@ class PunctuationToken extends GameTextToken {
 /// Handles extraction of:
 /// - Leading punctuation (e.g., quotes, parentheses)
 /// - Trailing punctuation (e.g., commas, periods)
-/// - +1 overlay suffix detection
-/// - Clean asset key for lookup
+/// - +1 overlay suffix detection for compound icons (e.g., "MOVE+1")
+/// - Clean asset key for lookup in the assets map
+///
+/// ## Important: +1 Handling
+///
+/// There are TWO different uses of "+1" in game text:
+///
+/// 1. **Standalone attack modifier icons**: `+1`, `+2`, `-1`, etc.
+///    These are complete asset keys that map to `attack_modifiers/plus_1.svg`.
+///    The word "+1" should be looked up directly in the assets map.
+///
+/// 2. **Overlay suffix on action icons**: `MOVE+1`, `ATTACK+1`, etc.
+///    These render the base icon (MOVE) with a small "+1" badge overlaid.
+///    The "+1" suffix is stripped, and [hasPlusOneOverlay] is set to true.
+///
+/// The parsing logic must distinguish between these cases:
+/// - "+1" alone → assetKey: "+1", hasPlusOneOverlay: false
+/// - "MOVE+1" → assetKey: "MOVE", hasPlusOneOverlay: true
 class ParsedWord {
   static const _leadingPunctuation = ['"', "'", '('];
   static const _trailingPunctuation = ['"', "'", ',', ')', '.'];
 
-  /// The cleaned asset key (no punctuation, no +1 suffix)
+  /// The cleaned asset key (no punctuation, +1 suffix stripped only if overlay)
+  ///
+  /// For standalone modifiers like "+1", this contains the full "+1".
+  /// For overlay cases like "MOVE+1", this contains just "MOVE".
   final String assetKey;
 
   /// Leading punctuation character, if any
@@ -307,7 +335,10 @@ class ParsedWord {
   /// Trailing punctuation character, if any
   final String? trailingPunct;
 
-  /// Whether the word had a +1 suffix (e.g., "MOVE+1")
+  /// Whether the word had a +1 suffix that should be rendered as an overlay.
+  ///
+  /// Only true for compound icons like "MOVE+1" where we render the MOVE icon
+  /// with a small +1 badge. NOT true for standalone "+1" attack modifiers.
   final bool hasPlusOneOverlay;
 
   const ParsedWord({
@@ -319,33 +350,55 @@ class ParsedWord {
 
   /// Parse a raw word into its components.
   ///
-  /// Example: `"MOVE+1,` -> ParsedWord(
+  /// ## Examples
+  ///
+  /// Compound icon with overlay:
+  /// ```
+  /// "MOVE+1," -> ParsedWord(
   ///   assetKey: 'MOVE',
   ///   leadingPunct: '"',
   ///   trailingPunct: ',',
   ///   hasPlusOneOverlay: true,
   /// )
+  /// ```
+  ///
+  /// Standalone attack modifier (no overlay):
+  /// ```
+  /// "+1" -> ParsedWord(
+  ///   assetKey: '+1',
+  ///   hasPlusOneOverlay: false,
+  /// )
+  /// ```
   factory ParsedWord.from(String word) {
     String working = word;
     String? leading;
     String? trailing;
 
-    // Strip leading punctuation
+    // Strip leading punctuation (quotes, parentheses)
     if (working.isNotEmpty && _leadingPunctuation.contains(working[0])) {
       leading = working[0];
       working = working.substring(1);
     }
 
-    // Strip trailing punctuation
+    // Strip trailing punctuation (quotes, commas, parentheses, periods)
     if (working.isNotEmpty &&
         _trailingPunctuation.contains(working[working.length - 1])) {
       trailing = working[working.length - 1];
       working = working.substring(0, working.length - 1);
     }
 
-    // Detect and strip +1 suffix
+    // Detect and strip +1 suffix for OVERLAY icons only.
+    //
+    // CRITICAL: Only strip if something remains after stripping (length > 2).
+    // This distinguishes between:
+    //   - "MOVE+1" (length 7) → strip to "MOVE", overlay = true
+    //   - "+1" (length 2) → keep as "+1", overlay = false
+    //
+    // Without the length check, "+1" would become "" with overlay = true,
+    // causing tryGetAssetConfig("") to return null and the attack modifier
+    // icon would not render.
     bool plusOne = false;
-    if (working.endsWith('+1')) {
+    if (working.endsWith('+1') && working.length > 2) {
       working = working.substring(0, working.length - 2);
       plusOne = true;
     }
