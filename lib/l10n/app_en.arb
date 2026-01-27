@@ -1,9 +1,7 @@
 {
   "@@locale": "en",
-
   "appTitleIOS": "Gloomhaven Utility",
   "appTitleAndroid": "Gloomhaven Companion",
-
   "search": "Search...",
   "close": "Close",
   "cancel": "Cancel",
@@ -18,20 +16,17 @@
   "restoring": "Restoring...",
   "solve": "Solve",
   "unlock": "Unlock",
-
   "settings": "Settings",
   "changelog": "Changelog",
   "license": "License",
   "supportAndFeedback": "Support & Feedback",
-
   "name": "Name",
   "xp": "XP",
   "gold": "Gold",
   "resources": "Resources",
   "notes": "Notes",
   "retired": "(retired)",
-
-  "previousRetirements": "Previous retirements",
+  "previousRetirements": "Previous Retirements",
   "pocketItemsAllowed": "{count} pocket item{count, plural, =1{} other{s}} allowed",
   "@pocketItemsAllowed": {
     "placeholders": {
@@ -40,8 +35,7 @@
       }
     }
   },
-  "battleGoalCheckmarks": "Battle Goal Checkmarks",
-
+  "battleGoals": "Battle Goals",
   "cardLevel": "Card Level",
   "previousEnhancements": "Previous Enhancements",
   "enhancementType": "Enhancement Type",
@@ -70,12 +64,10 @@
   "lossNonPersistent": "Loss non-persistent",
   "persistent": "Persistent",
   "eligibleFor": "Eligible For",
-
   "gameplay": "GAMEPLAY",
   "display": "DISPLAY",
   "backupAndRestore": "BACKUP & RESTORE",
   "testing": "TESTING",
-
   "customClasses": "Custom Classes",
   "customClassesDescription": "Include Crimson Scales, Trail of Ashes, and 'released' custom classes created by the CCUG community",
   "solveEnvelopeX": "Solve 'Envelope X'",
@@ -88,7 +80,6 @@
   "enterPassword": "What is the password for unlocking this envelope?",
   "password": "Password",
   "vanquisherUnlocked": "Vanquisher unlocked",
-
   "brightness": "Brightness",
   "dark": "Dark",
   "light": "Light",
@@ -96,7 +87,6 @@
   "useInterFontDescription": "Replace stylized fonts with Inter to improve readability",
   "showRetiredCharacters": "Show Retired Characters",
   "showRetiredCharactersDescription": "Toggle visibility of retired characters in the Characters tab to reduce clutter",
-
   "backup": "Backup",
   "backupDescription": "Backup your current characters",
   "restore": "Restore",
@@ -122,14 +112,12 @@
       }
     }
   },
-
   "createAll": "Create All",
   "gloomhaven": "Gloomhaven",
   "frosthaven": "Frosthaven",
   "crimsonScales": "Crimson Scales",
   "custom": "Custom",
   "andVariants": "& variants",
-
   "createCharacterPrompt": "Create {article} character using the button below, or restore a backup from the Settings menu",
   "@createCharacterPrompt": {
     "placeholders": {
@@ -140,7 +128,6 @@
   },
   "articleA": "a",
   "articleYourFirst": "your first",
-
   "class_": "Class",
   "classWithVariant": "Class ({variant})",
   "@classWithVariant": {

@@ -292,8 +292,6 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   }
 
   Widget _buildExpandedContent(ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-
     return Column(
       children: [
         // Header with close button
@@ -342,7 +340,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           ),
         ),
 
-        Divider(height: 1, color: colorScheme.outlineVariant),
+        Divider(height: 1, color: Theme.of(context).dividerTheme.color),
 
         // Breakdown content
         Expanded(
@@ -371,7 +369,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       itemCount: widget.steps.length,
-      separatorBuilder: (context, index) => const Divider(height: 1),
+      separatorBuilder: (context, index) =>
+          Divider(height: 1, color: Theme.of(context).dividerTheme.color),
       itemBuilder: (context, index) =>
           _buildStepRow(theme, widget.steps[index]),
     );

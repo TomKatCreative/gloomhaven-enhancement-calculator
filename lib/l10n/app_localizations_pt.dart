@@ -87,7 +87,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get retired => '(aposentado)';
 
   @override
-  String get previousRetirements => 'Aposentadorias anteriores';
+  String get previousRetirements => 'Aposentadorias Anteriores';
 
   @override
   String pocketItemsAllowed(int count) {
@@ -101,7 +101,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get battleGoalCheckmarks => 'Marcas de Objetivo de Batalha';
+  String get battleGoals => 'Objetivo de Batalha';
 
   @override
   String get cardLevel => 'Nível da Carta';

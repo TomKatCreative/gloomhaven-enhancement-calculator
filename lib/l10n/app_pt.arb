@@ -1,9 +1,7 @@
 {
   "@@locale": "pt",
-
   "appTitleIOS": "Gloomhaven Utility",
   "appTitleAndroid": "Gloomhaven Companion",
-
   "search": "Pesquisar...",
   "close": "Fechar",
   "cancel": "Cancelar",
@@ -18,23 +16,19 @@
   "restoring": "Restaurando...",
   "solve": "Resolver",
   "unlock": "Desbloquear",
-
   "settings": "Configurações",
   "changelog": "Changelog",
   "license": "Licença",
   "supportAndFeedback": "Suporte e Feedback",
-
   "name": "Nome",
   "xp": "XP",
   "gold": "Ouro",
   "resources": "Recursos",
   "notes": "Notas",
   "retired": "(aposentado)",
-
-  "previousRetirements": "Aposentadorias anteriores",
+  "previousRetirements": "Aposentadorias Anteriores",
   "pocketItemsAllowed": "{count, plural, =1{1 item de bolso permitido} other{{count} itens de bolso permitidos}}",
-  "battleGoalCheckmarks": "Marcas de Objetivo de Batalha",
-
+  "battleGoals": "Objetivo de Batalha",
   "cardLevel": "Nível da Carta",
   "previousEnhancements": "Melhorias Anteriores",
   "enhancementType": "Tipo de Melhoria",
@@ -63,12 +57,10 @@
   "lossNonPersistent": "Perda não persistente",
   "persistent": "Persistente",
   "eligibleFor": "Elegível Para",
-
   "gameplay": "JOGABILIDADE",
   "display": "EXIBIÇÃO",
   "backupAndRestore": "BACKUP E RESTAURAÇÃO",
   "testing": "TESTE",
-
   "customClasses": "Classes Personalizadas",
   "customClassesDescription": "Incluir Crimson Scales, Trail of Ashes e classes personalizadas 'lançadas' criadas pela comunidade CCUG",
   "solveEnvelopeX": "Resolver 'Envelope X'",
@@ -81,7 +73,6 @@
   "enterPassword": "Qual é a senha para desbloquear este envelope?",
   "password": "Senha",
   "vanquisherUnlocked": "Vanquisher desbloqueado",
-
   "brightness": "Brilho",
   "dark": "Escuro",
   "light": "Claro",
@@ -89,7 +80,6 @@
   "useInterFontDescription": "Substituir fontes estilizadas por Inter para melhorar a legibilidade",
   "showRetiredCharacters": "Mostrar Personagens Aposentados",
   "showRetiredCharactersDescription": "Alternar visibilidade de personagens aposentados na aba Personagens para reduzir a desordem",
-
   "backup": "Backup",
   "backupDescription": "Fazer backup dos seus personagens atuais",
   "restore": "Restaurar",
@@ -101,18 +91,15 @@
   "restoreWarning": "Restaurar um arquivo de backup substituirá todos os personagens atuais. Deseja continuar?",
   "errorDuringRestore": "Erro Durante a Operação de Restauração",
   "restoreErrorMessage": "Houve um erro durante o processo de restauração. Seus dados existentes foram salvos e seu backup não foi modificado. Entre em contato com o desenvolvedor (através do menu Configurações) com seu arquivo de backup existente e estas informações:\n\n{error}",
-
   "createAll": "Criar Todos",
   "gloomhaven": "Gloomhaven",
   "frosthaven": "Frosthaven",
   "crimsonScales": "Crimson Scales",
   "custom": "Personalizado",
   "andVariants": "e variantes",
-
   "createCharacterPrompt": "Crie {article} personagem usando o botão abaixo, ou restaure um backup pelo menu Configurações",
   "articleA": "um",
   "articleYourFirst": "seu primeiro",
-
   "class_": "Classe",
   "classWithVariant": "Classe ({variant})",
   "startingLevel": "Nível inicial",

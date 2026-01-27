@@ -34,15 +34,19 @@ class EnhancementTypeSelector extends StatefulWidget {
     return showModalBottomSheet<Enhancement>(
       context: context,
       isScrollControlled: true,
-      useSafeArea: true,
+      useSafeArea: false,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (context) => EnhancementTypeSelector(
-        currentSelection: currentSelection,
-        edition: edition,
-        onSelected: onSelected,
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: EnhancementTypeSelector(
+          currentSelection: currentSelection,
+          edition: edition,
+          onSelected: onSelected,
+        ),
       ),
     );
   }
@@ -170,7 +174,10 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
                       ),
                     ),
                   ),
-                  const Divider(height: 1),
+                  Divider(
+                    height: 1,
+                    color: Theme.of(context).dividerTheme.color,
+                  ),
                 ],
               ),
             ),
@@ -224,7 +231,7 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
         children: [
-          Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+          Expanded(child: Divider(color: theme.dividerTheme.color)),
           const SizedBox(width: 12),
           if (assetKey != null) ...[
             ThemedSvg(assetKey: assetKey, width: 24, height: 24),
@@ -238,7 +245,7 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+          Expanded(child: Divider(color: theme.dividerTheme.color)),
         ],
       ),
     );

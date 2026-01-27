@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @previousRetirements.
   ///
   /// In en, this message translates to:
-  /// **'Previous retirements'**
+  /// **'Previous Retirements'**
   String get previousRetirements;
 
   /// No description provided for @pocketItemsAllowed.
@@ -266,11 +266,11 @@ abstract class AppLocalizations {
   /// **'{count} pocket item{count, plural, =1{} other{s}} allowed'**
   String pocketItemsAllowed(int count);
 
-  /// No description provided for @battleGoalCheckmarks.
+  /// No description provided for @battleGoals.
   ///
   /// In en, this message translates to:
-  /// **'Battle Goal Checkmarks'**
-  String get battleGoalCheckmarks;
+  /// **'Battle Goals'**
+  String get battleGoals;
 
   /// No description provided for @cardLevel.
   ///
