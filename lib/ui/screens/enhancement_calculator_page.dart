@@ -330,51 +330,38 @@ class _EnhancementTypeCardState extends State<_EnhancementTypeCard>
             vertical: mediumPadding,
             horizontal: largePadding,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              // Row with info button, centered selector, and balancing spacer
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // Info button on left
-                  IconButton(
-                    icon: const Icon(Icons.info_outline_rounded),
-                    onPressed: enhancement != null
-                        ? () => showDialog<void>(
-                            context: context,
-                            builder: (_) =>
-                                InfoDialog(category: enhancement.category),
-                          )
-                        : null,
-                  ),
-                  // Centered enhancement type selector
-                  Expanded(
-                    child: EnhancementTypeBody(
-                      model: widget.enhancementCalculatorModel,
-                      edition: widget.edition,
-                    ),
-                  ),
-                  // Spacer to balance the info button (same width as IconButton)
-                  const SizedBox(width: 48),
-                ],
+              // Info button on left
+              IconButton(
+                icon: const Icon(Icons.info_outline_rounded),
+                onPressed: enhancement != null
+                    ? () => showDialog<void>(
+                        context: context,
+                        builder: (_) =>
+                            InfoDialog(category: enhancement.category),
+                      )
+                    : null,
               ),
-              // Cost display below (only when enhancement is selected)
-              if (enhancement != null) ...[
-                const SizedBox(height: mediumPadding),
-                CostDisplay(
-                  config: CostDisplayConfig(
-                    baseCost: enhancement.cost(edition: widget.edition),
-                    discountedCost:
-                        widget.enhancementCalculatorModel.enhancementCost(
-                      enhancement,
-                    ),
-                    marker: widget.enhancementCalculatorModel.hailsDiscount
-                        ? '\u2021'
-                        : null,
-                  ),
+              // Enhancement type selector with inline cost
+              Expanded(
+                child: EnhancementTypeBody(
+                  model: widget.enhancementCalculatorModel,
+                  edition: widget.edition,
+                  costConfig: enhancement != null
+                      ? CostDisplayConfig(
+                          baseCost: enhancement.cost(edition: widget.edition),
+                          discountedCost:
+                              widget.enhancementCalculatorModel.enhancementCost(
+                            enhancement,
+                          ),
+                          marker: widget.enhancementCalculatorModel.hailsDiscount
+                              ? '\u2021'
+                              : null,
+                        )
+                      : null,
                 ),
-              ],
+              ),
             ],
           ),
         ),

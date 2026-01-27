@@ -1,28 +1,34 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/enhancement_type_selector.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
-/// Icon size for the prominent enhancement type display.
-const double _prominentIconSize = 40;
+/// Icon size for the enhancement type display.
+const double _iconSize = 30;
 
 /// The body content for the Enhancement Type selector card.
 ///
 /// Contains a tappable button that opens a bottom sheet for selecting
-/// enhancement types, and displays the current selection with its cost.
+/// enhancement types, and displays the current selection with its cost inline.
 class EnhancementTypeBody extends StatelessWidget {
   final EnhancementCalculatorModel model;
   final GameEdition edition;
+
+  /// Optional cost configuration to display inline with the enhancement.
+  final CostDisplayConfig? costConfig;
 
   const EnhancementTypeBody({
     super.key,
     required this.model,
     required this.edition,
+    this.costConfig,
   });
 
   @override
@@ -56,7 +62,6 @@ class EnhancementTypeBody extends StatelessWidget {
                   ? _buildSelectedEnhancement(context, enhancement)
                   : Text(
                       AppLocalizations.of(context).type,
-                      textAlign: TextAlign.center,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -79,80 +84,82 @@ class EnhancementTypeBody extends StatelessWidget {
         enhancement.category == EnhancementCategory.summonPlusOne;
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (enhancement.assetKey != null) ...[
           _buildEnhancementIcon(enhancement, isPlusOne),
           const SizedBox(width: 12),
         ],
         Flexible(
-          child: Text(
+          child: AutoSizeText(
             enhancement.name,
-            style: theme.textTheme.titleLarge,
-            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium,
+            maxLines: 1,
+            minFontSize: 10,
           ),
         ),
+        if (costConfig != null) ...[
+          const SizedBox(width: 12),
+          CostDisplay(config: costConfig!),
+        ],
       ],
     );
   }
 
   Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
     if (enhancement.name == 'Element') {
-      // Scale factor from standard iconSize (30) to prominent size (40)
-      const scale = _prominentIconSize / 30;
       return SizedBox(
-        width: _prominentIconSize,
-        height: _prominentIconSize,
+        width: _iconSize,
+        height: _iconSize,
         child: Stack(
           children: [
             Positioned(
-              bottom: 5 * scale,
-              top: 5 * scale,
-              left: 5 * scale,
+              bottom: 5,
+              top: 5,
+              left: 5,
               child: SvgPicture.asset(
                 'images/elements/elem_dark.svg',
-                width: 10 * scale,
+                width: 10,
               ),
             ),
             Positioned(
-              top: 4 * scale,
-              left: 7 * scale,
+              top: 4,
+              left: 7,
               child: SvgPicture.asset(
                 'images/elements/elem_air.svg',
-                width: 11 * scale,
+                width: 11,
               ),
             ),
             Positioned(
-              top: 3 * scale,
-              right: 6 * scale,
+              top: 3,
+              right: 6,
               child: SvgPicture.asset(
                 'images/elements/elem_ice.svg',
-                width: 12 * scale,
+                width: 12,
               ),
             ),
             Positioned(
               top: 0,
-              right: 2 * scale,
-              bottom: 2 * scale,
+              right: 2,
+              bottom: 2,
               child: SvgPicture.asset(
                 'images/elements/elem_fire.svg',
-                width: 13 * scale,
+                width: 13,
               ),
             ),
             Positioned(
-              bottom: 1 * scale,
-              right: 4 * scale,
+              bottom: 1,
+              right: 4,
               child: SvgPicture.asset(
                 'images/elements/elem_earth.svg',
-                width: 14 * scale,
+                width: 14,
               ),
             ),
             Positioned(
               bottom: 0,
-              left: 3 * scale,
+              left: 3,
               child: SvgPicture.asset(
                 'images/elements/elem_light.svg',
-                width: 15 * scale,
+                width: 15,
               ),
             ),
           ],
@@ -162,7 +169,7 @@ class EnhancementTypeBody extends StatelessWidget {
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: _prominentIconSize,
+      width: _iconSize,
       showPlusOneOverlay: isPlusOne,
     );
   }
