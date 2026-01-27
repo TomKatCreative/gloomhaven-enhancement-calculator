@@ -60,11 +60,17 @@ class CharacterScreen extends StatelessWidget {
                 child: _StatsSection(character: character),
               ),
             ),
-            // PREVIOUS RETIREMENTS (edit mode only)
+            // BATTLE GOAL CHECKMARKS & PREVIOUS RETIREMENTS (edit mode only)
             if (model.isEditMode && !character.isRetired)
-              Padding(
-                padding: const EdgeInsets.all(mediumPadding),
-                child: _PreviousRetirementsSection(character: character),
+              Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: mediumPadding,
+                    vertical: smallPadding,
+                  ),
+                  child: _CheckmarksAndRetirementsRow(character: character),
+                ),
               ),
             // RESOURCES
             Padding(
@@ -83,10 +89,6 @@ class CharacterScreen extends StatelessWidget {
                     : const SizedBox(),
               ),
             ),
-            // BATTLE GOAL CHECKMARKS
-            if (context.read<CharactersModel>().isEditMode &&
-                !character.isRetired)
-              _BattleGoalCheckmarksSection(character: character),
             // PERKS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
@@ -113,31 +115,121 @@ class CharacterScreen extends StatelessWidget {
   }
 }
 
-class _PreviousRetirementsSection extends StatelessWidget {
-  const _PreviousRetirementsSection({required this.character});
+/// Combined section showing Battle Goal Checkmarks and Previous Retirements.
+/// Layout: Row with two columns side by side.
+class _CheckmarksAndRetirementsRow extends StatelessWidget {
+  const _CheckmarksAndRetirementsRow({required this.character});
   final Character character;
+
   @override
   Widget build(BuildContext context) {
-    final charactersModel = context.read<CharactersModel>();
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 200),
-      child: TextFormField(
-        key: ValueKey('previous_retirements_${character.uuid}'),
-        initialValue: character.previousRetirements.toString(),
-        textAlign: TextAlign.center,
-        enableInteractiveSelection: false,
-        onChanged: (String value) => charactersModel.updateCharacter(
-          character..previousRetirements = value.isEmpty ? 0 : int.parse(value),
+    final charactersModel = context.watch<CharactersModel>();
+    final theme = Theme.of(context);
+    final isRetired = character.isRetired;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Battle Goal Checkmarks (left column)
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AutoSizeText(
+                AppLocalizations.of(context).battleGoals,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                minFontSize: 10,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: smallPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: character.checkMarks > 0 && !isRetired
+                        ? () => charactersModel.decreaseCheckmark(character)
+                        : null,
+                  ),
+                  Text(
+                    '${character.checkMarks}/18',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.add_circle),
+                    onPressed: character.checkMarks < 18 && !isRetired
+                        ? () => charactersModel.increaseCheckmark(character)
+                        : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-        decoration: InputDecoration(
-          labelText: AppLocalizations.of(context).previousRetirements,
-          border: const OutlineInputBorder(),
+        // Vertical divider (matches CheckRowDivider style from perk rows)
+        Container(
+          width: 1,
+          height: 52,
+          margin: const EdgeInsets.symmetric(horizontal: largePadding),
+          color: theme.dividerTheme.color,
         ),
-        inputFormatters: [
-          FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
-        ],
-        keyboardType: TextInputType.number,
-      ),
+        // Previous Retirements (right column)
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AutoSizeText(
+                AppLocalizations.of(context).previousRetirements,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                minFontSize: 10,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: smallPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: character.previousRetirements > 0 && !isRetired
+                        ? () => charactersModel.updateCharacter(
+                              character
+                                ..previousRetirements =
+                                    character.previousRetirements - 1,
+                            )
+                        : null,
+                  ),
+                  Text(
+                    '${character.previousRetirements}',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.add_circle),
+                    onPressed: !isRetired
+                        ? () => charactersModel.updateCharacter(
+                              character
+                                ..previousRetirements =
+                                    character.previousRetirements + 1,
+                            )
+                        : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -428,7 +520,7 @@ class _StatsSectionState extends State<_StatsSection> {
           ),
         ),
         Tooltip(
-          message: AppLocalizations.of(context).battleGoalCheckmarks,
+          message: AppLocalizations.of(context).battleGoals,
           child: SizedBox(
             width: 90,
             child: Row(
@@ -603,63 +695,5 @@ class _NotesSection extends StatelessWidget {
             : Text(character.notes),
       ],
     );
-  }
-}
-
-class _BattleGoalCheckmarksSection extends StatelessWidget {
-  const _BattleGoalCheckmarksSection({required this.character});
-  final Character character;
-
-  @override
-  Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.watch<CharactersModel>();
-    return charactersModel.isEditMode
-        ? Padding(
-            padding: const EdgeInsets.all(mediumPadding),
-            child: Column(
-              children: <Widget>[
-                AutoSizeText(
-                  AppLocalizations.of(context).battleGoalCheckmarks,
-                  textAlign: TextAlign.center,
-                  minFontSize: titleFontSize,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Visibility(
-                      visible: character.checkMarks > 0 && !character.isRetired,
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: IconButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        icon: const Icon(Icons.remove_circle),
-                        onPressed: () =>
-                            charactersModel.decreaseCheckmark(character),
-                      ),
-                    ),
-                    Text(
-                      '${character.checkMarks} / 18',
-                      style: const TextStyle(fontSize: titleFontSize),
-                    ),
-                    Visibility(
-                      visible:
-                          character.checkMarks < 18 && !character.isRetired,
-                      maintainSize: true,
-                      maintainAnimation: true,
-                      maintainState: true,
-                      child: IconButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        icon: const Icon(Icons.add_circle),
-                        onPressed: () =>
-                            charactersModel.increaseCheckmark(character),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        : Container();
   }
 }

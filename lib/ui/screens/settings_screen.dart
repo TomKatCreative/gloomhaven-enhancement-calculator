@@ -532,7 +532,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   try {
                                     String value = await DatabaseHelper.instance
                                         .generateBackup();
-                                    downloadPath = '/storage/emulated/0/Download';
+                                    downloadPath =
+                                        '/storage/emulated/0/Download';
                                     File backupFile = File(
                                       '$downloadPath/${fileNameController.text}.txt',
                                     );
@@ -546,8 +547,9 @@ class SettingsScreenState extends State<SettingsScreen> {
                                       ..showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                            AppLocalizations.of(context)
-                                                .backupError,
+                                            AppLocalizations.of(
+                                              context,
+                                            ).backupError,
                                           ),
                                         ),
                                       );
@@ -841,7 +843,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ],
                 // Extra padding to scroll content above bottom sheet
-                const SizedBox(height: 200),
+                const SizedBox(height: 160),
               ],
             ),
           ),
