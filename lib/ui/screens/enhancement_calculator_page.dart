@@ -9,12 +9,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator_section_card.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/card_level_body.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/enhancement_type_body.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/info_button_config.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/previous_enhancements_body.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_cost_chip.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -43,6 +38,15 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
       children: [
         Column(
           children: [
+            // 1. ENHANCEMENT TYPE - pinned at top
+            Container(
+              constraints: const BoxConstraints(maxWidth: maxWidth),
+              padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+              child: _EnhancementTypeCard(
+                edition: edition,
+                enhancementCalculatorModel: enhancementCalculatorModel,
+              ),
+            ),
             Expanded(
               child: Container(
                 constraints: const BoxConstraints(maxWidth: maxWidth),
@@ -58,12 +62,6 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                   children: <Widget>[
                     // === CALCULATION INPUTS (change per enhancement) ===
 
-                    // 1. ENHANCEMENT TYPE - core selection
-                    _EnhancementTypeCard(
-                      edition: edition,
-                      enhancementCalculatorModel: enhancementCalculatorModel,
-                    ),
-
                     // 2. CARD LEVEL
                     _CardLevelCard(
                       edition: edition,
@@ -78,116 +76,12 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                       darkTheme: darkTheme,
                     ),
 
-                    // 4. MODIFIERS
-
-                    // 4a. MULTIPLE TARGETS
-                    CalculatorSectionCard(
-                      layout: CardLayoutVariant.toggle,
-                      infoConfig: InfoButtonConfig.titleMessage(
-                        title: Strings.multipleTargetsInfoTitle,
-                        message: Strings.multipleTargetsInfoBody(
-                          context,
-                          edition: edition,
-                          enhancerLvl2:
-                              edition.hasEnhancerLevels &&
-                              SharedPrefs().enhancerLvl2,
-                          darkMode: darkTheme,
-                        ),
-                      ),
-                      title: AppLocalizations.of(context).multipleTargets,
-                      toggleValue: enhancementCalculatorModel.multipleTargets,
-                      toggleEnabled:
-                          !enhancementCalculatorModel.disableMultiTargetsSwitch,
-                      onToggleChanged: (bool value) {
-                        enhancementCalculatorModel.multipleTargets = value;
-                      },
+                    // 4. MODIFIERS - grouped card
+                    _ModifiersGroupCard(
+                      edition: edition,
+                      enhancementCalculatorModel: enhancementCalculatorModel,
+                      darkTheme: darkTheme,
                     ),
-
-                    // 4b. LOSS NON-PERSISTENT (GH2E and FH only)
-                    if (edition.hasLostModifier)
-                      CalculatorSectionCard(
-                        layout: CardLayoutVariant.toggle,
-                        infoConfig: InfoButtonConfig.titleMessage(
-                          title: Strings.lostNonPersistentInfoTitle(
-                            edition: edition,
-                          ),
-                          message: Strings.lostNonPersistentInfoBody(
-                            context,
-                            edition,
-                            darkTheme,
-                          ),
-                        ),
-                        subtitle: AppLocalizations.of(
-                          context,
-                        ).lossNonPersistent,
-                        titleWidget: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            ThemedSvg(assetKey: 'LOSS', width: iconSize),
-                            if (edition.hasPersistentModifier) ...[
-                              const SizedBox(width: largePadding),
-                              SizedBox(
-                                width: iconSize + 16,
-                                height: iconSize + 11,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    ThemedSvg(
-                                      assetKey: 'PERSISTENT',
-                                      width: iconSize,
-                                    ),
-                                    Positioned(
-                                      right: 5,
-                                      child: SvgPicture.asset(
-                                        'images/ui/not.svg',
-                                        width: iconSize + 11,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        toggleValue:
-                            enhancementCalculatorModel.lostNonPersistent,
-                        toggleEnabled:
-                            !enhancementCalculatorModel.persistent &&
-                            (edition.hasPersistentModifier ||
-                                enhancementCalculatorModel
-                                        .enhancement
-                                        ?.category !=
-                                    EnhancementCategory.summonPlusOne),
-                        onToggleChanged: (bool value) {
-                          enhancementCalculatorModel.lostNonPersistent = value;
-                        },
-                      ),
-
-                    // 4c. PERSISTENT (FH only)
-                    if (edition.hasPersistentModifier)
-                      CalculatorSectionCard(
-                        layout: CardLayoutVariant.toggle,
-                        infoConfig: InfoButtonConfig.titleMessage(
-                          title: Strings.persistentInfoTitle,
-                          message: Strings.persistentInfoBody(
-                            context,
-                            darkTheme,
-                          ),
-                        ),
-                        subtitle: AppLocalizations.of(context).persistent,
-                        titleWidget: ThemedSvg(
-                          assetKey: 'PERSISTENT',
-                          width: iconSize,
-                        ),
-                        toggleValue: enhancementCalculatorModel.persistent,
-                        toggleEnabled:
-                            enhancementCalculatorModel.enhancement?.category !=
-                                EnhancementCategory.summonPlusOne &&
-                            !enhancementCalculatorModel.lostNonPersistent,
-                        onToggleChanged: (bool value) {
-                          enhancementCalculatorModel.persistent = value;
-                        },
-                      ),
 
                     // === DISCOUNTS & SETTINGS (set once) ===
                     Padding(
@@ -196,7 +90,11 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                       ),
                       child: Row(
                         children: [
-                          const Expanded(child: Divider()),
+                          Expanded(
+                            child: Divider(
+                              color: Theme.of(context).dividerTheme.color,
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: largePadding,
@@ -211,79 +109,22 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                                   ),
                             ),
                           ),
-                          const Expanded(child: Divider()),
+                          Expanded(
+                            child: Divider(
+                              color: Theme.of(context).dividerTheme.color,
+                            ),
+                          ),
                         ],
                       ),
                     ),
 
-                    // 5. HAIL'S DISCOUNT
-                    CalculatorSectionCard(
-                      layout: CardLayoutVariant.toggle,
-                      infoConfig: InfoButtonConfig.titleMessage(
-                        title: Strings.hailsDiscountTitle,
-                        message: Strings.hailsDiscountInfoBody(
-                          context,
-                          darkTheme,
-                        ),
-                      ),
-                      title: AppLocalizations.of(context).hailsDiscount,
-                      toggleValue: enhancementCalculatorModel.hailsDiscount,
-                      onToggleChanged: (bool value) {
-                        enhancementCalculatorModel.hailsDiscount = value;
-                      },
+                    // 5. DISCOUNTS & SETTINGS - grouped card
+                    _DiscountsGroupCard(
+                      edition: edition,
+                      enhancementCalculatorModel: enhancementCalculatorModel,
+                      darkTheme: darkTheme,
+                      onSettingChanged: () => setState(() {}),
                     ),
-
-                    // 6. TEMPORARY ENHANCEMENT
-                    CalculatorSectionCard(
-                      layout: CardLayoutVariant.toggle,
-                      infoConfig: InfoButtonConfig.titleMessage(
-                        title: Strings.temporaryEnhancement,
-                        message: Strings.temporaryEnhancementInfoBody(
-                          context,
-                          darkTheme,
-                        ),
-                      ),
-                      title: AppLocalizations.of(context).temporaryEnhancement,
-                      subtitle: AppLocalizations.of(context).variant,
-                      toggleValue:
-                          enhancementCalculatorModel.temporaryEnhancementMode,
-                      onToggleChanged: (bool value) {
-                        enhancementCalculatorModel.temporaryEnhancementMode =
-                            value;
-                      },
-                    ),
-
-                    // 7. SCENARIO 114 REWARD (PARTY BOON) - Gloomhaven/GH2E only
-                    if (edition.supportsPartyBoon)
-                      CalculatorSectionCard(
-                        layout: CardLayoutVariant.toggle,
-                        infoConfig: InfoButtonConfig.titleMessage(
-                          title: Strings.scenario114RewardTitle,
-                          message: Strings.scenario114RewardInfoBody(
-                            context,
-                            darkTheme,
-                          ),
-                        ),
-                        title: AppLocalizations.of(context).scenario114Reward,
-                        subtitle: AppLocalizations.of(
-                          context,
-                        ).forgottenCirclesSpoilers,
-                        toggleValue: SharedPrefs().partyBoon,
-                        onToggleChanged: (bool value) {
-                          setState(() {
-                            SharedPrefs().partyBoon = value;
-                            enhancementCalculatorModel.calculateCost();
-                          });
-                        },
-                      ),
-
-                    // 8. BUILDING 44 (ENHANCER) - Frosthaven only
-                    if (edition.hasEnhancerLevels)
-                      _Building44Card(
-                        enhancementCalculatorModel: enhancementCalculatorModel,
-                        darkTheme: darkTheme,
-                        onDialogClosed: () => setState(() {}),
-                      ),
                   ],
                 ),
               ),
@@ -389,8 +230,8 @@ class _PreviousEnhancementsCard extends StatelessWidget {
   }
 }
 
-/// Enhancement Type selector card using the new component system.
-class _EnhancementTypeCard extends StatelessWidget {
+/// Enhancement Type selector card - pinned with animated glow effect.
+class _EnhancementTypeCard extends StatefulWidget {
   final dynamic edition;
   final EnhancementCalculatorModel enhancementCalculatorModel;
 
@@ -400,91 +241,359 @@ class _EnhancementTypeCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final enhancement = enhancementCalculatorModel.enhancement;
-
-    return CalculatorSectionCard(
-      infoConfig: enhancement != null
-          ? InfoButtonConfig.category(category: enhancement.category)
-          : InfoButtonConfig.titleMessage(
-              title: '',
-              message: RichText(text: const TextSpan()),
-              enabled: false,
-            ),
-      title: AppLocalizations.of(context).enhancementType,
-      body: EnhancementTypeBody(
-        model: enhancementCalculatorModel,
-        edition: edition,
-      ),
-    );
-  }
+  State<_EnhancementTypeCard> createState() => _EnhancementTypeCardState();
 }
 
-/// Building 44 (Enhancer) card - special case with dialog.
-class _Building44Card extends StatelessWidget {
-  final EnhancementCalculatorModel enhancementCalculatorModel;
-  final bool darkTheme;
-  final VoidCallback onDialogClosed;
+class _EnhancementTypeCardState extends State<_EnhancementTypeCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _glowController;
+  late Animation<double> _glowAnimation;
 
-  const _Building44Card({
-    required this.enhancementCalculatorModel,
-    required this.darkTheme,
-    required this.onDialogClosed,
-  });
+  @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _glowAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
+    );
+    // Start pulsing if no enhancement selected
+    if (widget.enhancementCalculatorModel.enhancement == null) {
+      _glowController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_EnhancementTypeCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final hasEnhancement = widget.enhancementCalculatorModel.enhancement != null;
+    final hadEnhancement =
+        oldWidget.enhancementCalculatorModel.enhancement != null;
+
+    if (hasEnhancement && !hadEnhancement) {
+      // Enhancement was selected - stop pulsing
+      _glowController.stop();
+      _glowController.value = 1.0;
+    } else if (!hasEnhancement && hadEnhancement) {
+      // Enhancement was cleared - start pulsing
+      _glowController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _glowController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final enhancement = widget.enhancementCalculatorModel.enhancement;
+    final hasEnhancement = enhancement != null;
 
-    return Card(
-      elevation: isDark ? 4 : 1,
-      color: isDark
-          ? colorScheme.surfaceContainerHighest
-          : colorScheme.surfaceContainerLow,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            ListTile(
-              leading: IconButton(
-                icon: const Icon(Icons.info_outline_rounded),
-                onPressed: () => showDialog<void>(
-                  context: context,
-                  builder: (_) {
-                    return InfoDialog(
-                      title: Strings.building44Title,
-                      message: Strings.building44InfoBody(context, darkTheme),
-                    );
-                  },
+    // Glow color based on theme
+    final glowColor = colorScheme.primary;
+
+    return AnimatedBuilder(
+      animation: _glowAnimation,
+      builder: (context, child) {
+        // Stronger glow when no enhancement, subtle when selected
+        final glowIntensity = hasEnhancement ? 0.4 : _glowAnimation.value;
+        final glowSpread = hasEnhancement ? 2.0 : 4.0 * _glowAnimation.value;
+        final glowBlur = hasEnhancement ? 8.0 : 12.0 * _glowAnimation.value;
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: glowColor.withValues(alpha: glowIntensity * 0.5),
+                blurRadius: glowBlur,
+                spreadRadius: glowSpread,
+              ),
+            ],
+          ),
+          child: child,
+        );
+      },
+      child: Card(
+        elevation: isDark ? 4 : 2,
+        color: isDark
+            ? colorScheme.surfaceContainerHighest
+            : colorScheme.surfaceContainerLow,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: mediumPadding,
+            horizontal: largePadding,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Row with info button, centered selector, and balancing spacer
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // Info button on left
+                  IconButton(
+                    icon: const Icon(Icons.info_outline_rounded),
+                    onPressed: enhancement != null
+                        ? () => showDialog<void>(
+                            context: context,
+                            builder: (_) =>
+                                InfoDialog(category: enhancement.category),
+                          )
+                        : null,
+                  ),
+                  // Centered enhancement type selector
+                  Expanded(
+                    child: EnhancementTypeBody(
+                      model: widget.enhancementCalculatorModel,
+                      edition: widget.edition,
+                    ),
+                  ),
+                  // Spacer to balance the info button (same width as IconButton)
+                  const SizedBox(width: 48),
+                ],
+              ),
+              // Cost display below (only when enhancement is selected)
+              if (enhancement != null) ...[
+                const SizedBox(height: mediumPadding),
+                CostDisplay(
+                  config: CostDisplayConfig(
+                    baseCost: enhancement.cost(edition: widget.edition),
+                    discountedCost:
+                        widget.enhancementCalculatorModel.enhancementCost(
+                      enhancement,
+                    ),
+                    marker: widget.enhancementCalculatorModel.hailsDiscount
+                        ? '\u2021'
+                        : null,
+                  ),
                 ),
-              ),
-              title: Text(AppLocalizations.of(context).building44),
-              subtitle: Text(
-                AppLocalizations.of(context).frosthavenSpoilers,
-                style: Theme.of(
-                  context,
-                ).textTheme.titleSmall?.copyWith(color: Colors.grey),
-              ),
-              onTap: () => _showEnhancerDialog(context),
-            ),
-            Positioned(
-              right: 32.5,
-              child: IgnorePointer(
-                ignoring: true,
-                child: Icon(
-                  Icons.open_in_new,
-                  size: 30,
-                  color: colorScheme.onSurface.withValues(alpha: .75),
-                ),
-              ),
-            ),
-            const SizedBox(width: 32.5),
-          ],
+              ],
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+/// Modifiers group card - groups Multi-target, Loss, and Persistent toggles.
+class _ModifiersGroupCard extends StatelessWidget {
+  final dynamic edition;
+  final EnhancementCalculatorModel enhancementCalculatorModel;
+  final bool darkTheme;
+
+  const _ModifiersGroupCard({
+    required this.edition,
+    required this.enhancementCalculatorModel,
+    required this.darkTheme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final items = <ToggleGroupItem>[
+      // Multi-target
+      ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.multipleTargetsInfoTitle,
+          message: Strings.multipleTargetsInfoBody(
+            context,
+            edition: edition,
+            enhancerLvl2:
+                edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
+            darkMode: darkTheme,
+          ),
+        ),
+        title: AppLocalizations.of(context).multipleTargets,
+        value: enhancementCalculatorModel.multipleTargets,
+        enabled: !enhancementCalculatorModel.disableMultiTargetsSwitch,
+        onChanged: (value) {
+          enhancementCalculatorModel.multipleTargets = value;
+        },
+      ),
+
+      // Loss Non-Persistent (GH2E and FH only)
+      if (edition.hasLostModifier)
+        ToggleGroupItem(
+          infoConfig: InfoButtonConfig.titleMessage(
+            title: Strings.lostNonPersistentInfoTitle(edition: edition),
+            message: Strings.lostNonPersistentInfoBody(
+              context,
+              edition,
+              darkTheme,
+            ),
+          ),
+          titleWidget: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ThemedSvg(assetKey: 'LOSS', width: iconSize),
+              if (edition.hasPersistentModifier) ...[
+                const SizedBox(width: largePadding),
+                SizedBox(
+                  width: iconSize + 16,
+                  height: iconSize + 11,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+                      Positioned(
+                        right: 5,
+                        child: SvgPicture.asset(
+                          'images/ui/not.svg',
+                          width: iconSize + 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+          subtitle: AppLocalizations.of(context).lossNonPersistent,
+          value: enhancementCalculatorModel.lostNonPersistent,
+          enabled:
+              !enhancementCalculatorModel.persistent &&
+              (edition.hasPersistentModifier ||
+                  enhancementCalculatorModel.enhancement?.category !=
+                      EnhancementCategory.summonPlusOne),
+          onChanged: (value) {
+            enhancementCalculatorModel.lostNonPersistent = value;
+          },
+        ),
+
+      // Persistent (FH only)
+      if (edition.hasPersistentModifier)
+        ToggleGroupItem(
+          infoConfig: InfoButtonConfig.titleMessage(
+            title: Strings.persistentInfoTitle,
+            message: Strings.persistentInfoBody(context, darkTheme),
+          ),
+          titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+          subtitle: AppLocalizations.of(context).persistent,
+          value: enhancementCalculatorModel.persistent,
+          enabled:
+              enhancementCalculatorModel.enhancement?.category !=
+                  EnhancementCategory.summonPlusOne &&
+              !enhancementCalculatorModel.lostNonPersistent,
+          onChanged: (value) {
+            enhancementCalculatorModel.persistent = value;
+          },
+        ),
+    ];
+
+    return CalculatorToggleGroupCard(items: items);
+  }
+}
+
+/// Discounts & Settings group card - groups Temp Enhancement, Hail's Discount,
+/// Scenario 114 Reward, and Building 44.
+class _DiscountsGroupCard extends StatefulWidget {
+  final dynamic edition;
+  final EnhancementCalculatorModel enhancementCalculatorModel;
+  final bool darkTheme;
+  final VoidCallback onSettingChanged;
+
+  const _DiscountsGroupCard({
+    required this.edition,
+    required this.enhancementCalculatorModel,
+    required this.darkTheme,
+    required this.onSettingChanged,
+  });
+
+  @override
+  State<_DiscountsGroupCard> createState() => _DiscountsGroupCardState();
+}
+
+class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final items = <ToggleGroupItem>[
+      // Temporary Enhancement (first, after swap)
+      ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.temporaryEnhancement,
+          message: Strings.temporaryEnhancementInfoBody(
+            context,
+            widget.darkTheme,
+          ),
+        ),
+        title: AppLocalizations.of(context).temporaryEnhancement,
+        subtitle: AppLocalizations.of(context).variant,
+        value: widget.enhancementCalculatorModel.temporaryEnhancementMode,
+        onChanged: (value) {
+          widget.enhancementCalculatorModel.temporaryEnhancementMode = value;
+        },
+      ),
+
+      // Hail's Discount
+      ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.hailsDiscountTitle,
+          message: Strings.hailsDiscountInfoBody(context, widget.darkTheme),
+        ),
+        title: AppLocalizations.of(context).hailsDiscount,
+        value: widget.enhancementCalculatorModel.hailsDiscount,
+        onChanged: (value) {
+          widget.enhancementCalculatorModel.hailsDiscount = value;
+        },
+      ),
+
+      // Scenario 114 Reward (Party Boon) - Gloomhaven/GH2E only
+      if (widget.edition.supportsPartyBoon)
+        ToggleGroupItem(
+          infoConfig: InfoButtonConfig.titleMessage(
+            title: Strings.scenario114RewardTitle,
+            message: Strings.scenario114RewardInfoBody(
+              context,
+              widget.darkTheme,
+            ),
+          ),
+          title: AppLocalizations.of(context).scenario114Reward,
+          subtitle: AppLocalizations.of(context).forgottenCirclesSpoilers,
+          value: SharedPrefs().partyBoon,
+          onChanged: (value) {
+            setState(() {
+              SharedPrefs().partyBoon = value;
+              widget.enhancementCalculatorModel.calculateCost();
+            });
+            widget.onSettingChanged();
+          },
+        ),
+
+      // Building 44 (Enhancer) - Frosthaven only
+      if (widget.edition.hasEnhancerLevels)
+        ToggleGroupItem(
+          infoConfig: InfoButtonConfig.titleMessage(
+            title: Strings.building44Title,
+            message: Strings.building44InfoBody(context, widget.darkTheme),
+          ),
+          title: AppLocalizations.of(context).building44,
+          subtitle: AppLocalizations.of(context).frosthavenSpoilers,
+          value: _hasAnyEnhancerUpgrades(),
+          trailingWidget: Icon(
+            Icons.open_in_new,
+            size: 30,
+            color: colorScheme.onSurface.withValues(alpha: 0.75),
+          ),
+          onTap: () => _showEnhancerDialog(context),
+        ),
+    ];
+
+    return CalculatorToggleGroupCard(items: items);
+  }
+
+  bool _hasAnyEnhancerUpgrades() {
+    return SharedPrefs().enhancerLvl2 ||
+        SharedPrefs().enhancerLvl3 ||
+        SharedPrefs().enhancerLvl4;
   }
 
   void _showEnhancerDialog(BuildContext context) {
@@ -528,7 +637,7 @@ class _Building44Card extends StatelessWidget {
                           if (val != null) {
                             innerSetState(() {
                               SharedPrefs().enhancerLvl2 = val;
-                              enhancementCalculatorModel.calculateCost();
+                              widget.enhancementCalculatorModel.calculateCost();
                             });
                           }
                         },
@@ -545,7 +654,7 @@ class _Building44Card extends StatelessWidget {
                           if (val != null) {
                             innerSetState(() {
                               SharedPrefs().enhancerLvl3 = val;
-                              enhancementCalculatorModel.calculateCost();
+                              widget.enhancementCalculatorModel.calculateCost();
                             });
                           }
                         },
@@ -562,7 +671,7 @@ class _Building44Card extends StatelessWidget {
                           if (val != null) {
                             innerSetState(() {
                               SharedPrefs().enhancerLvl4 = val;
-                              enhancementCalculatorModel.calculateCost();
+                              widget.enhancementCalculatorModel.calculateCost();
                             });
                           }
                         },
@@ -583,7 +692,10 @@ class _Building44Card extends StatelessWidget {
           ],
         );
       },
-    ).then((_) => onDialogClosed());
+    ).then((_) {
+      setState(() {}); // Refresh to update Building 44 toggle state
+      widget.onSettingChanged();
+    });
   }
 
   Widget _buildEnhancerLevel(
