@@ -142,6 +142,20 @@ Use constants from `lib/data/constants.dart` instead of hardcoded values:
 - `mediumPadding` (8) - use instead of `8`
 - `largePadding` (16) - use instead of `16`
 
+### Dividers
+Use the app's standard divider widgets (`lib/ui/widgets/app_divider.dart`) instead of raw `Divider` or `VerticalDivider`:
+
+```dart
+// Horizontal divider
+AppDivider()
+AppDivider(height: 1, indent: 16, endIndent: 16)
+
+// Vertical divider
+AppVerticalDivider(height: 52, horizontalMargin: largePadding)
+```
+
+These widgets use `Theme.of(context).dividerTheme.color` for consistent styling across the app, matching the style used in perk rows (`CheckRowDivider`).
+
 ### Database
 - UUID for character IDs (with legacy migration for old int IDs)
 - Migrations in `database_migrations.dart` - append new migrations, don't modify old ones

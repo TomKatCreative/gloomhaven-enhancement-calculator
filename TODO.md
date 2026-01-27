@@ -236,3 +236,14 @@ Add to ARB files:
 4. **Reload app** - Verify quest data persists correctly
 5. **Backup/restore** - Verify quest progress included in backup
 6. **Edition switching** - Verify correct quests shown per edition
+
+---
+
+## Enhancement Type Card - Make it stand out ✅ DONE
+
+**Implemented:** Pinned header with animated primary-colored glow.
+
+- Card is now pinned at the top (stays visible when scrolling)
+- Pulsing glow animation when no enhancement is selected (draws attention)
+- Subtle static glow when enhancement is selected
+- Larger icon (40px vs 30px) and text (titleLarge vs bodyMedium) for prominence
