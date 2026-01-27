@@ -1,5 +1,4 @@
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository_legacy.dart';
@@ -106,7 +105,7 @@ class DatabaseMigrations {
         });
   }
 
-  static migrateToUuids(Transaction txn) async {
+  static Future<void> migrateToUuids(Transaction txn) async {
     await txn.execute('''
         ALTER TABLE $tableCharacterPerks RENAME TO cptmp
         ''');
@@ -176,7 +175,7 @@ class DatabaseMigrations {
         ''');
   }
 
-  static includeClassMasteries(Transaction txn) async {
+  static Future<void> includeClassMasteries(Transaction txn) async {
     await txn
         .execute('''
         ${DatabaseHelper.createTable} $tableMasteries (
@@ -197,7 +196,7 @@ class DatabaseMigrations {
         )''');
   }
 
-  static includeResources(Transaction txn) async {
+  static Future<void> includeResources(Transaction txn) async {
     await txn.rawInsert(
       'ALTER TABLE $tableCharacters ADD COLUMN $columnResourceHide ${DatabaseHelper.integerType} DEFAULT 0',
     );
@@ -227,7 +226,7 @@ class DatabaseMigrations {
     );
   }
 
-  static createMetaDataTable(Transaction txn, int version) async {
+  static Future<void> createMetaDataTable(Transaction txn, int version) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     await txn.execute('''
         ${DatabaseHelper.createTable} ${DatabaseHelper.tableMetaData} (
@@ -244,7 +243,7 @@ class DatabaseMigrations {
     });
   }
 
-  static updateMetaDataTable(Transaction txn, int databaseVersion) async {
+  static Future<void> updateMetaDataTable(Transaction txn, int databaseVersion) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     DateTime now = DateTime.now().toUtc();
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
@@ -256,13 +255,13 @@ class DatabaseMigrations {
     });
   }
 
-  static addVariantColumnToCharacterTable(Transaction txn) async {
+  static Future<void> addVariantColumnToCharacterTable(Transaction txn) async {
     await txn.rawInsert(
       'ALTER TABLE $tableCharacters ADD COLUMN $columnVariant ${DatabaseHelper.textType} DEFAULT \'${Variant.base.name}\'',
     );
   }
 
-  static convertCharacterPerkIdColumnFromIntToText(Transaction txn) async {
+  static Future<void> convertCharacterPerkIdColumnFromIntToText(Transaction txn) async {
     await txn.execute('''
   ALTER TABLE $tableCharacterPerks
   RENAME TO temp_$tableCharacterPerks
@@ -288,7 +287,7 @@ class DatabaseMigrations {
     await txn.execute('DROP TABLE temp_$tableCharacterPerks');
   }
 
-  static convertCharacterMasteryIdColumnFromIntToText(Transaction txn) async {
+  static Future<void> convertCharacterMasteryIdColumnFromIntToText(Transaction txn) async {
     await txn.execute('''
   ALTER TABLE $tableCharacterMasteries
   RENAME TO temp_$tableCharacterMasteries
@@ -384,9 +383,6 @@ class DatabaseMigrations {
             if (matchingCharacterPerks.isNotEmpty) {
               for (final CharacterPerk matchingCharacterPerk
                   in matchingCharacterPerks) {
-                debugPrint(
-                  '**\nMATCH CHAR PERK:\n${matchingCharacterPerk.associatedPerkId}\n${matchingCharacterPerk.associatedPerkId}\n**',
-                );
                 Character? character = characters.firstWhere(
                   (element) =>
                       element?.uuid ==
@@ -472,14 +468,10 @@ class DatabaseMigrations {
           perk.variant = list.variant;
           perk.classCode = classCode;
           for (int i = 0; i < perk.quantity; i++) {
-            try {
-              await txn.insert(
-                tempTablePerks,
-                perk.toMap('${list.perks.indexOf(perk)}${indexToLetter(i)}'),
-              );
-            } catch (e) {
-              debugPrint('ERROR WITH PERKS2 TABLE: $e');
-            }
+            await txn.insert(
+              tempTablePerks,
+              perk.toMap('${list.perks.indexOf(perk)}${indexToLetter(i)}'),
+            );
           }
         }
       }

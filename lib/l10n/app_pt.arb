@@ -97,6 +97,7 @@
   "backupFileWarning": "Se já existir outro arquivo de backup na pasta Downloads com o mesmo nome, ele será substituído",
   "filename": "Nome do arquivo",
   "savedTo": "Salvo em {path}",
+  "backupError": "Falha ao criar backup. Por favor, tente novamente.",
   "restoreWarning": "Restaurar um arquivo de backup substituirá todos os personagens atuais. Deseja continuar?",
   "errorDuringRestore": "Erro Durante a Operação de Restauração",
   "restoreErrorMessage": "Houve um erro durante o processo de restauração. Seus dados existentes foram salvos e seu backup não foi modificado. Entre em contato com o desenvolvedor (através do menu Configurações) com seu arquivo de backup existente e estas informações:\n\n{error}",

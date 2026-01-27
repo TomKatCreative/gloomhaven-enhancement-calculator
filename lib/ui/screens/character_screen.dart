@@ -346,7 +346,7 @@ class _StatsSectionState extends State<_StatsSection> {
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
               Consumer<CharactersModel>(
-                builder: (_, charactersModel, __) => Text(
+                builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize:

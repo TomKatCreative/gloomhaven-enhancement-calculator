@@ -288,6 +288,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get backupError => 'Failed to create backup. Please try again.';
+
+  @override
   String get restoreWarning =>
       'Restoring a backup file will overwrite any current characters. Do you wish to continue?';
 

@@ -212,7 +212,6 @@ class CharactersModel with ChangeNotifier {
             prosperityLevel: random.nextInt(5),
             variant: variant,
           );
-          debugPrint('Created $variantName (${variant.name})');
         }
       } else {
         // Create only base variant
@@ -224,7 +223,6 @@ class CharactersModel with ChangeNotifier {
           gloomhavenMode: random.nextBool(),
           prosperityLevel: random.nextInt(5),
         );
-        debugPrint('Created ${playerClass.name}');
       }
     }
   }
@@ -256,15 +254,6 @@ class CharactersModel with ChangeNotifier {
     }
   }
 
-  // void toggleEditMode({bool? value}) {
-  //   if (value != null) {
-  //     isEditMode = value;
-  //   } else {
-  //     isEditMode = !isEditMode;
-  //   }
-  //   notifyListeners();
-  // }
-
   void onPageChanged(int index) {
     SharedPrefs().initialPage = index;
     isScrolledToTop = true;
@@ -293,11 +282,7 @@ class CharactersModel with ChangeNotifier {
           : 10 * prosperityLevel + 20,
       variant: variant,
     );
-    try {
-      character.id = await databaseHelper.insertCharacter(character);
-    } catch (e) {
-      debugPrint(e.toString());
-    }
+    character.id = await databaseHelper.insertCharacter(character);
     character.characterPerks = await _loadPerks(character);
 
     character.characterMasteries = await _loadMasteries(character);

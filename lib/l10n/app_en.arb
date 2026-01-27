@@ -111,6 +111,7 @@
       }
     }
   },
+  "backupError": "Failed to create backup. Please try again.",
   "restoreWarning": "Restoring a backup file will overwrite any current characters. Do you wish to continue?",
   "errorDuringRestore": "Error During Restore Operation",
   "restoreErrorMessage": "There was an error during the restoration process. Your existing data was saved and your backup hasn't been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}",

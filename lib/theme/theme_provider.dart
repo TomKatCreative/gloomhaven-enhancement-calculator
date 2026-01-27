@@ -40,7 +40,7 @@ class ThemeProvider extends ChangeNotifier {
     if (_config.seedColor == color) return;
 
     _config = _config.copyWith(seedColor: color);
-    SharedPrefs().primaryClassColor = color.value;
+    SharedPrefs().primaryClassColor = color.toARGB32();
     _rebuildThemes();
     _updateSystemUI();
     notifyListeners();
@@ -68,7 +68,7 @@ class ThemeProvider extends ChangeNotifier {
     if (_config == config) return;
 
     _config = config;
-    SharedPrefs().primaryClassColor = config.seedColor.value;
+    SharedPrefs().primaryClassColor = config.seedColor.toARGB32();
     SharedPrefs().darkTheme = config.useDarkMode;
     SharedPrefs().useDefaultFonts = config.useDefaultFonts;
     _rebuildThemes();

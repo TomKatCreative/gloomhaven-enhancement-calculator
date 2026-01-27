@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'Saved to {path}'**
   String savedTo(String path);
 
+  /// No description provided for @backupError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create backup. Please try again.'**
+  String get backupError;
+
   /// No description provided for @restoreWarning.
   ///
   /// In en, this message translates to:

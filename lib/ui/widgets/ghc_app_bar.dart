@@ -178,6 +178,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
                     Character? character = charactersModel.currentCharacter;
                     await charactersModel.retireCurrentCharacter();
                     appModel.updateTheme();
+                    if (!context.mounted) return;
                     ScaffoldMessenger.of(context)
                       ..clearSnackBars()
                       ..showSnackBar(
@@ -204,21 +205,6 @@ class _GHCAppBarState extends State<GHCAppBar> {
                   },
                 ),
               ),
-            // if (appModel.page == 0 && !charactersModel.isEditMode)
-            //   IconButton(
-            //     icon: const Icon(
-            //       Icons.info_outline_rounded,
-            //     ),
-            //     onPressed: () => showDialog<void>(
-            //       context: context,
-            //       builder: (_) {
-            //         return InfoDialog(
-            //           title: Strings.previousRetirementsInfoTitle,
-            //           message: Strings.previousRetirementsInfoBody(context),
-            //         );
-            //       },
-            //     ),
-            //   ),
             if (appModel.page == 0)
               Tooltip(
                 message: charactersModel.isEditMode
@@ -293,6 +279,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
                               final String characterName =
                                   charactersModel.currentCharacter!.name;
                               await charactersModel.deleteCurrentCharacter();
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context)
                                 ..clearSnackBars()
                                 ..showSnackBar(

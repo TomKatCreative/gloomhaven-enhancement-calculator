@@ -236,7 +236,16 @@ class CustomSearchDelegate extends SearchDelegate<SelectedPlayerClass> {
 
   @override
   Widget buildResults(BuildContext context) {
-    throw UnimplementedError();
+    // buildResults is called when showResults(context) is triggered.
+    // We display the same filtered list as suggestions since selection
+    // is handled via Navigator.pop in the ListTile.onTap callback.
+    return _WordSuggestionList(
+      query: query,
+      suggestions: _filteredList(_playerClasses),
+      onSelected: (String suggestion) {
+        query = suggestion;
+      },
+    );
   }
 }
 

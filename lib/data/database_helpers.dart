@@ -268,12 +268,9 @@ class DatabaseHelper {
 
     List json = convert.jsonDecode(backup);
 
-    // if (json[0] is List<String>) {
     if (!json[0].contains('MetaData')) {
-      debugPrint('NO META DATA TABLE');
       throw ('No Meta Data Table');
     }
-    // }
 
     for (var i = 0; i < json[0].length; i++) {
       for (var k = 0; k < json[1][i].length; k++) {

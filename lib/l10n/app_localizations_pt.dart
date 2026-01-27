@@ -288,6 +288,10 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get backupError =>
+      'Falha ao criar backup. Por favor, tente novamente.';
+
+  @override
   String get restoreWarning =>
       'Restaurar um arquivo de backup substituirá todos os personagens atuais. Deseja continuar?';
 

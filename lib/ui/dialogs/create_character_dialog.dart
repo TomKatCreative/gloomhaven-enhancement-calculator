@@ -11,7 +11,6 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_con
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-// import 'package:gloomhaven_enhancement_calc/models/personal_goal.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
@@ -76,8 +75,6 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
   String _generateRandomName() {
     return '${_faker.person.firstName()} ${_faker.person.lastName()}';
   }
-
-  // PersonalGoal _personalGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +149,7 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                           ),
                         );
                     if (selectedPlayerClass != null) {
+                      if (!context.mounted) return;
                       FocusScope.of(context).requestFocus(nameFocusNode);
 
                       setState(() {
@@ -224,42 +222,6 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                   ),
                 ),
               ),
-              // DropdownButton<PersonalGoal>(
-              //   value: _personalGoal,
-              //   selectedItemBuilder: (BuildContext context) {
-              //     return CharacterData.personalGoals
-              //         .map<Widget>((PersonalGoal personalGoal) {
-              //       return Text('PG ${personalGoal.id}');
-              //     }).toList();
-              //   },
-              //   items: CharacterData.personalGoals
-              //       .map((PersonalGoal personalGoal) {
-              //     return DropdownMenuItem<PersonalGoal>(
-              //       child: Text('PG ${personalGoal.id}'),
-              //       value: personalGoal,
-              //     );
-              //   }).toList(),
-              //   onChanged: (personalGoal) {
-              //     setState(() {
-              //       _personalGoal = personalGoal;
-              //     });
-              //   },
-              // ),
-              // TextFormField(
-              //   enableInteractiveSelection: false,
-              //   key: _levelKey,
-              //   controller: _previousRetirementsTextFieldController,
-              //   readOnly: true,
-              //   onTap: () => isPersonalGoalMenuOpen ? closeMenu() : openMenu(),
-              //   decoration: InputDecoration(
-              //     suffixIcon: Icon(Icons.arrow_drop_down),
-              //     suffixIconConstraints: BoxConstraints(
-              //       maxHeight: 0,
-              //       minWidth: 48,
-              //     ),
-              //     labelText: 'Personal Goal',
-              //   ),
-              // ),
               const SizedBox(height: 12),
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -345,7 +307,7 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                         inactiveThumbImage: const AssetImage(
                           'images/branding/switch_gh.png',
                         ),
-                        activeColor: const Color(0xff005cb2),
+                        activeThumbColor: const Color(0xff005cb2),
                         trackColor: WidgetStateProperty.resolveWith(
                           (states) => states.contains(WidgetState.selected)
                               ? const Color(0xff6ab7ff)
@@ -409,6 +371,7 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                     : 0,
                 variant: _variant,
               );
+              if (!context.mounted) return;
               Navigator.pop(context, true);
             }
           },
