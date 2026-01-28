@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
-import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
-import 'package:provider/provider.dart';
 
 import '../models/enhancement.dart';
 
@@ -130,7 +126,7 @@ class EnhancementData {
       EnhancementCategory.summonPlusOne,
       'HP',
       ghCost: 50,
-      assetKey: 'hp',
+      assetKey: 'HP',
       fhCost: 40,
     ),
     Enhancement(
@@ -322,111 +318,6 @@ class EnhancementData {
       assetKey: 'hex',
     ),
   ];
-
-  static List<DropdownMenuItem<int>> cardLevels(
-    BuildContext context, {
-    required bool partyBoon,
-    required bool enhancerLvl3,
-  }) {
-    EnhancementCalculatorModel enhancementCalculatorModel = Provider.of(
-      context,
-      listen: false,
-    );
-    List<DropdownMenuItem<int>> list = [];
-    for (int x = 0; x <= 8; x++) {
-      list.add(
-        DropdownMenuItem(
-          value: x,
-          child: RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyMedium,
-              children: <InlineSpan>[
-                if (x == 0)
-                  const TextSpan(text: '1 / x')
-                else ...[
-                  TextSpan(text: '${x + 1} ('),
-                  if (enhancerLvl3 || (!enhancerLvl3 && partyBoon)) ...[
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: StrikethroughText(
-                        '${25 * x}g',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                      ),
-                    ),
-                    const TextSpan(text: ' '),
-                    TextSpan(
-                      text:
-                          '${enhancementCalculatorModel.cardLevelPenalty(x)}g',
-                      // style: Theme.of(context).textTheme.bodyMedium.copyWith(
-                      //       color: Colors.green,
-                      //     ),
-                    ),
-                    const TextSpan(text: ')'),
-                  ] else ...[
-                    TextSpan(text: '${25 * x}g)'),
-                  ],
-                ],
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-    return list;
-  }
-
-  static List<DropdownMenuItem<int>> previousEnhancements(
-    BuildContext context, {
-    bool enhancerLvl4 = false,
-    bool tempEnhancements = false,
-  }) {
-    EnhancementCalculatorModel enhancementCalculatorModel = Provider.of(
-      context,
-      listen: false,
-    );
-    List<DropdownMenuItem<int>> list = [];
-    for (int x = 0; x <= 3; x++) {
-      list.add(
-        DropdownMenuItem(
-          value: x,
-          child: RichText(
-            text: TextSpan(
-              style: Theme.of(context).textTheme.bodyMedium,
-              children: <InlineSpan>[
-                if (x == 0)
-                  const TextSpan(text: 'None')
-                else ...[
-                  TextSpan(text: '$x ('),
-                  if (enhancerLvl4 || tempEnhancements) ...[
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: StrikethroughText(
-                        '${75 * x}g',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
-                      ),
-                    ),
-                    const TextSpan(text: ' '),
-                    TextSpan(
-                      text:
-                          '${enhancementCalculatorModel.previousEnhancementsPenalty(x)}g${tempEnhancements ? ' †' : ''}',
-                    ),
-                    const TextSpan(text: ')'),
-                  ] else ...[
-                    TextSpan(text: '${75 * x}g)'),
-                  ],
-                ],
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-    return list;
-  }
 
   /// Returns true if the enhancement is available in the given edition
   static bool isAvailableInEdition(

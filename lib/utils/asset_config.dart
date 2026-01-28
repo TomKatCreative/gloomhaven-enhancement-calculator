@@ -524,7 +524,7 @@ const Map<String, AssetConfig> assets = {
   // ===========================================================================
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),
   'hex': AssetConfig('ui/hex.svg'),
-  'hp': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
+  'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'item_minus_one': AssetConfig(
     'ui/item_minus_one.svg',
     lightPath: 'ui/item_minus_one_light.svg',
