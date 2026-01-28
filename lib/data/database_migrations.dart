@@ -1,9 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
-import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository_legacy.dart';
+import 'package:gloomhaven_enhancement_calc/data/migrations/masteries_repository_legacy.dart';
+import 'package:gloomhaven_enhancement_calc/data/migrations/perks_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
-import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/legacy_mastery.dart'
