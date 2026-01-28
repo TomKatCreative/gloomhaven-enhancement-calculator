@@ -247,3 +247,15 @@ Add to ARB files:
 - Pulsing glow animation when no enhancement is selected (draws attention)
 - Subtle static glow when enhancement is selected
 - Larger icon (40px vs 30px) and text (titleLarge vs bodyMedium) for prominence
+
+---
+
+## Font Consolidation - Investigate
+
+Consider changing fonts to use **Tinos** for body text and **Germania One** for subtitles (keeping Pirata One for select large titles). This would mean we could potentially remove some of the font assets and use Google Fonts or built-in alternatives.
+
+**To investigate:**
+- Are Tinos and Germania One available via `google_fonts` package or system fonts?
+- Which current font assets could be removed (HighTower, Nyala, OpenSans, Roboto)?
+- How would this affect app bundle size?
+- Visual comparison of current fonts vs proposed alternatives
