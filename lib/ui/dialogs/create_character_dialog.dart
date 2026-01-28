@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:faker/faker.dart' as faker;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,62 +12,72 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-class CreateCharacterDialog extends StatefulWidget {
+/// A modal bottom sheet for creating new characters.
+/// Material 3 compliant with drag handle, scrollable form, and fixed action buttons.
+class CreateCharacterSheet extends StatefulWidget {
   final CharactersModel charactersModel;
 
-  const CreateCharacterDialog({super.key, required this.charactersModel});
+  const CreateCharacterSheet({super.key, required this.charactersModel});
+
+  /// Shows the create character sheet as a modal bottom sheet.
+  static Future<bool?> show(BuildContext context, CharactersModel model) {
+    return showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: false,
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: CreateCharacterSheet(charactersModel: model),
+      ),
+    );
+  }
 
   @override
-  CreateCharacterDialogState createState() => CreateCharacterDialogState();
+  CreateCharacterSheetState createState() => CreateCharacterSheetState();
 }
 
-class CreateCharacterDialogState extends State<CreateCharacterDialog> {
+class CreateCharacterSheetState extends State<CreateCharacterSheet> {
   final TextEditingController _nameTextFieldController =
       TextEditingController();
   final TextEditingController _classTextFieldController =
-      TextEditingController();
-  final TextEditingController _personalGoalTextFieldController =
-      TextEditingController();
-  final TextEditingController _levelTextFieldController =
       TextEditingController();
   final TextEditingController _previousRetirementsTextFieldController =
       TextEditingController();
   final TextEditingController _prosperityLevelTextFieldController =
       TextEditingController();
-  bool _gloomhavenMode = true;
+
+  GameEdition _selectedEdition = GameEdition.gloomhaven;
   PlayerClass? _selectedClass;
   late faker.Faker _faker;
-  late String placeholderName;
-  FocusNode nameFocusNode = FocusNode();
+  late String _placeholderName;
+  final FocusNode _nameFocusNode = FocusNode();
   Variant _variant = Variant.base;
+  int _selectedLevel = 1;
 
   final _formKey = GlobalKey<FormState>();
-  final GlobalKey _levelKey = LabeledGlobalKey("button_icon");
-  late Size buttonSize;
-  late Offset buttonPosition;
-  bool isLevelMenuOpen = false;
-  bool isPersonalGoalMenuOpen = false;
 
   @override
   void initState() {
     super.initState();
     _faker = faker.Faker();
-    _levelTextFieldController.text = '1';
-    placeholderName = _generateRandomName();
+    _placeholderName = _generateRandomName();
   }
 
   @override
   void dispose() {
     _nameTextFieldController.dispose();
     _classTextFieldController.dispose();
-    _personalGoalTextFieldController.dispose();
-    _levelTextFieldController.dispose();
     _previousRetirementsTextFieldController.dispose();
     _prosperityLevelTextFieldController.dispose();
-    nameFocusNode.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
@@ -78,161 +87,322 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      content: Container(
-        constraints: const BoxConstraints(
-          maxWidth: maxDialogWidth,
-          minWidth: maxDialogWidth,
-        ),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              ListTile(
-                minVerticalPadding: 0,
-                contentPadding: EdgeInsets.zero,
-                title: TextFormField(
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.words,
-                  autocorrect: false,
-                  focusNode: nameFocusNode,
-                  decoration: InputDecoration(
-                    hintText: placeholderName,
-                    labelText: AppLocalizations.of(context).name,
-                    border: const OutlineInputBorder(),
-                  ),
-                  controller: _nameTextFieldController,
-                  onChanged: (value) {
-                    setState(() {
-                      placeholderName = value;
-                      _nameTextFieldController.text = value;
-                    });
-                  },
-                ),
-                trailing: IconButton(
-                  icon: const FaIcon(FontAwesomeIcons.dice),
-                  onPressed: () {
-                    _nameTextFieldController.clear();
-                    FocusScope.of(context).requestFocus(nameFocusNode);
-                    setState(() {
-                      placeholderName = _generateRandomName();
-                    });
-                  },
-                ),
-              ),
-              const SizedBox(height: 12),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                minVerticalPadding: 0,
-                title: TextFormField(
-                  validator: (value) => _selectedClass == null
-                      ? AppLocalizations.of(context).pleaseSelectClass
-                      : null,
-                  readOnly: true,
-                  controller: _classTextFieldController,
-                  decoration: InputDecoration(
-                    // hintText: 'Class',
-                    border: const OutlineInputBorder(),
-                    labelText: _variant != Variant.base
-                        ? AppLocalizations.of(context).classWithVariant(
-                            ClassVariants.classVariants[_variant]!,
-                          )
-                        : AppLocalizations.of(context).class_,
-                  ),
-                  onTap: () async {
-                    SelectedPlayerClass? selectedPlayerClass =
-                        await showSearch<SelectedPlayerClass>(
-                          context: context,
-                          delegate: CustomSearchDelegate(
-                            PlayerClasses.playerClasses,
-                          ),
-                        );
-                    if (selectedPlayerClass != null) {
-                      if (!context.mounted) return;
-                      FocusScope.of(context).requestFocus(nameFocusNode);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-                      setState(() {
-                        // Mercenary Pack classes pre-populate the name field
-                        // with the name of the Mercenary
-                        if (selectedPlayerClass.playerClass.category ==
-                            ClassCategory.mercenaryPacks) {
-                          _nameTextFieldController.text =
-                              selectedPlayerClass.playerClass.name;
-                        }
-                        _variant = selectedPlayerClass.variant!;
-                        _classTextFieldController.text = selectedPlayerClass
-                            .playerClass
-                            .getDisplayName(_variant);
-                        _selectedClass = selectedPlayerClass.playerClass;
-                      });
-                      _formKey.currentState?.validate();
-                    }
-                  },
-                ),
-                trailing: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: _selectedClass == null
-                        ? const Icon(Icons.open_in_new)
-                        : SvgPicture.asset(
-                            'images/class_icons/${_selectedClass!.icon}',
-                            colorFilter: ColorFilter.mode(
-                              Color(_selectedClass!.primaryColor),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                  ),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) {
+        return Column(
+          children: [
+            // Fixed header section
+            _buildHeader(context, theme, colorScheme),
+            // Scrollable form content
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(largePadding),
+                  children: [
+                    _buildNameField(context, theme),
+                    const SizedBox(height: 20),
+                    _buildClassSelector(context, theme),
+                    const SizedBox(height: 20),
+                    _buildLevelSelector(context, theme, colorScheme),
+                    const SizedBox(height: 20),
+                    _buildRetirementsAndProsperityRow(context, theme),
+                    const SizedBox(height: 20),
+                    _buildEditionToggle(context, theme),
+                    // Extra bottom padding for scrolling past last field
+                    const SizedBox(height: 20),
+                  ],
                 ),
               ),
-              const SizedBox(height: 12),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                minVerticalPadding: 0,
-                title: TextFormField(
-                  enableInteractiveSelection: false,
-                  key: _levelKey,
-                  controller: _levelTextFieldController,
-                  readOnly: true,
-                  onTap: () async => await _showLevelGridDialog(context),
-                  decoration: InputDecoration(
-                    suffixIcon: const Icon(Icons.arrow_drop_down),
-                    suffixIconConstraints: const BoxConstraints(
-                      maxHeight: 0,
-                      minWidth: 48,
-                    ),
-                    labelText: AppLocalizations.of(context).startingLevel,
-                    border: const OutlineInputBorder(),
-                  ),
+            ),
+            // Fixed action buttons at bottom
+            _buildActionButtons(context, theme, colorScheme),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return Container(
+      color: colorScheme.surfaceContainerLow,
+      child: Column(
+        children: [
+          // Drag handle
+          Padding(
+            padding: const EdgeInsets.only(top: 12, bottom: 8),
+            child: Container(
+              width: 32,
+              height: 4,
+              decoration: BoxDecoration(
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          // Title
+          Padding(
+            padding: const EdgeInsets.only(bottom: mediumPadding),
+            child: Text(
+              AppLocalizations.of(context).createCharacter,
+              style: theme.textTheme.headlineSmall,
+            ),
+          ),
+          Divider(height: 1, color: theme.dividerTheme.color),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(
+    BuildContext context,
+    ThemeData theme,
+    String label,
+    IconData icon,
+  ) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+        const SizedBox(width: mediumPadding),
+        Text(
+          label,
+          style: theme.textTheme.labelLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNameField(BuildContext context, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel(
+          context,
+          theme,
+          AppLocalizations.of(context).name,
+          Icons.person_outline,
+        ),
+        const SizedBox(height: mediumPadding),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                autocorrect: false,
+                focusNode: _nameFocusNode,
+                decoration: InputDecoration(
+                  hintText: _placeholderName,
                 ),
-                trailing: SizedBox(
-                  width: 48,
-                  height: 48,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: SvgPicture.asset(
-                      'images/ui/level.svg',
+                controller: _nameTextFieldController,
+                onChanged: (value) {
+                  setState(() {
+                    _placeholderName = value;
+                    _nameTextFieldController.text = value;
+                  });
+                },
+              ),
+            ),
+            const SizedBox(width: mediumPadding),
+            IconButton(
+              icon: const FaIcon(FontAwesomeIcons.dice),
+              tooltip: 'Generate random name',
+              onPressed: () {
+                _nameTextFieldController.clear();
+                FocusScope.of(context).requestFocus(_nameFocusNode);
+                setState(() {
+                  _placeholderName = _generateRandomName();
+                });
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClassSelector(BuildContext context, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel(
+          context,
+          theme,
+          _variant != Variant.base
+              ? AppLocalizations.of(
+                  context,
+                ).classWithVariant(ClassVariants.classVariants[_variant]!)
+              : AppLocalizations.of(context).class_,
+          Icons.shield_outlined,
+        ),
+        const SizedBox(height: mediumPadding),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                validator: (value) => _selectedClass == null
+                    ? AppLocalizations.of(context).pleaseSelectClass
+                    : null,
+                readOnly: true,
+                controller: _classTextFieldController,
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context).selectClass,
+                  suffixIcon: const Icon(Icons.chevron_right),
+                ),
+                onTap: () async {
+                  SelectedPlayerClass? selectedPlayerClass =
+                      await showSearch<SelectedPlayerClass>(
+                        context: context,
+                        delegate: CustomSearchDelegate(
+                          PlayerClasses.playerClasses,
+                        ),
+                      );
+                  if (selectedPlayerClass != null) {
+                    if (!context.mounted) return;
+                    FocusScope.of(context).requestFocus(_nameFocusNode);
+
+                    setState(() {
+                      // Mercenary Pack classes pre-populate the name field
+                      if (selectedPlayerClass.playerClass.category ==
+                          ClassCategory.mercenaryPacks) {
+                        _nameTextFieldController.text =
+                            selectedPlayerClass.playerClass.name;
+                      }
+                      _variant = selectedPlayerClass.variant!;
+                      _classTextFieldController.text = selectedPlayerClass
+                          .playerClass
+                          .getDisplayName(_variant);
+                      _selectedClass = selectedPlayerClass.playerClass;
+                    });
+                    _formKey.currentState?.validate();
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: mediumPadding),
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: _selectedClass == null
+                  ? Icon(
+                      Icons.help_outline,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    )
+                  : SvgPicture.asset(
+                      'images/class_icons/${_selectedClass!.icon}',
                       colorFilter: ColorFilter.mode(
-                        Theme.of(context).colorScheme.onSurface,
+                        Color(_selectedClass!.primaryColor),
                         BlendMode.srcIn,
                       ),
                     ),
-                  ),
-                ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLevelSelector(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel(
+          context,
+          theme,
+          '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
+          Icons.trending_up,
+        ),
+        const SizedBox(height: mediumPadding),
+        SfSlider(
+          min: 1.0,
+          max: 9.0,
+          value: _selectedLevel.toDouble(),
+          interval: 1,
+          stepSize: 1,
+          showLabels: true,
+          activeColor: colorScheme.primary,
+          inactiveColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+          onChanged: (dynamic value) {
+            setState(() => _selectedLevel = (value as double).round());
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRetirementsAndProsperityRow(
+    BuildContext context,
+    ThemeData theme,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Previous Retirements
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionLabel(
+                context,
+                theme,
+                AppLocalizations.of(context).previousRetirements,
+                Icons.elderly,
               ),
-              const SizedBox(height: 12),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                minVerticalPadding: 0,
-                title: TextFormField(
+              const SizedBox(height: mediumPadding),
+              TextFormField(
+                enableInteractiveSelection: false,
+                controller: _previousRetirementsTextFieldController,
+                decoration: InputDecoration(
+                  hintText: '0',
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
+                ],
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: largePadding),
+        // Prosperity Level (used by GH2E and Frosthaven)
+        Expanded(
+          child: Opacity(
+            opacity: _selectedEdition == GameEdition.gloomhaven ? 0.4 : 1.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSectionLabel(
+                  context,
+                  theme,
+                  AppLocalizations.of(context).prosperityLevel,
+                  Icons.location_city,
+                ),
+                const SizedBox(height: mediumPadding),
+                TextFormField(
+                  enabled: _selectedEdition != GameEdition.gloomhaven,
                   enableInteractiveSelection: false,
-                  controller: _previousRetirementsTextFieldController,
+                  controller: _prosperityLevelTextFieldController,
                   decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context).previousRetirements,
-                    border: const OutlineInputBorder(),
-                  ),
+                    hintText: '0',
+                    ),
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(
                       RegExp('[\\.|\\,|\\ |\\-]'),
@@ -240,198 +410,134 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                   ],
                   keyboardType: TextInputType.number,
                 ),
-              ),
-              if (!_gloomhavenMode) ...[
-                const SizedBox(height: 12),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  minVerticalPadding: 0,
-                  title: HighlightedWidget(
-                    color: GameEditionColors.gloomhavenLight,
-                    child: TextFormField(
-                      enableInteractiveSelection: false,
-                      controller: _prosperityLevelTextFieldController,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context).prosperityLevel,
-                        border: const OutlineInputBorder(),
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.deny(
-                          RegExp('[\\.|\\,|\\ |\\-]'),
-                        ),
-                      ],
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                ),
               ],
-
-              const SizedBox(height: mediumPadding),
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                minVerticalPadding: 0,
-                visualDensity: VisualDensity.compact,
-                leading: IconButton(
-                  icon: const Icon(Icons.info_outline_rounded),
-                  onPressed: () => showDialog<void>(
-                    context: context,
-                    builder: (_) {
-                      return InfoDialog(
-                        title: Strings.newCharacterInfoTitle,
-                        message: Strings.newCharacterInfoBody(
-                          context,
-                          edition: _gloomhavenMode
-                              ? GameEdition.gloomhaven
-                              : GameEdition.frosthaven,
-                          darkMode:
-                              Theme.of(context).brightness == Brightness.dark,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                title: Row(
-                  children: [
-                    Flexible(
-                      child: AutoSizeText(
-                        AppLocalizations.of(context).gloomhaven,
-                        minFontSize: 8,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: _gloomhavenMode
-                              ? null
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Switch(
-                        inactiveThumbImage: const AssetImage(
-                          'images/branding/switch_gh.png',
-                        ),
-                        activeThumbColor: GameEditionColors.gloomhavenPrimary,
-                        trackColor: WidgetStateProperty.resolveWith(
-                          (states) => states.contains(WidgetState.selected)
-                              ? GameEditionColors.gloomhavenLight
-                              : GameEditionColors.frosthavenPrimary,
-                        ),
-                        value: !_gloomhavenMode,
-                        onChanged: (_) {
-                          setState(() {
-                            if (!_gloomhavenMode) {
-                              _prosperityLevelTextFieldController.clear();
-                            }
-                            _gloomhavenMode = !_gloomhavenMode;
-                          });
-                        },
-                      ),
-                    ),
-                    Flexible(
-                      child: AutoSizeText(
-                        AppLocalizations.of(context).frosthaven,
-                        minFontSize: 8,
-                        maxLines: 1,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: _gloomhavenMode
-                              ? Theme.of(context).colorScheme.onSurfaceVariant
-                              : null,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(AppLocalizations.of(context).cancel),
-        ),
-        ElevatedButton.icon(
-          style: Theme.of(context).textButtonTheme.style?.copyWith(
-            backgroundColor: WidgetStateProperty.resolveWith<Color>(
-              (Set<WidgetState> states) => Colors.green.withValues(alpha: 0.75),
             ),
           ),
-          onPressed: () async {
-            if (_formKey.currentState != null &&
-                _formKey.currentState!.validate()) {
-              await widget.charactersModel.createCharacter(
-                _nameTextFieldController.text.isEmpty
-                    ? placeholderName
-                    : _nameTextFieldController.text,
-                _selectedClass!,
-                initialLevel: int.parse(_levelTextFieldController.text),
-                previousRetirements:
-                    _previousRetirementsTextFieldController.text.isEmpty
-                    ? 0
-                    : int.parse(_previousRetirementsTextFieldController.text),
-                gloomhavenMode: _gloomhavenMode,
-                prosperityLevel: _prosperityLevelTextFieldController.text != ''
-                    ? int.parse(_prosperityLevelTextFieldController.text)
-                    : 0,
-                variant: _variant,
-              );
-              if (!context.mounted) return;
-              Navigator.pop(context, true);
-            }
-          },
-          label: Text(
-            AppLocalizations.of(context).create,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.white),
-          ),
-          icon: const Icon(Icons.check_rounded, color: Colors.white),
         ),
       ],
     );
   }
 
-  // Function to show the dialog with a grid of numbers representing the Character's starting level.
-  Future<void> _showLevelGridDialog(BuildContext context) async {
-    final int? result = await showDialog<int>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          icon: SvgPicture.asset(
-            'images/ui/level.svg',
-            width: iconSize + 5,
-            colorFilter: ColorFilter.mode(
-              Theme.of(context).colorScheme.onSurface,
-              BlendMode.srcIn,
-            ),
-          ),
-          content: SizedBox(
-            width: 100,
-            child: GridView.builder(
-              shrinkWrap: true,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+  Widget _buildEditionToggle(BuildContext context, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.info_outline_rounded),
+              onPressed: () => showDialog<void>(
+                context: context,
+                builder: (_) {
+                  return InfoDialog(
+                    title: Strings.newCharacterInfoTitle,
+                    message: Strings.newCharacterInfoBody(
+                      context,
+                      edition: _selectedEdition,
+                      darkMode: theme.brightness == Brightness.dark,
+                    ),
+                  );
+                },
               ),
-              itemCount: 9,
-              itemBuilder: (BuildContext context, int index) {
-                final number = index + 1;
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).pop(number);
-                  },
-                  child: Center(child: Text(number.toString())),
-                );
-              },
             ),
+            Text(
+              AppLocalizations.of(context).gameEdition,
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: mediumPadding),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<GameEdition>(
+            showSelectedIcon: false,
+            segments: [
+              ButtonSegment(
+                value: GameEdition.gloomhaven,
+                label: const Text('GH'),
+                tooltip: AppLocalizations.of(context).gloomhaven,
+              ),
+              ButtonSegment(
+                value: GameEdition.gloomhaven2e,
+                label: const Text('GH2E'),
+                tooltip: 'Gloomhaven 2nd Edition',
+              ),
+              ButtonSegment(
+                value: GameEdition.frosthaven,
+                label: const Text('FH'),
+                tooltip: AppLocalizations.of(context).frosthaven,
+              ),
+            ],
+            selected: {_selectedEdition},
+            onSelectionChanged: (Set<GameEdition> selection) {
+              setState(() {
+                final newEdition = selection.first;
+                // Clear prosperity when switching to original GH
+                if (newEdition == GameEdition.gloomhaven) {
+                  _prosperityLevelTextFieldController.clear();
+                }
+                _selectedEdition = newEdition;
+              });
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
+  }
 
-    if (result != null) {
-      setState(() {
-        _levelTextFieldController.text = result.toString();
-      });
+  Widget _buildActionButtons(
+    BuildContext context,
+    ThemeData theme,
+    ColorScheme colorScheme,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(largePadding),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        border: Border(
+          top: BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(AppLocalizations.of(context).cancel),
+          ),
+          const SizedBox(width: mediumPadding),
+          FilledButton.icon(
+            icon: const Icon(Icons.check),
+            label: Text(AppLocalizations.of(context).create),
+            onPressed: _onCreatePressed,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onCreatePressed() async {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
+      await widget.charactersModel.createCharacter(
+        _nameTextFieldController.text.isEmpty
+            ? _placeholderName
+            : _nameTextFieldController.text,
+        _selectedClass!,
+        initialLevel: _selectedLevel,
+        previousRetirements:
+            _previousRetirementsTextFieldController.text.isEmpty
+            ? 0
+            : int.parse(_previousRetirementsTextFieldController.text),
+        edition: _selectedEdition,
+        prosperityLevel: _prosperityLevelTextFieldController.text != ''
+            ? int.parse(_prosperityLevelTextFieldController.text)
+            : 0,
+        variant: _variant,
+      );
+      if (!mounted) return;
+      Navigator.pop(context, true);
     }
   }
 }

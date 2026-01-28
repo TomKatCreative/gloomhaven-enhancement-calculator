@@ -107,13 +107,7 @@ class _HomeState extends State<Home> {
               onPressed: appModel.page == 1
                   ? () => enhancementModel.resetCost()
                   : charactersModel.characters.isEmpty
-                  ? () => showDialog<bool>(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (_) => CreateCharacterDialog(
-                        charactersModel: charactersModel,
-                      ),
-                    )
+                  ? () => CreateCharacterSheet.show(context, charactersModel)
                   : () => charactersModel.isEditMode =
                         !charactersModel.isEditMode,
               child: Icon(

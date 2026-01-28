@@ -268,14 +268,9 @@ class _GHCAppBarState extends State<GHCAppBar> {
                           });
                         }
                       : () async {
-                          await showDialog<bool>(
-                            barrierDismissible: false,
-                            context: context,
-                            builder: (_) {
-                              return CreateCharacterDialog(
-                                charactersModel: charactersModel,
-                              );
-                            },
+                          await CreateCharacterSheet.show(
+                            context,
+                            charactersModel,
                           );
                         },
                 ),
