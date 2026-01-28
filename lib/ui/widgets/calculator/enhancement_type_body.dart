@@ -43,7 +43,7 @@ class EnhancementTypeBody extends StatelessWidget {
         onSelected: model.enhancementSelected,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: enhancement != null
             ? _buildSelectedEnhancement(context, enhancement)
             : Text(

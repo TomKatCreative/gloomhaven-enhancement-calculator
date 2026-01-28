@@ -45,7 +45,7 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                 .enhancementCalcScrollController,
             padding: EdgeInsets.only(
               // Extra padding when chip and FAB are present
-              bottom: enhancementCalculatorModel.showCost ? 80 : 16,
+              bottom: enhancementCalculatorModel.showCost ? 90 : largePadding,
             ),
             children: <Widget>[
               // === ACTION DETAILS ===

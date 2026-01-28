@@ -174,10 +174,6 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
                       ),
                     ),
                   ),
-                  Divider(
-                    height: 1,
-                    color: Theme.of(context).dividerTheme.color,
-                  ),
                 ],
               ),
             ),
