@@ -15,15 +15,15 @@ import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
-class EnhancementCalculatorPage extends StatefulWidget {
-  const EnhancementCalculatorPage({super.key});
+class EnhancementCalculatorScreen extends StatefulWidget {
+  const EnhancementCalculatorScreen({super.key});
 
   @override
-  State<EnhancementCalculatorPage> createState() =>
-      _EnhancementCalculatorPageState();
+  State<EnhancementCalculatorScreen> createState() =>
+      _EnhancementCalculatorScreenState();
 }
 
-class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
+class _EnhancementCalculatorScreenState extends State<EnhancementCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context

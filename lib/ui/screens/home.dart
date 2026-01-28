@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/create_character_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_430_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_page.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_bottom_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
@@ -97,7 +97,7 @@ class _HomeState extends State<Home> {
               }
             },
           ),
-          const EnhancementCalculatorPage(),
+          const EnhancementCalculatorScreen(),
         ],
       ),
       floatingActionButton: hideFab
@@ -107,7 +107,7 @@ class _HomeState extends State<Home> {
               onPressed: appModel.page == 1
                   ? () => enhancementModel.resetCost()
                   : charactersModel.characters.isEmpty
-                  ? () => CreateCharacterSheet.show(context, charactersModel)
+                  ? () => CreateCharacterScreen.show(context, charactersModel)
                   : () => charactersModel.isEditMode =
                         !charactersModel.isEditMode,
               child: Icon(
