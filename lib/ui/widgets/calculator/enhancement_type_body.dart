@@ -5,7 +5,7 @@ import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/enhancement_type_selector.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_type_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
@@ -14,8 +14,8 @@ const double _iconSize = 30;
 
 /// The body content for the Enhancement Type selector card.
 ///
-/// Contains a tappable button that opens a bottom sheet for selecting
-/// enhancement types, and displays the current selection with its cost inline.
+/// Contains a tappable button that opens [EnhancementTypeSelectorScreen] for
+/// selecting enhancement types, and displays the current selection with its cost inline.
 class EnhancementTypeBody extends StatelessWidget {
   final EnhancementCalculatorModel model;
   final GameEdition edition;
@@ -36,7 +36,7 @@ class EnhancementTypeBody extends StatelessWidget {
     final enhancement = model.enhancement;
 
     return InkWell(
-      onTap: () => EnhancementTypeSelector.show(
+      onTap: () => EnhancementTypeSelectorScreen.show(
         context,
         currentSelection: enhancement,
         edition: edition,

@@ -3,7 +3,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/create_character_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -268,7 +268,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
                           });
                         }
                       : () async {
-                          await CreateCharacterSheet.show(
+                          await CreateCharacterScreen.show(
                             context,
                             charactersModel,
                           );

@@ -5,44 +5,77 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:provider/provider.dart';
 
-/// A searchable bottom sheet for selecting enhancement types.
-/// Material 3 compliant with search, grouping by category, and rich item display.
-class EnhancementTypeSelector extends StatefulWidget {
+/// A full-page screen for selecting enhancement types in the calculator.
+///
+/// Displays all available enhancements for the current [GameEdition], grouped
+/// by category with search functionality. Each enhancement shows its base cost
+/// and any applicable discounts.
+///
+/// ## Features
+/// - **Search**: Filters enhancements by name
+/// - **Section headers**: Groups enhancements by [EnhancementCategory]
+/// - **Cost display**: Shows base cost and discounted cost (with strikethrough)
+/// - **Edition-aware**: Only shows enhancements available in the selected edition
+///
+/// ## Layout
+/// ```
+/// ┌─────────────────────────────────────┐
+/// │ [←]  [🔍 Search...]                 │  ← AppBar with search
+/// ├─────────────────────────────────────┤
+/// │ ──────── [+1] +1 Stats ────────     │  ← Section header with icon
+/// │ [MOVE] +1 Move                 30g  │
+/// │ [ATK]  +1 Attack               50g  │
+/// │ ──────── [◇] Elements ────────      │
+/// │ [FIRE] Fire                    50g  │
+/// │ ...                                 │
+/// └─────────────────────────────────────┘
+/// ```
+///
+/// ## Invocation
+/// ```dart
+/// await EnhancementTypeSelectorScreen.show(
+///   context,
+///   currentSelection: model.enhancement,
+///   edition: model.edition,
+///   onSelected: model.enhancementSelected,
+/// );
+/// ```
+class EnhancementTypeSelectorScreen extends StatefulWidget {
+  /// The currently selected enhancement, if any. Used for highlight styling.
   final Enhancement? currentSelection;
+
+  /// The game edition to filter available enhancements.
   final GameEdition edition;
+
+  /// Callback invoked when an enhancement is selected.
   final ValueChanged<Enhancement> onSelected;
 
-  const EnhancementTypeSelector({
+  const EnhancementTypeSelectorScreen({
     super.key,
     this.currentSelection,
     required this.edition,
     required this.onSelected,
   });
 
-  /// Shows the enhancement type selector as a modal bottom sheet.
+  /// Shows the enhancement type selector as a full page route.
+  ///
+  /// Returns the selected [Enhancement] or `null` if cancelled.
   static Future<Enhancement?> show(
     BuildContext context, {
     Enhancement? currentSelection,
     required GameEdition edition,
     required ValueChanged<Enhancement> onSelected,
   }) {
-    return showModalBottomSheet<Enhancement>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: false,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) => SafeArea(
-        top: false,
-        bottom: true,
-        child: EnhancementTypeSelector(
+    return Navigator.push<Enhancement>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EnhancementTypeSelectorScreen(
           currentSelection: currentSelection,
           edition: edition,
           onSelected: onSelected,
@@ -52,15 +85,16 @@ class EnhancementTypeSelector extends StatefulWidget {
   }
 
   @override
-  State<EnhancementTypeSelector> createState() =>
-      _EnhancementTypeSelectorState();
+  State<EnhancementTypeSelectorScreen> createState() =>
+      _EnhancementTypeSelectorScreenState();
 }
 
-class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
+class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   String _searchQuery = '';
 
+  /// Returns enhancements filtered by edition and search query.
   List<Enhancement> get _filteredEnhancements {
     final available = EnhancementData.enhancements
         .where((e) => EnhancementData.isAvailableInEdition(e, widget.edition))
@@ -76,7 +110,9 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
         .toList();
   }
 
-  /// Returns the section title if this item starts a new section, null otherwise
+  /// Returns the section title if this index starts a new category.
+  ///
+  /// Used to insert [SearchSectionHeader] widgets between category groups.
   String? _getSectionHeader(int index) {
     final enhancements = _filteredEnhancements;
     if (index >= enhancements.length) return null;
@@ -96,7 +132,7 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
     return null;
   }
 
-  /// Returns the asset key for a section header
+  /// Returns the asset key for a section's icon.
   String? _getSectionAssetKey(int index) {
     final enhancements = _filteredEnhancements;
     if (index >= enhancements.length) return null;
@@ -112,141 +148,81 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final model = context.read<EnhancementCalculatorModel>();
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Column(
-          children: [
-            // Header section with background to prevent list items showing through
-            Container(
-              color: colorScheme.surfaceContainerLow,
-              child: Column(
-                children: [
-                  // Drag handle
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12, bottom: 8),
-                    child: Container(
-                      width: 32,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.4,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  // Search bar
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: SearchBar(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      hintText: AppLocalizations.of(context).search,
-                      leading: const Padding(
-                        padding: EdgeInsets.only(left: 8),
-                        child: Icon(Icons.search),
-                      ),
-                      trailing: _searchQuery.isNotEmpty
-                          ? [
-                              IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() => _searchQuery = '');
-                                },
-                              ),
-                            ]
-                          : null,
-                      onChanged: (value) {
-                        setState(() => _searchQuery = value);
+    return Scaffold(
+      appBar: AppBar(
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: SearchBar(
+            controller: _searchController,
+            focusNode: _searchFocusNode,
+            hintText: AppLocalizations.of(context).search,
+            leading: const Padding(
+              padding: EdgeInsets.only(left: 8),
+              child: Icon(Icons.search),
+            ),
+            trailing: _searchQuery.isNotEmpty
+                ? [
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _searchQuery = '');
                       },
-                      elevation: WidgetStateProperty.all(0),
-                      backgroundColor: WidgetStateProperty.all(
-                        colorScheme.surfaceContainerHighest,
-                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            // Enhancement list
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                padding: const EdgeInsets.only(bottom: 16),
-                itemCount: _filteredEnhancements.length,
-                itemBuilder: (context, index) {
-                  final enhancement = _filteredEnhancements[index];
-                  final isSelected = widget.currentSelection == enhancement;
-                  final sectionHeader = _getSectionHeader(index);
-                  final sectionAssetKey = _getSectionAssetKey(index);
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Show section header if this item starts a new section
-                      if (sectionHeader != null)
-                        _buildCategoryHeader(
-                          context,
-                          sectionHeader,
-                          sectionAssetKey,
-                        ),
-                      // Enhancement item
-                      _buildEnhancementTile(
-                        context,
-                        enhancement,
-                        isSelected: isSelected,
-                        model: model,
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildCategoryHeader(
-    BuildContext context,
-    String title,
-    String? assetKey,
-  ) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Row(
-        children: [
-          Expanded(child: Divider(color: theme.dividerTheme.color)),
-          const SizedBox(width: 12),
-          if (assetKey != null) ...[
-            ThemedSvg(assetKey: assetKey, width: 24, height: 24),
-            const SizedBox(width: 8),
-          ],
-          Text(
-            title,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+                  ]
+                : null,
+            onChanged: (value) {
+              setState(() => _searchQuery = value);
+            },
+            elevation: WidgetStateProperty.all(0),
+            backgroundColor: WidgetStateProperty.all(Colors.transparent),
           ),
-          const SizedBox(width: 12),
-          Expanded(child: Divider(color: theme.dividerTheme.color)),
-        ],
+        ),
+      ),
+      body: SafeArea(
+        top: false,
+        child: ListView.builder(
+          padding: const EdgeInsets.only(bottom: 16),
+          itemCount: _filteredEnhancements.length,
+          itemBuilder: (context, index) {
+            final enhancement = _filteredEnhancements[index];
+            final isSelected = widget.currentSelection == enhancement;
+            final sectionHeader = _getSectionHeader(index);
+            final sectionAssetKey = _getSectionAssetKey(index);
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Show section header if this item starts a new section
+                if (sectionHeader != null)
+                  SearchSectionHeader(
+                    title: sectionHeader,
+                    assetKey: sectionAssetKey,
+                  ),
+                // Enhancement item
+                _buildEnhancementTile(
+                  context,
+                  enhancement,
+                  isSelected: isSelected,
+                  model: model,
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
+  /// Builds a list tile for an enhancement option.
+  ///
+  /// Shows:
+  /// - Enhancement icon (with +1 overlay for stat boosts)
+  /// - Enhancement name
+  /// - Cost chip (base cost, or strikethrough + discounted if applicable)
   Widget _buildEnhancementTile(
     BuildContext context,
     Enhancement enhancement, {
@@ -279,6 +255,11 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
     );
   }
 
+  /// Builds the icon for an enhancement.
+  ///
+  /// Special cases:
+  /// - "Element" shows a stacked element icon
+  /// - +1 stat enhancements show a +1 overlay badge
   Widget _buildEnhancementIcon(Enhancement enhancement) {
     final isPlusOne =
         enhancement.category == EnhancementCategory.charPlusOne ||
@@ -296,6 +277,11 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
     );
   }
 
+  /// Builds the cost display chip for an enhancement.
+  ///
+  /// If there's a discount (from enhancer level, Hail's discount, etc.),
+  /// shows the base cost with strikethrough and the discounted cost.
+  /// The ‡ marker indicates Hail's discount is active.
   Widget _buildCostChip(
     BuildContext context, {
     required int baseCost,
@@ -309,7 +295,6 @@ class _EnhancementTypeSelectorState extends State<EnhancementTypeSelector> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        // color: colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(16),
       ),
       child: hasDiscount

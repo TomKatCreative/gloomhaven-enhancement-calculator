@@ -3,48 +3,38 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:gloomhaven_enhancement_calc/custom_search_delegate.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
-import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-/// A modal bottom sheet for creating new characters.
-/// Material 3 compliant with drag handle, scrollable form, and fixed action buttons.
-class CreateCharacterSheet extends StatefulWidget {
+/// A full-page screen for creating new characters.
+class CreateCharacterScreen extends StatefulWidget {
   final CharactersModel charactersModel;
 
-  const CreateCharacterSheet({super.key, required this.charactersModel});
+  const CreateCharacterScreen({super.key, required this.charactersModel});
 
-  /// Shows the create character sheet as a modal bottom sheet.
+  /// Shows the create character screen as a full page route.
   static Future<bool?> show(BuildContext context, CharactersModel model) {
-    return showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: false,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      builder: (context) => SafeArea(
-        top: false,
-        bottom: true,
-        child: CreateCharacterSheet(charactersModel: model),
+    return Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateCharacterScreen(charactersModel: model),
       ),
     );
   }
 
   @override
-  CreateCharacterSheetState createState() => CreateCharacterSheetState();
+  CreateCharacterScreenState createState() => CreateCharacterScreenState();
 }
 
-class CreateCharacterSheetState extends State<CreateCharacterSheet> {
+class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   final TextEditingController _nameTextFieldController =
       TextEditingController();
   final TextEditingController _classTextFieldController =
@@ -89,83 +79,38 @@ class CreateCharacterSheetState extends State<CreateCharacterSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.5,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: bottomInset),
-          child: Column(
-            children: [
-              // Fixed header section
-              _buildHeader(context, theme, colorScheme),
-              // Scrollable form content
-              Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(largePadding),
-                    children: [
-                      _buildNameField(context, theme),
-                      const SizedBox(height: 20),
-                      _buildClassSelector(context, theme),
-                      const SizedBox(height: 20),
-                      _buildLevelSelector(context, theme, colorScheme),
-                      const SizedBox(height: 20),
-                      _buildRetirementsAndProsperityRow(context, theme),
-                      const SizedBox(height: 20),
-                      _buildEditionToggle(context, theme),
-                      // Extra bottom padding for scrolling past last field
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-              // Fixed action buttons at bottom
-              _buildActionButtons(context, theme, colorScheme),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildHeader(
-    BuildContext context,
-    ThemeData theme,
-    ColorScheme colorScheme,
-  ) {
-    return Container(
-      color: colorScheme.surfaceContainerLow,
-      child: Column(
-        children: [
-          // Drag handle
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context).createCharacter),
+        actions: [
           Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 8),
-            child: Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
+            padding: const EdgeInsets.only(right: mediumPadding),
+            child: FilledButton.icon(
+              icon: const Icon(Icons.check),
+              label: Text(AppLocalizations.of(context).create),
+              onPressed: _onCreatePressed,
             ),
           ),
-          // Title
-          Padding(
-            padding: const EdgeInsets.only(bottom: mediumPadding),
-            child: Text(
-              AppLocalizations.of(context).createCharacter,
-              style: theme.textTheme.headlineSmall,
-            ),
-          ),
-          Divider(height: 1, color: theme.dividerTheme.color),
         ],
+      ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(largePadding),
+          children: [
+            _buildNameField(context, theme),
+            const SizedBox(height: 20),
+            _buildClassSelector(context, theme),
+            const SizedBox(height: 20),
+            _buildLevelSelector(context, theme, colorScheme),
+            const SizedBox(height: 20),
+            _buildRetirementsAndProsperityRow(context, theme),
+            const SizedBox(height: 20),
+            _buildEditionToggle(context, theme),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
@@ -269,12 +214,7 @@ class CreateCharacterSheetState extends State<CreateCharacterSheet> {
                 ),
                 onTap: () async {
                   SelectedPlayerClass? selectedPlayerClass =
-                      await showSearch<SelectedPlayerClass>(
-                        context: context,
-                        delegate: CustomSearchDelegate(
-                          PlayerClasses.playerClasses,
-                        ),
-                      );
+                      await ClassSelectorScreen.show(context);
                   if (selectedPlayerClass != null) {
                     if (!context.mounted) return;
                     FocusScope.of(context).requestFocus(_nameFocusNode);
@@ -488,37 +428,6 @@ class CreateCharacterSheetState extends State<CreateCharacterSheet> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActionButtons(
-    BuildContext context,
-    ThemeData theme,
-    ColorScheme colorScheme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(largePadding),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerLow,
-        border: Border(
-          top: BorderSide(color: theme.dividerTheme.color ?? Colors.grey),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(AppLocalizations.of(context).cancel),
-          ),
-          const SizedBox(width: mediumPadding),
-          FilledButton.icon(
-            icon: const Icon(Icons.check),
-            label: Text(AppLocalizations.of(context).create),
-            onPressed: _onCreatePressed,
-          ),
-        ],
-      ),
     );
   }
 
