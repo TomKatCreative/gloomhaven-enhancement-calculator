@@ -498,26 +498,32 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   static const String newCharacterInfoTitle = "New Character";
 
   static String _newCharacterContent({required GameEdition edition}) {
-    if (edition == GameEdition.frosthaven) {
-      return "When starting a new character in Frosthaven, you can choose to immediately "
-          "level up to any level less than or equal to the current Prosperity Level of the "
-          "city divided by 2 (rounded up), gaining the benefits for each level in sequence.\n"
-          "You are also alloted an amount of gold equal to **10xP+20**, where 'P' is the "
-          "current Prosperity Level.\nFor example, if the city is at Prosperity Level 3, "
-          "you could start a character at level 1 or 2, and would be alloted 40 gold. This "
-          "gold must be spent immediately on items in the available purchasable supply, and "
-          "any unspent gold is forfeited.";
-    } else {
-      // GH and GH2E use the same new character rules
-      final gameName = edition == GameEdition.gloomhaven2e
-          ? 'Gloomhaven 2E'
-          : 'Gloomhaven';
-      return "When starting a new character in $gameName, you can choose to immediately "
-          "level up to any level less than or equal to the current Prosperity Level of the "
-          "city, gaining the benefits for each level in sequence.\nYou are also alloted an "
-          "amount of gold equal to **15x(L+1)**, where L is your character's starting level.\n"
-          "For example, if the city is at Prosperity Level 3, you could start a character at "
-          "level 1, 2, or 3, and would be alloted 30, 45, or 60 gold, respectively.";
+    switch (edition) {
+      case GameEdition.gloomhaven:
+        return "When starting a new character in Gloomhaven, you can choose to immediately "
+            "level up to any level less than or equal to the current Prosperity Level of the "
+            "city, gaining the benefits for each level in sequence.\n\n"
+            "You are also alloted an amount of gold equal to **15x(L+1)**, where 'L' is your "
+            "character's starting level.\n\n"
+            "For example, if the city is at Prosperity Level 3, you could start a character at "
+            "level 1, 2, or 3, and would be alloted 30, 45, or 60 gold, respectively.";
+      case GameEdition.gloomhaven2e:
+        return "When starting a new character in Gloomhaven 2E, they always start "
+            "at level 1. They may immediately level up (even multiple times) as long as their "
+            "level does not exceed half the current Prosperity Level (rounded up).\n\n"
+            "You are alloted an amount of gold equal to **10xP+15**, where 'P' is the current "
+            "Prosperity Level. This gold must be spent immediately on items.\n\n"
+            "For example, if the city is at Prosperity Level 4, you could level up to level 2, "
+            "and would be alloted 55 gold.";
+      case GameEdition.frosthaven:
+        return "When starting a new character in Frosthaven, you can choose to immediately "
+            "level up to any level less than or equal to the current Prosperity Level of the "
+            "city divided by 2 (rounded up), gaining the benefits for each level in sequence.\n\n"
+            "You are also alloted an amount of gold equal to **10xP+20**, where 'P' is the "
+            "current Prosperity Level.\n\n"
+            "For example, if the city is at Prosperity Level 3, you could start a character at "
+            "level 1 or 2, and would be alloted 50 gold. This gold must be spent immediately "
+            "on items in the available purchasable supply, and any unspent gold is forfeited.";
     }
   }
 
