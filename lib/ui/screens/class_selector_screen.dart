@@ -4,9 +4,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
-import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -78,6 +78,7 @@ class ClassSelectorScreen extends StatefulWidget {
 class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
 
   /// Active category filters. Empty means show all categories.
@@ -90,6 +91,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -197,36 +199,16 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: SearchBar(
-            controller: _searchController,
-            focusNode: _searchFocusNode,
-            hintText: AppLocalizations.of(context).search,
-            leading: const Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.search),
-            ),
-            trailing: _searchQuery.isNotEmpty
-                ? [
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                    ),
-                  ]
-                : null,
-            onChanged: (value) {
-              setState(() => _searchQuery = value);
-            },
-            elevation: WidgetStateProperty.all(0),
-            backgroundColor: WidgetStateProperty.all(Colors.transparent),
-          ),
-        ),
+      appBar: GHCSearchAppBar(
+        controller: _searchController,
+        focusNode: _searchFocusNode,
+        searchQuery: _searchQuery,
+        scrollController: _scrollController,
+        onChanged: (value) => setState(() => _searchQuery = value),
+        onClear: () {
+          _searchController.clear();
+          setState(() => _searchQuery = '');
+        },
       ),
       body: SafeArea(
         top: false,
@@ -295,6 +277,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
             // Class list with section headers
             Expanded(
               child: ListView.builder(
+                controller: _scrollController,
                 padding: const EdgeInsets.only(bottom: 16),
                 itemCount: _filteredClasses.length,
                 itemBuilder: (context, index) {

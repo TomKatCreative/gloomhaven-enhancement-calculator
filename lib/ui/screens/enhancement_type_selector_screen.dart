@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
-import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
@@ -92,6 +92,7 @@ class EnhancementTypeSelectorScreen extends StatefulWidget {
 class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
 
   /// Returns enhancements filtered by edition and search query.
@@ -143,6 +144,7 @@ class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorS
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -151,40 +153,21 @@ class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorS
     final model = context.read<EnhancementCalculatorModel>();
 
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        title: Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: SearchBar(
-            controller: _searchController,
-            focusNode: _searchFocusNode,
-            hintText: AppLocalizations.of(context).search,
-            leading: const Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.search),
-            ),
-            trailing: _searchQuery.isNotEmpty
-                ? [
-                    IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      },
-                    ),
-                  ]
-                : null,
-            onChanged: (value) {
-              setState(() => _searchQuery = value);
-            },
-            elevation: WidgetStateProperty.all(0),
-            backgroundColor: WidgetStateProperty.all(Colors.transparent),
-          ),
-        ),
+      appBar: GHCSearchAppBar(
+        controller: _searchController,
+        focusNode: _searchFocusNode,
+        searchQuery: _searchQuery,
+        scrollController: _scrollController,
+        onChanged: (value) => setState(() => _searchQuery = value),
+        onClear: () {
+          _searchController.clear();
+          setState(() => _searchQuery = '');
+        },
       ),
       body: SafeArea(
         top: false,
         child: ListView.builder(
+          controller: _scrollController,
           padding: const EdgeInsets.only(bottom: 16),
           itemCount: _filteredEnhancements.length,
           itemBuilder: (context, index) {

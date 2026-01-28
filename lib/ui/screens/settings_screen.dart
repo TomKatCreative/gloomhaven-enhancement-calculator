@@ -17,6 +17,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/changelog_screen.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:intl/intl.dart';
@@ -73,23 +74,15 @@ class SettingsScreenState extends State<SettingsScreen> {
       top: false,
       bottom: Platform.isAndroid,
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          leading: IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: Icon(
-              Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
-            ),
-          ),
-          title: Text(
-            AppLocalizations.of(context).settings,
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
+        appBar: GHCAppBar(
+          title: AppLocalizations.of(context).settings,
+          scrollController: scrollController,
         ),
         body: Center(
           child: Container(
             constraints: const BoxConstraints(maxWidth: maxWidth),
             child: ListView(
+              controller: scrollController,
               children: <Widget>[
                 SettingsSection(title: AppLocalizations.of(context).gameplay),
                 SwitchListTile(

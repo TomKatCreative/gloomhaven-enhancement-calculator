@@ -6,6 +6,7 @@ const double secondaryFontSize = 25.0,
     smallPadding = 4.0,
     mediumPadding = 8.0,
     largePadding = 16.0,
+    extraLargePadding = 24.0,
     maxWidth = 500,
     maxDialogWidth = 400;
 const String nyala = 'Nyala',

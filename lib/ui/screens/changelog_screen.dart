@@ -2,11 +2,26 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-class ChangelogScreen extends StatelessWidget {
+class ChangelogScreen extends StatefulWidget {
   const ChangelogScreen({super.key});
+
+  @override
+  State<ChangelogScreen> createState() => _ChangelogScreenState();
+}
+
+class _ChangelogScreenState extends State<ChangelogScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,27 +29,32 @@ class ChangelogScreen extends StatelessWidget {
       top: false,
       bottom: Platform.isAndroid,
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: FutureBuilder<PackageInfo>(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (context, snapshot) {
-              return Column(
-                children: [
-                  Text(AppLocalizations.of(context).changelog),
-                  if (snapshot.hasData)
-                    Text(
-                      kDebugMode
-                          ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-                          : 'v${snapshot.data!.version}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                ],
+              final versionText = snapshot.hasData
+                  ? (kDebugMode
+                      ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
+                      : 'v${snapshot.data!.version}')
+                  : null;
+              return GHCAppBar(
+                title: AppLocalizations.of(context).changelog,
+                centerTitle: true,
+                scrollController: _scrollController,
+                subtitle: versionText != null
+                    ? Text(
+                        versionText,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      )
+                    : null,
               );
             },
           ),
         ),
         body: ListView(
+          controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
@@ -45,13 +65,13 @@ class ChangelogScreen extends StatelessWidget {
                 'Added cost breakdown details.',
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             const _VersionSection(
               version: '4.3.2',
               date: '2026-01-18',
               changes: ['Added Alchemancer class.'],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             _VersionSection(
               version: '4.3.1',
               date: '2026-01-17',
@@ -61,7 +81,7 @@ class ChangelogScreen extends StatelessWidget {
                 'Added device information to email feedback pre-populated body text.',
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             _VersionSection(
               version: '4.3.0',
               date: '2026-01-11',
@@ -74,7 +94,7 @@ class ChangelogScreen extends StatelessWidget {
                   '(US based Android users only) Added "Buy me a Coffee" link to the Settings screen for donations (no added perks or features - just a way to show support)',
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             const _VersionSection(
               version: '4.2.2',
               date: '2025-10-16',
@@ -82,7 +102,7 @@ class ChangelogScreen extends StatelessWidget {
                 'Added all Gloomhaven 2nd Edition starter classes (locked classes coming soon).',
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             const _VersionSection(
               version: '4.2.1',
               date: '2025-10-06',
@@ -90,7 +110,7 @@ class ChangelogScreen extends StatelessWidget {
                 'Added Vimthreader, DOME, CORE, and Skitterclaw custom classes from CCUG.',
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: extraLargePadding),
             const _VersionSection(
               version: '4.2.0',
               date: '2025-06-19',

@@ -11,6 +11,7 @@ import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -49,6 +50,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   late faker.Faker _faker;
   late String _placeholderName;
   final FocusNode _nameFocusNode = FocusNode();
+  final ScrollController _scrollController = ScrollController();
   Variant _variant = Variant.base;
   int _selectedLevel = 1;
 
@@ -68,6 +70,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     _previousRetirementsTextFieldController.dispose();
     _prosperityLevelTextFieldController.dispose();
     _nameFocusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -81,8 +84,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).createCharacter),
+      appBar: GHCAppBar(
+        title: AppLocalizations.of(context).createCharacter,
+        scrollController: _scrollController,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: mediumPadding),
@@ -97,7 +101,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(largePadding),
+          controller: _scrollController,
+          padding: const EdgeInsets.all(extraLargePadding),
           children: [
             _buildNameField(context, theme),
             const SizedBox(height: 20),
@@ -154,9 +159,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 textCapitalization: TextCapitalization.words,
                 autocorrect: false,
                 focusNode: _nameFocusNode,
-                decoration: InputDecoration(
-                  hintText: _placeholderName,
-                ),
+                decoration: InputDecoration(hintText: _placeholderName),
                 controller: _nameTextFieldController,
                 onChanged: (value) {
                   setState(() {
@@ -314,9 +317,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               TextFormField(
                 enableInteractiveSelection: false,
                 controller: _previousRetirementsTextFieldController,
-                decoration: InputDecoration(
-                  hintText: '0',
-                ),
+                decoration: InputDecoration(hintText: '0'),
                 inputFormatters: [
                   FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
                 ],
@@ -344,9 +345,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   enabled: _selectedEdition != GameEdition.gloomhaven,
                   enableInteractiveSelection: false,
                   controller: _prosperityLevelTextFieldController,
-                  decoration: InputDecoration(
-                    hintText: '0',
-                    ),
+                  decoration: InputDecoration(hintText: '0'),
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(
                       RegExp('[\\.|\\,|\\ |\\-]'),

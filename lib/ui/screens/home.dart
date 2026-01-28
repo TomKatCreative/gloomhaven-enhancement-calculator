@@ -10,7 +10,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.d
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_430_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_bottom_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
       // this is necessary to make notched FAB background transparent, effectively
       // extendBody: true,
       key: scaffoldMessengerKey,
-      appBar: const GHCAppBar(),
+      appBar: const GHCAnimatedAppBar(),
       body: PageView(
         physics: const NeverScrollableScrollPhysics(),
         controller: context.read<AppModel>().pageController,

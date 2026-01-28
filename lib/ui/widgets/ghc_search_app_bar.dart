@@ -1,49 +1,53 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 
-/// Standard AppBar for pushed routes with scroll-aware tinting.
+/// An AppBar with an integrated search field and scroll-aware tinting.
 ///
 /// Features:
 /// - Platform-aware back button (iOS arrow vs Android arrow)
+/// - Integrated SearchBar with clear button
 /// - Scroll-aware primary color tint (8% overlay) with fade animation
-/// - Optional subtitle below title
-/// - Optional action buttons
 ///
 /// When a [scrollController] is provided, the AppBar animates its background
 /// color based on scroll position:
 /// - At top: Uses surface color (no tint)
 /// - When scrolled: Fades to 8% primary color tint
 ///
-/// For the Home screen's scroll-animated AppBar, use [GHCAnimatedAppBar].
-/// For search-enabled AppBars, use [GHCSearchAppBar].
-///
 /// ## Usage
 /// ```dart
-/// GHCAppBar(
-///   title: 'Settings',
+/// GHCSearchAppBar(
+///   controller: _searchController,
+///   focusNode: _searchFocusNode,
+///   searchQuery: _searchQuery,
 ///   scrollController: _scrollController,
-///   actions: [
-///     IconButton(icon: Icon(Icons.save), onPressed: _save),
-///   ],
+///   onChanged: (value) => setState(() => _searchQuery = value),
+///   onClear: () {
+///     _searchController.clear();
+///     setState(() => _searchQuery = '');
+///   },
 /// )
 /// ```
-class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
-  /// The primary title text displayed in the AppBar.
-  final String title;
+class GHCSearchAppBar extends StatefulWidget implements PreferredSizeWidget {
+  /// The controller for the search text field.
+  final TextEditingController controller;
 
-  /// Optional widget displayed below the title.
-  final Widget? subtitle;
+  /// The focus node for the search text field.
+  final FocusNode focusNode;
 
-  /// Whether to center the title. Defaults to false.
-  final bool centerTitle;
+  /// The current search query value. Used to show/hide clear button.
+  final String searchQuery;
 
-  /// Optional action buttons displayed on the right side.
-  final List<Widget>? actions;
+  /// Optional hint text override. Defaults to localized "Search".
+  final String? hintText;
 
-  /// Custom text style for the title. If null, uses headlineLarge from theme.
-  final TextStyle? titleStyle;
+  /// Callback when search text changes.
+  final ValueChanged<String> onChanged;
+
+  /// Callback when clear button is pressed.
+  final VoidCallback onClear;
 
   /// Optional scroll controller to enable scroll-aware tinting.
   ///
@@ -51,24 +55,25 @@ class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
   /// and tinted color (when scrolled) with a 300ms fade animation.
   final ScrollController? scrollController;
 
-  const GHCAppBar({
+  const GHCSearchAppBar({
     super.key,
-    required this.title,
-    this.subtitle,
-    this.centerTitle = false,
-    this.actions,
-    this.titleStyle,
+    required this.controller,
+    required this.focusNode,
+    required this.searchQuery,
+    this.hintText,
+    required this.onChanged,
+    required this.onClear,
     this.scrollController,
   });
 
   @override
-  State<GHCAppBar> createState() => _GHCAppBarState();
+  State<GHCSearchAppBar> createState() => _GHCSearchAppBarState();
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class _GHCAppBarState extends State<GHCAppBar> {
+class _GHCSearchAppBarState extends State<GHCSearchAppBar> {
   bool _isScrolledToTop = true;
 
   @override
@@ -78,7 +83,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
   }
 
   @override
-  void didUpdateWidget(GHCAppBar oldWidget) {
+  void didUpdateWidget(GHCSearchAppBar oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.scrollController != widget.scrollController) {
       oldWidget.scrollController?.removeListener(_scrollListener);
@@ -105,8 +110,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final baseColor = colorScheme.surface;
     final scrolledColor = AppBarUtils.getTintedBackground(colorScheme);
 
@@ -117,32 +121,39 @@ class _GHCAppBarState extends State<GHCAppBar> {
       builder: (context, progress, child) {
         return AppBar(
           automaticallyImplyLeading: false,
-          centerTitle: widget.centerTitle,
           elevation: progress * 4.0,
           scrolledUnderElevation: 0,
           backgroundColor: Color.lerp(baseColor, scrolledColor, progress),
+          titleSpacing: 0,
           leading: IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(
               Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
             ),
           ),
-          title: widget.subtitle != null
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.title,
-                      style: widget.titleStyle ?? theme.textTheme.headlineLarge,
-                    ),
-                    widget.subtitle!,
-                  ],
-                )
-              : Text(
-                  widget.title,
-                  style: widget.titleStyle ?? theme.textTheme.headlineLarge,
-                ),
-          actions: widget.actions,
+          title: Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: SearchBar(
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              hintText: widget.hintText ?? AppLocalizations.of(context).search,
+              leading: const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Icon(Icons.search),
+              ),
+              trailing: widget.searchQuery.isNotEmpty
+                  ? [
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: widget.onClear,
+                      ),
+                    ]
+                  : null,
+              onChanged: widget.onChanged,
+              elevation: WidgetStateProperty.all(0),
+              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+            ),
+          ),
         );
       },
     );
