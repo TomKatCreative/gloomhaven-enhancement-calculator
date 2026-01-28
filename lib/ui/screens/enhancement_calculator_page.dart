@@ -64,12 +64,9 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                       ),
                       child: Text(
                         AppLocalizations.of(context).actionDetails,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     Expanded(
@@ -87,21 +84,14 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                 model: enhancementCalculatorModel,
               ),
 
-              // 2. CARD LEVEL
-              _CardLevelCard(
+              // 2. CARD LEVEL & PREVIOUS ENHANCEMENTS - grouped card
+              _CardDetailsGroupCard(
                 edition: edition,
-                enhancementCalculatorModel: enhancementCalculatorModel,
+                model: enhancementCalculatorModel,
                 darkTheme: darkTheme,
               ),
 
-              // 3. PREVIOUS ENHANCEMENTS
-              _PreviousEnhancementsCard(
-                edition: edition,
-                enhancementCalculatorModel: enhancementCalculatorModel,
-                darkTheme: darkTheme,
-              ),
-
-              // 4. MODIFIERS - grouped card
+              // 3. MODIFIERS - grouped card
               _ModifiersGroupCard(
                 edition: edition,
                 enhancementCalculatorModel: enhancementCalculatorModel,
@@ -124,12 +114,9 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                       ),
                       child: Text(
                         AppLocalizations.of(context).discounts,
-                        style: Theme.of(context).textTheme.labelMedium
-                            ?.copyWith(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onSurfaceVariant,
-                            ),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                     Expanded(
@@ -163,88 +150,154 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
   }
 }
 
-/// Card Level selector card using the new component system.
-class _CardLevelCard extends StatelessWidget {
+/// Card Details group - combines Card Level and Previous Enhancements.
+class _CardDetailsGroupCard extends StatelessWidget {
   final dynamic edition;
-  final EnhancementCalculatorModel enhancementCalculatorModel;
+  final EnhancementCalculatorModel model;
   final bool darkTheme;
 
-  const _CardLevelCard({
+  const _CardDetailsGroupCard({
     required this.edition,
-    required this.enhancementCalculatorModel,
+    required this.model,
     required this.darkTheme,
   });
 
   @override
   Widget build(BuildContext context) {
-    final partyBoon = edition.supportsPartyBoon && SharedPrefs().partyBoon;
-    final enhancerLvl3 =
-        edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3;
-    final level = enhancementCalculatorModel.cardLevel;
-    final baseCost = 25 * level;
-    final actualCost = enhancementCalculatorModel.cardLevelPenalty(level);
-
-    return CalculatorSectionCard(
-      infoConfig: InfoButtonConfig.titleMessage(
-        title: Strings.cardLevelInfoTitle,
-        message: Strings.cardLevelInfoBody(
-          context,
-          darkTheme,
-          edition: edition,
-          partyBoon: partyBoon,
-          enhancerLvl3: enhancerLvl3,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
+        child: Column(
+          children: [
+            _buildCardLevelSection(context),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: largePadding),
+              child: Divider(
+                height: 1,
+                color: Theme.of(context).dividerTheme.color,
+              ),
+            ),
+            _buildPreviousEnhancementsSection(context),
+          ],
         ),
-      ),
-      title: '${AppLocalizations.of(context).cardLevel}: ${level + 1}',
-      body: CardLevelBody(model: enhancementCalculatorModel),
-      costConfig: CostDisplayConfig(
-        baseCost: baseCost,
-        discountedCost: actualCost != baseCost ? actualCost : null,
       ),
     );
   }
-}
 
-/// Previous Enhancements selector card using the new component system.
-class _PreviousEnhancementsCard extends StatelessWidget {
-  final dynamic edition;
-  final EnhancementCalculatorModel enhancementCalculatorModel;
-  final bool darkTheme;
+  Widget _buildCardLevelSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final partyBoon = edition.supportsPartyBoon && SharedPrefs().partyBoon;
+    final enhancerLvl3 =
+        edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3;
+    final level = model.cardLevel;
+    final baseCost = 25 * level;
+    final actualCost = model.cardLevelPenalty(level);
 
-  const _PreviousEnhancementsCard({
-    required this.edition,
-    required this.enhancementCalculatorModel,
-    required this.darkTheme,
-  });
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: largePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.info_outline_rounded),
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => InfoDialog(
+                    title: Strings.cardLevelInfoTitle,
+                    message: Strings.cardLevelInfoBody(
+                      context,
+                      darkTheme,
+                      edition: edition,
+                      partyBoon: partyBoon,
+                      enhancerLvl3: enhancerLvl3,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: largePadding),
+              Text(
+                '${AppLocalizations.of(context).cardLevel}: ${level + 1}',
+                style: theme.textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          // Slider body
+          CardLevelBody(model: model),
+          // Cost display - padded to align with title (icon button width + spacing)
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 48 + largePadding,
+              top: mediumPadding,
+              bottom: mediumPadding,
+            ),
+            child: CostDisplay(
+              config: CostDisplayConfig(
+                baseCost: baseCost,
+                discountedCost: actualCost != baseCost ? actualCost : null,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildPreviousEnhancementsSection(BuildContext context) {
+    final theme = Theme.of(context);
     final enhancerLvl4 =
         edition.hasEnhancerLevels && SharedPrefs().enhancerLvl4;
-    final tempEnhancements =
-        enhancementCalculatorModel.temporaryEnhancementMode;
-    final selected = enhancementCalculatorModel.previousEnhancements;
+    final tempEnhancements = model.temporaryEnhancementMode;
+    final selected = model.previousEnhancements;
     final baseCost = 75 * selected;
-    final actualCost = enhancementCalculatorModel.previousEnhancementsPenalty(
-      selected,
-    );
+    final actualCost = model.previousEnhancementsPenalty(selected);
 
-    return CalculatorSectionCard(
-      infoConfig: InfoButtonConfig.titleMessage(
-        title: Strings.previousEnhancementsInfoTitle,
-        message: Strings.previousEnhancementsInfoBody(
-          context,
-          darkTheme,
-          edition: edition,
-          enhancerLvl4: enhancerLvl4,
-        ),
-      ),
-      title: AppLocalizations.of(context).previousEnhancements,
-      body: PreviousEnhancementsBody(model: enhancementCalculatorModel),
-      costConfig: CostDisplayConfig(
-        baseCost: baseCost,
-        discountedCost: actualCost != baseCost ? actualCost : null,
-        marker: tempEnhancements ? '\u2020' : null,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: largePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.info_outline_rounded),
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => InfoDialog(
+                    title: Strings.previousEnhancementsInfoTitle,
+                    message: Strings.previousEnhancementsInfoBody(
+                      context,
+                      darkTheme,
+                      edition: edition,
+                      enhancerLvl4: enhancerLvl4,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: largePadding),
+              Text(
+                AppLocalizations.of(context).previousEnhancements,
+                style: theme.textTheme.bodyLarge,
+              ),
+            ],
+          ),
+          // Segmented button body
+          PreviousEnhancementsBody(model: model),
+          // Cost display - padded to align with title (icon button width + spacing)
+          Padding(
+            padding: const EdgeInsets.only(left: 48 + largePadding),
+            child: CostDisplay(
+              config: CostDisplayConfig(
+                baseCost: baseCost,
+                discountedCost: actualCost != baseCost ? actualCost : null,
+                marker: tempEnhancements ? '\u2020' : null,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -263,7 +316,7 @@ class _EnhancementTypeCard extends StatelessWidget {
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: largePadding),
+        padding: const EdgeInsets.only(left: largePadding),
         child: Row(
           children: [
             IconButton(

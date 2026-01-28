@@ -86,7 +86,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
     // Base and scrolled colors for tint effect
     final baseColor = colorScheme.surface;
     final scrolledColor = Color.alphaBlend(
-      colorScheme.surfaceTint.withValues(alpha: 0.08),
+      colorScheme.primary.withValues(alpha: 0.08),
       baseColor,
     );
 

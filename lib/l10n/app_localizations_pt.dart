@@ -113,7 +113,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enhancementType => 'Tipo de Melhoria';
 
   @override
-  String get actionDetails => 'Detalhes da Ação';
+  String get actionDetails => 'Detalhes do Cartão';
 
   @override
   String get discounts => 'Descontos';
@@ -125,7 +125,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enhancementGuidelines => 'Diretrizes de Melhoria';
 
   @override
-  String get type => 'Tipo';
+  String get type => 'Selecionar tipo...';
 
   @override
   String get multipleTargets => 'Múltiplos Alvos';

@@ -113,7 +113,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enhancementType => 'Enhancement Type';
 
   @override
-  String get actionDetails => 'Action Details';
+  String get actionDetails => 'Card Details';
 
   @override
   String get discounts => 'Discounts';
@@ -125,7 +125,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enhancementGuidelines => 'Enhancement Guidelines';
 
   @override
-  String get type => 'Type';
+  String get type => 'Select type...';
 
   @override
   String get multipleTargets => 'Multiple Targets';

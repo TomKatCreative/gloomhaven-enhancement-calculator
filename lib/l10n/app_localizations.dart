@@ -293,7 +293,7 @@ abstract class AppLocalizations {
   /// No description provided for @actionDetails.
   ///
   /// In en, this message translates to:
-  /// **'Action Details'**
+  /// **'Card Details'**
   String get actionDetails;
 
   /// No description provided for @discounts.
@@ -317,7 +317,7 @@ abstract class AppLocalizations {
   /// No description provided for @type.
   ///
   /// In en, this message translates to:
-  /// **'Type'**
+  /// **'Select type...'**
   String get type;
 
   /// No description provided for @multipleTargets.

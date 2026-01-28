@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/enhancement_type_selector.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -48,7 +48,7 @@ class EnhancementTypeBody extends StatelessWidget {
             ? _buildSelectedEnhancement(context, enhancement)
             : Text(
                 AppLocalizations.of(context).type,
-                style: theme.textTheme.titleLarge?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -89,64 +89,7 @@ class EnhancementTypeBody extends StatelessWidget {
 
   Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
     if (enhancement.name == 'Element') {
-      return SizedBox(
-        width: _iconSize,
-        height: _iconSize,
-        child: Stack(
-          children: [
-            Positioned(
-              bottom: 5,
-              top: 5,
-              left: 5,
-              child: SvgPicture.asset(
-                'images/elements/elem_dark.svg',
-                width: 10,
-              ),
-            ),
-            Positioned(
-              top: 4,
-              left: 7,
-              child: SvgPicture.asset(
-                'images/elements/elem_air.svg',
-                width: 11,
-              ),
-            ),
-            Positioned(
-              top: 3,
-              right: 6,
-              child: SvgPicture.asset(
-                'images/elements/elem_ice.svg',
-                width: 12,
-              ),
-            ),
-            Positioned(
-              top: 0,
-              right: 2,
-              bottom: 2,
-              child: SvgPicture.asset(
-                'images/elements/elem_fire.svg',
-                width: 13,
-              ),
-            ),
-            Positioned(
-              bottom: 1,
-              right: 4,
-              child: SvgPicture.asset(
-                'images/elements/elem_earth.svg',
-                width: 14,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 3,
-              child: SvgPicture.asset(
-                'images/elements/elem_light.svg',
-                width: 15,
-              ),
-            ),
-          ],
-        ),
-      );
+      return ElementStackIcon(size: _iconSize);
     }
 
     return ThemedSvg(

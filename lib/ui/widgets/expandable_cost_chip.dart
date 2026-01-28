@@ -7,6 +7,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/calculation_step.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
@@ -210,13 +211,6 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                     decoration: BoxDecoration(
                       borderRadius: borderRadius,
                       boxShadow: [
-                        // Primary color glow (only when collapsed)
-                        if (!isExpanding)
-                          BoxShadow(
-                            color: colorScheme.primary.withValues(alpha: 0.7),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
                         // Soft shadow for depth
                         BoxShadow(
                           color: colorScheme.shadow.withValues(alpha: 0.2),
@@ -265,13 +259,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (widget.enhancement?.assetKey != null) ...[
-              ThemedSvg(
-                assetKey: widget.enhancement!.assetKey!,
-                width: 22,
-                height: 22,
-                showPlusOneOverlay: _isPlusOneEnhancement(widget.enhancement!),
-              ),
+            if (widget.enhancement != null) ...[
+              _buildEnhancementIcon(widget.enhancement!, 22),
               const SizedBox(width: mediumPadding),
             ],
             Text(
@@ -307,15 +296,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (widget.enhancement?.assetKey != null) ...[
-                      ThemedSvg(
-                        assetKey: widget.enhancement!.assetKey!,
-                        width: 40,
-                        height: 40,
-                        showPlusOneOverlay: _isPlusOneEnhancement(
-                          widget.enhancement!,
-                        ),
-                      ),
+                    if (widget.enhancement != null) ...[
+                      _buildEnhancementIcon(widget.enhancement!, 40),
                       const SizedBox(width: 12),
                     ],
                     Text(
@@ -413,6 +395,24 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           fontWeight: FontWeight.w500,
         ),
       ),
+    );
+  }
+
+  /// Builds the appropriate icon for the enhancement.
+  Widget _buildEnhancementIcon(Enhancement enhancement, double size) {
+    if (enhancement.name == 'Element') {
+      return ElementStackIcon(size: size);
+    }
+
+    if (enhancement.assetKey == null) {
+      return SizedBox(width: size, height: size);
+    }
+
+    return ThemedSvg(
+      assetKey: enhancement.assetKey!,
+      width: size,
+      height: size,
+      showPlusOneOverlay: _isPlusOneEnhancement(enhancement),
     );
   }
 
