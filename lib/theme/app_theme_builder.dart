@@ -101,7 +101,6 @@ class AppThemeBuilder {
       // Component themes
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: textTheme.bodyMedium,
-        border: const OutlineInputBorder(),
       ),
 
       textButtonTheme: TextButtonThemeData(

@@ -162,9 +162,6 @@ Use constants from `lib/data/constants.dart` instead of hardcoded values:
 - `mediumPadding` (8) - use instead of `8`
 - `largePadding` (16) - use instead of `16`
 
-### TextField Borders
-TextField border styling is centralized in `InputDecorationTheme` (in `lib/theme/app_theme_builder.dart`). All TextFields automatically use `OutlineInputBorder()` unless explicitly overridden. Don't add `border: OutlineInputBorder()` to individual TextField decorations.
-
 ### Database
 - UUID for character IDs (with legacy migration for old int IDs)
 - Migrations in `database_migrations.dart` - append new migrations, don't modify old ones
