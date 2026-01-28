@@ -89,6 +89,7 @@ class CreateCharacterSheetState extends State<CreateCharacterSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return DraggableScrollableSheet(
       initialChildSize: 0.85,
@@ -96,36 +97,39 @@ class CreateCharacterSheetState extends State<CreateCharacterSheet> {
       maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
-        return Column(
-          children: [
-            // Fixed header section
-            _buildHeader(context, theme, colorScheme),
-            // Scrollable form content
-            Expanded(
-              child: Form(
-                key: _formKey,
-                child: ListView(
-                  controller: scrollController,
-                  padding: const EdgeInsets.all(largePadding),
-                  children: [
-                    _buildNameField(context, theme),
-                    const SizedBox(height: 20),
-                    _buildClassSelector(context, theme),
-                    const SizedBox(height: 20),
-                    _buildLevelSelector(context, theme, colorScheme),
-                    const SizedBox(height: 20),
-                    _buildRetirementsAndProsperityRow(context, theme),
-                    const SizedBox(height: 20),
-                    _buildEditionToggle(context, theme),
-                    // Extra bottom padding for scrolling past last field
-                    const SizedBox(height: 20),
-                  ],
+        return Padding(
+          padding: EdgeInsets.only(bottom: bottomInset),
+          child: Column(
+            children: [
+              // Fixed header section
+              _buildHeader(context, theme, colorScheme),
+              // Scrollable form content
+              Expanded(
+                child: Form(
+                  key: _formKey,
+                  child: ListView(
+                    controller: scrollController,
+                    padding: const EdgeInsets.all(largePadding),
+                    children: [
+                      _buildNameField(context, theme),
+                      const SizedBox(height: 20),
+                      _buildClassSelector(context, theme),
+                      const SizedBox(height: 20),
+                      _buildLevelSelector(context, theme, colorScheme),
+                      const SizedBox(height: 20),
+                      _buildRetirementsAndProsperityRow(context, theme),
+                      const SizedBox(height: 20),
+                      _buildEditionToggle(context, theme),
+                      // Extra bottom padding for scrolling past last field
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // Fixed action buttons at bottom
-            _buildActionButtons(context, theme, colorScheme),
-          ],
+              // Fixed action buttons at bottom
+              _buildActionButtons(context, theme, colorScheme),
+            ],
+          ),
         );
       },
     );
