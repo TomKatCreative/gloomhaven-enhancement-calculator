@@ -496,7 +496,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                 ],
                                 TextField(
                                   decoration: InputDecoration(
-                                    border: const OutlineInputBorder(),
                                     labelText: AppLocalizations.of(
                                       context,
                                     ).filename,

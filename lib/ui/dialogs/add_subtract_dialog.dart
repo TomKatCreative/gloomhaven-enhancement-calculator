@@ -79,7 +79,6 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       hintText: widget.hintText,
-                      border: const OutlineInputBorder(),
                     ),
                     style: Theme.of(
                       context,

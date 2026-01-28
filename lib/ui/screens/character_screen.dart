@@ -252,7 +252,6 @@ class _NameAndClassSection extends StatelessWidget {
                 },
                 decoration: InputDecoration(
                   label: Text(AppLocalizations.of(context).name),
-                  border: const OutlineInputBorder(),
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -406,7 +405,6 @@ class _StatsSectionState extends State<_StatsSection> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               label: Text(AppLocalizations.of(context).xp),
-                              border: const OutlineInputBorder(),
                             ),
                           ),
                           IconButton(
@@ -488,7 +486,6 @@ class _StatsSectionState extends State<_StatsSection> {
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               label: Text(AppLocalizations.of(context).gold),
-                              border: const OutlineInputBorder(),
                             ),
                           ),
                           IconButton(
@@ -689,7 +686,6 @@ class _NotesSection extends StatelessWidget {
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   label: Text(AppLocalizations.of(context).notes),
-                  border: const OutlineInputBorder(),
                 ),
               )
             : Text(character.notes),

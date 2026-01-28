@@ -101,6 +101,7 @@ class AppThemeBuilder {
       // Component themes
       inputDecorationTheme: InputDecorationTheme(
         hintStyle: textTheme.bodyMedium,
+        border: const OutlineInputBorder(),
       ),
 
       textButtonTheme: TextButtonThemeData(
@@ -140,7 +141,7 @@ class AppThemeBuilder {
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: colorScheme.surfaceContainer,
         elevation: 0,
       ),
 
