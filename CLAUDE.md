@@ -124,6 +124,26 @@ Example: "Brute" in base game → "Bruiser" in Gloomhaven 2E
 2. `Character` - Instance of a class (name, level, XP, gold, retirements)
 3. `CharacterPerk` / `CharacterMastery` - Join tables tracking which perks/masteries are checked
 
+### Game Editions (GameEdition)
+The enhancement calculator and character creation use `GameEdition` enum to apply edition-specific rules:
+```dart
+enum GameEdition { gloomhaven, gloomhaven2e, frosthaven }
+```
+
+**Starting Character Rules by Edition:**
+| Edition | Max Starting Level | Starting Gold Formula |
+|---------|-------------------|----------------------|
+| Gloomhaven | Prosperity Level | 15 × (L + 1) |
+| Gloomhaven 2E | Prosperity / 2 (rounded up) | 10 × P + 15 |
+| Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
+
+Where L = starting level, P = prosperity level.
+
+**Enhancement Calculator Differences:**
+- **Gloomhaven**: Multi-target multiplier applies to all enhancement types including Target and elements
+- **GH2E**: Has lost modifier (halves cost), no persistent modifier, multi-target excludes Target/hex/elements
+- **Frosthaven**: Has lost modifier, persistent modifier (triples cost), enhancer building levels
+
 ## Conventions
 
 ### File Naming
@@ -142,19 +162,8 @@ Use constants from `lib/data/constants.dart` instead of hardcoded values:
 - `mediumPadding` (8) - use instead of `8`
 - `largePadding` (16) - use instead of `16`
 
-### Dividers
-Use the app's standard divider widgets (`lib/ui/widgets/app_divider.dart`) instead of raw `Divider` or `VerticalDivider`:
-
-```dart
-// Horizontal divider
-AppDivider()
-AppDivider(height: 1, indent: 16, endIndent: 16)
-
-// Vertical divider
-AppVerticalDivider(height: 52, horizontalMargin: largePadding)
-```
-
-These widgets use `Theme.of(context).dividerTheme.color` for consistent styling across the app, matching the style used in perk rows (`CheckRowDivider`).
+### TextField Borders
+TextField border styling is centralized in `InputDecorationTheme` (in `lib/theme/app_theme_builder.dart`). All TextFields automatically use `OutlineInputBorder()` unless explicitly overridden. Don't add `border: OutlineInputBorder()` to individual TextField decorations.
 
 ### Database
 - UUID for character IDs (with legacy migration for old int IDs)
@@ -426,6 +435,29 @@ All elements use a shared fade controller (250ms) for smooth transitions:
 3. **Collapse communication**: Uses `ValueNotifier<int>` pattern - `CharactersModel.collapseElementSheetNotifier` is incremented to trigger collapse from outside the sheet widget (e.g., when navigating away from the Characters screen).
 
 4. **State persistence**: Element states are stored in SharedPreferences (`fireState`, `iceState`, etc.)
+
+## Create Character Sheet (`lib/ui/dialogs/create_character_dialog.dart`)
+
+The character creation flow uses a `DraggableScrollableSheet` modal bottom sheet.
+
+### Invocation Pattern
+
+Use the static `show()` method:
+```dart
+await CreateCharacterSheet.show(context, charactersModel);
+```
+
+### Form Fields
+
+1. **Name** - Text field with random name generator (faker)
+2. **Class** - Opens search delegate for class selection
+3. **Starting Level** - SfSlider (1-9)
+4. **Previous Retirements / Prosperity Level** - Two numeric fields in a row
+5. **Game Edition** - 3-way SegmentedButton (GH / GH2E / FH)
+
+### Edition-Specific Behavior
+
+The prosperity level field is disabled when Gloomhaven is selected (original GH uses level-based gold, not prosperity). See "Game Editions (GameEdition)" section for the gold/level formulas.
 
 ## Expandable Cost Chip (`lib/ui/widgets/expandable_cost_chip.dart`)
 
