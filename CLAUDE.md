@@ -69,6 +69,7 @@ CharactersModel        → Character CRUD, perk/mastery state (uses ProxyProvide
 ### Directory Structure
 
 ```
+docs/                         # Project documentation (plans, references, TODOs)
 lib/
 ├── main.dart                 # App entry, Provider setup
 ├── models/                   # Data models (Character, Perk, Mastery, etc.)
@@ -148,7 +149,7 @@ Where L = starting level, P = prosperity level.
 
 ### File Naming
 - Models: `snake_case.dart` (e.g., `player_class.dart`)
-- Screens: `*_screen.dart` or `*_page.dart`
+- Screens: `*_screen.dart`
 - Widgets: Descriptive names (e.g., `perk_row.dart`, `resource_card.dart`)
 
 ### Widget Patterns
@@ -172,6 +173,21 @@ Use constants from `lib/data/constants.dart` instead of hardcoded values:
 2. **Oversized screens** - `settings_screen.dart` (1000+ lines) needs extraction
 3. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
 4. **No tests** - Test suite needed for models and viewmodels
+
+## Documentation Files
+
+All project documentation (plans, reference docs, TODOs) lives in the `/docs` directory at the project root.
+
+**Current files:**
+- `docs/TODO.md` - Future feature plans and task tracking
+- `docs/enhancement_rules.md` - Enhancement cost calculation rules by edition
+- `docs/game_text_parser.md` - Game text parser syntax and usage
+- `docs/perk_format_reference.md` - Perk definition format for perks_repository.dart
+
+**When creating documentation:**
+- Place all `.md` files in `/docs` (not scattered in `lib/`)
+- Use `snake_case.md` naming
+- Exception: `README.md` and `CLAUDE.md` stay at project root
 
 ## Assets
 
@@ -433,21 +449,21 @@ All elements use a shared fade controller (250ms) for smooth transitions:
 
 4. **State persistence**: Element states are stored in SharedPreferences (`fireState`, `iceState`, etc.)
 
-## Create Character Sheet (`lib/ui/dialogs/create_character_dialog.dart`)
+## Create Character Screen (`lib/ui/screens/create_character_screen.dart`)
 
-The character creation flow uses a `DraggableScrollableSheet` modal bottom sheet.
+The character creation flow uses a full-page route with `Scaffold` and `AppBar`.
 
 ### Invocation Pattern
 
 Use the static `show()` method:
 ```dart
-await CreateCharacterSheet.show(context, charactersModel);
+await CreateCharacterScreen.show(context, charactersModel);
 ```
 
 ### Form Fields
 
 1. **Name** - Text field with random name generator (faker)
-2. **Class** - Opens search delegate for class selection
+2. **Class** - Opens `ClassSelectorScreen` for class selection
 3. **Starting Level** - SfSlider (1-9)
 4. **Previous Retirements / Prosperity Level** - Two numeric fields in a row
 5. **Game Edition** - 3-way SegmentedButton (GH / GH2E / FH)
@@ -455,6 +471,98 @@ await CreateCharacterSheet.show(context, charactersModel);
 ### Edition-Specific Behavior
 
 The prosperity level field is disabled when Gloomhaven is selected (original GH uses level-based gold, not prosperity). See "Game Editions (GameEdition)" section for the gold/level formulas.
+
+## Selector Screens
+
+The app uses two full-page selector screens with consistent styling for searching and selecting items.
+
+### Shared Components
+
+**SearchSectionHeader** (`lib/ui/widgets/search_section_header.dart`):
+A reusable section divider with optional icon:
+```
+─────────── [Icon] Title ───────────
+```
+
+### ClassSelectorScreen (`lib/ui/screens/class_selector_screen.dart`)
+
+Full-page screen for selecting a player class during character creation.
+
+**Layout:**
+```
+┌─────────────────────────────────────┐
+│ [←]  [🔍 Search...]                 │  ← AppBar with search
+├─────────────────────────────────────┤
+│ [GH] [JotL] [FH] [MP] ...           │  ← Filter chips
+│ Hide locked classes            [✓]  │  ← Toggle
+├─────────────────────────────────────┤
+│ ──────── Gloomhaven ────────        │  ← Section header
+│ [Icon] Brute / Bruiser              │
+│ [Icon] Tinkerer                     │
+│ ──────── Jaws of the Lion ────────  │
+│ ...                                 │
+└─────────────────────────────────────┘
+```
+
+**Features:**
+- Search filters by class name or variant names (e.g., "Bruiser" finds Brute)
+- Category filter chips for game editions
+- "Hide locked classes" toggle
+- Section headers group classes by `ClassCategory`
+- Variant selection dialog for multi-edition classes
+- Custom class warning dialog for community content
+
+**Invocation:**
+```dart
+final result = await ClassSelectorScreen.show(context);
+if (result != null) {
+  // result.playerClass - the PlayerClass
+  // result.variant - the Variant (base, gloomhaven2E, etc.)
+}
+```
+
+### EnhancementTypeSelectorScreen (`lib/ui/screens/enhancement_type_selector_screen.dart`)
+
+Full-page screen for selecting enhancement types in the calculator.
+
+**Layout:**
+```
+┌─────────────────────────────────────┐
+│ [←]  [🔍 Search...]                 │  ← AppBar with search
+├─────────────────────────────────────┤
+│ ──────── [+1] +1 Stats ────────     │  ← Section header with icon
+│ [MOVE] +1 Move                 30g  │
+│ [ATK]  +1 Attack               50g  │
+│ ──────── [◇] Elements ────────      │
+│ [FIRE] Fire                    50g  │
+│ ...                                 │
+└─────────────────────────────────────┘
+```
+
+**Features:**
+- Search filters by enhancement name
+- Section headers with category icons group by `EnhancementCategory`
+- Cost display shows base cost and discounted cost (with strikethrough)
+- Edition-aware: only shows enhancements available in selected `GameEdition`
+- Highlights currently selected enhancement
+
+**Invocation:**
+```dart
+await EnhancementTypeSelector.show(
+  context,
+  currentSelection: model.enhancement,
+  edition: model.edition,
+  onSelected: model.enhancementSelected,
+);
+```
+
+### Design Patterns
+
+Both selectors follow these conventions:
+- **AppBar search**: Search field in AppBar title with transparent background
+- **SafeArea**: Bottom-only SafeArea for device navigation buttons
+- **Static show()**: Invoked via static method returning `Future<T?>`
+- **Section headers**: Use `SearchSectionHeader` widget for category grouping
 
 ## Expandable Cost Chip (`lib/ui/widgets/expandable_cost_chip.dart`)
 
@@ -534,7 +642,7 @@ lib/ui/widgets/calculator/
 └── enhancement_type_body.dart     # Dropdown selector
 ```
 
-Note: Modifier toggles (Multi-target, Loss, Persistent) use the `toggle` layout variant directly in `enhancement_calculator_page.dart` rather than a separate body widget.
+Note: Modifier toggles (Multi-target, Loss, Persistent) use the `toggle` layout variant directly in `enhancement_calculator_screen.dart` rather than a separate body widget.
 
 ### CalculatorSectionCard
 
