@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
@@ -34,41 +33,25 @@ class EnhancementTypeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final enhancement = model.enhancement;
 
     return InkWell(
-      onTap: () {
-        EnhancementTypeSelector.show(
-          context,
-          currentSelection: enhancement,
-          edition: edition,
-          onSelected: (selected) {
-            model.enhancementSelected(selected);
-          },
-        );
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: enhancement != null
-                  ? _buildSelectedEnhancement(context, enhancement)
-                  : Text(
-                      AppLocalizations.of(context).type,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-            ),
-          ],
-        ),
+      onTap: () => EnhancementTypeSelector.show(
+        context,
+        currentSelection: enhancement,
+        edition: edition,
+        onSelected: model.enhancementSelected,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        child: enhancement != null
+            ? _buildSelectedEnhancement(context, enhancement)
+            : Text(
+                AppLocalizations.of(context).type,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
       ),
     );
   }
@@ -90,11 +73,10 @@ class EnhancementTypeBody extends StatelessWidget {
           const SizedBox(width: 12),
         ],
         Flexible(
-          child: AutoSizeText(
+          child: Text(
             enhancement.name,
             style: theme.textTheme.bodyMedium,
-            maxLines: 1,
-            minFontSize: 10,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         if (costConfig != null) ...[

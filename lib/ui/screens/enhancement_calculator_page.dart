@@ -36,33 +36,27 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
 
     return Stack(
       children: [
-        Column(
-          children: [
-            // 1. ENHANCEMENT TYPE - pinned at top
-            Container(
-              constraints: const BoxConstraints(maxWidth: maxWidth),
-              padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
-              child: _EnhancementTypeCard(
-                edition: edition,
-                enhancementCalculatorModel: enhancementCalculatorModel,
-              ),
+        Container(
+          constraints: const BoxConstraints(maxWidth: maxWidth),
+          padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+          child: ListView(
+            controller: context
+                .read<CharactersModel>()
+                .enhancementCalcScrollController,
+            padding: EdgeInsets.only(
+              // Extra padding when chip and FAB are present
+              bottom: enhancementCalculatorModel.showCost ? 80 : 16,
             ),
-            Expanded(
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: maxWidth),
-                padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
-                child: ListView(
-                  controller: context
-                      .read<CharactersModel>()
-                      .enhancementCalcScrollController,
-                  padding: EdgeInsets.only(
-                    // Extra padding when chip and FAB are present
-                    bottom: enhancementCalculatorModel.showCost ? 80 : 16,
-                  ),
-                  children: <Widget>[
-                    // === CALCULATION INPUTS (change per enhancement) ===
+            children: <Widget>[
+              // === CALCULATION INPUTS (change per enhancement) ===
 
-                    // 2. CARD LEVEL
+              // 1. ENHANCEMENT TYPE
+              _EnhancementTypeCard(
+                edition: edition,
+                model: enhancementCalculatorModel,
+              ),
+
+              // 2. CARD LEVEL
                     _CardLevelCard(
                       edition: edition,
                       enhancementCalculatorModel: enhancementCalculatorModel,
@@ -118,18 +112,15 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
                       ),
                     ),
 
-                    // 5. DISCOUNTS & SETTINGS - grouped card
-                    _DiscountsGroupCard(
-                      edition: edition,
-                      enhancementCalculatorModel: enhancementCalculatorModel,
-                      darkTheme: darkTheme,
-                      onSettingChanged: () => setState(() {}),
-                    ),
-                  ],
-                ),
+              // 5. DISCOUNTS & SETTINGS - grouped card
+              _DiscountsGroupCard(
+                edition: edition,
+                enhancementCalculatorModel: enhancementCalculatorModel,
+                darkTheme: darkTheme,
+                onSettingChanged: () => setState(() {}),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         // Cost chip overlay
         if (enhancementCalculatorModel.showCost)
@@ -230,140 +221,55 @@ class _PreviousEnhancementsCard extends StatelessWidget {
   }
 }
 
-/// Enhancement Type selector card - pinned with animated glow effect.
-class _EnhancementTypeCard extends StatefulWidget {
+/// Enhancement Type selector card.
+class _EnhancementTypeCard extends StatelessWidget {
   final dynamic edition;
-  final EnhancementCalculatorModel enhancementCalculatorModel;
+  final EnhancementCalculatorModel model;
 
   const _EnhancementTypeCard({
     required this.edition,
-    required this.enhancementCalculatorModel,
+    required this.model,
   });
-
-  @override
-  State<_EnhancementTypeCard> createState() => _EnhancementTypeCardState();
-}
-
-class _EnhancementTypeCardState extends State<_EnhancementTypeCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _glowController;
-  late Animation<double> _glowAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _glowController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-    _glowAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
-    );
-    // Start pulsing if no enhancement selected
-    if (widget.enhancementCalculatorModel.enhancement == null) {
-      _glowController.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void didUpdateWidget(_EnhancementTypeCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    final hasEnhancement = widget.enhancementCalculatorModel.enhancement != null;
-    final hadEnhancement =
-        oldWidget.enhancementCalculatorModel.enhancement != null;
-
-    if (hasEnhancement && !hadEnhancement) {
-      // Enhancement was selected - stop pulsing
-      _glowController.stop();
-      _glowController.value = 1.0;
-    } else if (!hasEnhancement && hadEnhancement) {
-      // Enhancement was cleared - start pulsing
-      _glowController.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void dispose() {
-    _glowController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final enhancement = widget.enhancementCalculatorModel.enhancement;
-    final hasEnhancement = enhancement != null;
+    final enhancement = model.enhancement;
 
-    // Glow color based on theme
-    final glowColor = colorScheme.primary;
-
-    return AnimatedBuilder(
-      animation: _glowAnimation,
-      builder: (context, child) {
-        // Stronger glow when no enhancement, subtle when selected
-        final glowIntensity = hasEnhancement ? 0.4 : _glowAnimation.value;
-        final glowSpread = hasEnhancement ? 2.0 : 4.0 * _glowAnimation.value;
-        final glowBlur = hasEnhancement ? 8.0 : 12.0 * _glowAnimation.value;
-
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: glowColor.withValues(alpha: glowIntensity * 0.5),
-                blurRadius: glowBlur,
-                spreadRadius: glowSpread,
-              ),
-            ],
+    return Card(
+      elevation: isDark ? 4 : 1,
+      color: isDark
+          ? colorScheme.surfaceContainerHighest
+          : colorScheme.surfaceContainerLow,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: largePadding),
+        child: Row(
+          children: [
+            IconButton(
+              icon: const Icon(Icons.info_outline_rounded),
+              onPressed: enhancement != null
+                  ? () => showDialog<void>(
+                      context: context,
+                      builder: (_) => InfoDialog(category: enhancement.category),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: largePadding),
+            Expanded(
+              child: EnhancementTypeBody(
+              model: model,
+              edition: edition,
+              costConfig: enhancement != null
+                  ? CostDisplayConfig(
+                      baseCost: enhancement.cost(edition: edition),
+                      discountedCost: model.enhancementCost(enhancement),
+                      marker: model.hailsDiscount ? '\u2021' : null,
+                    )
+                  : null,
+            ),
           ),
-          child: child,
-        );
-      },
-      child: Card(
-        elevation: isDark ? 4 : 2,
-        color: isDark
-            ? colorScheme.surfaceContainerHighest
-            : colorScheme.surfaceContainerLow,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: mediumPadding,
-            horizontal: largePadding,
-          ),
-          child: Row(
-            children: [
-              // Info button on left
-              IconButton(
-                icon: const Icon(Icons.info_outline_rounded),
-                onPressed: enhancement != null
-                    ? () => showDialog<void>(
-                        context: context,
-                        builder: (_) =>
-                            InfoDialog(category: enhancement.category),
-                      )
-                    : null,
-              ),
-              // Enhancement type selector with inline cost
-              Expanded(
-                child: EnhancementTypeBody(
-                  model: widget.enhancementCalculatorModel,
-                  edition: widget.edition,
-                  costConfig: enhancement != null
-                      ? CostDisplayConfig(
-                          baseCost: enhancement.cost(edition: widget.edition),
-                          discountedCost:
-                              widget.enhancementCalculatorModel.enhancementCost(
-                            enhancement,
-                          ),
-                          marker: widget.enhancementCalculatorModel.hailsDiscount
-                              ? '\u2021'
-                              : null,
-                        )
-                      : null,
-                ),
-              ),
-            ],
-          ),
+        ],
         ),
       ),
     );
