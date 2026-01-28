@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 
 /// Configuration for displaying cost with optional discount.
@@ -41,14 +40,7 @@ class CostDisplay extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(mediumPadding),
-      ),
-      child: _buildCostContent(theme, colorScheme),
-    );
+    return _buildCostContent(theme, colorScheme);
   }
 
   Widget _buildCostContent(ThemeData theme, ColorScheme colorScheme) {

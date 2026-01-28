@@ -63,14 +63,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Card(
-      elevation: isDark ? 4 : 1,
-      color: isDark
-          ? colorScheme.surfaceContainerHighest
-          : colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: mediumPadding),
         child: Column(
@@ -106,6 +99,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
 
   Widget _buildToggleRow(BuildContext context, ToggleGroupItem item) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     void handleToggle() {
       if (item.enabled && item.onChanged != null) {
@@ -152,7 +146,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
                       Text(
                         item.subtitle!,
                         style: theme.textTheme.titleSmall?.copyWith(
-                          color: Colors.grey,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                   ],

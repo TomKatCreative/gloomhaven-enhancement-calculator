@@ -109,30 +109,16 @@ class _GHCAppBarState extends State<GHCAppBar> {
                   effect: ScrollingDotsEffect(
                     dotHeight: 10,
                     dotWidth: 10,
-                    activeDotColor:
-                        Theme.of(context).brightness == Brightness.light
-                        ? Colors.black
-                        : Colors.white,
+                    activeDotColor: colorScheme.onSurface,
                   ),
                 )
               : context.watch<AppModel>().page == 1
               ? SegmentedButton<GameEdition>(
-                  style: ButtonStyle(
+                  style: const ButtonStyle(
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: WidgetStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 8),
+                    padding: WidgetStatePropertyAll(
+                      EdgeInsets.symmetric(horizontal: 8),
                     ),
-                    foregroundColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.selected)) {
-                        final isDark =
-                            ThemeData.estimateBrightnessForColor(
-                              Theme.of(context).colorScheme.primary,
-                            ) ==
-                            Brightness.dark;
-                        return isDark ? Colors.white : Colors.black;
-                      }
-                      return null;
-                    }),
                   ),
                   showSelectedIcon: false,
                   segments: const [
@@ -189,11 +175,6 @@ class _GHCAppBarState extends State<GHCAppBar> {
                               ? null
                               : SnackBarAction(
                                   label: 'Show',
-                                  textColor:
-                                      Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black,
                                   onPressed: () {
                                     charactersModel.toggleShowRetired(
                                       character: character,
@@ -215,11 +196,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
                     charactersModel.isEditMode
                         ? Icons.delete_rounded
                         : Icons.person_add_rounded,
-                    color: charactersModel.isEditMode
-                        ? Colors.red[400]
-                        : Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
-                        : Colors.black,
+                    color: charactersModel.isEditMode ? Colors.red[400] : null,
                   ),
                   onPressed: charactersModel.isEditMode
                       ? () {
@@ -306,12 +283,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
             Tooltip(
               message: 'Settings',
               child: IconButton(
-                icon: Icon(
-                  Icons.settings_rounded,
-                  color: Theme.of(context).brightness == Brightness.dark
-                      ? Colors.white
-                      : Colors.black,
-                ),
+                icon: const Icon(Icons.settings_rounded),
                 onPressed: () async {
                   charactersModel.isEditMode = false;
 

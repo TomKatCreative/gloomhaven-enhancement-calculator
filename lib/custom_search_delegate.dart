@@ -35,21 +35,6 @@ class CustomSearchDelegate extends SearchDelegate<SelectedPlayerClass> {
     );
   }
 
-  /// Helper method to get the label style for FilterChips
-  TextStyle? _getFilterChipLabelStyle(BuildContext context, bool isSelected) {
-    if (!isSelected) return null;
-
-    final isDark =
-        ThemeData.estimateBrightnessForColor(
-          Theme.of(context).colorScheme.primary,
-        ) ==
-        Brightness.dark;
-
-    return Theme.of(context).textTheme.titleMedium?.copyWith(
-      color: isDark ? Colors.white : Colors.black,
-    );
-  }
-
   /// Helper method to build a FilterChip with consistent styling
   Widget _buildFilterChip({
     required BuildContext context,
@@ -57,13 +42,20 @@ class CustomSearchDelegate extends SearchDelegate<SelectedPlayerClass> {
     required bool selected,
     required ValueChanged<bool> onSelected,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return FilterChip(
       visualDensity: VisualDensity.compact,
       elevation: selected ? 4 : 0,
-      labelStyle: _getFilterChipLabelStyle(context, selected),
       selected: selected,
       onSelected: onSelected,
-      label: Text(label),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: selected
+              ? colorScheme.onPrimaryContainer
+              : colorScheme.onSurface,
+        ),
+      ),
     );
   }
 

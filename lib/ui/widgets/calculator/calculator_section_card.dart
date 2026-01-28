@@ -94,14 +94,7 @@ class CalculatorSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Card(
-      elevation: isDark ? 4 : 1,
-      color: isDark
-          ? colorScheme.surfaceContainerHighest
-          : colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: mediumPadding),
         child: layout == CardLayoutVariant.toggle
@@ -133,6 +126,7 @@ class CalculatorSectionCard extends StatelessWidget {
 
   Widget _buildToggleLayout(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     void handleTap() {
       if (toggleEnabled && onToggleChanged != null) {
@@ -169,7 +163,7 @@ class CalculatorSectionCard extends StatelessWidget {
                       Text(
                         subtitle!,
                         style: theme.textTheme.titleSmall?.copyWith(
-                          color: Colors.grey,
+                          color: colorScheme.onSurfaceVariant,
                         ),
                       ),
                   ],

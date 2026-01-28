@@ -164,7 +164,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
               return GestureDetector(
                 onTap: _collapse,
                 child: Container(
-                  color: Colors.black.withValues(
+                  color: colorScheme.scrim.withValues(
                     alpha: 0.5 * _expandAnimation.value,
                   ),
                 ),
@@ -358,7 +358,9 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
         padding: const EdgeInsets.all(mediumPadding * 2),
         child: Text(
           'Select options to see cost breakdown',
-          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
         ),
       ),

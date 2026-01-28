@@ -247,7 +247,7 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                   contentPadding: EdgeInsets.zero,
                   minVerticalPadding: 0,
                   title: HighlightedWidget(
-                    color: const Color(0xff6ab7ff),
+                    color: GameEditionColors.gloomhavenLight,
                     child: TextFormField(
                       enableInteractiveSelection: false,
                       controller: _prosperityLevelTextFieldController,
@@ -298,7 +298,9 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                         minFontSize: 8,
                         maxLines: 1,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: _gloomhavenMode ? null : Colors.grey,
+                          color: _gloomhavenMode
+                              ? null
+                              : Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -307,11 +309,11 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                         inactiveThumbImage: const AssetImage(
                           'images/branding/switch_gh.png',
                         ),
-                        activeThumbColor: const Color(0xff005cb2),
+                        activeThumbColor: GameEditionColors.gloomhavenPrimary,
                         trackColor: WidgetStateProperty.resolveWith(
                           (states) => states.contains(WidgetState.selected)
-                              ? const Color(0xff6ab7ff)
-                              : const Color(0xffa98274),
+                              ? GameEditionColors.gloomhavenLight
+                              : GameEditionColors.frosthavenPrimary,
                         ),
                         value: !_gloomhavenMode,
                         onChanged: (_) {
@@ -330,7 +332,9 @@ class CreateCharacterDialogState extends State<CreateCharacterDialog> {
                         minFontSize: 8,
                         maxLines: 1,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: _gloomhavenMode ? Colors.grey : null,
+                          color: _gloomhavenMode
+                              ? Theme.of(context).colorScheme.onSurfaceVariant
+                              : null,
                         ),
                       ),
                     ),

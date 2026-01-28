@@ -4,8 +4,8 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_config.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 
 class AppThemeBuilder {
-  /// The dark surface color used throughout the app.
-  /// Used for: Scaffold background, BottomNavigationBar, system nav bar, etc.
+  /// The dark surface color for the Android system navigation bar.
+  /// Note: This matches M3's default dark surface color.
   static const Color darkSurface = Color(0xff1c1b1f);
   // Cache themes to avoid rebuilding
   static final Map<int, ThemeData> _lightThemeCache = {};
@@ -46,38 +46,41 @@ class AppThemeBuilder {
     required ThemeConfig config,
     required Brightness brightness,
   }) {
-    // Use the EXACT seed color, not a generated palette
     final primaryColor = config.seedColor;
 
-    // Calculate onPrimary color based on brightness of the primary color
-    final onPrimaryColor =
+    // Generate a neutral base palette, then override primary colors with character color
+    final baseScheme = ColorScheme.fromSeed(
+      seedColor: Colors.grey,
+      brightness: brightness,
+      surfaceTint: Colors.transparent,
+    );
+
+    // Calculate contrast colors based on the character's primary color brightness
+    final onPrimary =
         ThemeData.estimateBrightnessForColor(primaryColor) == Brightness.dark
         ? Colors.white
         : Colors.black87;
 
-    // Build ColorScheme with exact colors
-    final colorScheme = brightness == Brightness.light
-        ? ColorScheme.light(
-            surface: Colors.white,
-            onSurface: Colors.black87,
-            primary: primaryColor,
-            onPrimary: onPrimaryColor,
-            secondary: primaryColor,
-            primaryContainer: primaryColor,
-            secondaryContainer: primaryColor,
-            surfaceTint: primaryColor,
-            outline: Colors.grey[600],
-          )
-        : ColorScheme.dark(
-            // surface: darkSurface,
-            primary: primaryColor,
-            secondary: primaryColor,
-            primaryContainer: primaryColor,
-            secondaryContainer: primaryColor,
-            onPrimary: onPrimaryColor,
-            surfaceTint: primaryColor,
-            outline: Colors.grey[600],
-          );
+    // Generate primary container as a lighter/darker variant of the primary
+    final primaryContainer = brightness == Brightness.dark
+        ? _lighten(primaryColor, 15)
+        : _lighten(primaryColor, 30);
+    final onPrimaryContainer =
+        ThemeData.estimateBrightnessForColor(primaryContainer) ==
+            Brightness.dark
+        ? Colors.white
+        : Colors.black87;
+
+    // Override the primary accent colors with the character's color
+    final colorScheme = baseScheme.copyWith(
+      primary: primaryColor,
+      onPrimary: onPrimary,
+      primaryContainer: primaryContainer,
+      onPrimaryContainer: onPrimaryContainer,
+      // Also set secondary to match for consistency
+      secondary: primaryColor,
+      onSecondary: onPrimary,
+    );
 
     final textTheme = config.useDefaultFonts
         ? _buildDefaultTextTheme(brightness)
@@ -117,36 +120,57 @@ class AppThemeBuilder {
         }),
         checkColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.disabled)) {
-            return onPrimaryColor;
+            return colorScheme.onPrimary;
           }
           return null;
         }),
       ),
 
-      chipTheme: const ChipThemeData(showCheckmark: false),
-
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: brightness == Brightness.dark
-            ? darkSurface
-            : Colors.white,
-        actionTextColor: brightness == Brightness.dark
-            ? Colors.white
-            : darkSurface,
+        backgroundColor: colorScheme.inverseSurface,
+        actionTextColor: colorScheme.inversePrimary,
         contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: brightness == Brightness.dark ? Colors.white : darkSurface,
+          color: colorScheme.onInverseSurface,
         ),
       ),
 
       dividerTheme: DividerThemeData(
-        color: colorScheme.onSurface.withValues(alpha: 0.12),
+        color: colorScheme.outlineVariant,
         thickness: 0.5,
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: brightness == Brightness.dark
-            ? darkSurface
-            : Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 0,
+      ),
+
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.onPrimaryContainer;
+            }
+            return colorScheme.onSurface;
+          }),
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.primaryContainer;
+            }
+            return null;
+          }),
+        ),
+      ),
+
+      cardTheme: CardThemeData(
+        elevation: brightness == Brightness.dark ? 4 : 1,
+        color: brightness == Brightness.dark
+            ? colorScheme.surfaceContainerLow
+            : colorScheme.surfaceContainerLow,
+      ),
+
+      chipTheme: ChipThemeData(
+        showCheckmark: false,
+        selectedColor: colorScheme.primaryContainer,
       ),
 
       // Add custom extension with exact character color

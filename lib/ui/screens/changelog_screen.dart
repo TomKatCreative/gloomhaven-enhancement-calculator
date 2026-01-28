@@ -136,9 +136,9 @@ class _VersionSection extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               date,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

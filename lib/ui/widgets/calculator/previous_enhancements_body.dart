@@ -12,7 +12,6 @@ class PreviousEnhancementsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return SizedBox(
       width: double.infinity,
@@ -30,15 +29,6 @@ class PreviousEnhancementsBody extends StatelessWidget {
         showSelectedIcon: false,
         style: ButtonStyle(
           textStyle: WidgetStatePropertyAll(theme.textTheme.bodyMedium),
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              final isDark =
-                  ThemeData.estimateBrightnessForColor(colorScheme.primary) ==
-                  Brightness.dark;
-              return isDark ? Colors.white : Colors.black;
-            }
-            return null;
-          }),
         ),
       ),
     );

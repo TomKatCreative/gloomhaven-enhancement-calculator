@@ -28,7 +28,6 @@ class ResourceCard extends StatelessWidget {
       height: canEdit ? 100 : 75,
       width: 100,
       child: Card(
-        elevation: 4,
         child: ResourceDetails(
           resource: resource,
           color: color,
