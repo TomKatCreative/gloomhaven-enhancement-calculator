@@ -733,6 +733,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select a Class'**
   String get pleaseSelectClass;
+
+  /// No description provided for @createCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Character'**
+  String get createCharacter;
+
+  /// No description provided for @gameEdition.
+  ///
+  /// In en, this message translates to:
+  /// **'Game Edition'**
+  String get gameEdition;
+
+  /// No description provided for @selectClass.
+  ///
+  /// In en, this message translates to:
+  /// **'Select class...'**
+  String get selectClass;
 }
 
 class _AppLocalizationsDelegate

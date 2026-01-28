@@ -351,4 +351,13 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get pleaseSelectClass => 'Por favor, selecione uma Classe';
+
+  @override
+  String get createCharacter => 'Criar Personagem';
+
+  @override
+  String get gameEdition => 'Edição do Jogo';
+
+  @override
+  String get selectClass => 'Selecionar classe...';
 }

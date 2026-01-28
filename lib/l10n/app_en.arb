@@ -140,5 +140,8 @@
   },
   "startingLevel": "Starting level",
   "prosperityLevel": "Prosperity level",
-  "pleaseSelectClass": "Please select a Class"
+  "pleaseSelectClass": "Please select a Class",
+  "createCharacter": "Create Character",
+  "gameEdition": "Game Edition",
+  "selectClass": "Select class..."
 }

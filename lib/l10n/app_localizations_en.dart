@@ -350,4 +350,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pleaseSelectClass => 'Please select a Class';
+
+  @override
+  String get createCharacter => 'Create Character';
+
+  @override
+  String get gameEdition => 'Game Edition';
+
+  @override
+  String get selectClass => 'Select class...';
 }

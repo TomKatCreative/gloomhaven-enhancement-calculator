@@ -105,5 +105,8 @@
   "classWithVariant": "Classe ({variant})",
   "startingLevel": "Nível inicial",
   "prosperityLevel": "Nível de prosperidade",
-  "pleaseSelectClass": "Por favor, selecione uma Classe"
+  "pleaseSelectClass": "Por favor, selecione uma Classe",
+  "createCharacter": "Criar Personagem",
+  "gameEdition": "Edição do Jogo",
+  "selectClass": "Selecionar classe..."
 }
