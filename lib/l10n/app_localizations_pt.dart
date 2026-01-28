@@ -113,7 +113,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enhancementType => 'Tipo de Melhoria';
 
   @override
-  String get discountsAndSettings => 'Descontos e Configurações';
+  String get actionDetails => 'Detalhes da Ação';
+
+  @override
+  String get discounts => 'Descontos';
 
   @override
   String get enhancementCalculator => 'Calculadora de Melhorias';

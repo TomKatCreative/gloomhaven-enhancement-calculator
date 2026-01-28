@@ -48,7 +48,38 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
               bottom: enhancementCalculatorModel.showCost ? 80 : 16,
             ),
             children: <Widget>[
-              // === CALCULATION INPUTS (change per enhancement) ===
+              // === ACTION DETAILS ===
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: largePadding),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: largePadding,
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).actionDetails,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               // 1. ENHANCEMENT TYPE
               _EnhancementTypeCard(
@@ -57,62 +88,60 @@ class _EnhancementCalculatorPageState extends State<EnhancementCalculatorPage> {
               ),
 
               // 2. CARD LEVEL
-                    _CardLevelCard(
-                      edition: edition,
-                      enhancementCalculatorModel: enhancementCalculatorModel,
-                      darkTheme: darkTheme,
-                    ),
+              _CardLevelCard(
+                edition: edition,
+                enhancementCalculatorModel: enhancementCalculatorModel,
+                darkTheme: darkTheme,
+              ),
 
-                    // 3. PREVIOUS ENHANCEMENTS
-                    _PreviousEnhancementsCard(
-                      edition: edition,
-                      enhancementCalculatorModel: enhancementCalculatorModel,
-                      darkTheme: darkTheme,
-                    ),
+              // 3. PREVIOUS ENHANCEMENTS
+              _PreviousEnhancementsCard(
+                edition: edition,
+                enhancementCalculatorModel: enhancementCalculatorModel,
+                darkTheme: darkTheme,
+              ),
 
-                    // 4. MODIFIERS - grouped card
-                    _ModifiersGroupCard(
-                      edition: edition,
-                      enhancementCalculatorModel: enhancementCalculatorModel,
-                      darkTheme: darkTheme,
-                    ),
+              // 4. MODIFIERS - grouped card
+              _ModifiersGroupCard(
+                edition: edition,
+                enhancementCalculatorModel: enhancementCalculatorModel,
+                darkTheme: darkTheme,
+              ),
 
-                    // === DISCOUNTS & SETTINGS (set once) ===
+              // === DISCOUNTS ===
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: largePadding),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        vertical: largePadding,
+                        horizontal: largePadding,
                       ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Divider(
-                              color: Theme.of(context).dividerTheme.color,
+                      child: Text(
+                        AppLocalizations.of(context).discounts,
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: largePadding,
-                            ),
-                            child: Text(
-                              AppLocalizations.of(context).discountsAndSettings,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant,
-                                  ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Divider(
-                              color: Theme.of(context).dividerTheme.color,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
-              // 5. DISCOUNTS & SETTINGS - grouped card
+              // 5. DISCOUNTS - grouped card
               _DiscountsGroupCard(
                 edition: edition,
                 enhancementCalculatorModel: enhancementCalculatorModel,
@@ -226,22 +255,13 @@ class _EnhancementTypeCard extends StatelessWidget {
   final dynamic edition;
   final EnhancementCalculatorModel model;
 
-  const _EnhancementTypeCard({
-    required this.edition,
-    required this.model,
-  });
+  const _EnhancementTypeCard({required this.edition, required this.model});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final enhancement = model.enhancement;
 
     return Card(
-      elevation: isDark ? 4 : 1,
-      color: isDark
-          ? colorScheme.surfaceContainerHighest
-          : colorScheme.surfaceContainerLow,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: largePadding),
         child: Row(
@@ -251,25 +271,26 @@ class _EnhancementTypeCard extends StatelessWidget {
               onPressed: enhancement != null
                   ? () => showDialog<void>(
                       context: context,
-                      builder: (_) => InfoDialog(category: enhancement.category),
+                      builder: (_) =>
+                          InfoDialog(category: enhancement.category),
                     )
                   : null,
             ),
             const SizedBox(width: largePadding),
             Expanded(
               child: EnhancementTypeBody(
-              model: model,
-              edition: edition,
-              costConfig: enhancement != null
-                  ? CostDisplayConfig(
-                      baseCost: enhancement.cost(edition: edition),
-                      discountedCost: model.enhancementCost(enhancement),
-                      marker: model.hailsDiscount ? '\u2021' : null,
-                    )
-                  : null,
+                model: model,
+                edition: edition,
+                costConfig: enhancement != null
+                    ? CostDisplayConfig(
+                        baseCost: enhancement.cost(edition: edition),
+                        discountedCost: model.enhancementCost(enhancement),
+                        marker: model.hailsDiscount ? '\u2021' : null,
+                      )
+                    : null,
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
@@ -612,7 +633,9 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
       subtitle: Text(
         subtitle,
         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: isActive ? null : Colors.grey,
+          color: isActive
+              ? null
+              : Theme.of(context).colorScheme.onSurfaceVariant,
           fontSize: 20,
         ),
       ),

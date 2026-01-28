@@ -113,7 +113,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enhancementType => 'Enhancement Type';
 
   @override
-  String get discountsAndSettings => 'Discounts & Settings';
+  String get actionDetails => 'Action Details';
+
+  @override
+  String get discounts => 'Discounts';
 
   @override
   String get enhancementCalculator => 'Enhancement Calculator';

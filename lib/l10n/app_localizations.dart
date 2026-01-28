@@ -290,11 +290,17 @@ abstract class AppLocalizations {
   /// **'Enhancement Type'**
   String get enhancementType;
 
-  /// No description provided for @discountsAndSettings.
+  /// No description provided for @actionDetails.
   ///
   /// In en, this message translates to:
-  /// **'Discounts & Settings'**
-  String get discountsAndSettings;
+  /// **'Action Details'**
+  String get actionDetails;
+
+  /// No description provided for @discounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Discounts'**
+  String get discounts;
 
   /// No description provided for @enhancementCalculator.
   ///
