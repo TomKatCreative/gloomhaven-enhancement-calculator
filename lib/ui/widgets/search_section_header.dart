@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 /// A reusable section header widget for search/selector screens.
@@ -32,6 +33,14 @@ class SearchSectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    // Ensure the primary color has sufficient contrast against the surface
+    final textColor = ColorUtils.ensureTextContrast(
+      colorScheme.primary,
+      colorScheme.surface,
+    );
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Row(
@@ -45,7 +54,7 @@ class SearchSectionHeader extends StatelessWidget {
           Text(
             title,
             style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.primary,
+              color: textColor,
               fontWeight: FontWeight.bold,
             ),
           ),
