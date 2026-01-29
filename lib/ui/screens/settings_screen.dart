@@ -131,7 +131,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 SwitchListTile(
-                  secondary: const Icon(Icons.warning_rounded),
+                  secondary: Icon(
+                    SharedPrefs().envelopeX
+                        ? Icons.drafts_rounded
+                        : Icons.mail_rounded,
+                  ),
                   title: Text(AppLocalizations.of(context).solveEnvelopeX),
                   subtitle: Text(
                     AppLocalizations.of(context).gloomhavenSpoilers,
@@ -178,8 +182,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                               labelText: AppLocalizations.of(
                                                 context,
                                               ).solution,
-                                              border:
-                                                  const OutlineInputBorder(),
                                             ),
                                           ),
                                         ],
@@ -255,7 +257,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 SwitchListTile(
-                  secondary: const Icon(Icons.warning_rounded),
+                  secondary: Icon(
+                    SharedPrefs().envelopeV
+                        ? Icons.drafts_rounded
+                        : Icons.mail_rounded,
+                  ),
                   title: Text(AppLocalizations.of(context).unlockEnvelopeV),
                   subtitle: Text(
                     AppLocalizations.of(context).crimsonScalesSpoilers,
@@ -302,8 +308,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                               labelText: AppLocalizations.of(
                                                 context,
                                               ).password,
-                                              border:
-                                                  const OutlineInputBorder(),
                                             ),
                                           ),
                                         ],
