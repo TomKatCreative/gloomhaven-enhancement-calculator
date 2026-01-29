@@ -92,10 +92,7 @@ class ColorUtils {
   ///   theme.colorScheme.surface,
   /// );
   /// ```
-  static Color readableTextColor(
-    Color preferredColor,
-    Color backgroundColor,
-  ) {
+  static Color readableTextColor(Color preferredColor, Color backgroundColor) {
     return ensureTextContrast(preferredColor, backgroundColor);
   }
 }
