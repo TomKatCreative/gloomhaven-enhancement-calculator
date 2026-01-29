@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_config.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 
 class AppThemeBuilder {
   /// The dark surface color for the Android system navigation bar.
@@ -104,7 +105,14 @@ class AppThemeBuilder {
       ),
 
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(textStyle: textTheme.bodyMedium),
+        style: TextButton.styleFrom(
+          textStyle: textTheme.bodyMedium,
+          foregroundColor: ColorUtils.ensureTextContrast(
+            primaryColor,
+            colorScheme.surface,
+          ),
+          iconSize: 24,
+        ),
       ),
 
       checkboxTheme: CheckboxThemeData(
@@ -142,6 +150,10 @@ class AppThemeBuilder {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colorScheme.surfaceContainer,
         elevation: 0,
+        selectedItemColor: ColorUtils.ensureTextContrast(
+          primaryColor,
+          colorScheme.surfaceContainer,
+        ),
       ),
 
       segmentedButtonTheme: SegmentedButtonThemeData(
@@ -179,6 +191,10 @@ class AppThemeBuilder {
           characterPrimary: primaryColor,
           characterSecondary: primaryColor,
           characterAccent: _adjustColor(primaryColor, brightness),
+          contrastedPrimary: ColorUtils.ensureTextContrast(
+            primaryColor,
+            colorScheme.surface,
+          ),
         ),
       ],
     );
