@@ -86,12 +86,11 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
 
     return Scaffold(
       appBar: GHCAppBar(
-        title: AppLocalizations.of(context).createCharacter,
         scrollController: _scrollController,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: mediumPadding),
-            child: FilledButton.icon(
+            child: TextButton.icon(
               icon: const Icon(Icons.check),
               label: Text(AppLocalizations.of(context).create),
               onPressed: _onCreatePressed,
