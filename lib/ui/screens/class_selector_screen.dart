@@ -1,14 +1,13 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/custom_class_warning_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/variant_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 /// Result object returned when a player class is selected.
 ///
@@ -409,13 +408,17 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     // Show custom class warning if needed
     if ((selectedPlayerClass.category == ClassCategory.custom) &&
         !hideMessage) {
-      proceed = await _showCustomClassWarningDialog(hideMessage);
+      proceed = await CustomClassWarningDialog.show(context);
+      if (!mounted) return null;
     }
 
     // Show variant selection if class has multiple versions
     if (PlayerClass.perkListByClassCode(selectedPlayerClass.classCode)!.length >
         1) {
-      Variant? variant = await _showVariantDialog(selectedPlayerClass);
+      Variant? variant = await VariantSelectorDialog.show(
+        context: context,
+        playerClass: selectedPlayerClass,
+      );
       proceed = variant != null;
       userChoice = SelectedPlayerClass(
         playerClass: selectedPlayerClass,
@@ -424,154 +427,5 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     }
 
     return proceed == true ? userChoice : null;
-  }
-
-  /// Shows a warning dialog about custom/community classes.
-  Future<bool?> _showCustomClassWarningDialog(bool hideMessage) async {
-    return await showDialog<bool?>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: Center(
-            child: Text(
-              'Custom Classes',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          content: StatefulBuilder(
-            builder: (thisLowerContext, innerSetState) {
-              return Container(
-                constraints: const BoxConstraints(
-                  maxWidth: maxDialogWidth,
-                  minWidth: maxDialogWidth,
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text.rich(
-                        TextSpan(
-                          children: [
-                            const TextSpan(
-                              text:
-                                  "Please note that these classes are created by members of the 'Gloomhaven Custom Content Unity Guild' and are subject to change. Use at your own risk and report any incongruencies to the developer. More information can be found on the ",
-                            ),
-                            TextSpan(
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                              text: 'Discord server',
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () async {
-                                  Uri uri = Uri(
-                                    scheme: 'https',
-                                    host: 'discord.gg',
-                                    path:
-                                        'gloomhaven-custom-content-unity-guild-728375347732807825',
-                                  );
-                                  var urllaunchable = await canLaunchUrl(uri);
-                                  if (urllaunchable) {
-                                    await launchUrl(uri);
-                                  }
-                                },
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 35),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "Don't show again",
-                            overflow: TextOverflow.visible,
-                          ),
-                          Checkbox(
-                            value: hideMessage,
-                            onChanged: (bool? value) {
-                              if (value != null) {
-                                innerSetState(() {
-                                  SharedPrefs()
-                                          .hideCustomClassesWarningMessage =
-                                      value;
-                                  hideMessage = !hideMessage;
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () => Navigator.pop(context, false),
-            ),
-            TextButton(
-              child: const Text('Continue'),
-              onPressed: () => Navigator.pop(context, true),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  /// Shows a dialog to select between class variants/editions.
-  Future<Variant?> _showVariantDialog(PlayerClass selectedPlayerClass) async {
-    return await showDialog<Variant?>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                'images/class_icons/${selectedPlayerClass.icon}',
-                width: iconSize + 5,
-                height: iconSize + 5,
-                colorFilter: ColorFilter.mode(
-                  Color(selectedPlayerClass.primaryColor),
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: mediumPadding * 2),
-              Text(
-                selectedPlayerClass.name,
-                style: Theme.of(context).textTheme.headlineLarge,
-              ),
-            ],
-          ),
-          content: const Text('Version', textAlign: TextAlign.center),
-          actions:
-              PlayerClass.perkListByClassCode(
-                  selectedPlayerClass.classCode,
-                )!.map((perkList) {
-                  return TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(perkList.variant);
-                    },
-                    child: Text(
-                      ClassVariants.classVariants[perkList.variant]!,
-                      textAlign: TextAlign.end,
-                    ),
-                  );
-                }).toList()
-                ..add(
-                  TextButton(
-                    onPressed: (() => Navigator.of(context).pop()),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-        );
-      },
-    );
   }
 }

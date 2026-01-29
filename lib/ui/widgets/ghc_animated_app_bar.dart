@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
@@ -206,73 +206,29 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                     color: charactersModel.isEditMode ? Colors.red[400] : null,
                   ),
                   onPressed: charactersModel.isEditMode
-                      ? () {
-                          showDialog<bool?>(
+                      ? () async {
+                          final bool? result = await ConfirmationDialog.show(
                             context: context,
-                            builder: (_) {
-                              return AlertDialog(
-                                content: Container(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: maxDialogWidth,
-                                    minWidth: maxDialogWidth,
-                                  ),
-                                  child: const Text(
-                                    'Are you sure? This cannot be undone',
-                                  ),
+                            content: const Text(
+                              'Are you sure? This cannot be undone',
+                            ),
+                            confirmLabel: 'Delete',
+                            cancelLabel: 'Cancel',
+                          );
+
+                          if (result == true && context.mounted) {
+                            final String characterName =
+                                charactersModel.currentCharacter!.name;
+                            await charactersModel.deleteCurrentCharacter();
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context)
+                              ..clearSnackBars()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: Text('$characterName deleted'),
                                 ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: const Text('Cancel'),
-                                    onPressed: () =>
-                                        Navigator.pop(context, false),
-                                  ),
-                                  ElevatedButton.icon(
-                                    style: Theme.of(context)
-                                        .textButtonTheme
-                                        .style
-                                        ?.copyWith(
-                                          backgroundColor:
-                                              WidgetStateProperty.resolveWith<
-                                                Color
-                                              >(
-                                                (Set<WidgetState> states) =>
-                                                    Colors.red.withValues(
-                                                      alpha: 0.75,
-                                                    ),
-                                              ),
-                                        ),
-                                    onPressed: () =>
-                                        Navigator.pop(context, true),
-                                    icon: const Icon(
-                                      Icons.delete_rounded,
-                                      color: Colors.white,
-                                    ),
-                                    label: Text(
-                                      'Delete',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium
-                                          ?.copyWith(color: Colors.white),
-                                    ),
-                                  ),
-                                ],
                               );
-                            },
-                          ).then((bool? result) async {
-                            if (result != null && result) {
-                              final String characterName =
-                                  charactersModel.currentCharacter!.name;
-                              await charactersModel.deleteCurrentCharacter();
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context)
-                                ..clearSnackBars()
-                                ..showSnackBar(
-                                  SnackBar(
-                                    content: Text('$characterName deleted'),
-                                  ),
-                                );
-                            }
-                          });
+                          }
                         }
                       : () async {
                           await CreateCharacterScreen.show(
