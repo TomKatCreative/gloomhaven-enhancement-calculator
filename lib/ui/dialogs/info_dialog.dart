@@ -5,6 +5,7 @@ import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 class InfoDialog extends StatefulWidget {
@@ -367,7 +368,7 @@ class _InfoDialogState extends State<InfoDialog> {
           onPressed: () => Navigator.pop(context),
           child: Text(
             AppLocalizations.of(context).gotIt,
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            style: TextStyle(color: Theme.of(context).contrastedPrimary),
           ),
         ),
       ],

@@ -31,7 +31,8 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 /// ```
 class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
   /// The primary title text displayed in the AppBar.
-  final String title;
+  /// If null, no title is displayed.
+  final String? title;
 
   /// Optional widget displayed below the title.
   final Widget? subtitle;
@@ -53,7 +54,7 @@ class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
 
   const GHCAppBar({
     super.key,
-    required this.title,
+    this.title,
     this.subtitle,
     this.centerTitle = false,
     this.actions,
@@ -127,21 +128,26 @@ class _GHCAppBarState extends State<GHCAppBar> {
               Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
             ),
           ),
-          title: widget.subtitle != null
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      widget.title,
-                      style: widget.titleStyle ?? theme.textTheme.headlineLarge,
-                    ),
-                    widget.subtitle!,
-                  ],
-                )
-              : Text(
-                  widget.title,
-                  style: widget.titleStyle ?? theme.textTheme.headlineLarge,
-                ),
+          title: widget.title != null
+              ? (widget.subtitle != null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            widget.title!,
+                            style:
+                                widget.titleStyle ??
+                                theme.textTheme.headlineLarge,
+                          ),
+                          widget.subtitle!,
+                        ],
+                      )
+                    : Text(
+                        widget.title!,
+                        style:
+                            widget.titleStyle ?? theme.textTheme.headlineLarge,
+                      ))
+              : null,
           actions: widget.actions,
         );
       },

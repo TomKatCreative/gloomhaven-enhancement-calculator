@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
@@ -130,7 +131,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 SwitchListTile(
-                  secondary: const Icon(Icons.warning_rounded),
+                  secondary: Icon(
+                    SharedPrefs().envelopeX
+                        ? Icons.drafts_rounded
+                        : Icons.mail_rounded,
+                  ),
                   title: Text(AppLocalizations.of(context).solveEnvelopeX),
                   subtitle: Text(
                     AppLocalizations.of(context).gloomhavenSpoilers,
@@ -177,8 +182,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                               labelText: AppLocalizations.of(
                                                 context,
                                               ).solution,
-                                              border:
-                                                  const OutlineInputBorder(),
                                             ),
                                           ),
                                         ],
@@ -205,7 +208,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                             color: envelopeXSolved
                                                 ? Theme.of(
                                                     context,
-                                                  ).colorScheme.primary
+                                                  ).contrastedPrimary
                                                 : Theme.of(
                                                     context,
                                                   ).disabledColor,
@@ -254,7 +257,11 @@ class SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 SwitchListTile(
-                  secondary: const Icon(Icons.warning_rounded),
+                  secondary: Icon(
+                    SharedPrefs().envelopeV
+                        ? Icons.drafts_rounded
+                        : Icons.mail_rounded,
+                  ),
                   title: Text(AppLocalizations.of(context).unlockEnvelopeV),
                   subtitle: Text(
                     AppLocalizations.of(context).crimsonScalesSpoilers,
@@ -301,8 +308,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                                               labelText: AppLocalizations.of(
                                                 context,
                                               ).password,
-                                              border:
-                                                  const OutlineInputBorder(),
                                             ),
                                           ),
                                         ],
@@ -329,7 +334,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                                             color: envelopeVSolved
                                                 ? Theme.of(
                                                     context,
-                                                  ).colorScheme.primary
+                                                  ).contrastedPrimary
                                                 : Theme.of(
                                                     context,
                                                   ).disabledColor,
@@ -1068,11 +1073,13 @@ class SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListTile(
       leading: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: Theme.of(context).colorScheme.primary,
+        style: theme.textTheme.titleMedium?.copyWith(
+          color: theme.contrastedPrimary,
         ),
       ),
     );

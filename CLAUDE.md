@@ -56,6 +56,21 @@ git merge feature/my-new-feature
 git push origin dev  # Auto-deploys to internal testing
 ```
 
+### Common Git Commands
+
+**IMPORTANT:** Git options (like `--stat`, `--oneline`) must come BEFORE file arguments, not after.
+
+```bash
+# ✅ Correct - options before file arguments
+git diff --stat lib/ui/screens/file.dart
+git log --oneline main..HEAD
+git diff --name-only HEAD~1
+
+# ❌ Wrong - will fail with "fatal: option must come before non-option arguments"
+git diff lib/ui/screens/file.dart --stat
+git log main..HEAD --oneline
+```
+
 ## Architecture
 
 ### State Management: Provider + ChangeNotifier
@@ -197,6 +212,49 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 - Class icons: `images/class_icons/*.svg`
 - Attack modifiers: `images/attack_modifiers/`
 - Custom fonts: PirataOne (headers), HighTower, Nyala, Roboto, OpenSans, Inter
+
+## Theme System
+
+### Color Contrast for Accessibility
+
+The app uses a centralized contrast system to ensure text and UI elements meet WCAG AA accessibility standards (4.5:1 contrast ratio).
+
+**Implementation:**
+- **`ColorUtils.ensureTextContrast()`** - Calculates and adjusts colors for proper contrast
+- **`theme.contrastedPrimary`** - Pre-calculated contrasted primary color available throughout the app
+- **Theme extension** - Contrast calculated once at theme build time for performance
+
+**Where contrast is applied:**
+- TextButton foreground color (all buttons app-wide)
+- Bottom navigation bar selected items
+- Dialog action buttons
+- Section headers and primary-colored text
+- Any text using `theme.contrastedPrimary`
+
+**Adding contrast to new components:**
+```dart
+// Option 1: Use theme extension (recommended)
+Text(
+  'My Text',
+  style: TextStyle(color: Theme.of(context).contrastedPrimary),
+)
+
+// Option 2: Calculate manually (for one-off cases)
+Text(
+  'My Text',
+  style: TextStyle(
+    color: ColorUtils.ensureTextContrast(
+      primaryColor,
+      backgroundColor,
+    ),
+  ),
+)
+```
+
+**Key files:**
+- `lib/utils/color_utils.dart` - Contrast calculation utilities
+- `lib/theme/theme_extensions.dart` - `AppThemeExtension` with `contrastedPrimary`
+- `lib/theme/app_theme_builder.dart` - Theme-level contrast application
 
 ## SVG Theming
 
@@ -566,6 +624,82 @@ Both selectors follow these conventions:
 - **SafeArea**: Bottom-only SafeArea for device navigation buttons
 - **Static show()**: Invoked via static method returning `Future<T?>`
 - **Section headers**: Use `SearchSectionHeader` widget for category grouping
+
+## Reusable Dialog Components (`lib/ui/dialogs/`)
+
+The app provides reusable dialog components for common interaction patterns. All dialogs use the centralized theme contrast system for accessibility.
+
+### ConfirmationDialog
+
+General-purpose confirmation dialog with customizable content and actions.
+
+**Usage:**
+```dart
+final confirmed = await ConfirmationDialog.show(
+  context: context,
+  title: 'Delete Character?',  // Optional
+  content: Text('This action cannot be undone.'),
+  confirmLabel: 'Delete',
+  cancelLabel: 'Cancel',
+  showCancel: true,  // Default true
+);
+
+if (confirmed == true) {
+  // User confirmed
+}
+```
+
+**Features:**
+- Optional title
+- Scrollable content area (max width 468dp)
+- Up to two action buttons with automatic contrast adjustment
+- Static show() method returns `Future<bool?>`
+
+### CustomClassWarningDialog
+
+Specialized dialog for custom/community class warnings.
+
+**Usage:**
+```dart
+final proceed = await CustomClassWarningDialog.show(context);
+if (proceed == true) {
+  // User accepted warning
+}
+```
+
+**Features:**
+- Discord server link for community content
+- "Don't show again" checkbox (persisted to SharedPreferences)
+- Custom stateful behavior for checkbox management
+
+### VariantSelectorDialog
+
+Dialog for selecting between class variants/editions.
+
+**Usage:**
+```dart
+final variant = await VariantSelectorDialog.show(
+  context: context,
+  playerClass: selectedClass,
+);
+
+if (variant != null) {
+  // Use selected variant (Variant.base, Variant.gloomhaven2E, etc.)
+}
+```
+
+**Features:**
+- Class icon and name in title
+- Dynamic button generation for all available variants
+- Supports unlimited variants (future-proof)
+- Cancel option with contrast-adjusted styling
+
+### Best Practices
+
+- Use `ConfirmationDialog` for simple yes/no confirmations
+- Create specialized dialogs (like `CustomClassWarningDialog`) for complex, reusable patterns
+- All dialog buttons automatically use `theme.contrastedPrimary` for accessibility
+- Always check `context.mounted` before using context after `await`
 
 ## Expandable Cost Chip (`lib/ui/widgets/expandable_cost_chip.dart`)
 
