@@ -31,6 +31,9 @@ dart run flutter_launcher_icons
 
 # Analyze code
 flutter analyze
+
+# Format code (run after making changes)
+dart format .
 ```
 
 ## Git Branching Strategy
@@ -801,3 +804,4 @@ Or use the GitHub Actions web UI → Actions tab → "Deploy to Internal Track" 
 8. **User interaction** - When speaking with the developer who is working on this project, push back again their ideas if they aren't technically sound. Don't just do whatever they want - think about it in the context of the app and if you think there's a better way to do something, suggest it.
 9. **Branching** - Always suggest starting new work from the `dev` branch, not `master`. Pushes to `dev` auto-deploy to internal testing.
 10. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
+11. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
