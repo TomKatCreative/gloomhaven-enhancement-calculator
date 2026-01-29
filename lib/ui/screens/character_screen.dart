@@ -65,10 +65,7 @@ class CharacterScreen extends StatelessWidget {
               Container(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: mediumPadding,
-                    vertical: smallPadding,
-                  ),
+                  padding: const EdgeInsets.all(mediumPadding),
                   child: _CheckmarksAndRetirementsRow(character: character),
                 ),
               ),
@@ -91,16 +88,13 @@ class CharacterScreen extends StatelessWidget {
             ),
             // PERKS
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+              padding: const EdgeInsets.all(mediumPadding),
               child: PerksSection(character: character),
             ),
-            const SizedBox(height: mediumPadding),
             // MASTERIES
             if (character.characterMasteries.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: mediumPadding - 3,
-                ),
+                padding: const EdgeInsets.all(mediumPadding),
                 child: MasteriesSection(
                   character: character,
                   charactersModel: context.watch<CharactersModel>(),
