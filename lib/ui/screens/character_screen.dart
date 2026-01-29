@@ -595,7 +595,7 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
       decoration: BoxDecoration(
         border: Border.all(
           width: 1,
-          color: Theme.of(context).colorScheme.onSurface,
+          color: Theme.of(context).colorScheme.outlineVariant,
         ),
         borderRadius: BorderRadius.circular(4),
       ),
