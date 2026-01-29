@@ -81,10 +81,7 @@ class CrimsonScalesPerks {
         Perk('$_replace $_one -1 $_card with $_one +2 $_muddle $_card'),
         Perk('$_replace $_one -1 $_card with $_one +1 $_poison $_card'),
         Perk('$_replace $_one -1 $_card with $_one +1 $_wound $_card'),
-        Perk(
-          '$_add $_two $_rolling +1 $_immobilize $_cards',
-          quantity: 2,
-        ),
+        Perk('$_add $_two $_rolling +1 $_immobilize $_cards', quantity: 2),
         Perk(
           '$_add $_one $_rolling "$_heal 1, Self" $_card and $_one $_rolling "$_shield 1, Self" $_card',
           quantity: 2,
@@ -102,9 +99,7 @@ class CrimsonScalesPerks {
     ],
     ClassCodes.artificer: [
       Perks([
-        Perk(
-          '$_replace $_one -2 $_card with $_one -1 $_wildElement $_card',
-        ),
+        Perk('$_replace $_one -2 $_card with $_one -1 $_wildElement $_card'),
         Perk('$_replace $_one -1 $_card with $_one +1 $_disarm $_card'),
         Perk(
           '$_replace $_one -1 $_card with $_one +1 $_push 1 $_card',
@@ -126,9 +121,7 @@ class CrimsonScalesPerks {
           '$_replace $_one +0 $_card with $_one +1 $_pierce 2 $_card',
           quantity: 2,
         ),
-        Perk(
-          '$_replace $_one +2 $_card with $_one +3 "$_heal 2, Self" $_card',
-        ),
+        Perk('$_replace $_one +2 $_card with $_one +3 "$_heal 2, Self" $_card'),
         Perk(
           '$_replace $_two +1 $_cards with $_two $_rolling +1 $_poison $_cards',
         ),
@@ -208,9 +201,7 @@ class CrimsonScalesPerks {
           '$_replace $_one -1 $_card with $_one +0 "$_heal 1, Affect all summoned allies owned" $_card',
           quantity: 2,
         ),
-        Perk(
-          '$_replace $_one -2 $_card with $_one -2 "$_bless, Self" $_card',
-        ),
+        Perk('$_replace $_one -2 $_card with $_one -2 "$_bless, Self" $_card'),
         Perk(
           '$_replace $_two +0 $_cards with $_one +0 "$_immobilize and $_push 1" $_card',
         ),
@@ -250,9 +241,7 @@ class CrimsonScalesPerks {
           quantity: 2,
         ),
         Perk('$_add $_two $_rolling $_wound $_cards'),
-        Perk(
-          '$_ignoreNegativeItemEffectsAndAdd $_one $_rolling $_fire $_card',
-        ),
+        Perk('$_ignoreNegativeItemEffectsAndAdd $_one $_rolling $_fire $_card'),
         Perk(
           '$_ignoreNegativeScenarioEffectsAndAdd $_one $_rolling $_fire $_card',
         ),
@@ -374,9 +363,7 @@ class CrimsonScalesPerks {
           quantity: 2,
         ),
         Perk('$_add $_one +1 $_wound, $_muddle $_card', quantity: 2),
-        Perk(
-          'At the start of your first turn each $_scenario, gain $_bless',
-        ),
+        Perk('At the start of your first turn each $_scenario, gain $_bless'),
         Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
@@ -392,10 +379,7 @@ class CrimsonScalesPerks {
           '$_replace $_one -2 $_card with $_one -2 "Perform $_one Glow ability" $_card',
         ),
         Perk('$_add $_one +0 $_wildElement $_card', quantity: 2),
-        Perk(
-          '$_add $_one $_rolling +1 "$_heal 1, Self" $_card',
-          quantity: 2,
-        ),
+        Perk('$_add $_one $_rolling +1 "$_heal 1, Self" $_card', quantity: 2),
         Perk(
           '$_add $_one "$_poison, target all enemies in the depicted LUMINARY_HEXES area" $_card',
           quantity: 2,

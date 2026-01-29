@@ -23,7 +23,8 @@ class EnhancementCalculatorScreen extends StatefulWidget {
       _EnhancementCalculatorScreenState();
 }
 
-class _EnhancementCalculatorScreenState extends State<EnhancementCalculatorScreen> {
+class _EnhancementCalculatorScreenState
+    extends State<EnhancementCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context

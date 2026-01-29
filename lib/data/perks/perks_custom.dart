@@ -28,8 +28,12 @@ class CustomPerks {
           '${P.replace} ${P.one} +0 ${P.card} with ${P.one} +1 "${P.heal} 1, ${P.targetDiamond} 1 ally" ${P.card}',
           quantity: 3,
         ),
-        Perk('${P.replace} ${P.one} +2 ${P.card} with ${P.four} +1 ${P.rolling} ${P.cards}'),
-        Perk('${P.add} ${P.two} ${P.pierce} 2 ${P.poison} ${P.rolling} ${P.cards}'),
+        Perk(
+          '${P.replace} ${P.one} +2 ${P.card} with ${P.four} +1 ${P.rolling} ${P.cards}',
+        ),
+        Perk(
+          '${P.add} ${P.two} ${P.pierce} 2 ${P.poison} ${P.rolling} ${P.cards}',
+        ),
         Perk(
           '${P.add} ${P.three} "${P.heal} 1, ${P.range} 1" ${P.rolling} ${P.cards}',
           quantity: 2,
@@ -76,7 +80,9 @@ class CustomPerks {
           '${P.add} ${P.one} "${P.ward}, ${P.regenerate}, self" ${P.rolling} ${P.card}',
           quantity: 2,
         ),
-        Perk('${P.add} ${P.one} -2 ${P.brittle} and one +3 "${P.brittle}, self" ${P.card}'),
+        Perk(
+          '${P.add} ${P.one} -2 ${P.brittle} and one +3 "${P.brittle}, self" ${P.card}',
+        ),
         Perk('${P.ignoreItemMinusOneEffectsAndRemove} ${P.one} +0 ${P.card}'),
         Perk(
           '${P.atTheStartOfEachScenario}, you may perform "${P.strengthen}, ${P.wound}, self" or "${P.ward}, ${P.immobilize}, self"',
@@ -89,8 +95,13 @@ class CustomPerks {
     ],
     ClassCodes.brewmaster: [
       Perks([
-        Perk('${P.replace} ${P.one} -2 ${P.card} with ${P.one} -1 ${P.stun} ${P.card}'),
-        Perk('${P.replace} ${P.one} -1 ${P.card} with ${P.one} +1 ${P.card}', quantity: 2),
+        Perk(
+          '${P.replace} ${P.one} -2 ${P.card} with ${P.one} -1 ${P.stun} ${P.card}',
+        ),
+        Perk(
+          '${P.replace} ${P.one} -1 ${P.card} with ${P.one} +1 ${P.card}',
+          quantity: 2,
+        ),
         Perk(
           '${P.replace} ${P.one} -1 ${P.card} with ${P.two} ${P.rolling} ${P.muddle} ${P.cards}',
           quantity: 2,
@@ -111,7 +122,9 @@ class CustomPerks {
     ClassCodes.frostborn: [
       Perks([
         Perk('${P.remove} ${P.two} -1 ${P.cards}', quantity: 2),
-        Perk('${P.replace} ${P.one} -2 ${P.card} with ${P.one} +0 CHILL ${P.card}'),
+        Perk(
+          '${P.replace} ${P.one} -2 ${P.card} with ${P.one} +0 CHILL ${P.card}',
+        ),
         Perk(
           '${P.replace} ${P.two} +0 ${P.cards} with ${P.two} +1 ${P.push} 1 ${P.cards}',
           quantity: 2,
@@ -122,7 +135,10 @@ class CustomPerks {
         ),
         Perk('${P.replace} ${P.one} +1 ${P.card} with ${P.one} +3 ${P.card}'),
         Perk('${P.add} ${P.one} +0 ${P.stun} ${P.card}'),
-        Perk('${P.add} ${P.one} ${P.rolling} ADD ${P.targetDiamond} ${P.card}', quantity: 2),
+        Perk(
+          '${P.add} ${P.one} ${P.rolling} ADD ${P.targetDiamond} ${P.card}',
+          quantity: 2,
+        ),
         Perk('${P.add} ${P.three} ${P.rolling} CHILL ${P.cards}'),
         Perk('${P.add} ${P.three} ${P.rolling} ${P.push} 1 ${P.cards}'),
         Perk('Ignore difficult and hazardous terrain during move actions'),
@@ -133,12 +149,21 @@ class CustomPerks {
       Perks([
         Perk('${P.remove} ${P.two} -1 ${P.cards}', quantity: 2),
         Perk('${P.remove} four +0 ${P.cards}'),
-        Perk('${P.replace} ${P.one} +0 ${P.card} with ${P.one} +2 ${P.card}', quantity: 2),
+        Perk(
+          '${P.replace} ${P.one} +0 ${P.card} with ${P.one} +2 ${P.card}',
+          quantity: 2,
+        ),
         Perk('${P.add} ${P.one} ${P.rolling} +2 ${P.card}', quantity: 2),
         Perk('${P.add} ${P.one} +1 ${P.immobilize} ${P.card}', quantity: 2),
-        Perk('${P.add} ${P.two} ${P.rolling} ${P.poison} ${P.cards}', quantity: 2),
+        Perk(
+          '${P.add} ${P.two} ${P.rolling} ${P.poison} ${P.cards}',
+          quantity: 2,
+        ),
         Perk('${P.add} ${P.one} ${P.rolling} ${P.disarm} ${P.card}'),
-        Perk('${P.add} ${P.one} ${P.rolling} ${P.heal} 2 ${P.earth} ${P.card}', quantity: 2),
+        Perk(
+          '${P.add} ${P.one} ${P.rolling} ${P.heal} 2 ${P.earth} ${P.card}',
+          quantity: 2,
+        ),
         Perk(P.ignoreNegativeScenarioEffects),
       ], variant: Variant.base),
     ],
@@ -175,7 +200,9 @@ class CustomPerks {
         Perk(
           'You may bring one additional ${P.oneHand} item into each ${P.scenario}',
         ),
-        Perk('Each time you short rest, ${P.recover} one spent ${P.oneHand} item'),
+        Perk(
+          'Each time you short rest, ${P.recover} one spent ${P.oneHand} item',
+        ),
         Perk('${P.ignoreNegativeItemEffectsAndRemove} one -1 ${P.card}'),
       ], variant: Variant.base),
       Perks([
@@ -227,7 +254,9 @@ class CustomPerks {
         Perk(
           '${P.replace} ${P.one} +0 ${P.card} with ${P.one} ${P.rolling} "${P.heal} 3, ${P.wound}, Self" ${P.card}',
         ),
-        Perk('${P.replace} ${P.two} +0 ${P.cards} with ${P.two} ${P.rolling} ${P.fire} ${P.cards}'),
+        Perk(
+          '${P.replace} ${P.two} +0 ${P.cards} with ${P.two} ${P.rolling} ${P.fire} ${P.cards}',
+        ),
         Perk(
           '${P.replace} ${P.three} +1 ${P.cards} with ${P.one} ${P.rolling} +1 card, ${P.one} +1 ${P.wound} ${P.card}, and ${P.one} +1 "${P.heal} 1, Self" ${P.card}',
         ),
@@ -239,7 +268,9 @@ class CustomPerks {
           '${P.replace} ${P.one} -1 ${P.card} with ${P.one} +0 CHILL ${P.card}',
           quantity: 2,
         ),
-        Perk('${P.replace} ${P.one} +2 ${P.card} with ${P.one} +3 CHILL ${P.card}'),
+        Perk(
+          '${P.replace} ${P.one} +2 ${P.card} with ${P.one} +3 CHILL ${P.card}',
+        ),
         Perk('${P.add} ${P.one} +2 ${P.fire}/${P.ice} ${P.card}', quantity: 2),
         Perk('${P.add} ${P.one} +0 ${P.brittle} ${P.card}'),
         Perk(
@@ -253,7 +284,10 @@ class CustomPerks {
     ClassCodes.shardrender: [
       Perks([
         Perk('Remove one -2 card'),
-        Perk('${P.replace} ${P.one} -1 ${P.card} with ${P.one} +1 card', quantity: 2),
+        Perk(
+          '${P.replace} ${P.one} -1 ${P.card} with ${P.one} +1 card',
+          quantity: 2,
+        ),
         Perk(
           '${P.replace} ${P.one} -1 ${P.card} with ${P.one} ${P.rolling} "${P.shield} 1, Self" card',
           quantity: 2,
@@ -324,7 +358,10 @@ class CustomPerks {
         Perk(
           '${P.replace} ${P.two} +0 ${P.cards} with ${P.two} +0 ${P.pierce} 3 ${P.rolling} ${P.cards}',
         ),
-        Perk('${P.add} ${P.three} ${P.barrierPlus} 1 ${P.rolling} ${P.cards}', quantity: 2),
+        Perk(
+          '${P.add} ${P.three} ${P.barrierPlus} 1 ${P.rolling} ${P.cards}',
+          quantity: 2,
+        ),
         Perk('${P.add} ${P.one} +2 ${P.light} ${P.card}', quantity: 2),
         Perk(
           '${P.replace} ${P.one} +0 ${P.card} with ${P.one} +1 "${P.regenerate}, self" ${P.rolling} ${P.card}',
@@ -360,7 +397,9 @@ class CustomPerks {
           '${P.replace} ${P.one} +0 ${P.card} with ${P.one} +1 "If the target is Latched, +2 instead" ${P.card}',
           quantity: 2,
         ),
-        Perk('${P.replace} ${P.one} +0 ${P.card} with ${P.one} +1 ${P.poison} ${P.card}'),
+        Perk(
+          '${P.replace} ${P.one} +0 ${P.card} with ${P.one} +1 ${P.poison} ${P.card}',
+        ),
         Perk(
           '${P.add} ${P.two} "${P.heal} 1, ${P.targetCircle} 1 ally." ${P.rolling} ${P.cards}',
         ),

@@ -202,10 +202,10 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
-                              character
-                                ..previousRetirements =
-                                    character.previousRetirements - 1,
-                            )
+                            character
+                              ..previousRetirements =
+                                  character.previousRetirements - 1,
+                          )
                         : null,
                   ),
                   Text(
@@ -218,10 +218,10 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     icon: const Icon(Icons.add_circle),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
-                              character
-                                ..previousRetirements =
-                                    character.previousRetirements + 1,
-                            )
+                            character
+                              ..previousRetirements =
+                                  character.previousRetirements + 1,
+                          )
                         : null,
                   ),
                 ],

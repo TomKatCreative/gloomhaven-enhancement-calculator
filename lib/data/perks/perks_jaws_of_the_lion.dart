@@ -95,8 +95,7 @@ class JawsOfTheLionPerks {
           '$_replace $_one +1 $_card with $_one +2 $_earth $_card',
           quantity: 2,
         ),
-        Perk(
-            '$_add $_two +0 "All adjacent enemies suffer $_damage 1" $_cards'),
+        Perk('$_add $_two +0 "All adjacent enemies suffer $_damage 1" $_cards'),
         Perk('$_ignoreScenarioEffectsAndRemove $_one -1 $_card'),
         Perk(
           '**Remodeling:** Whenever you rest while adjacent to a wall or obstacle, you may place an obstacle in an empty hex within $_range 2 (of you)',

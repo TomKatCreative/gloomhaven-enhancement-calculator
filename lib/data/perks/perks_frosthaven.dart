@@ -83,10 +83,7 @@ class FrosthavenPerks {
     // DRIFTER
     ClassCodes.drifter: [
       Perks([
-        Perk(
-          '$_replace $_one -1 $_card with $_one +1 $_card',
-          quantity: 3,
-        ),
+        Perk('$_replace $_one -1 $_card with $_one +1 $_card', quantity: 3),
         Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
         Perk(
           '$_replace $_one +1 $_card with $_two +0 "Move $_one of your character tokens backward $_one slot" $_cards',

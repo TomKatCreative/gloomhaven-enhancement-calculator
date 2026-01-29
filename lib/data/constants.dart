@@ -9,9 +9,7 @@ const double secondaryFontSize = 25.0,
     extraLargePadding = 24.0,
     maxWidth = 500,
     maxDialogWidth = 400;
-const String nyala = 'Nyala',
-    pirataOne = 'PirataOne',
-    inter = 'Inter';
+const String nyala = 'Nyala', pirataOne = 'PirataOne', inter = 'Inter';
 
 /// Game edition-specific colors used for branding elements like edition toggles.
 /// These are intentionally hardcoded as they represent game brand colors,

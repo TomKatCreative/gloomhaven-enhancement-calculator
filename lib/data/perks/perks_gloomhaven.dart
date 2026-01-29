@@ -85,18 +85,29 @@ class GloomhavenPerks {
   static const _berserker = PerkTextConstants.berserker;
   static const _doomstalker = PerkTextConstants.doomstalker;
   static const _bladeswarm = PerkTextConstants.bladeswarm;
-  static const _atTheStartOfEachScenario = PerkTextConstants.atTheStartOfEachScenario;
-  static const _atTheEndOfEachScenario = PerkTextConstants.atTheEndOfEachScenario;
-  static const _ignoreItemMinusOneEffects = PerkTextConstants.ignoreItemMinusOneEffects;
-  static const _ignoreItemMinusOneEffectsAndAdd = PerkTextConstants.ignoreItemMinusOneEffectsAndAdd;
-  static const _ignoreItemMinusOneEffectsAndRemove = PerkTextConstants.ignoreItemMinusOneEffectsAndRemove;
-  static const _ignoreNegativeItemEffects = PerkTextConstants.ignoreNegativeItemEffects;
-  static const _ignoreNegativeItemEffectsAndAdd = PerkTextConstants.ignoreNegativeItemEffectsAndAdd;
-  static const _ignoreNegativeScenarioEffects = PerkTextConstants.ignoreNegativeScenarioEffects;
-  static const _ignoreNegativeScenarioEffectsAndAdd = PerkTextConstants.ignoreNegativeScenarioEffectsAndAdd;
+  static const _atTheStartOfEachScenario =
+      PerkTextConstants.atTheStartOfEachScenario;
+  static const _atTheEndOfEachScenario =
+      PerkTextConstants.atTheEndOfEachScenario;
+  static const _ignoreItemMinusOneEffects =
+      PerkTextConstants.ignoreItemMinusOneEffects;
+  static const _ignoreItemMinusOneEffectsAndAdd =
+      PerkTextConstants.ignoreItemMinusOneEffectsAndAdd;
+  static const _ignoreItemMinusOneEffectsAndRemove =
+      PerkTextConstants.ignoreItemMinusOneEffectsAndRemove;
+  static const _ignoreNegativeItemEffects =
+      PerkTextConstants.ignoreNegativeItemEffects;
+  static const _ignoreNegativeItemEffectsAndAdd =
+      PerkTextConstants.ignoreNegativeItemEffectsAndAdd;
+  static const _ignoreNegativeScenarioEffects =
+      PerkTextConstants.ignoreNegativeScenarioEffects;
+  static const _ignoreNegativeScenarioEffectsAndAdd =
+      PerkTextConstants.ignoreNegativeScenarioEffectsAndAdd;
   static const _ignoreScenarioEffects = PerkTextConstants.ignoreScenarioEffects;
-  static const _ignoreScenarioEffectsAndAdd = PerkTextConstants.ignoreScenarioEffectsAndAdd;
-  static const _ignoreScenarioEffectsAndRemove = PerkTextConstants.ignoreScenarioEffectsAndRemove;
+  static const _ignoreScenarioEffectsAndAdd =
+      PerkTextConstants.ignoreScenarioEffectsAndAdd;
+  static const _ignoreScenarioEffectsAndRemove =
+      PerkTextConstants.ignoreScenarioEffectsAndRemove;
   static const _onceEachScenario = PerkTextConstants.onceEachScenario;
   static const _wheneverYouLongRest = PerkTextConstants.wheneverYouLongRest;
   static const _wheneverYouShortRest = PerkTextConstants.wheneverYouShortRest;

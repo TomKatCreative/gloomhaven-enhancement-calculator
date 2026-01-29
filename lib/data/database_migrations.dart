@@ -243,7 +243,10 @@ class DatabaseMigrations {
     });
   }
 
-  static Future<void> updateMetaDataTable(Transaction txn, int databaseVersion) async {
+  static Future<void> updateMetaDataTable(
+    Transaction txn,
+    int databaseVersion,
+  ) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     DateTime now = DateTime.now().toUtc();
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
@@ -261,7 +264,9 @@ class DatabaseMigrations {
     );
   }
 
-  static Future<void> convertCharacterPerkIdColumnFromIntToText(Transaction txn) async {
+  static Future<void> convertCharacterPerkIdColumnFromIntToText(
+    Transaction txn,
+  ) async {
     await txn.execute('''
   ALTER TABLE $tableCharacterPerks
   RENAME TO temp_$tableCharacterPerks
@@ -287,7 +292,9 @@ class DatabaseMigrations {
     await txn.execute('DROP TABLE temp_$tableCharacterPerks');
   }
 
-  static Future<void> convertCharacterMasteryIdColumnFromIntToText(Transaction txn) async {
+  static Future<void> convertCharacterMasteryIdColumnFromIntToText(
+    Transaction txn,
+  ) async {
     await txn.execute('''
   ALTER TABLE $tableCharacterMasteries
   RENAME TO temp_$tableCharacterMasteries

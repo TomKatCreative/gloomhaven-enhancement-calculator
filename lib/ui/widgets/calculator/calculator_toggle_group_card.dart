@@ -56,10 +56,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
   /// The list of toggle items to display.
   final List<ToggleGroupItem> items;
 
-  const CalculatorToggleGroupCard({
-    super.key,
-    required this.items,
-  });
+  const CalculatorToggleGroupCard({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -156,10 +153,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
           ),
           // Trailing widget (if any) or switch
           if (item.trailingWidget != null) ...[
-            GestureDetector(
-              onTap: handleTap,
-              child: item.trailingWidget,
-            ),
+            GestureDetector(onTap: handleTap, child: item.trailingWidget),
             const SizedBox(width: largePadding),
           ] else ...[
             GestureDetector(

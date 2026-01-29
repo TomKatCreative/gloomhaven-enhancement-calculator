@@ -27,11 +27,7 @@ class SearchSectionHeader extends StatelessWidget {
   /// Keys are defined in `lib/utils/asset_config.dart`.
   final String? assetKey;
 
-  const SearchSectionHeader({
-    super.key,
-    required this.title,
-    this.assetKey,
-  });
+  const SearchSectionHeader({super.key, required this.title, this.assetKey});
 
   @override
   Widget build(BuildContext context) {

@@ -92,7 +92,11 @@ A **main** ability is an ability that is written in larger font, whereas a **non
     BuildContext context,
     bool darkMode,
   ) {
-    return RichTextBuilder.build(context, _temporaryEnhancementContent, darkMode);
+    return RichTextBuilder.build(
+      context,
+      _temporaryEnhancementContent,
+      darkMode,
+    );
   }
 
   // ============================================================================
@@ -538,5 +542,4 @@ A **main** ability is an ability that is written in larger font, whereas a **non
       darkMode,
     );
   }
-
 }

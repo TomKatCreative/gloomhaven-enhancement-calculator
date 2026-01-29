@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -123,12 +124,21 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   Widget _buildSectionLabel(
     BuildContext context,
     ThemeData theme,
-    String label,
-    IconData icon,
-  ) {
+    String label, {
+    IconData? icon,
+    String? svgAssetKey,
+  }) {
+    assert(icon != null || svgAssetKey != null);
     return Row(
       children: [
-        Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+        if (icon != null)
+          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+        if (svgAssetKey != null)
+          ThemedSvg(
+            assetKey: svgAssetKey,
+            width: 20,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         const SizedBox(width: mediumPadding),
         Text(
           label,
@@ -148,7 +158,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           context,
           theme,
           AppLocalizations.of(context).name,
-          Icons.person_outline,
+          icon: Icons.person_outline,
         ),
         const SizedBox(height: mediumPadding),
         Row(
@@ -199,7 +209,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   context,
                 ).classWithVariant(ClassVariants.classVariants[_variant]!)
               : AppLocalizations.of(context).class_,
-          Icons.shield_outlined,
+          svgAssetKey: 'CLASS',
         ),
         const SizedBox(height: mediumPadding),
         Row(
@@ -275,7 +285,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           context,
           theme,
           '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
-          Icons.trending_up,
+          svgAssetKey: 'LEVEL',
         ),
         const SizedBox(height: mediumPadding),
         SfSlider(
@@ -311,7 +321,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 context,
                 theme,
                 AppLocalizations.of(context).previousRetirements,
-                Icons.elderly,
+                icon: Icons.elderly,
               ),
               const SizedBox(height: mediumPadding),
               TextFormField(
@@ -338,7 +348,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   context,
                   theme,
                   AppLocalizations.of(context).prosperityLevel,
-                  Icons.location_city,
+                  icon: Icons.location_city,
                 ),
                 const SizedBox(height: mediumPadding),
                 TextFormField(

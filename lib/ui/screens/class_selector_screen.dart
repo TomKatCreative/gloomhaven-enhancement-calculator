@@ -104,24 +104,24 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
   /// 4. Filters by selected categories (if any are selected)
   List<PlayerClass> get _filteredClasses {
     return PlayerClasses.playerClasses.where((playerClass) {
-      // Filter out classes that shouldn't be rendered
-      if (_doNotRenderPlayerClass(playerClass)) {
-        return false;
-      }
+        // Filter out classes that shouldn't be rendered
+        if (_doNotRenderPlayerClass(playerClass)) {
+          return false;
+        }
 
-      // Name/variant must match query
-      if (!_matchesClassOrVariantName(playerClass, _searchQuery)) {
-        return false;
-      }
+        // Name/variant must match query
+        if (!_matchesClassOrVariantName(playerClass, _searchQuery)) {
+          return false;
+        }
 
-      // If no category filters are active, include all
-      if (_selectedCategories.isEmpty) {
-        return true;
-      }
+        // If no category filters are active, include all
+        if (_selectedCategories.isEmpty) {
+          return true;
+        }
 
-      // Include if this class's category is selected
-      return _selectedCategories.contains(playerClass.category);
-    }).toList()
+        // Include if this class's category is selected
+        return _selectedCategories.contains(playerClass.category);
+      }).toList()
       // TODO: remove this when reintroducing the Rootwhisperer
       ..removeWhere((element) => element.classCode == 'rw');
   }
@@ -407,7 +407,8 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     );
 
     // Show custom class warning if needed
-    if ((selectedPlayerClass.category == ClassCategory.custom) && !hideMessage) {
+    if ((selectedPlayerClass.category == ClassCategory.custom) &&
+        !hideMessage) {
       proceed = await _showCustomClassWarningDialog(hideMessage);
     }
 
@@ -456,9 +457,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                                   "Please note that these classes are created by members of the 'Gloomhaven Custom Content Unity Guild' and are subject to change. Use at your own risk and report any incongruencies to the developer. More information can be found on the ",
                             ),
                             TextSpan(
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
+                              style: Theme.of(context).textTheme.bodyMedium
                                   ?.copyWith(
                                     color: Colors.blue,
                                     decoration: TextDecoration.underline,
@@ -494,7 +493,8 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                             onChanged: (bool? value) {
                               if (value != null) {
                                 innerSetState(() {
-                                  SharedPrefs().hideCustomClassesWarningMessage =
+                                  SharedPrefs()
+                                          .hideCustomClassesWarningMessage =
                                       value;
                                   hideMessage = !hideMessage;
                                 });
@@ -550,27 +550,26 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
             ],
           ),
           content: const Text('Version', textAlign: TextAlign.center),
-          actions: PlayerClass.perkListByClassCode(
-            selectedPlayerClass.classCode,
-          )!
-              .map((perkList) {
-                return TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(perkList.variant);
-                  },
-                  child: Text(
-                    ClassVariants.classVariants[perkList.variant]!,
-                    textAlign: TextAlign.end,
+          actions:
+              PlayerClass.perkListByClassCode(
+                  selectedPlayerClass.classCode,
+                )!.map((perkList) {
+                  return TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(perkList.variant);
+                    },
+                    child: Text(
+                      ClassVariants.classVariants[perkList.variant]!,
+                      textAlign: TextAlign.end,
+                    ),
+                  );
+                }).toList()
+                ..add(
+                  TextButton(
+                    onPressed: (() => Navigator.of(context).pop()),
+                    child: const Text('Cancel'),
                   ),
-                );
-              })
-              .toList()
-            ..add(
-              TextButton(
-                onPressed: (() => Navigator.of(context).pop()),
-                child: const Text('Cancel'),
-              ),
-            ),
+                ),
         );
       },
     );

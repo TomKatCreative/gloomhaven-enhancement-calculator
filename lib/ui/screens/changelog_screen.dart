@@ -36,8 +36,8 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
             builder: (context, snapshot) {
               final versionText = snapshot.hasData
                   ? (kDebugMode
-                      ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-                      : 'v${snapshot.data!.version}')
+                        ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
+                        : 'v${snapshot.data!.version}')
                   : null;
               return GHCAppBar(
                 title: AppLocalizations.of(context).changelog,

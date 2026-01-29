@@ -89,7 +89,8 @@ class EnhancementTypeSelectorScreen extends StatefulWidget {
       _EnhancementTypeSelectorScreenState();
 }
 
-class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorScreen> {
+class _EnhancementTypeSelectorScreenState
+    extends State<EnhancementTypeSelectorScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
@@ -277,9 +278,7 @@ class _EnhancementTypeSelectorScreenState extends State<EnhancementTypeSelectorS
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
       child: hasDiscount
           ? Row(
               mainAxisSize: MainAxisSize.min,

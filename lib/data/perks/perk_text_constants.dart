@@ -115,8 +115,7 @@ class PerkTextConstants {
   static const scenario = 'scenario';
   static const atTheStartOfEachScenario = 'At the start of each $scenario';
   static const atTheEndOfEachScenario = 'At the end of each $scenario';
-  static const ignoreItemMinusOneEffects =
-      'Ignore item item_minus_one effects';
+  static const ignoreItemMinusOneEffects = 'Ignore item item_minus_one effects';
   static const ignoreItemMinusOneEffectsAndAdd =
       'Ignore item item_minus_one effects and $addLowercase';
   static const ignoreItemMinusOneEffectsAndRemove =
