@@ -1,7 +1,6 @@
 import 'package:faker/faker.dart' as faker;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
@@ -11,6 +10,7 @@ import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -225,13 +225,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                       Icons.help_outline,
                       color: theme.colorScheme.onSurfaceVariant,
                     )
-                  : SvgPicture.asset(
-                      'images/class_icons/${_selectedClass!.icon}',
-                      colorFilter: ColorFilter.mode(
-                        Color(_selectedClass!.primaryColor),
-                        BlendMode.srcIn,
-                      ),
-                    ),
+                  : ClassIconSvg(playerClass: _selectedClass!),
             ),
           ],
         ),

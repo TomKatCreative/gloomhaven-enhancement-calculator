@@ -5,7 +5,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
@@ -928,8 +927,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                     if (kDebugMode ||
                         (Platform.isAndroid && SharedPrefs().isUSRegion))
                       IconButton(
-                        icon: SvgPicture.asset(
-                          'images/branding/bmc-button.svg',
+                        icon: const ThemedSvg(
+                          assetKey: 'BMC_BUTTON',
                           height: 32,
                         ),
                         tooltip: 'Buy Me a Coffee',

@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/resources_repository.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -283,14 +283,7 @@ class _NameAndClassSection extends StatelessWidget {
             Stack(
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
-                SvgPicture.asset(
-                  'images/ui/level.svg',
-                  width: iconSize * 1.5,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'LEVEL', width: iconSize * 1.5),
                 Text(
                   '${Character.level(character.xp)}',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -315,14 +308,7 @@ class _NameAndClassSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                'images/ui/trait.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'TRAIT', width: iconSize),
               const SizedBox(width: mediumPadding),
               Flexible(
                 child: AutoSizeText(
@@ -483,14 +469,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SvgPicture.asset(
-                  'images/ui/goal.svg',
-                  width: iconSize,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'GOAL', width: iconSize),
                 const SizedBox(width: smallPadding),
                 Text(widget.character.checkMarkProgress().toString()),
                 Text(
@@ -511,14 +490,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Stack(
               alignment: AlignmentDirectional.bottomCenter,
               children: <Widget>[
-                SvgPicture.asset(
-                  'images/equipment_slots/pocket.svg',
-                  width: iconSize,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'Pocket', width: iconSize),
                 Padding(
                   padding: const EdgeInsets.only(left: 3.5),
                   child: Text(
@@ -545,14 +517,7 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).xp,
           child: Row(
             children: <Widget>[
-              SvgPicture.asset(
-                'images/ui/xp.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'XP', width: iconSize),
               const SizedBox(width: mediumPadding),
               Text(
                 widget.character.xp.toString(),
@@ -576,14 +541,7 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).gold,
           child: Row(
             children: <Widget>[
-              SvgPicture.asset(
-                'images/ui/gold.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'GOLD', width: iconSize),
               const SizedBox(width: 5),
               Text(
                 ' ${widget.character.gold}',
@@ -599,14 +557,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                SvgPicture.asset(
-                  'images/ui/goal.svg',
-                  width: iconSize,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'GOAL', width: iconSize),
                 SizedBox(
                   width: 5,
                   child: Text(widget.character.checkMarkProgress().toString()),
@@ -629,14 +580,7 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
-              SvgPicture.asset(
-                'images/equipment_slots/pocket.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'Pocket', width: iconSize),
               Padding(
                 padding: const EdgeInsets.only(left: 3.5),
                 child: Text(

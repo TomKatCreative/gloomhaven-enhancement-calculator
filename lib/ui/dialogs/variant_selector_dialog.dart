@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 
 /// A dialog for selecting between different variants/editions of a player class.
 ///
@@ -53,14 +53,10 @@ class VariantSelectorDialog extends StatelessWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SvgPicture.asset(
-            'images/class_icons/${playerClass.icon}',
+          ClassIconSvg(
+            playerClass: playerClass,
             width: iconSize + 5,
             height: iconSize + 5,
-            colorFilter: ColorFilter.mode(
-              Color(playerClass.primaryColor),
-              BlendMode.srcIn,
-            ),
           ),
           const SizedBox(width: mediumPadding * 2),
           Text(playerClass.name, style: theme.textTheme.headlineLarge),
