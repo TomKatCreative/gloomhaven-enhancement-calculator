@@ -175,11 +175,91 @@ Where L = starting level, P = prosperity level.
 - One-time reads use `context.read<Model>()`
 - Complex widgets are StatefulWidget with local controllers
 
-### Spacing & Padding
-Use constants from `lib/data/constants.dart` instead of hardcoded values:
-- `smallPadding` (4) - use instead of `4`
-- `mediumPadding` (8) - use instead of `8`
-- `largePadding` (16) - use instead of `16`
+### Design Constants (IMPORTANT)
+
+**NEVER hardcode pixel values for padding, icon sizes, border radii, or animation durations.** Always use the constants defined in `lib/data/constants.dart`. This ensures visual consistency and makes future adjustments easy.
+
+#### Spacing & Padding
+
+| Constant | Size | Usage |
+|----------|------|-------|
+| `tinyPadding` | 4 | Minimal spacing, tight layouts |
+| `smallPadding` | 8 | Standard tight spacing |
+| `mediumPadding` | 12 | Standard comfortable spacing |
+| `largePadding` | 16 | Section spacing, card padding |
+| `extraLargePadding` | 24 | Major section breaks, screen padding |
+
+#### Icon Sizes
+
+| Constant | Size | Usage |
+|----------|------|-------|
+| `iconSizeTiny` | 14 | Decorative overlays (+1 badge) |
+| `iconSizeSmall` | 20 | Form inputs, element tracker collapsed, stacked elements |
+| `iconSizeMedium` | 28 | Inline text icons (perks, masteries), section headers |
+| `iconSizeLarge` | 32 | Primary navigation, calculator, dialog buttons |
+| `iconSizeXL` | 36 | Class icons in lists/dialogs |
+| `iconSizeHero` | 48 | Hero elements (level badge) |
+
+#### Border Radius
+
+| Constant | Size | Usage |
+|----------|------|-------|
+| `borderRadiusSmall` | 4 | Small rounded corners (checkboxes) |
+| `borderRadiusMedium` | 8 | Standard input/card corners |
+| `borderRadiusLarge` | 16 | Larger rounded elements |
+| `borderRadiusPill` | 24 | Full pill shape (chips, FABs) |
+| `borderRadiusCard` | 28 | Card top corners |
+
+#### Font Sizes
+
+| Constant | Size | Usage |
+|----------|------|-------|
+| `smallLabelFontSize` | 15 | Smaller labels |
+| `labelFontSize` | 16 | Standard label text |
+| `bodyFontSize` | 20 | Common body text |
+| `secondaryFontSize` | 25 | Secondary headings |
+| `titleFontSize` | 30 | Main titles |
+
+#### Other Constants
+
+| Constant | Value | Usage |
+|----------|-------|-------|
+| `hairlineThickness` | 0.5 | Thin dividers |
+| `dividerThickness` | 1.0 | Standard divider line |
+| `animationDuration` | 250ms | Standard animation duration |
+| `navBarIconContainerHeight` | 35 | Navigation bar item height |
+| `blurBarHeight` | 100 | Blur bar at bottom of calculator |
+| `formFieldSpacing` | 28 | Vertical spacing between form fields |
+
+#### Guidelines
+
+1. **Always use constants** - Never write `padding: EdgeInsets.all(8)` or `width: 32`. Use `smallPadding` and `iconSizeLarge` instead.
+
+2. **No derived sizes** - Don't use expressions like `iconSizeLarge * 0.5` or `iconSize - 2`. If you need a different size, use an existing constant or discuss adding a new one.
+
+3. **Exceptions** - Local computed values for animations (like interpolating between two sizes) are acceptable as local variables.
+
+4. **Adding new constants** - If none of the existing sizes fit your use case, consider whether the design should be adjusted to use an existing size. Only add new constants if there's a clear, recurring need.
+
+```dart
+// ✅ Correct
+Padding(padding: EdgeInsets.all(smallPadding))
+Icon(Icons.info, size: iconSizeSmall)
+ThemedSvg(assetKey: 'MOVE', width: iconSizeLarge)
+BorderRadius.circular(borderRadiusMedium)
+Duration(milliseconds: animationDuration.inMilliseconds)
+
+// ❌ Wrong - hardcoded values
+Padding(padding: EdgeInsets.all(8))
+Icon(Icons.info, size: 20)
+ThemedSvg(assetKey: 'MOVE', width: 32)
+BorderRadius.circular(8.0)
+Duration(milliseconds: 250)
+
+// ❌ Wrong - derived sizes
+width: iconSizeLarge * 0.7
+height: iconSize - 2.5
+```
 
 ### Database
 - UUID for character IDs (with legacy migration for old int IDs)
