@@ -12,7 +12,7 @@ import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
-import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -120,44 +120,13 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     );
   }
 
-  Widget _buildSectionLabel(
-    BuildContext context,
-    ThemeData theme,
-    String label, {
-    IconData? icon,
-    String? svgAssetKey,
-  }) {
-    assert(icon != null || svgAssetKey != null);
-    return Row(
-      children: [
-        if (icon != null)
-          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
-        if (svgAssetKey != null)
-          ThemedSvg(
-            assetKey: svgAssetKey,
-            width: 20,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        const SizedBox(width: mediumPadding),
-        Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildNameField(BuildContext context, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(
-          context,
-          theme,
-          AppLocalizations.of(context).name,
-          icon: Icons.person_outline,
+        SectionLabel(
+          label: AppLocalizations.of(context).name,
+          icon: Icons.person_rounded,
         ),
         const SizedBox(height: mediumPadding),
         Row(
@@ -200,10 +169,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(
-          context,
-          theme,
-          _variant != Variant.base
+        SectionLabel(
+          label: _variant != Variant.base
               ? AppLocalizations.of(
                   context,
                 ).classWithVariant(ClassVariants.classVariants[_variant]!)
@@ -280,10 +247,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionLabel(
-          context,
-          theme,
-          '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
+        SectionLabel(
+          label:
+              '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
           svgAssetKey: 'LEVEL',
         ),
         const SizedBox(height: mediumPadding),
@@ -313,25 +279,15 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       children: [
         // Previous Retirements
         Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildSectionLabel(
-                context,
-                theme,
-                AppLocalizations.of(context).previousRetirements,
-                icon: Icons.elderly,
-              ),
-              const SizedBox(height: mediumPadding),
-              TextFormField(
-                enableInteractiveSelection: false,
-                controller: _previousRetirementsTextFieldController,
-                decoration: InputDecoration(hintText: '0'),
-                inputFormatters: [
-                  FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
-                ],
-                keyboardType: TextInputType.number,
-              ),
+          child: LabeledTextField(
+            label: AppLocalizations.of(context).previousRetirements,
+            icon: Icons.elderly,
+            hintText: '0',
+            controller: _previousRetirementsTextFieldController,
+            enableInteractiveSelection: false,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
             ],
           ),
         ),
@@ -340,28 +296,16 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         Expanded(
           child: Opacity(
             opacity: _selectedEdition == GameEdition.gloomhaven ? 0.4 : 1.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSectionLabel(
-                  context,
-                  theme,
-                  AppLocalizations.of(context).prosperityLevel,
-                  icon: Icons.location_city,
-                ),
-                const SizedBox(height: mediumPadding),
-                TextFormField(
-                  enabled: _selectedEdition != GameEdition.gloomhaven,
-                  enableInteractiveSelection: false,
-                  controller: _prosperityLevelTextFieldController,
-                  decoration: InputDecoration(hintText: '0'),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(
-                      RegExp('[\\.|\\,|\\ |\\-]'),
-                    ),
-                  ],
-                  keyboardType: TextInputType.number,
-                ),
+            child: LabeledTextField(
+              label: AppLocalizations.of(context).prosperityLevel,
+              icon: Icons.location_city,
+              hintText: '0',
+              controller: _prosperityLevelTextFieldController,
+              enabled: _selectedEdition != GameEdition.gloomhaven,
+              enableInteractiveSelection: false,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
               ],
             ),
           ),
@@ -374,10 +318,13 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Custom label row with info button instead of standard icon
         Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.info_outline_rounded),
+              icon: const Icon(Icons.info_outline_rounded, size: 20),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
               onPressed: () => showDialog<void>(
                 context: context,
                 builder: (_) {
@@ -392,6 +339,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 },
               ),
             ),
+            const SizedBox(width: mediumPadding),
             Text(
               AppLocalizations.of(context).gameEdition,
               style: theme.textTheme.labelLarge?.copyWith(
