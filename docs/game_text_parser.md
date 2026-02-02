@@ -32,13 +32,17 @@ The Game Text Parser is a robust, token-based system for parsing and rendering r
 
 ### Icons
 ```
-UPPERCASE_WORDS that match asset names
+UPPERCASE_WORDS or PascalCase words that match asset names
 ```
 **Examples:**
 - `ATTACK` → 🗡️ (attack icon)
 - `MOVE` → 👟 (move icon)
 - `HEAL` → ❤️ (heal icon)
 - `FIRE` → 🔥 (fire element icon)
+- `Berserker` → Berserker class icon
+- `Rolling` → Rolling modifier icon
+
+**Important:** Icon tokens must use UPPERCASE or PascalCase. All-lowercase words are treated as plain text, even if they match an asset key. This prevents common English words like "be", "hex", or "hive" from being incorrectly replaced with class icons (Berserker's code is `be`, Hive's code is `hive`, etc.).
 
 ### XP Values
 ```
@@ -313,8 +317,12 @@ Potential additions:
 
 ### Icons Not Showing
 - Verify asset exists in `asset_config.dart`
-- Check that word is UPPERCASE
+- Check that word is UPPERCASE or PascalCase (all-lowercase words are ignored)
 - Ensure asset file exists in `images/` directory
+
+### Unexpected Icon Appearing
+- If a common word is being replaced with an icon, ensure it's lowercase in your text
+- The parser skips all-lowercase words to prevent matching class codes that are English words (e.g., "be" → Berserker, "hive" → Hive class)
 
 ### Bold Not Working
 - Verify square brackets are properly closed: `[text]`

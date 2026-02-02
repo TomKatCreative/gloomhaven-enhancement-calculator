@@ -949,6 +949,17 @@ AssetConfig? tryGetAssetConfig(String element) {
     '',
   );
 
+  // Skip all-lowercase words to prevent matching class codes
+  // that happen to be English words (e.g., 'be', 'hive', 'core')
+  // Intentional icon tokens use UPPERCASE (ATTACK, MOVE) or PascalCase (Berserker)
+  if (cleanElement.isNotEmpty &&
+      cleanElement == cleanElement.toLowerCase() &&
+      !RegExp(r'^[+-]?\d').hasMatch(cleanElement) && // Allow +1, -1, 2x
+      !cleanElement.startsWith('xp')) {
+    // Allow xp8, xp10
+    return null;
+  }
+
   // Handle XP pattern (xp8, xp10, etc.)
   if (RegExp(r'^xp\d+$').hasMatch(cleanElement)) {
     return const AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme());
