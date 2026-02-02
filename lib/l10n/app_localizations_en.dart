@@ -362,4 +362,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectClass => 'Select class...';
+
+  @override
+  String get addNotes => 'Add notes...';
 }

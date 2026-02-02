@@ -757,6 +757,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select class...'**
   String get selectClass;
+
+  /// No description provided for @addNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes...'**
+  String get addNotes;
 }
 
 class _AppLocalizationsDelegate

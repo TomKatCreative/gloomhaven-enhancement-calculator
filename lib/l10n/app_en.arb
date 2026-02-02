@@ -144,5 +144,6 @@
   "pleaseSelectClass": "Please select a Class",
   "createCharacter": "Create Character",
   "gameEdition": "Game Edition",
-  "selectClass": "Select class..."
+  "selectClass": "Select class...",
+  "addNotes": "Add notes..."
 }

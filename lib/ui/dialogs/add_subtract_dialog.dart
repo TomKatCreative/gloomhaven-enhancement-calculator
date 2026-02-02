@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 
 class AddSubtractDialog extends StatefulWidget {
-  const AddSubtractDialog(this.currentValue, this.hintText, {super.key});
+  const AddSubtractDialog(this.currentValue, this.labelText, {super.key});
 
   final int currentValue;
-  final String hintText;
+  final String labelText;
 
   @override
   State<AddSubtractDialog> createState() => _AddSubtractDialogState();
@@ -35,14 +35,14 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Center(child: Text('Adjust ${widget.hintText}')),
+      title: Center(child: Text('Adjust ${widget.labelText}')),
       content: Container(
         constraints: const BoxConstraints(maxWidth: maxDialogWidth),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Enter a value to add or subtract from your current ${widget.hintText.toLowerCase()}',
+              'Enter a value to add or subtract from your current ${widget.labelText.toLowerCase()}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: mediumPadding * 2),
@@ -77,7 +77,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                     keyboardType: TextInputType.number,
                     autofocus: true,
                     textAlign: TextAlign.center,
-                    decoration: InputDecoration(hintText: widget.hintText),
+                    decoration: InputDecoration(labelText: widget.labelText),
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium?.copyWith(fontSize: titleFontSize),
