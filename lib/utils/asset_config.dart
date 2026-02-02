@@ -524,6 +524,7 @@ const Map<String, AssetConfig> assets = {
   // ===========================================================================
   'CLASS': AssetConfig('ui/class.svg', themeMode: CurrentColorTheme()),
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),
+  'GOLD': AssetConfig('ui/gold.svg', themeMode: CurrentColorTheme()),
   'hex': AssetConfig('ui/hex.svg'),
   'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),
@@ -537,6 +538,7 @@ const Map<String, AssetConfig> assets = {
     lightPath: 'ui/plus_one_light.svg',
   ),
   'SECTION': AssetConfig('ui/section.svg', themeMode: CurrentColorTheme()),
+  'XP': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
   'xp': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
 };
 
