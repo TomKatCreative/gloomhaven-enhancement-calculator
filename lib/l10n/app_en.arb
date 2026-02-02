@@ -68,7 +68,7 @@
   "eligibleFor": "Eligible For",
   "gameplay": "GAMEPLAY",
   "display": "DISPLAY",
-  "backupAndRestore": "BACKUP & RESTORE",
+  "backupAndRestore": "LOCAL BACKUP & RESTORE",
   "testing": "TESTING",
   "customClasses": "Custom Classes",
   "customClassesDescription": "Include Crimson Scales, Trail of Ashes, and 'released' custom classes created by the CCUG community",
@@ -103,6 +103,7 @@
       }
     }
   },
+  "filenameRequired": "Please enter a filename",
   "backupError": "Failed to create backup. Please try again.",
   "restoreWarning": "Restoring a backup file will overwrite any current characters. Do you wish to continue?",
   "errorDuringRestore": "Error During Restore Operation",
