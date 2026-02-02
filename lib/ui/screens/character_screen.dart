@@ -10,6 +10,7 @@ import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
@@ -109,7 +110,7 @@ class CharacterScreen extends StatelessWidget {
   }
 }
 
-/// Combined section showing Battle Goal Checkmarks and Previous Retirements.
+/// Combined section showing Previous Retirements and Battle Goal Checkmarks.
 /// Layout: Row with two columns side by side.
 class _CheckmarksAndRetirementsRow extends StatelessWidget {
   const _CheckmarksAndRetirementsRow({required this.character});
@@ -124,56 +125,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Battle Goal Checkmarks (left column)
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AutoSizeText(
-                AppLocalizations.of(context).battleGoals,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                minFontSize: 10,
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: smallPadding),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 20,
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: character.checkMarks > 0 && !isRetired
-                        ? () => charactersModel.decreaseCheckmark(character)
-                        : null,
-                  ),
-                  Text(
-                    '${character.checkMarks}/18',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 20,
-                    icon: const Icon(Icons.add_circle),
-                    onPressed: character.checkMarks < 18 && !isRetired
-                        ? () => charactersModel.increaseCheckmark(character)
-                        : null,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // Vertical divider (matches CheckRowDivider style from perk rows)
-        Container(
-          width: 1,
-          height: 52,
-          margin: const EdgeInsets.symmetric(horizontal: largePadding),
-          color: theme.dividerTheme.color,
-        ),
-        // Previous Retirements (right column)
+        // Previous Retirements (left column)
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -223,6 +175,55 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
             ],
           ),
         ),
+        // Vertical divider (matches CheckRowDivider style from perk rows)
+        Container(
+          width: 1,
+          height: 52,
+          margin: const EdgeInsets.symmetric(horizontal: largePadding),
+          color: theme.dividerTheme.color,
+        ),
+        // Battle Goal Checkmarks (right column)
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AutoSizeText(
+                AppLocalizations.of(context).battleGoals,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                minFontSize: 10,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: smallPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: character.checkMarks > 0 && !isRetired
+                        ? () => charactersModel.decreaseCheckmark(character)
+                        : null,
+                  ),
+                  Text(
+                    '${character.checkMarks}/18',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 20,
+                    icon: const Icon(Icons.add_circle),
+                    onPressed: character.checkMarks < 18 && !isRetired
+                        ? () => charactersModel.increaseCheckmark(character)
+                        : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -245,7 +246,7 @@ class _NameAndClassSection extends StatelessWidget {
                   charactersModel.updateCharacter(character..name = value);
                 },
                 decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context).name),
+                  labelText: AppLocalizations.of(context).name,
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -275,6 +276,7 @@ class _NameAndClassSection extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
+        const SizedBox(height: largePadding),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -372,7 +374,170 @@ class _StatsSectionState extends State<_StatsSection> {
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.read<CharactersModel>();
+    final charactersModel = context.read<CharactersModel>();
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode &&
+        !widget.character.isRetired;
+
+    // Edit mode: Show XP and Gold with external labels, plus Battle Goals and Pocket
+    if (isEditMode) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // XP field with label
+          Expanded(
+            child: Column(
+              children: [
+                SectionLabel(
+                  label: AppLocalizations.of(context).xp,
+                  svgAssetKey: 'XP',
+                ),
+                const SizedBox(height: mediumPadding),
+                TextField(
+                  controller: _xpController,
+                  enableInteractiveSelection: false,
+                  onChanged: (String value) {
+                    charactersModel.updateCharacter(
+                      widget.character..xp = value == '' ? 0 : int.parse(value),
+                    );
+                  },
+                  textAlign: TextAlign.center,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(
+                      RegExp('[\\.|\\,|\\ |\\-]'),
+                    ),
+                  ],
+                  keyboardType: TextInputType.number,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.exposure),
+                  onPressed: () async {
+                    int? value = await showDialog<int?>(
+                      context: context,
+                      builder: (_) => AddSubtractDialog(
+                        widget.character.xp,
+                        AppLocalizations.of(context).xp,
+                      ),
+                    );
+                    if (value != null) {
+                      charactersModel.updateCharacter(
+                        widget.character
+                          ..xp = value.clamp(0, double.infinity).toInt(),
+                      );
+                      _xpController.text = value.toString();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: mediumPadding),
+          // Gold field with label
+          Expanded(
+            child: Column(
+              children: [
+                SectionLabel(
+                  label: AppLocalizations.of(context).gold,
+                  svgAssetKey: 'GOLD',
+                ),
+                const SizedBox(height: mediumPadding),
+                TextField(
+                  controller: _goldController,
+                  enableInteractiveSelection: false,
+                  onChanged: (String value) => charactersModel.updateCharacter(
+                    widget.character..gold = value == '' ? 0 : int.parse(value),
+                  ),
+                  textAlign: TextAlign.center,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(
+                      RegExp('[\\.|\\,|\\ |\\-]'),
+                    ),
+                  ],
+                  keyboardType: TextInputType.number,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.exposure),
+                  onPressed: () async {
+                    int? value = await showDialog<int?>(
+                      context: context,
+                      builder: (_) => AddSubtractDialog(
+                        widget.character.gold,
+                        AppLocalizations.of(context).gold,
+                      ),
+                    );
+                    if (value != null) {
+                      charactersModel.updateCharacter(
+                        widget.character..gold = value,
+                      );
+                      _goldController.text = value.toString();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: largePadding),
+          // Battle Goals (fixed width, always visible) - icon beside text
+          Tooltip(
+            message: AppLocalizations.of(context).battleGoals,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  'images/ui/goal.svg',
+                  width: iconSize,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(width: smallPadding),
+                Text(widget.character.checkMarkProgress().toString()),
+                Text(
+                  '/3',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: largePadding),
+          // Pocket Items (fixed width, always visible)
+          Tooltip(
+            message: AppLocalizations.of(context).pocketItemsAllowed(
+              (Character.level(widget.character.xp) / 2).round(),
+            ),
+            child: Stack(
+              alignment: AlignmentDirectional.bottomCenter,
+              children: <Widget>[
+                SvgPicture.asset(
+                  'images/equipment_slots/pocket.svg',
+                  width: iconSize,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurface,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 3.5),
+                  child: Text(
+                    '${(Character.level(widget.character.xp) / 2).round()}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // View mode: Original inline layout
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -389,62 +554,10 @@ class _StatsSectionState extends State<_StatsSection> {
                 ),
               ),
               const SizedBox(width: mediumPadding),
-              context.watch<CharactersModel>().isEditMode &&
-                      !widget.character.isRetired
-                  ? Container(
-                      constraints: const BoxConstraints(maxWidth: 75),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextField(
-                            controller: _xpController,
-                            enableInteractiveSelection: false,
-                            onChanged: (String value) {
-                              charactersModel.updateCharacter(
-                                widget.character
-                                  ..xp = value == '' ? 0 : int.parse(value),
-                              );
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.center,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.deny(
-                                RegExp('[\\.|\\,|\\ |\\-]'),
-                              ),
-                            ],
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              label: Text(AppLocalizations.of(context).xp),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.exposure),
-                            onPressed: () async {
-                              int? value = await showDialog<int?>(
-                                context: context,
-                                builder: (_) => AddSubtractDialog(
-                                  widget.character.xp,
-                                  AppLocalizations.of(context).xp,
-                                ),
-                              );
-                              if (value != null) {
-                                charactersModel.updateCharacter(
-                                  widget.character
-                                    ..xp = value
-                                        .clamp(0, double.infinity)
-                                        .toInt(),
-                                );
-                                _xpController.text = value.toString();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(
-                      widget.character.xp.toString(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+              Text(
+                widget.character.xp.toString(),
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               Consumer<CharactersModel>(
                 builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
@@ -472,57 +585,10 @@ class _StatsSectionState extends State<_StatsSection> {
                 ),
               ),
               const SizedBox(width: 5),
-              context.watch<CharactersModel>().isEditMode &&
-                      !widget.character.isRetired
-                  ? Container(
-                      constraints: const BoxConstraints(maxWidth: 75),
-                      child: Column(
-                        children: <Widget>[
-                          TextField(
-                            controller: _goldController,
-                            enableInteractiveSelection: false,
-                            onChanged: (String value) =>
-                                charactersModel.updateCharacter(
-                                  widget.character
-                                    ..gold = value == '' ? 0 : int.parse(value),
-                                ),
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.center,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.deny(
-                                RegExp('[\\.|\\,|\\ |\\-]'),
-                              ),
-                            ],
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              label: Text(AppLocalizations.of(context).gold),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.exposure),
-                            onPressed: () async {
-                              int? value = await showDialog<int?>(
-                                context: context,
-                                builder: (_) => AddSubtractDialog(
-                                  widget.character.gold,
-                                  AppLocalizations.of(context).gold,
-                                ),
-                              );
-                              if (value != null) {
-                                charactersModel.updateCharacter(
-                                  widget.character..gold = value,
-                                );
-                                _goldController.text = value.toString();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(
-                      ' ${widget.character.gold}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+              Text(
+                ' ${widget.character.gold}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ],
           ),
         ),
@@ -607,7 +673,7 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
           width: 1,
           color: Theme.of(context).colorScheme.outlineVariant,
         ),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(8),
       ),
       constraints: const BoxConstraints(maxWidth: 400),
       child: Theme(
@@ -676,15 +742,21 @@ class _NotesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CharactersModel charactersModel = context.read<CharactersModel>();
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode && !character.isRetired;
+
     return Column(
       children: <Widget>[
-        Text(
-          AppLocalizations.of(context).notes,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: mediumPadding),
-        context.watch<CharactersModel>().isEditMode && !character.isRetired
+        // Hide header in edit mode since the text field has a floating label
+        if (!isEditMode) ...[
+          Text(
+            AppLocalizations.of(context).notes,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: mediumPadding),
+        ],
+        isEditMode
             ? TextFormField(
                 key: ValueKey('notes_${character.uuid}'),
                 initialValue: character.notes,
@@ -695,7 +767,7 @@ class _NotesSection extends StatelessWidget {
                 },
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context).notes),
+                  labelText: AppLocalizations.of(context).notes,
                 ),
               )
             : Text(character.notes),
