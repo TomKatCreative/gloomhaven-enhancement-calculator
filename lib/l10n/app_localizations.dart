@@ -293,8 +293,14 @@ abstract class AppLocalizations {
   /// No description provided for @actionDetails.
   ///
   /// In en, this message translates to:
-  /// **'Card Details'**
+  /// **'Enhancement'**
   String get actionDetails;
+
+  /// No description provided for @cardDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Details'**
+  String get cardDetails;
 
   /// No description provided for @discounts.
   ///
@@ -347,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @temporaryEnhancement.
   ///
   /// In en, this message translates to:
-  /// **'Temporary Enhancement †'**
+  /// **'Temporary Enhancement'**
   String get temporaryEnhancement;
 
   /// No description provided for @variant.
@@ -425,7 +431,7 @@ abstract class AppLocalizations {
   /// No description provided for @hailsDiscount.
   ///
   /// In en, this message translates to:
-  /// **'Hail\'s Discount ‡'**
+  /// **'Hail\'s Discount'**
   String get hailsDiscount;
 
   /// No description provided for @lossNonPersistent.
