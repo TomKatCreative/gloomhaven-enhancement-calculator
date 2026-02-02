@@ -256,7 +256,23 @@ class _NameAndClassSection extends StatelessWidget {
             : AutoSizeText(
                 character.name,
                 maxLines: 2,
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                  shadows: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          Shadow(
+                            color: Colors.white.withValues(alpha: 0.25),
+                            blurRadius: 6,
+                            offset: Offset.zero,
+                          ),
+                        ]
+                      : [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.35),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                ),
                 textAlign: TextAlign.center,
               ),
         Row(
