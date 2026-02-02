@@ -16,7 +16,6 @@ class PlayerClass {
   final String race;
   final String name;
   String classCode;
-  final String icon;
   final ClassCategory category;
   final int primaryColor;
   final String? title;
@@ -29,7 +28,6 @@ class PlayerClass {
     required this.race,
     required this.name,
     required this.classCode,
-    required this.icon,
     required this.category,
     required this.primaryColor,
     this.title,
