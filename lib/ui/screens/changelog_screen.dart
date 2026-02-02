@@ -59,10 +59,10 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           children: [
             const _VersionSection(
               version: '4.3.3',
-              date: '2026-01-27',
+              date: '2026-02-01',
               changes: [
-                'UI overhaul of Enhancement Calculator.',
-                'Added cost breakdown details.',
+                'UI overhaul of entire Enhancement Calculator.',
+                'UI overhaul of create character dialog.',
               ],
             ),
             SizedBox(height: extraLargePadding),
