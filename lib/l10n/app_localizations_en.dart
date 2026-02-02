@@ -113,7 +113,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enhancementType => 'Enhancement Type';
 
   @override
-  String get actionDetails => 'Card Details';
+  String get actionDetails => 'Enhancement';
+
+  @override
+  String get cardDetails => 'Card Details';
 
   @override
   String get discounts => 'Discounts';
@@ -140,7 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgottenCirclesSpoilers => 'Forgotten Circles spoilers';
 
   @override
-  String get temporaryEnhancement => 'Temporary Enhancement †';
+  String get temporaryEnhancement => 'Temporary Enhancement';
 
   @override
   String get variant => 'Variant';
@@ -182,7 +185,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'and reduce repeat penalties by 25 gold per enhancement';
 
   @override
-  String get hailsDiscount => 'Hail\'s Discount ‡';
+  String get hailsDiscount => 'Hail\'s Discount';
 
   @override
   String get lossNonPersistent => 'Loss non-persistent';
