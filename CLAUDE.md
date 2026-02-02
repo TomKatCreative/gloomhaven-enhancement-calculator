@@ -114,7 +114,7 @@ lib/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 13)
+- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 16)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ## Key Domain Concepts
@@ -267,10 +267,9 @@ height: iconSize - 2.5
 
 ## Known Technical Debt
 
-1. **Large data files** - `perks_repository.dart` (3000+ lines) should be split by edition
-2. **Oversized screens** - `settings_screen.dart` (1000+ lines) needs extraction
-3. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
-4. **No tests** - Test suite needed for models and viewmodels
+1. **Oversized screens** - `settings_screen.dart` (1000+ lines) needs extraction
+2. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
+3. **No tests** - Test suite needed for models and viewmodels
 
 ## Documentation Files
 
@@ -283,6 +282,13 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 - `docs/perk_format_reference.md` - Perk definition format for perks_repository.dart
 - `docs/svg_asset_config_refactor.md` - SVG asset centralization patterns and rationale
 
+**Widget/Feature documentation** (read when working on specific features):
+- `docs/element_tracker.md` - Element tracker sheet and animation system
+- `docs/screens.md` - Create character and selector screens
+- `docs/dialogs.md` - Reusable dialog components
+- `docs/calculator_widgets.md` - Expandable cost chip and calculator cards
+- `docs/theme_system.md` - Color contrast and Android navigation bar
+
 **When creating documentation:**
 - Place all `.md` files in `/docs` (not scattered in `lib/`)
 - Use `snake_case.md` naming
@@ -294,56 +300,11 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 - Attack modifiers: `images/attack_modifiers/`
 - Custom fonts: PirataOne (headers), HighTower, Nyala, Roboto, OpenSans, Inter
 
-## Theme System
-
-### Color Contrast for Accessibility
-
-The app uses a centralized contrast system to ensure text and UI elements meet WCAG AA accessibility standards (4.5:1 contrast ratio).
-
-**Implementation:**
-- **`ColorUtils.ensureTextContrast()`** - Calculates and adjusts colors for proper contrast
-- **`theme.contrastedPrimary`** - Pre-calculated contrasted primary color available throughout the app
-- **Theme extension** - Contrast calculated once at theme build time for performance
-
-**Where contrast is applied:**
-- TextButton foreground color (all buttons app-wide)
-- Bottom navigation bar selected items
-- Dialog action buttons
-- Section headers and primary-colored text
-- Any text using `theme.contrastedPrimary`
-
-**Adding contrast to new components:**
-```dart
-// Option 1: Use theme extension (recommended)
-Text(
-  'My Text',
-  style: TextStyle(color: Theme.of(context).contrastedPrimary),
-)
-
-// Option 2: Calculate manually (for one-off cases)
-Text(
-  'My Text',
-  style: TextStyle(
-    color: ColorUtils.ensureTextContrast(
-      primaryColor,
-      backgroundColor,
-    ),
-  ),
-)
-```
-
-**Key files:**
-- `lib/utils/color_utils.dart` - Contrast calculation utilities
-- `lib/theme/theme_extensions.dart` - `AppThemeExtension` with `contrastedPrimary`
-- `lib/theme/app_theme_builder.dart` - Theme-level contrast application
-
 ## SVG Theming
 
 The app uses `flutter_svg` for rendering SVG icons. **All SVG assets are centralized in `asset_config.dart`** - never use `SvgPicture.asset()` directly.
 
 ### ThemedSvg Widget (`lib/utils/themed_svg.dart`)
-
-Use the `ThemedSvg` widget to render theme-aware SVG icons:
 
 ```dart
 // Basic usage - just pass an asset key
@@ -356,124 +317,35 @@ ThemedSvg(assetKey: 'ATTACK', width: 24, color: Colors.red)
 ThemedSvgWithPlusOne(assetKey: 'MOVE', width: 24)
 ```
 
-The widget automatically:
-- Looks up the asset key in `asset_config.dart` to get the file path
-- Detects light/dark theme from `Theme.of(context)`
-- Applies appropriate coloring based on the asset's configuration
-- For assets with `CurrentColorTheme()`, no `color` parameter is needed - theming is automatic
-
 ### ClassIconSvg Widget (`lib/ui/widgets/class_icon_svg.dart`)
-
-Use `ClassIconSvg` for player class icons. It automatically uses the class's primary color:
 
 ```dart
 // Basic usage - uses playerClass.primaryColor automatically
 ClassIconSvg(playerClass: myClass, width: 48, height: 48)
 
 // With custom color override
-ClassIconSvg(
-  playerClass: myClass,
-  width: 48,
-  height: 48,
-  color: Colors.grey.withOpacity(0.5),
-)
+ClassIconSvg(playerClass: myClass, width: 48, height: 48, color: Colors.grey)
 ```
-
-The widget uses `playerClass.classCode` as the asset key, which maps to the class icon in `asset_config.dart`.
-
-### Asset Configuration (`lib/utils/asset_config.dart`)
-
-All SVG assets are configured here with their file paths and theming behavior:
-
-```dart
-// UI icons - use string keys
-'MOVE': AssetConfig('move.svg', themeMode: CurrentColorTheme()),
-'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),
-
-// Class icons - use ClassCodes constants as keys
-ClassCodes.brute: AssetConfig('class_icons/brute.svg', themeMode: CurrentColorTheme()),
-ClassCodes.tinkerer: AssetConfig('class_icons/tinkerer.svg', themeMode: CurrentColorTheme()),
-
-// Resources - use lowercase string keys
-'lumber': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
-'metal': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
-
-// No theming needed - renders as-is in both themes
-'hex': AssetConfig('hex.svg'),
-```
-
-**Asset categories in asset_config.dart:**
-- UI icons (LEVEL, XP, GOLD, GOAL, TRAIT, Pocket, etc.)
-- Elements (FIRE, ICE, AIR, EARTH, LIGHT, DARK)
-- Enhancement types (MOVE, ATTACK, RANGE, etc.)
-- Class icons (71 entries using ClassCodes constants)
-- Resources (lumber, metal, hide, etc.)
-- Branding (BMC_BUTTON)
 
 ### Adding a New SVG Icon
 
 1. Add the SVG file to the appropriate `images/` subdirectory
-2. Edit the SVG to use `currentColor` for theme-aware parts:
-   - `fill="currentColor"` or `style="fill:currentColor"`
-   - `stroke="currentColor"` for strokes
+2. Edit the SVG to use `currentColor` for theme-aware parts: `fill="currentColor"`
 3. Add an entry in `asset_config.dart`:
    ```dart
    'MY_ICON': AssetConfig('subfolder/my_icon.svg', themeMode: CurrentColorTheme())
    ```
 4. Use it with `ThemedSvg(assetKey: 'MY_ICON', width: 24)`
 
-### How It Works
-
-- **`themeMode: CurrentColorTheme()`**: Uses `SvgTheme` so only SVG elements with `fill="currentColor"` change color. Other colors in the SVG are preserved. This is ideal for multi-color icons where only some parts should adapt to the theme.
-
 ### Important Rules
 
 1. **Never use `SvgPicture.asset()` directly** - always use `ThemedSvg` or `ClassIconSvg`
 2. **All SVG assets must be in `asset_config.dart`** - this is the single source of truth
 3. **Class icons use `ClassCodes` constants as keys** - not string literals like `'br'` or `'sc'`
-4. **SVGs need `fill="currentColor"`** for theme-aware coloring to work
-
-## Android System Navigation Bar
-
-The Android system navigation bar (soft buttons at bottom of screen) color is managed by `ThemeProvider`.
-
-### Key Implementation Details
-
-1. **Single source of truth**: `ThemeProvider._updateSystemUI()` is the only place that sets the navigation bar style. Don't duplicate this in `main.dart` or elsewhere.
-
-2. **Post-frame callback required**: The system UI style must be set after the first frame renders, otherwise Flutter may override it during initialization:
-   ```dart
-   // In ThemeProvider constructor:
-   SchedulerBinding.instance.addPostFrameCallback((_) {
-     _updateSystemUI();
-   });
-   ```
-
-3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the bottom navigation bar:
-   ```dart
-   final navBarColor = _config.useDarkMode
-       ? _cachedDarkTheme!.colorScheme.surfaceContainer
-       : _cachedLightTheme!.colorScheme.surfaceContainer;
-   ```
-
-4. **Icon brightness**: Set `systemNavigationBarIconBrightness` to ensure buttons are visible:
-   - Dark mode: `Brightness.light` (white icons on dark background)
-   - Light mode: `Brightness.dark` (dark icons on light background)
-
-### Common Pitfalls
-
-- **Don't set system UI in `main.dart`**: It will be overridden by Flutter before ThemeProvider initializes
-- **Don't use transparent nav bar** unless you want app content to show through (requires edge-to-edge mode)
-- **Always call `SystemChrome.setSystemUIOverlayStyle()`**: Creating a `SystemUiOverlayStyle` object without passing it to this method does nothing
 
 ## Localization (i18n)
 
 The app uses Flutter's official `gen_l10n` system for internationalization. Currently supports English (default) and Portuguese.
-
-### Configuration
-
-- **`l10n.yaml`** (project root) - Localization settings
-- **`pubspec.yaml`** - Requires `flutter_localizations` dependency and `generate: true`
 
 ### Using Localized Strings
 
@@ -486,591 +358,20 @@ Text(AppLocalizations.of(context).gold)
 
 // With parameters:
 Text(AppLocalizations.of(context).pocketItemsAllowed(count))
-Text(AppLocalizations.of(context).savedTo(filePath))
 ```
 
 ### Adding New Strings
 
-1. Add the string to `lib/l10n/app_en.arb` (English template):
-   ```json
-   "myNewString": "Hello world",
-   ```
-
-2. For strings with parameters, add metadata:
-   ```json
-   "greeting": "Hello {name}!",
-   "@greeting": {
-     "placeholders": {
-       "name": { "type": "String" }
-     }
-   }
-   ```
-
-3. Add translation to `lib/l10n/app_pt.arb`:
-   ```json
-   "myNewString": "Olá mundo",
-   "greeting": "Olá {name}!"
-   ```
-
+1. Add the string to `lib/l10n/app_en.arb` (English template)
+2. For strings with parameters, add metadata with placeholders
+3. Add translation to `lib/l10n/app_pt.arb`
 4. Run `flutter pub get` or `flutter gen-l10n` to regenerate
 
 ### What's NOT Localized (By Design)
 
-- **`strings.dart`** - Complex markdown content with inline icons (`{ATTACK}`, `{MOVE}`) used by `GameTextParser`. These are tightly coupled with icon rendering and should be localized in a future phase.
-- **`perks_repository.dart`** - Perk descriptions with icon placeholders. Game-specific terminology that players recognize across languages.
-- **Discount marker symbols** - The `†`, `‡`, and `*` markers for Temporary Enhancement, Hail's Discount, and Building 44 are appended in `enhancement_calculator_screen.dart` using unicode escapes (e.g., `\u2020`), not in ARB files. This keeps symbols consistent across languages.
-
-### Adding a New Language
-
-1. Create `lib/l10n/app_XX.arb` (where XX is the locale code)
-2. Copy all keys from `app_en.arb` and translate values
-3. Run `flutter pub get` - the language is automatically detected
-4. For iOS: Add the language to Xcode project (Runner > Info > Localizations)
-
-## Element Tracker Sheet (`lib/ui/widgets/element_tracker_sheet.dart`)
-
-The Characters screen includes a draggable bottom sheet for tracking the 6 Gloomhaven elements (FIRE, ICE, AIR, EARTH, LIGHT, DARK). Each element cycles through states when tapped: gone → strong → waning → gone.
-
-### Architecture
-
-**Files involved:**
-- `lib/ui/widgets/element_tracker_sheet.dart` - The draggable sheet with three expansion states
-- `lib/ui/widgets/animated_element_icon.dart` - Animated element icons with glow effects
-- `lib/ui/screens/characters_screen.dart` - Contains scrim overlay for full expansion
-- `lib/viewmodels/characters_model.dart` - State for sheet expansion, collapse notifier
-
-### Sheet States
-
-The sheet has three snap positions:
-- **Collapsed** (6.5%): Icons in a compact row, minimal state representation
-- **Expanded** (18%): Icons in a spaced row, interactive with animations
-- **Full Expanded** (85%): Icons in 2x3 grid with responsive spacing
-
-### Element Icon States (`lib/ui/widgets/animated_element_icon.dart`)
-
-**Static (collapsed sheet):**
-- Gone: 30% opacity
-- Strong: 100% opacity
-- Waning: Bisected horizontally (top dim, bottom bright) with sharp line
-
-**Animated (expanded sheet):**
-- Gone: 30% opacity, no glow
-- Strong: Element-specific animated glow effect
-- Waning: Bisected with animated glow on bottom half
-
-### Animation System (Config-Driven)
-
-Element animations use a centralized configuration system via `ElementAnimationConfig`. All animation parameters are defined in config objects, keeping the rendering logic generic.
-
-**Architecture:**
-- 2-3 `AnimationController`s per element combined via `Listenable.merge`
-- Controllers: base (slow), secondary (faster), optional tertiary (fastest - FIRE only)
-- 250ms crossfade for all state transitions (hardcoded)
-- Waning state derived from strong with multipliers (0.85 intensity, 0.6 size)
-
-**Glow Layer Structure (all elements):**
-1. Outer glow - BoxShadow, largest radius, lowest intensity
-2. Middle glow - BoxShadow, medium radius
-3. Inner core - RadialGradient, smallest, highest intensity
-4. Icon - SVG on top
-
-### ElementAnimationConfig Parameters
-
-| Parameter | Description | Typical Range |
-|-----------|-------------|---------------|
-| `baseDuration` | Primary controller duration | 2000-3000ms |
-| `secondaryDuration` | Secondary controller duration | 800-1800ms |
-| `tertiaryDuration` | Optional third controller | null or ~800ms |
-| `outerGlowColor` | Outer shadow color | Element-specific |
-| `middleGlowColor` | Middle shadow color | Element-specific |
-| `innerGradientColors` | 4-color gradient for core | Element-specific |
-| `outerSizeOffset` | Added to baseSize for outer | 8-18 |
-| `middleSizeOffset` | Added to baseSize for middle | 4-10 |
-| `outerBlurRadius` | Base blur for outer glow | 12-28 |
-| `middleBlurRadius` | Base blur for middle glow | 8-16 |
-| `baseIntensity` | Minimum glow intensity | 0.25-0.7 |
-| `intensityVariation` | How much intensity varies | 0.15-0.45 |
-| `sizeVariation` | Max size pulse amount | 1.5-5 |
-| `isThemeAware` | Use theme-dependent colors | false (AIR=true) |
-
-### Animation Styles
-
-Each style has unique mathematical behavior preserved in `_compute*Animation()` methods:
-
-| Style | Character | Math Behavior |
-|-------|-----------|---------------|
-| `fire` | Breathing, warm | Eased sine waves, 3 layers combined |
-| `ice` | Crystalline, sharp | Multi-freq (4x,7x,11x) with abs() |
-| `air` | Flowing, gentle | Cosine undulation, minimal variation |
-| `earth` | Tremor, crunchy | High-freq (11x,17x,23x) + threshold cracks |
-| `light` | Steady, radiant | Smooth breathing |
-| `dark` | Drifting, eerie | Horizontal cosine drift for cloud effect |
-
-### Adding/Modifying Element Animations
-
-**Stay within these bounds** - modifications should only adjust `ElementAnimationConfig` values:
-
-1. Add/modify a factory constructor in `ElementAnimationConfig` (e.g., `ElementAnimationConfig.fire()`)
-2. Update the `_configs` map if adding a new element
-3. Adjust timing, colors, sizes, and intensity within the documented ranges
-
-**Requires special consideration** (discuss before implementing):
-- Adding a new animation style (new enum value + new `_compute*Animation()` method)
-- Adding new config parameters beyond the existing ones
-- Changing the 3-layer glow structure
-- Modifying the 250ms crossfade duration
-- Adding element-specific rendering logic in `_buildStrongGlow()` or `_buildWaningGlow()`
-
-The goal is to keep all elements rendering through the same generic code paths, with only config values differentiating them.
-
-### Crossfade Transitions
-
-All elements use a shared fade controller (250ms) for smooth transitions:
-- `_fadeController` handles: gone↔strong, strong↔waning, sheet expand/collapse
-- `_buildFadeToGone()` handles fade-out to gone state specifically
-
-### Key Implementation Details
-
-1. **Responsive grid spacing**: In full-expanded mode, icon spacing adapts to screen width using 45% of remaining horizontal space (clamped 24-80px)
-
-2. **Scrim overlay**: When fully expanded, a semi-transparent scrim blocks interaction with content behind. Tapping the scrim collapses to partially expanded.
-
-3. **Collapse communication**: Uses `ValueNotifier<int>` pattern - `CharactersModel.collapseElementSheetNotifier` is incremented to trigger collapse from outside the sheet widget (e.g., when navigating away from the Characters screen).
-
-4. **State persistence**: Element states are stored in SharedPreferences (`fireState`, `iceState`, etc.)
-
-## Create Character Screen (`lib/ui/screens/create_character_screen.dart`)
-
-The character creation flow uses a full-page route with `Scaffold` and `AppBar`.
-
-### Invocation Pattern
-
-Use the static `show()` method:
-```dart
-await CreateCharacterScreen.show(context, charactersModel);
-```
-
-### Form Fields
-
-1. **Name** - Text field with random name generator (faker)
-2. **Class** - Opens `ClassSelectorScreen` for class selection
-3. **Starting Level** - SfSlider (1-9)
-4. **Previous Retirements / Prosperity Level** - Two numeric fields in a row
-5. **Game Edition** - 3-way SegmentedButton (GH / GH2E / FH)
-
-### Edition-Specific Behavior
-
-The prosperity level field is disabled when Gloomhaven is selected (original GH uses level-based gold, not prosperity). See "Game Editions (GameEdition)" section for the gold/level formulas.
-
-## Selector Screens
-
-The app uses two full-page selector screens with consistent styling for searching and selecting items.
-
-### Shared Components
-
-**SearchSectionHeader** (`lib/ui/widgets/search_section_header.dart`):
-A reusable section divider with optional icon:
-```
-─────────── [Icon] Title ───────────
-```
-
-### ClassSelectorScreen (`lib/ui/screens/class_selector_screen.dart`)
-
-Full-page screen for selecting a player class during character creation.
-
-**Layout:**
-```
-┌─────────────────────────────────────┐
-│ [←]  [🔍 Search...]                 │  ← AppBar with search
-├─────────────────────────────────────┤
-│ [GH] [JotL] [FH] [MP] ...           │  ← Filter chips
-│ Hide locked classes            [✓]  │  ← Toggle
-├─────────────────────────────────────┤
-│ ──────── Gloomhaven ────────        │  ← Section header
-│ [Icon] Brute / Bruiser              │
-│ [Icon] Tinkerer                     │
-│ ──────── Jaws of the Lion ────────  │
-│ ...                                 │
-└─────────────────────────────────────┘
-```
-
-**Features:**
-- Search filters by class name or variant names (e.g., "Bruiser" finds Brute)
-- Category filter chips for game editions
-- "Hide locked classes" toggle
-- Section headers group classes by `ClassCategory`
-- Variant selection dialog for multi-edition classes
-- Custom class warning dialog for community content
-
-**Invocation:**
-```dart
-final result = await ClassSelectorScreen.show(context);
-if (result != null) {
-  // result.playerClass - the PlayerClass
-  // result.variant - the Variant (base, gloomhaven2E, etc.)
-}
-```
-
-### EnhancementTypeSelectorScreen (`lib/ui/screens/enhancement_type_selector_screen.dart`)
-
-Full-page screen for selecting enhancement types in the calculator.
-
-**Layout:**
-```
-┌─────────────────────────────────────┐
-│ [←]  [🔍 Search...]                 │  ← AppBar with search
-├─────────────────────────────────────┤
-│ ──────── [+1] +1 Stats ────────     │  ← Section header with icon
-│ [MOVE] +1 Move                 30g  │
-│ [ATK]  +1 Attack               50g  │
-│ ──────── [◇] Elements ────────      │
-│ [FIRE] Fire                    50g  │
-│ ...                                 │
-└─────────────────────────────────────┘
-```
-
-**Features:**
-- Search filters by enhancement name
-- Section headers with category icons group by `EnhancementCategory`
-- Cost display shows base cost and discounted cost (with strikethrough)
-- Edition-aware: only shows enhancements available in selected `GameEdition`
-- Highlights currently selected enhancement
-
-**Invocation:**
-```dart
-await EnhancementTypeSelector.show(
-  context,
-  currentSelection: model.enhancement,
-  edition: model.edition,
-  onSelected: model.enhancementSelected,
-);
-```
-
-### Design Patterns
-
-Both selectors follow these conventions:
-- **AppBar search**: Search field in AppBar title with transparent background
-- **SafeArea**: Bottom-only SafeArea for device navigation buttons
-- **Static show()**: Invoked via static method returning `Future<T?>`
-- **Section headers**: Use `SearchSectionHeader` widget for category grouping
-
-## Reusable Dialog Components (`lib/ui/dialogs/`)
-
-The app provides reusable dialog components for common interaction patterns. All dialogs use the centralized theme contrast system for accessibility.
-
-### ConfirmationDialog
-
-General-purpose confirmation dialog with customizable content and actions.
-
-**Usage:**
-```dart
-final confirmed = await ConfirmationDialog.show(
-  context: context,
-  title: 'Delete Character?',  // Optional
-  content: Text('This action cannot be undone.'),
-  confirmLabel: 'Delete',
-  cancelLabel: 'Cancel',
-  showCancel: true,  // Default true
-);
-
-if (confirmed == true) {
-  // User confirmed
-}
-```
-
-**Features:**
-- Optional title
-- Scrollable content area (max width 468dp)
-- Up to two action buttons with automatic contrast adjustment
-- Static show() method returns `Future<bool?>`
-
-### CustomClassWarningDialog
-
-Specialized dialog for custom/community class warnings.
-
-**Usage:**
-```dart
-final proceed = await CustomClassWarningDialog.show(context);
-if (proceed == true) {
-  // User accepted warning
-}
-```
-
-**Features:**
-- Discord server link for community content
-- "Don't show again" checkbox (persisted to SharedPreferences)
-- Custom stateful behavior for checkbox management
-
-### VariantSelectorDialog
-
-Dialog for selecting between class variants/editions.
-
-**Usage:**
-```dart
-final variant = await VariantSelectorDialog.show(
-  context: context,
-  playerClass: selectedClass,
-);
-
-if (variant != null) {
-  // Use selected variant (Variant.base, Variant.gloomhaven2E, etc.)
-}
-```
-
-**Features:**
-- Class icon and name in title
-- Dynamic button generation for all available variants
-- Supports unlimited variants (future-proof)
-- Cancel option with contrast-adjusted styling
-
-### Best Practices
-
-- Use `ConfirmationDialog` for simple yes/no confirmations
-- Create specialized dialogs (like `CustomClassWarningDialog`) for complex, reusable patterns
-- All dialog buttons automatically use `theme.contrastedPrimary` for accessibility
-- Always check `context.mounted` before using context after `await`
-
-## Expandable Cost Chip (`lib/ui/widgets/expandable_cost_chip.dart`)
-
-The enhancement calculator displays a floating chip that shows the total cost and expands into a full breakdown card when tapped.
-
-### Architecture
-
-The widget uses a `Stack` with two layers:
-1. **Scrim** - Semi-transparent overlay (50% black) when expanded, tapping collapses
-2. **Expandable chip/card** - Morphs between collapsed chip and expanded card states
-
-### States
-
-**Collapsed (Chip)**:
-- 48dp tall, 160dp wide pill shape
-- Centered icon + cost with expand arrow on right
-- Positioned 20dp from bottom (vertically centered with FAB)
-- Background matches bottom navigation bar color
-
-**Expanded (Card)**:
-- 85% of available screen height
-- Max width 468dp, horizontally centered
-- Header with centered icon + cost, close button on right
-- Scrollable breakdown list below divider
-- Tapping anywhere on the card collapses it
-
-### Animation
-
-- 300ms duration with `easeOutCubic` (expand) / `easeInCubic` (collapse)
-- Interpolates: width, height, border radius, elevation
-- Scrim fades in/out with expansion
-- Content switches at 50% animation progress
-
-### Key Implementation Details
-
-1. **FAB alignment**: Chip is positioned 20dp from bottom to vertically center-align with the 56dp FAB (which sits at 16dp offset)
-
-2. **Scrim interaction**: The scrim uses `GestureDetector` to collapse on tap. Returns `SizedBox.shrink()` when fully collapsed to avoid blocking touches.
-
-3. **Tap to close**: The expanded card is wrapped in a `GestureDetector` with `HitTestBehavior.opaque` so tapping anywhere (including empty space) closes it. The `ListView` still scrolls normally.
-
-4. **FAB visibility**: Updates `EnhancementCalculatorModel.isSheetExpanded` when toggling, which the home screen uses to hide the FAB when expanded.
-
-5. **Blur bar drag-through**: The frosted glass blur bar at the bottom accepts an optional `scrollController` parameter. Vertical drags on the blur area are forwarded to the scroll controller, allowing users to scroll the calculator content even when touching the blur area. Taps are absorbed (do nothing). Note: This implementation uses `jumpTo()` so momentum/flick scrolling is not supported.
-
-### Dimensions
-
-```dart
-// Chip (collapsed)
-_chipHeight = 48.0
-_chipWidth = 160.0
-_chipBorderRadius = 24.0
-
-// Card (expanded)
-_cardTopRadius = 28.0
-_cardBottomRadius = 24.0
-_cardMaxWidth = 468.0
-_cardExpandedFraction = 0.85  // of available height
-
-// Positioning
-_bottomOffset = 20.0
-_horizontalPadding = 16.0
-```
-
-## Calculator Section Cards (`lib/ui/widgets/calculator/`)
-
-The enhancement calculator uses a standardized card component system for consistent layout and styling across all calculator sections.
-
-### Screen Layout
-
-The calculator screen is organized into three main sections with dividers:
-
-```
-─────────── Enhancement ───────────
-┌─────────────────────────────────┐
-│ Enhancement Type Card           │
-└─────────────────────────────────┘
-
-─────────── Card Details ──────────
-┌─────────────────────────────────┐
-│ Card Level (slider)             │
-│ ─────────────────────────────── │
-│ Previous Enhancements (0-3)     │
-│ ─────────────────────────────── │
-│ Multiple Targets [toggle]       │
-│ ─────────────────────────────── │
-│ Loss Non-Persistent [toggle]*   │
-│ ─────────────────────────────── │
-│ Persistent [toggle]*            │
-└─────────────────────────────────┘
-* GH2E/FH only
-
-─────────── Discounts ─────────────
-┌─────────────────────────────────┐
-│ Temporary Enhancement † [toggle]│
-│ ─────────────────────────────── │
-│ Hail's Discount ‡ [toggle]      │
-│ ─────────────────────────────── │
-│ Scenario 114 Reward [toggle]*   │
-│ ─────────────────────────────── │
-│ Building 44 * [dialog]*         │
-└─────────────────────────────────┘
-* Edition-specific
-```
-
-### Cost Markers
-
-The calculator displays markers on cost chips to indicate which discounts are applied:
-- **†** (dagger) - Temporary Enhancement mode active
-- **‡** (double-dagger) - Hail's Discount active
-- **§** (section sign) - Scenario 114 Reward active (Gloomhaven/GH2E only)
-- **\*** (asterisk) - Building 44 discount active (Frosthaven only)
-
-Markers can combine (e.g., `†*` if both temp enhancement and Building 44 L4 apply).
-
-### Building 44 Dialog (Frosthaven Spoiler Protection)
-
-The Building 44 dialog shows enhancer upgrade levels with spoiler protection:
-- Level 1 text is always visible (always unlocked)
-- Levels 2-4 have their subtitle text blurred with `ImageFiltered` until checked
-- Uses `ImageFilter.blur(sigmaX: 6, sigmaY: 6)` for the blur effect
-- Checking a level reveals the discount description immediately
-
-### File Structure
-
-```
-lib/ui/widgets/calculator/
-├── calculator.dart                # Barrel export file
-├── calculator_section_card.dart   # Main card component with layout variants
-├── calculator_toggle_group_card.dart # Card with multiple toggle rows (Discounts)
-├── info_button_config.dart        # Configuration for info buttons
-├── cost_display.dart              # Standardized cost chip with strikethrough
-├── card_level_body.dart           # SfSlider for card level selection
-├── previous_enhancements_body.dart # Segmented button (0-3)
-└── enhancement_type_body.dart     # Dropdown selector
-```
-
-Note: The Card Details card (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single card with internal dividers.
-
-### CalculatorSectionCard
-
-The main reusable card component with two layout variants:
-
-**Standard Layout** (`CardLayoutVariant.standard`):
-```
-+--------------------------------------------------+
-| [i] Title                                        |
-|                                                  |
-| [Body Widget - full width]                       |
-|                                                  |
-| [Cost Display Chip]                              |
-+--------------------------------------------------+
-```
-
-**Toggle Layout** (`CardLayoutVariant.toggle`):
-```
-+--------------------------------------------------+
-| [i]  Title                              [Toggle] |
-|      Subtitle (optional)                         |
-+--------------------------------------------------+
-```
-
-### Usage Example
-
-```dart
-// Standard card with slider body and cost display
-CalculatorSectionCard(
-  infoConfig: InfoButtonConfig.titleMessage(
-    title: 'Card Level',
-    message: richTextWidget,
-  ),
-  title: 'Card Level: 5',
-  body: CardLevelBody(model: calculatorModel),
-  costConfig: CostDisplayConfig(
-    baseCost: 100,
-    discountedCost: 75,  // Shows strikethrough when different
-  ),
-)
-
-// Toggle card
-CalculatorSectionCard(
-  layout: CardLayoutVariant.toggle,
-  infoConfig: InfoButtonConfig.titleMessage(
-    title: 'Hail\'s Discount',
-    message: richTextWidget,
-  ),
-  title: 'Hail\'s Discount',
-  toggleValue: model.hailsDiscount,
-  onToggleChanged: (value) => model.hailsDiscount = value,
-)
-```
-
-### InfoButtonConfig
-
-Two ways to configure info buttons:
-
-```dart
-// Option 1: Title + pre-built RichText message
-InfoButtonConfig.titleMessage(
-  title: 'Card Level',
-  message: Strings.cardLevelInfoBody(context, darkTheme),
-)
-
-// Option 2: Auto-configure based on enhancement category
-InfoButtonConfig.category(category: EnhancementCategory.posEffect)
-```
-
-### CostDisplay
-
-Standardized cost chip with optional strikethrough for discounts:
-
-```dart
-CostDisplayConfig(
-  baseCost: 100,
-  discountedCost: 75,    // Optional - shows strikethrough when different
-  marker: '†',           // Optional suffix (e.g., for temporary enhancements)
-)
-```
-
-### SfSlider (Card Level)
-
-The card level selector uses `syncfusion_flutter_sliders` package for a cleaner slider with built-in labels:
-
-```dart
-SfSlider(
-  min: 1.0,
-  max: 9.0,
-  value: displayLevel,
-  interval: 1,
-  stepSize: 1,
-  showLabels: true,
-  activeColor: colorScheme.primary,
-  onChanged: (value) => model.cardLevel = value.round() - 1,
-)
-```
-
-### Adding a New Calculator Card
-
-1. Create a body widget in `lib/ui/widgets/calculator/` if needed
-2. Use `CalculatorSectionCard` with appropriate layout variant
-3. Configure `InfoButtonConfig` for the info dialog
-4. Add `CostDisplayConfig` if the section has associated costs
+- **`strings.dart`** - Complex markdown content with inline icons used by `GameTextParser`
+- **`perks_repository.dart`** - Perk descriptions with icon placeholders
+- **Discount marker symbols** - The `†`, `‡`, `§`, and `*` markers are appended using unicode escapes
 
 ## CI/CD Pipeline
 
@@ -1085,8 +386,6 @@ gh workflow run deploy-internal.yml
 # Deploy with a specific version name
 gh workflow run deploy-internal.yml -f version_name=4.3.3
 ```
-
-Or use the GitHub Actions web UI → Actions tab → "Deploy to Internal Track" → "Run workflow".
 
 ### How It Works
 
@@ -1130,3 +429,4 @@ Or use the GitHub Actions web UI → Actions tab → "Deploy to Internal Track" 
 9. **Branching** - Always suggest starting new work from the `dev` branch, not `master`. Pushes to `dev` auto-deploy to internal testing.
 10. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
 11. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
+12. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).

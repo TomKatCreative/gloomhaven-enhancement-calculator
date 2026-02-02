@@ -240,7 +240,9 @@ test('Parser handles complex text', () {
 
 ## Migration Guide
 
-### Quick Migration Steps
+> **Note:** The migration from `[text]` to `**text**` syntax is complete. All perk data in the codebase now uses the Markdown-style syntax. This section is preserved for historical reference.
+
+### Quick Migration Steps (Historical)
 
 1. **Backup your perks_repository.dart file**
 2. **Run find-and-replace** in your IDE:
@@ -252,23 +254,14 @@ test('Parser handles complex text', () {
    - Or keep individual: `~word` → `*word*`
 4. **Test your perks** to make sure formatting looks correct
 
-### Updating Your Perk Data
+### Example Migration (Historical)
 
-You'll need to update your perk strings to use Markdown syntax:
-
-**Find and Replace:**
-1. `[` → `**` (opening bold) 
-2. `]` → `**` (closing bold)
-3. `~word` → `*word*` (for italic words)
-
-**Example Migration:**
-
-Before:
+Before (old syntax):
 ```dart
 '[Rested and Ready:] $_wheneverYouLongRest, if ~Reviving ~Ether is in your discard pile'
 ```
 
-After:
+After (current syntax):
 ```dart
 '**Rested and Ready:** $_wheneverYouLongRest, if *Reviving Ether* is in your discard pile'
 ```
@@ -325,8 +318,8 @@ Potential additions:
 - The parser skips all-lowercase words to prevent matching class codes that are English words (e.g., "be" → Berserker, "hive" → Hive class)
 
 ### Bold Not Working
-- Verify square brackets are properly closed: `[text]`
-- Check for nested brackets (not supported)
+- Verify double asterisks are properly paired: `**text**`
+- Check for nested bold (not supported)
 
 ### XP Number Wrong
 - Verify format is exactly `xpN` (no spaces)
