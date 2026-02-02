@@ -103,32 +103,6 @@ class SettingsScreenState extends State<SettingsScreen> {
                     });
                   },
                 ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline_rounded),
-                  title: Text(
-                    AppLocalizations.of(context).enhancementGuidelines,
-                  ),
-                  trailing: Icon(
-                    Icons.open_in_new,
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                  onTap: () => showDialog<void>(
-                    context: context,
-                    builder: (_) {
-                      return InfoDialog(
-                        title: Strings.generalInfoTitle,
-                        message: Strings.generalInfoBody(
-                          context,
-                          edition: SharedPrefs().gameEdition,
-                          darkMode:
-                              Theme.of(context).brightness == Brightness.dark,
-                        ),
-                      );
-                    },
-                  ),
-                ),
                 SwitchListTile(
                   secondary: Icon(
                     SharedPrefs().envelopeX
@@ -381,6 +355,32 @@ class SettingsScreenState extends State<SettingsScreen> {
                     }
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.auto_awesome_rounded),
+                  title: Text(
+                    AppLocalizations.of(context).enhancementGuidelines,
+                  ),
+                  trailing: Icon(
+                    Icons.open_in_new,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                  onTap: () => showDialog<void>(
+                    context: context,
+                    builder: (_) {
+                      return InfoDialog(
+                        title: Strings.generalInfoTitle,
+                        message: Strings.generalInfoBody(
+                          context,
+                          edition: SharedPrefs().gameEdition,
+                          darkMode:
+                              Theme.of(context).brightness == Brightness.dark,
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 SettingsSection(title: AppLocalizations.of(context).display),
                 Theme(
                   data: Theme.of(context).copyWith(
@@ -420,7 +420,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 SwitchListTile(
-                  secondary: Icon(MdiIcons.formatFont),
+                  secondary: const Icon(Icons.font_download_rounded),
                   title: Text(AppLocalizations.of(context).useInterFont),
                   subtitle: Text(
                     AppLocalizations.of(context).useInterFontDescription,
@@ -457,7 +457,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   title: AppLocalizations.of(context).backupAndRestore,
                 ),
                 ListTile(
-                  leading: const Icon(Icons.upload_rounded),
+                  leading: const Icon(Icons.download_rounded),
                   title: Text(AppLocalizations.of(context).backup),
                   subtitle: Text(
                     AppLocalizations.of(context).backupDescription,
@@ -472,107 +472,145 @@ class SettingsScreenState extends State<SettingsScreen> {
                           ..text =
                               'ghc_backup_${DateFormat('yyyy-MM-dd_HH:mm').format(DateTime.now())}'
                                   .replaceAll(RegExp(':'), '-');
-                        return AlertDialog(
-                          title: Platform.isAndroid
-                              ? const Icon(Icons.warning_rounded)
-                              : null,
-                          content: Container(
-                            constraints: const BoxConstraints(
-                              maxWidth: maxDialogWidth,
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (Platform.isAndroid) ...[
-                                  Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    ).backupFileWarning,
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
-                                TextField(
-                                  decoration: InputDecoration(
-                                    labelText: AppLocalizations.of(
-                                      context,
-                                    ).filename,
-                                  ),
-                                  controller: fileNameController,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter.deny(
-                                      RegExp(
-                                        '[\\#|\\<|\\>|\\+|\\\$|\\%|\\!|\\`|\\&|\\*|\\\'|\\||\\}|\\{|\\?|\\"|\\=|\\/|\\:|\\\\|\\ |\\@]',
+                        String? filenameError;
+                        return StatefulBuilder(
+                          builder: (context, setState) {
+                            return AlertDialog(
+                              title: Platform.isAndroid
+                                  ? const Icon(Icons.warning_rounded)
+                                  : null,
+                              content: Container(
+                                constraints: const BoxConstraints(
+                                  maxWidth: maxDialogWidth,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    if (Platform.isAndroid) ...[
+                                      Text(
+                                        AppLocalizations.of(
+                                          context,
+                                        ).backupFileWarning,
                                       ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                    TextField(
+                                      decoration: InputDecoration(
+                                        labelText: AppLocalizations.of(
+                                          context,
+                                        ).filename,
+                                        errorText: filenameError,
+                                      ),
+                                      controller: fileNameController,
+                                      onChanged: (_) {
+                                        if (filenameError != null) {
+                                          setState(() => filenameError = null);
+                                        }
+                                      },
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.deny(
+                                          RegExp(
+                                            '[\\#|\\<|\\>|\\+|\\\$|\\%|\\!|\\`|\\&|\\*|\\\'|\\||\\}|\\{|\\?|\\"|\\=|\\/|\\:|\\\\|\\ |\\@]',
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text(AppLocalizations.of(context).cancel),
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                            if (Platform.isAndroid)
-                              TextButton.icon(
-                                icon: Icon(
-                                  Icons.save,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                label: Text(AppLocalizations.of(context).save),
-                                onPressed: () async {
-                                  if (!await _getStoragePermission()) {
-                                    return;
-                                  }
-                                  try {
-                                    String value = await DatabaseHelper.instance
-                                        .generateBackup();
-                                    downloadPath =
-                                        '/storage/emulated/0/Download';
-                                    File backupFile = File(
-                                      '$downloadPath/${fileNameController.text}.txt',
-                                    );
-                                    await backupFile.writeAsString(value);
-                                    if (!context.mounted) return;
-                                    Navigator.of(context).pop('save');
-                                  } catch (e) {
-                                    if (!context.mounted) return;
-                                    ScaffoldMessenger.of(context)
-                                      ..clearSnackBars()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            AppLocalizations.of(
-                                              context,
-                                            ).backupError,
-                                          ),
-                                        ),
-                                      );
-                                  }
-                                },
                               ),
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.of(
-                                  context,
-                                ).pop(fileNameController.text);
-                              },
-                              icon: Platform.isAndroid
-                                  ? Icon(
-                                      Icons.share,
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    AppLocalizations.of(context).cancel,
+                                  ),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                                if (Platform.isAndroid)
+                                  TextButton.icon(
+                                    icon: Icon(
+                                      MdiIcons.contentSave,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.primary,
-                                    )
-                                  : Container(),
-                              label: Text(
-                                Platform.isAndroid
-                                    ? AppLocalizations.of(context).share
-                                    : AppLocalizations.of(context).continue_,
-                              ),
-                            ),
-                          ],
+                                    ),
+                                    label: Text(
+                                      AppLocalizations.of(context).save,
+                                    ),
+                                    onPressed: () async {
+                                      if (fileNameController.text
+                                          .trim()
+                                          .isEmpty) {
+                                        setState(() {
+                                          filenameError =
+                                              'Filename cannot be empty';
+                                        });
+                                        return;
+                                      }
+                                      if (!await _getStoragePermission()) {
+                                        return;
+                                      }
+                                      try {
+                                        String value = await DatabaseHelper
+                                            .instance
+                                            .generateBackup();
+                                        downloadPath =
+                                            '/storage/emulated/0/Download';
+                                        File backupFile = File(
+                                          '$downloadPath/${fileNameController.text}.txt',
+                                        );
+                                        await backupFile.writeAsString(value);
+                                        if (!context.mounted) return;
+                                        Navigator.of(context).pop('save');
+                                      } catch (e) {
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context)
+                                          ..clearSnackBars()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                AppLocalizations.of(
+                                                  context,
+                                                ).backupError,
+                                              ),
+                                            ),
+                                          );
+                                      }
+                                    },
+                                  ),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    if (fileNameController.text
+                                        .trim()
+                                        .isEmpty) {
+                                      setState(() {
+                                        filenameError =
+                                            'Filename cannot be empty';
+                                      });
+                                      return;
+                                    }
+                                    Navigator.of(
+                                      context,
+                                    ).pop(fileNameController.text);
+                                  },
+                                  icon: Platform.isAndroid
+                                      ? Icon(
+                                          Icons.share,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.primary,
+                                        )
+                                      : Container(),
+                                  label: Text(
+                                    Platform.isAndroid
+                                        ? AppLocalizations.of(context).share
+                                        : AppLocalizations.of(
+                                            context,
+                                          ).continue_,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                     ).then((String? backupName) async {
@@ -630,7 +668,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.download_rounded),
+                  leading: const Icon(Icons.upload_rounded),
                   title: Text(AppLocalizations.of(context).restore),
                   subtitle: Text(
                     AppLocalizations.of(context).restoreDescription,
