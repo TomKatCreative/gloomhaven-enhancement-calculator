@@ -128,6 +128,7 @@ class SectionLabel extends StatelessWidget {
     required this.label,
     this.icon,
     this.svgAssetKey,
+    this.textStyle,
   }) : assert(
          icon != null || svgAssetKey != null,
          'Either icon or svgAssetKey must be provided',
@@ -142,9 +143,15 @@ class SectionLabel extends StatelessWidget {
   /// SVG asset key to display before the label (alternative to [icon]).
   final String? svgAssetKey;
 
+  /// Custom text style for the label. If null, uses labelLarge.
+  final TextStyle? textStyle;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final defaultStyle = theme.textTheme.labelLarge?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
 
     return Row(
       children: [
@@ -157,12 +164,7 @@ class SectionLabel extends StatelessWidget {
             color: theme.colorScheme.onSurfaceVariant,
           ),
         const SizedBox(width: mediumPadding),
-        Text(
-          label,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
+        Text(label, style: textStyle ?? defaultStyle),
       ],
     );
   }
