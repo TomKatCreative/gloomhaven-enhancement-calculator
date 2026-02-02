@@ -113,7 +113,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(left: largePadding, right: smallPadding),
+      padding: const EdgeInsets.symmetric(horizontal: largePadding),
       child: Row(
         children: [
           // Info button
@@ -152,10 +152,9 @@ class CalculatorToggleGroupCard extends StatelessWidget {
             ),
           ),
           // Trailing widget (if any) or switch
-          if (item.trailingWidget != null) ...[
-            GestureDetector(onTap: handleTap, child: item.trailingWidget),
-            const SizedBox(width: largePadding),
-          ] else ...[
+          if (item.trailingWidget != null)
+            GestureDetector(onTap: handleTap, child: item.trailingWidget)
+          else
             GestureDetector(
               onTap: handleToggle,
               child: Switch(
@@ -163,8 +162,6 @@ class CalculatorToggleGroupCard extends StatelessWidget {
                 onChanged: item.enabled ? item.onChanged : null,
               ),
             ),
-            const SizedBox(width: mediumPadding),
-          ],
         ],
       ),
     );

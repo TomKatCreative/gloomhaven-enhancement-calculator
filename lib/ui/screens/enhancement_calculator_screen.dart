@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -49,7 +51,7 @@ class _EnhancementCalculatorScreenState
               bottom: enhancementCalculatorModel.showCost ? 90 : largePadding,
             ),
             children: <Widget>[
-              // === ACTION DETAILS ===
+              // === ENHANCEMENT ===
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: largePadding),
                 child: Row(
@@ -85,17 +87,40 @@ class _EnhancementCalculatorScreenState
                 model: enhancementCalculatorModel,
               ),
 
-              // 2. CARD LEVEL & PREVIOUS ENHANCEMENTS - grouped card
+              // === CARD DETAILS ===
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: largePadding),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: largePadding,
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).cardDetails,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        color: Theme.of(context).dividerTheme.color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 2. CARD DETAILS & MODIFIERS - grouped card
               _CardDetailsGroupCard(
                 edition: edition,
                 model: enhancementCalculatorModel,
-                darkTheme: darkTheme,
-              ),
-
-              // 3. MODIFIERS - grouped card
-              _ModifiersGroupCard(
-                edition: edition,
-                enhancementCalculatorModel: enhancementCalculatorModel,
                 darkTheme: darkTheme,
               ),
 
@@ -145,13 +170,16 @@ class _EnhancementCalculatorScreenState
             totalCost: enhancementCalculatorModel.totalCost,
             steps: enhancementCalculatorModel.getCalculationBreakdown(),
             enhancement: enhancementCalculatorModel.enhancement,
+            scrollController: context
+                .read<CharactersModel>()
+                .enhancementCalcScrollController,
           ),
       ],
     );
   }
 }
 
-/// Card Details group - combines Card Level and Previous Enhancements.
+/// Card Details group - combines Card Level, Previous Enhancements, and Modifiers.
 class _CardDetailsGroupCard extends StatelessWidget {
   final dynamic edition;
   final EnhancementCalculatorModel model;
@@ -171,17 +199,28 @@ class _CardDetailsGroupCard extends StatelessWidget {
         child: Column(
           children: [
             _buildCardLevelSection(context),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: largePadding),
-              child: Divider(
-                height: 1,
-                color: Theme.of(context).dividerTheme.color,
-              ),
-            ),
+            _buildDivider(context),
             _buildPreviousEnhancementsSection(context),
+            _buildDivider(context),
+            _buildMultipleTargetsToggle(context),
+            if (edition.hasLostModifier) ...[
+              _buildDivider(context),
+              _buildLossNonPersistentToggle(context),
+            ],
+            if (edition.hasPersistentModifier) ...[
+              _buildDivider(context),
+              _buildPersistentToggle(context),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDivider(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: largePadding),
+      child: Divider(height: 1, color: Theme.of(context).dividerTheme.color),
     );
   }
 
@@ -238,6 +277,7 @@ class _CardDetailsGroupCard extends StatelessWidget {
               config: CostDisplayConfig(
                 baseCost: baseCost,
                 discountedCost: actualCost != baseCost ? actualCost : null,
+                marker: model.enhancerLvl3Applies ? '*' : null,
               ),
             ),
           ),
@@ -250,7 +290,6 @@ class _CardDetailsGroupCard extends StatelessWidget {
     final theme = Theme.of(context);
     final enhancerLvl4 =
         edition.hasEnhancerLevels && SharedPrefs().enhancerLvl4;
-    final tempEnhancements = model.temporaryEnhancementMode;
     final selected = model.previousEnhancements;
     final baseCost = 75 * selected;
     final actualCost = model.previousEnhancementsPenalty(selected);
@@ -289,14 +328,177 @@ class _CardDetailsGroupCard extends StatelessWidget {
           PreviousEnhancementsBody(model: model),
           // Cost display - padded to align with title (icon button width + spacing)
           Padding(
-            padding: const EdgeInsets.only(left: 48 + largePadding),
+            padding: const EdgeInsets.only(
+              left: 48 + largePadding,
+              top: mediumPadding,
+              bottom: mediumPadding,
+            ),
             child: CostDisplay(
               config: CostDisplayConfig(
                 baseCost: baseCost,
                 discountedCost: actualCost != baseCost ? actualCost : null,
-                marker: tempEnhancements ? '\u2020' : null,
+                marker: _buildPreviousEnhancementsMarker(),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Builds the marker string for previous enhancements cost.
+  /// Combines temp † and Building 44 * markers.
+  String? _buildPreviousEnhancementsMarker() {
+    final markers = <String>[];
+    if (model.temporaryEnhancementMode) markers.add('\u2020'); // †
+    if (model.enhancerLvl4Applies) markers.add('*');
+    return markers.isEmpty ? null : markers.join();
+  }
+
+  Widget _buildMultipleTargetsToggle(BuildContext context) {
+    return _buildToggleRow(
+      context,
+      infoTitle: Strings.multipleTargetsInfoTitle,
+      infoMessage: Strings.multipleTargetsInfoBody(
+        context,
+        edition: edition,
+        enhancerLvl2: edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
+        darkMode: darkTheme,
+      ),
+      title: AppLocalizations.of(context).multipleTargets,
+      value: model.multipleTargets,
+      enabled: !model.disableMultiTargetsSwitch,
+      onChanged: (value) => model.multipleTargets = value,
+    );
+  }
+
+  Widget _buildLossNonPersistentToggle(BuildContext context) {
+    return _buildToggleRow(
+      context,
+      infoTitle: Strings.lostNonPersistentInfoTitle(edition: edition),
+      infoMessage: Strings.lostNonPersistentInfoBody(
+        context,
+        edition,
+        darkTheme,
+      ),
+      titleWidget: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ThemedSvg(assetKey: 'LOSS', width: iconSize),
+          if (edition.hasPersistentModifier) ...[
+            const SizedBox(width: largePadding),
+            SizedBox(
+              width: iconSize + 16,
+              height: iconSize + 11,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+                  Positioned(
+                    right: 5,
+                    child: SvgPicture.asset(
+                      'images/ui/not.svg',
+                      width: iconSize + 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+      subtitle: AppLocalizations.of(context).lossNonPersistent,
+      value: model.lostNonPersistent,
+      enabled:
+          !model.persistent &&
+          (edition.hasPersistentModifier ||
+              model.enhancement?.category != EnhancementCategory.summonPlusOne),
+      onChanged: (value) => model.lostNonPersistent = value,
+    );
+  }
+
+  Widget _buildPersistentToggle(BuildContext context) {
+    return _buildToggleRow(
+      context,
+      infoTitle: Strings.persistentInfoTitle,
+      infoMessage: Strings.persistentInfoBody(context, darkTheme),
+      titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+      subtitle: AppLocalizations.of(context).persistent,
+      value: model.persistent,
+      enabled:
+          model.enhancement?.category != EnhancementCategory.summonPlusOne &&
+          !model.lostNonPersistent,
+      onChanged: (value) => model.persistent = value,
+    );
+  }
+
+  /// Helper to build a toggle row with consistent styling.
+  Widget _buildToggleRow(
+    BuildContext context, {
+    required String infoTitle,
+    required RichText infoMessage,
+    String? title,
+    Widget? titleWidget,
+    String? subtitle,
+    required bool value,
+    required bool enabled,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    void handleToggle() {
+      if (enabled) {
+        onChanged(!value);
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: largePadding),
+      child: Row(
+        children: [
+          // Info button
+          IconButton(
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: () => showDialog<void>(
+              context: context,
+              builder: (_) =>
+                  InfoDialog(title: infoTitle, message: infoMessage),
+            ),
+          ),
+          // Tappable area: title/subtitle
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: handleToggle,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: largePadding,
+                  top: mediumPadding,
+                  bottom: mediumPadding,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    titleWidget ??
+                        Text(title!, style: theme.textTheme.bodyLarge),
+                    if (subtitle != null)
+                      Text(
+                        subtitle,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Switch
+          GestureDetector(
+            onTap: handleToggle,
+            child: Switch(value: value, onChanged: enabled ? onChanged : null),
           ),
         ],
       ),
@@ -310,6 +512,15 @@ class _EnhancementTypeCard extends StatelessWidget {
   final EnhancementCalculatorModel model;
 
   const _EnhancementTypeCard({required this.edition, required this.model});
+
+  /// Builds the marker string for enhancement type cost.
+  /// Combines Hail's ‡ and Building 44 * markers.
+  String? _buildEnhancementTypeMarker(EnhancementCalculatorModel model) {
+    final markers = <String>[];
+    if (model.hailsDiscount) markers.add('\u2021'); // ‡
+    if (model.enhancerLvl2Applies) markers.add('*');
+    return markers.isEmpty ? null : markers.join();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -339,7 +550,7 @@ class _EnhancementTypeCard extends StatelessWidget {
                     ? CostDisplayConfig(
                         baseCost: enhancement.cost(edition: edition),
                         discountedCost: model.enhancementCost(enhancement),
-                        marker: model.hailsDiscount ? '\u2021' : null,
+                        marker: _buildEnhancementTypeMarker(model),
                       )
                     : null,
               ),
@@ -348,114 +559,6 @@ class _EnhancementTypeCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-/// Modifiers group card - groups Multi-target, Loss, and Persistent toggles.
-class _ModifiersGroupCard extends StatelessWidget {
-  final dynamic edition;
-  final EnhancementCalculatorModel enhancementCalculatorModel;
-  final bool darkTheme;
-
-  const _ModifiersGroupCard({
-    required this.edition,
-    required this.enhancementCalculatorModel,
-    required this.darkTheme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final items = <ToggleGroupItem>[
-      // Multi-target
-      ToggleGroupItem(
-        infoConfig: InfoButtonConfig.titleMessage(
-          title: Strings.multipleTargetsInfoTitle,
-          message: Strings.multipleTargetsInfoBody(
-            context,
-            edition: edition,
-            enhancerLvl2:
-                edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
-            darkMode: darkTheme,
-          ),
-        ),
-        title: AppLocalizations.of(context).multipleTargets,
-        value: enhancementCalculatorModel.multipleTargets,
-        enabled: !enhancementCalculatorModel.disableMultiTargetsSwitch,
-        onChanged: (value) {
-          enhancementCalculatorModel.multipleTargets = value;
-        },
-      ),
-
-      // Loss Non-Persistent (GH2E and FH only)
-      if (edition.hasLostModifier)
-        ToggleGroupItem(
-          infoConfig: InfoButtonConfig.titleMessage(
-            title: Strings.lostNonPersistentInfoTitle(edition: edition),
-            message: Strings.lostNonPersistentInfoBody(
-              context,
-              edition,
-              darkTheme,
-            ),
-          ),
-          titleWidget: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ThemedSvg(assetKey: 'LOSS', width: iconSize),
-              if (edition.hasPersistentModifier) ...[
-                const SizedBox(width: largePadding),
-                SizedBox(
-                  width: iconSize + 16,
-                  height: iconSize + 11,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
-                      Positioned(
-                        right: 5,
-                        child: SvgPicture.asset(
-                          'images/ui/not.svg',
-                          width: iconSize + 11,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ],
-          ),
-          subtitle: AppLocalizations.of(context).lossNonPersistent,
-          value: enhancementCalculatorModel.lostNonPersistent,
-          enabled:
-              !enhancementCalculatorModel.persistent &&
-              (edition.hasPersistentModifier ||
-                  enhancementCalculatorModel.enhancement?.category !=
-                      EnhancementCategory.summonPlusOne),
-          onChanged: (value) {
-            enhancementCalculatorModel.lostNonPersistent = value;
-          },
-        ),
-
-      // Persistent (FH only)
-      if (edition.hasPersistentModifier)
-        ToggleGroupItem(
-          infoConfig: InfoButtonConfig.titleMessage(
-            title: Strings.persistentInfoTitle,
-            message: Strings.persistentInfoBody(context, darkTheme),
-          ),
-          titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
-          subtitle: AppLocalizations.of(context).persistent,
-          value: enhancementCalculatorModel.persistent,
-          enabled:
-              enhancementCalculatorModel.enhancement?.category !=
-                  EnhancementCategory.summonPlusOne &&
-              !enhancementCalculatorModel.lostNonPersistent,
-          onChanged: (value) {
-            enhancementCalculatorModel.persistent = value;
-          },
-        ),
-    ];
-
-    return CalculatorToggleGroupCard(items: items);
   }
 }
 
@@ -493,7 +596,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
             widget.darkTheme,
           ),
         ),
-        title: AppLocalizations.of(context).temporaryEnhancement,
+        title: '${AppLocalizations.of(context).temporaryEnhancement} \u2020',
         subtitle: AppLocalizations.of(context).variant,
         value: widget.enhancementCalculatorModel.temporaryEnhancementMode,
         onChanged: (value) {
@@ -507,7 +610,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
           title: Strings.hailsDiscountTitle,
           message: Strings.hailsDiscountInfoBody(context, widget.darkTheme),
         ),
-        title: AppLocalizations.of(context).hailsDiscount,
+        title: '${AppLocalizations.of(context).hailsDiscount} \u2021',
         value: widget.enhancementCalculatorModel.hailsDiscount,
         onChanged: (value) {
           widget.enhancementCalculatorModel.hailsDiscount = value;
@@ -543,7 +646,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
             title: Strings.building44Title,
             message: Strings.building44InfoBody(context, widget.darkTheme),
           ),
-          title: AppLocalizations.of(context).building44,
+          title: '${AppLocalizations.of(context).building44} \u002A',
           subtitle: AppLocalizations.of(context).frosthavenSpoilers,
           value: _hasAnyEnhancerUpgrades(),
           trailingWidget: Icon(
@@ -676,23 +779,33 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
     ValueChanged<bool?>? onChanged,
   }) {
     final isActive = value;
+    final theme = Theme.of(context);
+
+    // Build the subtitle text widget
+    final subtitleText = Text(
+      subtitle,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: isActive ? null : theme.colorScheme.onSurfaceVariant,
+        fontSize: 20,
+      ),
+    );
+
+    // Blur the subtitle for levels 2-4 when not checked (to avoid spoilers)
+    final subtitleWidget = (level > 1 && !isActive)
+        ? ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+            child: subtitleText,
+          )
+        : subtitleText;
 
     return CheckboxListTile(
       title: Text(
         _getLevelLabel(context, level),
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+        style: theme.textTheme.bodyMedium?.copyWith(
           fontSize: SharedPrefs().useDefaultFonts ? 25 : null,
         ),
       ),
-      subtitle: Text(
-        subtitle,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          color: isActive
-              ? null
-              : Theme.of(context).colorScheme.onSurfaceVariant,
-          fontSize: 20,
-        ),
-      ),
+      subtitle: subtitleWidget,
       value: value,
       onChanged: enabled ? onChanged : null,
     );
