@@ -69,6 +69,70 @@ if (variant != null) {
 - Supports unlimited variants (future-proof)
 - Cancel option with contrast-adjusted styling
 
+## EnvelopePuzzleDialog
+
+Dialog for solving envelope puzzles (Envelope X and Envelope V) that require entering a secret answer.
+
+**Usage:**
+```dart
+final solved = await EnvelopePuzzleDialog.show(
+  context: context,
+  promptText: AppLocalizations.of(context).enterSolution,
+  inputLabel: AppLocalizations.of(context).solution,
+  correctAnswer: 'bladeswarm',
+  successButtonText: AppLocalizations.of(context).solve,
+);
+
+if (solved == true) {
+  // Puzzle was solved correctly
+}
+```
+
+**Features:**
+- Text input with autofocus
+- Case-insensitive answer validation
+- Submit button disabled until correct answer entered
+- Static show() method returns `Future<bool?>`
+
+## BackupDialog
+
+Dialog for creating and exporting database backups.
+
+**Usage:**
+```dart
+final result = await BackupDialog.show(context: context);
+
+if (result?.action == BackupAction.saved) {
+  // Show success message with result.savedPath
+}
+```
+
+**Features:**
+- Filename input with validation (filters special characters)
+- Default filename with timestamp
+- Platform-specific options:
+  - Android: Save to Downloads OR Share
+  - iOS: Share only
+- Returns `BackupResult` with action type and saved path
+
+## RestoreDialog
+
+Handles the complete database restore workflow (not a traditional dialog widget).
+
+**Usage:**
+```dart
+await RestoreDialog.show(context: context);
+// If successful, characters model is reloaded and settings screen is popped
+```
+
+**Features:**
+- Confirmation warning before proceeding
+- Storage permission request (iOS)
+- File picker for .txt backup files
+- Progress indicator during restore
+- Error dialog with copy-to-clipboard option
+- Automatic navigation after success
+
 ## Best Practices
 
 - Use `ConfirmationDialog` for simple yes/no confirmations
