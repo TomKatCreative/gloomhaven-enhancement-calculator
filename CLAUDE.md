@@ -139,7 +139,7 @@ enum Variant { base, frosthavenCrossover, gloomhaven2E, v2, v3, v4 }
 Example: "Brute" in base game → "Bruiser" in Gloomhaven 2E
 
 ### Character Data Flow
-1. `PlayerClass` - Static class definition (race, name, icon, perks)
+1. `PlayerClass` - Static class definition (race, name, classCode, perks)
 2. `Character` - Instance of a class (name, level, XP, gold, retirements)
 3. `CharacterPerk` / `CharacterMastery` - Join tables tracking which perks/masteries are checked
 
@@ -201,6 +201,7 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 - `docs/enhancement_rules.md` - Enhancement cost calculation rules by edition
 - `docs/game_text_parser.md` - Game text parser syntax and usage
 - `docs/perk_format_reference.md` - Perk definition format for perks_repository.dart
+- `docs/svg_asset_config_refactor.md` - SVG asset centralization patterns and rationale
 
 **When creating documentation:**
 - Place all `.md` files in `/docs` (not scattered in `lib/`)
@@ -258,7 +259,7 @@ Text(
 
 ## SVG Theming
 
-The app uses `flutter_svg` for rendering SVG icons. Icons adapt to light/dark themes automatically.
+The app uses `flutter_svg` for rendering SVG icons. **All SVG assets are centralized in `asset_config.dart`** - never use `SvgPicture.asset()` directly.
 
 ### ThemedSvg Widget (`lib/utils/themed_svg.dart`)
 
@@ -279,34 +280,78 @@ The widget automatically:
 - Looks up the asset key in `asset_config.dart` to get the file path
 - Detects light/dark theme from `Theme.of(context)`
 - Applies appropriate coloring based on the asset's configuration
+- For assets with `CurrentColorTheme()`, no `color` parameter is needed - theming is automatic
+
+### ClassIconSvg Widget (`lib/ui/widgets/class_icon_svg.dart`)
+
+Use `ClassIconSvg` for player class icons. It automatically uses the class's primary color:
+
+```dart
+// Basic usage - uses playerClass.primaryColor automatically
+ClassIconSvg(playerClass: myClass, width: 48, height: 48)
+
+// With custom color override
+ClassIconSvg(
+  playerClass: myClass,
+  width: 48,
+  height: 48,
+  color: Colors.grey.withOpacity(0.5),
+)
+```
+
+The widget uses `playerClass.classCode` as the asset key, which maps to the class icon in `asset_config.dart`.
 
 ### Asset Configuration (`lib/utils/asset_config.dart`)
 
 All SVG assets are configured here with their file paths and theming behavior:
 
 ```dart
-// SVG uses fill="currentColor" - only those parts change with theme
-'MOVE': AssetConfig('move.svg', themeMode: CurrentColorTheme())
+// UI icons - use string keys
+'MOVE': AssetConfig('move.svg', themeMode: CurrentColorTheme()),
+'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),
+
+// Class icons - use ClassCodes constants as keys
+ClassCodes.brute: AssetConfig('class_icons/brute.svg', themeMode: CurrentColorTheme()),
+ClassCodes.tinkerer: AssetConfig('class_icons/tinkerer.svg', themeMode: CurrentColorTheme()),
+
+// Resources - use lowercase string keys
+'lumber': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
+'metal': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
 
 // No theming needed - renders as-is in both themes
-'hex': AssetConfig('hex.svg')
+'hex': AssetConfig('hex.svg'),
 ```
+
+**Asset categories in asset_config.dart:**
+- UI icons (LEVEL, XP, GOLD, GOAL, TRAIT, Pocket, etc.)
+- Elements (FIRE, ICE, AIR, EARTH, LIGHT, DARK)
+- Enhancement types (MOVE, ATTACK, RANGE, etc.)
+- Class icons (71 entries using ClassCodes constants)
+- Resources (lumber, metal, hide, etc.)
+- Branding (BMC_BUTTON)
 
 ### Adding a New SVG Icon
 
-1. Add the SVG file to `images/`
+1. Add the SVG file to the appropriate `images/` subdirectory
 2. Edit the SVG to use `currentColor` for theme-aware parts:
    - `fill="currentColor"` or `style="fill:currentColor"`
    - `stroke="currentColor"` for strokes
 3. Add an entry in `asset_config.dart`:
    ```dart
-   'MY_ICON': AssetConfig('my_icon.svg', themeMode: CurrentColorTheme())
+   'MY_ICON': AssetConfig('subfolder/my_icon.svg', themeMode: CurrentColorTheme())
    ```
 4. Use it with `ThemedSvg(assetKey: 'MY_ICON', width: 24)`
 
 ### How It Works
 
 - **`themeMode: CurrentColorTheme()`**: Uses `SvgTheme` so only SVG elements with `fill="currentColor"` change color. Other colors in the SVG are preserved. This is ideal for multi-color icons where only some parts should adapt to the theme.
+
+### Important Rules
+
+1. **Never use `SvgPicture.asset()` directly** - always use `ThemedSvg` or `ClassIconSvg`
+2. **All SVG assets must be in `asset_config.dart`** - this is the single source of truth
+3. **Class icons use `ClassCodes` constants as keys** - not string literals like `'br'` or `'sc'`
+4. **SVGs need `fill="currentColor"`** for theme-aware coloring to work
 
 ## Android System Navigation Bar
 
@@ -994,7 +1039,11 @@ Or use the GitHub Actions web UI → Actions tab → "Deploy to Internal Track" 
 3. **SharedPrefs keys** - Settings stored in `shared_prefs.dart` - check existing keys before adding
 4. **Database migrations** - New schema changes need migration code in `database_migrations.dart`
 5. **Theme awareness** - Use `Theme.of(context)` and ThemeProvider for colors/styling
-6. **SVG icons** - Use `ThemedSvg` widget with asset keys, not direct `SvgPicture` calls
+6. **SVG icons** - NEVER use `SvgPicture.asset()` directly. Always use:
+   - `ThemedSvg` for general SVG icons (with asset keys from `asset_config.dart`)
+   - `ClassIconSvg` for player class icons (uses `classCode` as asset key automatically)
+   - All new SVG assets must be added to `asset_config.dart` first
+   - Class icons use `ClassCodes` constants as keys, not string literals
 7. **Localization** - Use `AppLocalizations.of(context).xxx` for UI strings, not hardcoded text. Add new strings to ARB files.
 8. **User interaction** - When speaking with the developer who is working on this project, push back again their ideas if they aren't technically sound. Don't just do whatever they want - think about it in the context of the app and if you think there's a better way to do something, suggest it.
 9. **Branching** - Always suggest starting new work from the `dev` branch, not `master`. Pushes to `dev` auto-deploy to internal testing.
