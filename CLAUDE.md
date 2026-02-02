@@ -324,9 +324,12 @@ The Android system navigation bar (soft buttons at bottom of screen) color is ma
    });
    ```
 
-3. **Colors used**:
-   - Dark mode: `AppThemeBuilder.darkSurface` (0xff1c1b1f)
-   - Light mode: `Colors.white`
+3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the bottom navigation bar:
+   ```dart
+   final navBarColor = _config.useDarkMode
+       ? _cachedDarkTheme!.colorScheme.surfaceContainer
+       : _cachedLightTheme!.colorScheme.surfaceContainer;
+   ```
 
 4. **Icon brightness**: Set `systemNavigationBarIconBrightness` to ensure buttons are visible:
    - Dark mode: `Brightness.light` (white icons on dark background)
@@ -390,6 +393,7 @@ Text(AppLocalizations.of(context).savedTo(filePath))
 
 - **`strings.dart`** - Complex markdown content with inline icons (`{ATTACK}`, `{MOVE}`) used by `GameTextParser`. These are tightly coupled with icon rendering and should be localized in a future phase.
 - **`perks_repository.dart`** - Perk descriptions with icon placeholders. Game-specific terminology that players recognize across languages.
+- **Discount marker symbols** - The `†`, `‡`, and `*` markers for Temporary Enhancement, Hail's Discount, and Building 44 are appended in `enhancement_calculator_screen.dart` using unicode escapes (e.g., `\u2020`), not in ARB files. This keeps symbols consistent across languages.
 
 ### Adding a New Language
 
@@ -743,6 +747,8 @@ The widget uses a `Stack` with two layers:
 
 4. **FAB visibility**: Updates `EnhancementCalculatorModel.isSheetExpanded` when toggling, which the home screen uses to hide the FAB when expanded.
 
+5. **Blur bar drag-through**: The frosted glass blur bar at the bottom accepts an optional `scrollController` parameter. Vertical drags on the blur area are forwarded to the scroll controller, allowing users to scroll the calculator content even when touching the blur area. Taps are absorbed (do nothing). Note: This implementation uses `jumpTo()` so momentum/flick scrolling is not supported.
+
 ### Dimensions
 
 ```dart
@@ -766,12 +772,67 @@ _horizontalPadding = 16.0
 
 The enhancement calculator uses a standardized card component system for consistent layout and styling across all calculator sections.
 
+### Screen Layout
+
+The calculator screen is organized into three main sections with dividers:
+
+```
+─────────── Enhancement ───────────
+┌─────────────────────────────────┐
+│ Enhancement Type Card           │
+└─────────────────────────────────┘
+
+─────────── Card Details ──────────
+┌─────────────────────────────────┐
+│ Card Level (slider)             │
+│ ─────────────────────────────── │
+│ Previous Enhancements (0-3)     │
+│ ─────────────────────────────── │
+│ Multiple Targets [toggle]       │
+│ ─────────────────────────────── │
+│ Loss Non-Persistent [toggle]*   │
+│ ─────────────────────────────── │
+│ Persistent [toggle]*            │
+└─────────────────────────────────┘
+* GH2E/FH only
+
+─────────── Discounts ─────────────
+┌─────────────────────────────────┐
+│ Temporary Enhancement † [toggle]│
+│ ─────────────────────────────── │
+│ Hail's Discount ‡ [toggle]      │
+│ ─────────────────────────────── │
+│ Scenario 114 Reward [toggle]*   │
+│ ─────────────────────────────── │
+│ Building 44 * [dialog]*         │
+└─────────────────────────────────┘
+* Edition-specific
+```
+
+### Cost Markers
+
+The calculator displays markers on cost chips to indicate which discounts are applied:
+- **†** (dagger) - Temporary Enhancement mode active
+- **‡** (double-dagger) - Hail's Discount active
+- **\*** (asterisk) - Building 44 discount active (Frosthaven only)
+
+Markers can combine (e.g., `†*` if both temp enhancement and Building 44 L4 apply).
+
+### Building 44 Dialog (Frosthaven Spoiler Protection)
+
+The Building 44 dialog shows enhancer upgrade levels with spoiler protection:
+- Level 1 text is always visible (always unlocked)
+- Levels 2-4 have their subtitle text blurred with `ImageFiltered` until checked
+- Uses `ImageFilter.blur(sigmaX: 6, sigmaY: 6)` for the blur effect
+- Checking a level reveals the discount description immediately
+
 ### File Structure
 
 ```
 lib/ui/widgets/calculator/
 ├── calculator.dart                # Barrel export file
 ├── calculator_section_card.dart   # Main card component with layout variants
+├── calculator_toggle_group_card.dart # Card with multiple toggle rows (Discounts)
 ├── info_button_config.dart        # Configuration for info buttons
 ├── cost_display.dart              # Standardized cost chip with strikethrough
 ├── card_level_body.dart           # SfSlider for card level selection
@@ -779,7 +840,7 @@ lib/ui/widgets/calculator/
 └── enhancement_type_body.dart     # Dropdown selector
 ```
 
-Note: Modifier toggles (Multi-target, Loss, Persistent) use the `toggle` layout variant directly in `enhancement_calculator_screen.dart` rather than a separate body widget.
+Note: The Card Details card (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single card with internal dividers.
 
 ### CalculatorSectionCard
 
