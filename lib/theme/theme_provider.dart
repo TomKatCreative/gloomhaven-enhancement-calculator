@@ -82,14 +82,17 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   void _updateSystemUI() {
+    // Use surfaceContainer from the built theme to match bottom nav bar
+    final navBarColor = _config.useDarkMode
+        ? _cachedDarkTheme!.colorScheme.surfaceContainer
+        : _cachedLightTheme!.colorScheme.surfaceContainer;
+
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         systemNavigationBarIconBrightness: _config.useDarkMode
             ? Brightness.light
             : Brightness.dark,
-        systemNavigationBarColor: _config.useDarkMode
-            ? AppThemeBuilder.darkSurface
-            : Colors.white,
+        systemNavigationBarColor: navBarColor,
       ),
     );
   }
