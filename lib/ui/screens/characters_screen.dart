@@ -40,8 +40,8 @@ class _CharactersScreenState extends State<CharactersScreen>
         child: Center(
           child: Container(
             padding: const EdgeInsets.only(
-              left: mediumPadding * 2,
-              right: mediumPadding * 2,
+              left: largePadding,
+              right: largePadding,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -55,9 +55,9 @@ class _CharactersScreenState extends State<CharactersScreen>
                   textAlign: TextAlign.center,
                 ),
                 if (charactersModel.retiredCharactersAreHidden) ...[
-                  const SizedBox(height: mediumPadding),
+                  const SizedBox(height: smallPadding),
                   const Padding(
-                    padding: EdgeInsets.only(top: mediumPadding),
+                    padding: EdgeInsets.only(top: smallPadding),
                     child: Divider(),
                   ),
                   TextButton(

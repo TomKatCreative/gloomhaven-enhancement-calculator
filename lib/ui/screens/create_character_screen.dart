@@ -13,6 +13,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dar
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
@@ -89,7 +90,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         scrollController: _scrollController,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: mediumPadding),
+            padding: const EdgeInsets.only(right: smallPadding),
             child: TextButton.icon(
               icon: const Icon(Icons.how_to_reg_rounded),
               label: Text(AppLocalizations.of(context).create),
@@ -105,15 +106,15 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           padding: const EdgeInsets.all(extraLargePadding),
           children: [
             _buildNameField(context, theme),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
             _buildClassSelector(context, theme),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
             _buildLevelSelector(context, theme, colorScheme),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
             _buildRetirementsAndProsperityRow(context, theme),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
             _buildEditionToggle(context, theme),
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
           ],
         ),
       ),
@@ -121,111 +122,107 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   }
 
   Widget _buildNameField(BuildContext context, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        SectionLabel(
-          label: AppLocalizations.of(context).name,
-          icon: Icons.person_rounded,
+        Expanded(
+          child: TextFormField(
+            autofocus: true,
+            textCapitalization: TextCapitalization.words,
+            autocorrect: false,
+            focusNode: _nameFocusNode,
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context).name,
+              hintText: _placeholderName,
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              border: const OutlineInputBorder(),
+            ),
+            controller: _nameTextFieldController,
+            onChanged: (value) {
+              setState(() {
+                _placeholderName = value;
+                _nameTextFieldController.text = value;
+              });
+            },
+          ),
         ),
-        const SizedBox(height: mediumPadding),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                autofocus: true,
-                textCapitalization: TextCapitalization.words,
-                autocorrect: false,
-                focusNode: _nameFocusNode,
-                decoration: InputDecoration(hintText: _placeholderName),
-                controller: _nameTextFieldController,
-                onChanged: (value) {
-                  setState(() {
-                    _placeholderName = value;
-                    _nameTextFieldController.text = value;
-                  });
-                },
-              ),
-            ),
-            const SizedBox(width: mediumPadding),
-            IconButton(
-              icon: const FaIcon(FontAwesomeIcons.dice),
-              tooltip: 'Generate random name',
-              onPressed: () {
-                _nameTextFieldController.clear();
-                FocusScope.of(context).requestFocus(_nameFocusNode);
-                setState(() {
-                  _placeholderName = _generateRandomName();
-                });
-              },
-            ),
-          ],
+        const SizedBox(width: smallPadding),
+        IconButton(
+          icon: const FaIcon(FontAwesomeIcons.dice),
+          tooltip: 'Generate random name',
+          onPressed: () {
+            _nameTextFieldController.clear();
+            FocusScope.of(context).requestFocus(_nameFocusNode);
+            setState(() {
+              _placeholderName = _generateRandomName();
+            });
+          },
         ),
       ],
     );
   }
 
   Widget _buildClassSelector(BuildContext context, ThemeData theme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        SectionLabel(
-          label: _variant != Variant.base
-              ? '${AppLocalizations.of(context).classWithVariant(ClassVariants.classVariants[_variant]!)} *'
-              : '${AppLocalizations.of(context).class_} *',
-          svgAssetKey: 'CLASS',
-        ),
-        const SizedBox(height: mediumPadding),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                validator: (value) => _selectedClass == null
-                    ? AppLocalizations.of(context).pleaseSelectClass
-                    : null,
-                readOnly: true,
-                controller: _classTextFieldController,
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context).selectClass,
-                  suffixIcon: const Icon(Icons.chevron_right),
-                ),
-                onTap: () async {
-                  SelectedPlayerClass? selectedPlayerClass =
-                      await ClassSelectorScreen.show(context);
-                  if (selectedPlayerClass != null) {
-                    if (!context.mounted) return;
-                    FocusScope.of(context).requestFocus(_nameFocusNode);
-
-                    setState(() {
-                      // Mercenary Pack classes pre-populate the name field
-                      if (selectedPlayerClass.playerClass.category ==
-                          ClassCategory.mercenaryPacks) {
-                        _nameTextFieldController.text =
-                            selectedPlayerClass.playerClass.name;
-                      }
-                      _variant = selectedPlayerClass.variant!;
-                      _classTextFieldController.text = selectedPlayerClass
-                          .playerClass
-                          .getDisplayName(_variant);
-                      _selectedClass = selectedPlayerClass.playerClass;
-                    });
-                    _formKey.currentState?.validate();
-                  }
-                },
-              ),
+        Expanded(
+          child: TextFormField(
+            validator: (value) => _selectedClass == null
+                ? AppLocalizations.of(context).pleaseSelectClass
+                : null,
+            readOnly: true,
+            controller: _classTextFieldController,
+            decoration: InputDecoration(
+              labelText: _variant != Variant.base
+                  ? '${AppLocalizations.of(context).classWithVariant(ClassVariants.classVariants[_variant]!)} *'
+                  : '${AppLocalizations.of(context).class_} *',
+              hintText: AppLocalizations.of(context).selectClass,
+              floatingLabelBehavior: FloatingLabelBehavior.always,
+              border: const OutlineInputBorder(),
+              suffixIcon: const Icon(Icons.chevron_right),
             ),
-            const SizedBox(width: mediumPadding),
-            SizedBox(
-              width: 48,
-              height: 48,
+            onTap: () async {
+              SelectedPlayerClass? selectedPlayerClass =
+                  await ClassSelectorScreen.show(context);
+              if (selectedPlayerClass != null) {
+                if (!context.mounted) return;
+                FocusScope.of(context).requestFocus(_nameFocusNode);
+
+                setState(() {
+                  // Mercenary Pack classes pre-populate the name field
+                  if (selectedPlayerClass.playerClass.category ==
+                      ClassCategory.mercenaryPacks) {
+                    _nameTextFieldController.text =
+                        selectedPlayerClass.playerClass.name;
+                  }
+                  _variant = selectedPlayerClass.variant!;
+                  _classTextFieldController.text = selectedPlayerClass
+                      .playerClass
+                      .getDisplayName(_variant);
+                  _selectedClass = selectedPlayerClass.playerClass;
+                });
+                _formKey.currentState?.validate();
+              }
+            },
+          ),
+        ),
+        const SizedBox(width: smallPadding),
+        // Match IconButton's 48x48 touch target size for alignment
+        SizedBox(
+          width: 48,
+          height: 48,
+          child: Center(
+            child: SizedBox(
+              width: iconSizeLarge,
+              height: iconSizeLarge,
               child: _selectedClass == null
-                  ? Icon(
-                      Icons.help_outline,
+                  ? ThemedSvg(
+                      assetKey: 'CLASS',
+                      width: iconSizeLarge,
                       color: theme.colorScheme.onSurfaceVariant,
                     )
                   : ClassIconSvg(playerClass: _selectedClass!),
             ),
-          ],
+          ),
         ),
       ],
     );
@@ -243,11 +240,12 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           label:
               '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
           svgAssetKey: 'LEVEL',
-          textStyle: theme.textTheme.titleMedium?.copyWith(
+          iconSize: iconSizeLarge,
+          textStyle: theme.textTheme.bodyLarge?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
-        const SizedBox(height: mediumPadding),
+        const SizedBox(height: smallPadding),
         SfSlider(
           min: 1.0,
           max: 9.0,
@@ -317,7 +315,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         Row(
           children: [
             IconButton(
-              icon: const Icon(Icons.info_outline_rounded, size: 20),
+              icon: const Icon(Icons.info_outline_rounded, size: iconSizeLarge),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
               onPressed: () => showDialog<void>(
@@ -334,16 +332,16 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 },
               ),
             ),
-            const SizedBox(width: mediumPadding),
+            const SizedBox(width: smallPadding),
             Text(
               AppLocalizations.of(context).gameEdition,
-              style: theme.textTheme.titleMedium?.copyWith(
+              style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
         ),
-        const SizedBox(height: mediumPadding),
+        const SizedBox(height: smallPadding),
         SizedBox(
           width: double.infinity,
           child: SegmentedButton<GameEdition>(

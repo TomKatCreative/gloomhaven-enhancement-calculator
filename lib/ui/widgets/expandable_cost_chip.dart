@@ -279,7 +279,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           children: [
             if (widget.enhancement != null) ...[
               _buildEnhancementIcon(widget.enhancement!, 26),
-              const SizedBox(width: mediumPadding),
+              const SizedBox(width: smallPadding),
             ],
             Text(
               '${widget.totalCost}g',
@@ -357,7 +357,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(mediumPadding * 2),
+        padding: const EdgeInsets.all(largePadding),
         child: Text(
           'Select options to see cost breakdown',
           style: theme.textTheme.bodyMedium?.copyWith(

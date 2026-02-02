@@ -45,7 +45,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
               'Enter a value to add or subtract from your current ${widget.labelText.toLowerCase()}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
-            const SizedBox(height: mediumPadding * 2),
+            const SizedBox(height: largePadding),
             Row(
               children: [
                 // Subtract button
@@ -57,7 +57,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                           ? Theme.of(context).colorScheme.primary
                           : null,
                     ),
-                    iconSize: 32,
+                    iconSize: iconSizeXL,
                     onPressed: _hasInput ? () => _handleOperation(false) : null,
                     tooltip: 'Subtract',
                   ),
@@ -92,14 +92,14 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                           ? Theme.of(context).colorScheme.primary
                           : null,
                     ),
-                    iconSize: 32,
+                    iconSize: iconSizeXL,
                     onPressed: _hasInput ? () => _handleOperation(true) : null,
                     tooltip: 'Add',
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: mediumPadding),
+            const SizedBox(height: smallPadding),
             Text(
               'Current: ${widget.currentValue}',
               style: Theme.of(context).textTheme.bodySmall,

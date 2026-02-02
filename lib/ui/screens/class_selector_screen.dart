@@ -222,12 +222,12 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                   // Category filter chips
                   Padding(
                     padding: const EdgeInsets.only(
-                      left: mediumPadding,
-                      top: mediumPadding,
+                      left: smallPadding,
+                      top: smallPadding,
                     ),
                     child: Wrap(
-                      runSpacing: mediumPadding,
-                      spacing: mediumPadding,
+                      runSpacing: smallPadding,
+                      spacing: smallPadding,
                       children: [
                         _buildCategoryFilterChip(
                           category: ClassCategory.gloomhaven,
@@ -347,8 +347,8 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     return ListTile(
       leading: ClassIconSvg(
         playerClass: playerClass,
-        width: iconSize + 5,
-        height: iconSize + 5,
+        width: iconSizeXL,
+        height: iconSizeXL,
       ),
       title: Text(
         isUnlocked || !playerClass.locked

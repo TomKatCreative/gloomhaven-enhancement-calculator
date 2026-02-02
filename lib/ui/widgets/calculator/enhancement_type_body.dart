@@ -9,8 +9,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_type_selector
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
-/// Icon size for the enhancement type display.
-const double _iconSize = 30;
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 
 /// The body content for the Enhancement Type selector card.
 ///
@@ -89,12 +88,12 @@ class EnhancementTypeBody extends StatelessWidget {
 
   Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
     if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: _iconSize);
+      return ElementStackIcon(size: iconSizeLarge);
     }
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: _iconSize,
+      width: iconSizeLarge,
       showPlusOneOverlay: isPlusOne,
     );
   }
