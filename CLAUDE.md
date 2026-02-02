@@ -859,6 +859,7 @@ The calculator screen is organized into three main sections with dividers:
 The calculator displays markers on cost chips to indicate which discounts are applied:
 - **†** (dagger) - Temporary Enhancement mode active
 - **‡** (double-dagger) - Hail's Discount active
+- **§** (section sign) - Scenario 114 Reward active (Gloomhaven/GH2E only)
 - **\*** (asterisk) - Building 44 discount active (Frosthaven only)
 
 Markers can combine (e.g., `†*` if both temp enhancement and Building 44 L4 apply).
