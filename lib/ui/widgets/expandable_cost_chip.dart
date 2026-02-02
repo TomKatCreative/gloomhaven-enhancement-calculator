@@ -20,12 +20,14 @@ class ExpandableCostChip extends StatefulWidget {
   final int totalCost;
   final List<CalculationStep> steps;
   final Enhancement? enhancement;
+  final ScrollController? scrollController;
 
   const ExpandableCostChip({
     super.key,
     required this.totalCost,
     required this.steps,
     this.enhancement,
+    this.scrollController,
   });
 
   @override
@@ -112,41 +114,57 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
         children: [
           // Blur bar at bottom - provides frosted glass effect behind chip/FAB
           // Uses ShaderMask to fade the blur at the top edge for a soft transition
+          // Wrapped in GestureDetector to allow vertical drag scrolling but block taps
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             height: 100,
-            child: ShaderMask(
-              shaderCallback: (Rect bounds) {
-                return const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 0.4, 1.0],
-                  colors: [Colors.transparent, Colors.white, Colors.white],
-                ).createShader(bounds);
+            child: GestureDetector(
+              onTap: () {}, // Absorb taps (do nothing)
+              onVerticalDragUpdate: (details) {
+                final controller = widget.scrollController;
+                if (controller != null && controller.hasClients) {
+                  controller.jumpTo(
+                    (controller.offset - details.delta.dy).clamp(
+                      0.0,
+                      controller.position.maxScrollExtent,
+                    ),
+                  );
+                }
               },
-              blendMode: BlendMode.dstIn,
-              child: ClipRect(
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        stops: const [0.0, 0.5, 1.0],
-                        colors: [
-                          Theme.of(
-                            context,
-                          ).colorScheme.surface.withValues(alpha: 0.6),
-                          Theme.of(
-                            context,
-                          ).colorScheme.surface.withValues(alpha: 0.8),
-                          Theme.of(
-                            context,
-                          ).colorScheme.surface.withValues(alpha: 1.0),
-                        ],
+              behavior: HitTestBehavior.translucent,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0.0, 0.4, 1.0],
+                    colors: [Colors.transparent, Colors.white, Colors.white],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: ClipRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          stops: const [0.0, 0.5, 1.0],
+                          colors: [
+                            Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: 0.6),
+                            Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: 0.8),
+                            Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: 1.0),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -265,8 +283,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
             ],
             Text(
               '${widget.totalCost}g',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
             ),
             const SizedBox(width: 4),
@@ -303,7 +321,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                     Text(
                       '${widget.totalCost}g',
                       style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ],
