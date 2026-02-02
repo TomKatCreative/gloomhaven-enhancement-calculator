@@ -34,6 +34,25 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
   bool showCost = false;
 
+  /// Returns true if Enhancer Level 2 affects the enhancement cost
+  bool get enhancerLvl2Applies =>
+      edition.hasEnhancerLevels &&
+      SharedPrefs().enhancerLvl2 &&
+      enhancement != null;
+
+  /// Returns true if Enhancer Level 3 affects the card level cost
+  bool get enhancerLvl3Applies =>
+      edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3 && cardLevel > 0;
+
+  /// Returns true if Enhancer Level 4 affects the previous enhancements cost
+  bool get enhancerLvl4Applies =>
+      edition.hasEnhancerLevels &&
+      SharedPrefs().enhancerLvl4 &&
+      previousEnhancements > 0;
+
+  /// Returns the current game edition from SharedPrefs
+  GameEdition get edition => SharedPrefs().gameEdition;
+
   /// Whether the cost chip is expanded (used to hide FAB)
   bool _isSheetExpanded = false;
 
