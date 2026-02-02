@@ -101,7 +101,59 @@ class AppThemeBuilder {
 
       // Component themes
       inputDecorationTheme: InputDecorationTheme(
-        hintStyle: textTheme.bodyMedium,
+        // Hint text style
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+        ),
+
+        // Label styles (for floating labels)
+        labelStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        floatingLabelStyle: textTheme.bodySmall?.copyWith(
+          color: primaryColor,
+          fontWeight: FontWeight.w500,
+        ),
+
+        // Outlined border (default state)
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: colorScheme.outline),
+        ),
+
+        // Focused state
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: primaryColor, width: 2.0),
+        ),
+
+        // Error states
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: colorScheme.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(color: colorScheme.error, width: 2.0),
+        ),
+
+        // Disabled state
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.4),
+          ),
+        ),
+
+        // Content padding
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+          vertical: 12.0,
+        ),
       ),
 
       textButtonTheme: TextButtonThemeData(
