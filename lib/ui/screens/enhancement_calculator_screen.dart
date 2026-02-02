@@ -277,7 +277,7 @@ class _CardDetailsGroupCard extends StatelessWidget {
               config: CostDisplayConfig(
                 baseCost: baseCost,
                 discountedCost: actualCost != baseCost ? actualCost : null,
-                marker: model.enhancerLvl3Applies ? '*' : null,
+                marker: _buildCardLevelMarker(partyBoon),
               ),
             ),
           ),
@@ -344,6 +344,15 @@ class _CardDetailsGroupCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  /// Builds the marker string for card level cost.
+  /// Combines Party Boon § and Building 44 * markers.
+  String? _buildCardLevelMarker(bool partyBoon) {
+    final markers = <String>[];
+    if (partyBoon) markers.add('\u00A7'); // §
+    if (model.enhancerLvl3Applies) markers.add('*');
+    return markers.isEmpty ? null : markers.join();
   }
 
   /// Builds the marker string for previous enhancements cost.
@@ -627,7 +636,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
               widget.darkTheme,
             ),
           ),
-          title: AppLocalizations.of(context).scenario114Reward,
+          title: '${AppLocalizations.of(context).scenario114Reward} \u00A7',
           subtitle: AppLocalizations.of(context).forgottenCirclesSpoilers,
           value: SharedPrefs().partyBoon,
           onChanged: (value) {

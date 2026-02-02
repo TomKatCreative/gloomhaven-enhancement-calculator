@@ -91,7 +91,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           Padding(
             padding: const EdgeInsets.only(right: mediumPadding),
             child: TextButton.icon(
-              icon: const Icon(Icons.check),
+              icon: const Icon(Icons.how_to_reg_rounded),
               label: Text(AppLocalizations.of(context).create),
               onPressed: _onCreatePressed,
             ),
@@ -171,10 +171,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       children: [
         SectionLabel(
           label: _variant != Variant.base
-              ? AppLocalizations.of(
-                  context,
-                ).classWithVariant(ClassVariants.classVariants[_variant]!)
-              : AppLocalizations.of(context).class_,
+              ? '${AppLocalizations.of(context).classWithVariant(ClassVariants.classVariants[_variant]!)} *'
+              : '${AppLocalizations.of(context).class_} *',
           svgAssetKey: 'CLASS',
         ),
         const SizedBox(height: mediumPadding),
@@ -245,6 +243,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           label:
               '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
           svgAssetKey: 'LEVEL',
+          textStyle: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
         ),
         const SizedBox(height: mediumPadding),
         SfSlider(
@@ -336,7 +337,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             const SizedBox(width: mediumPadding),
             Text(
               AppLocalizations.of(context).gameEdition,
-              style: theme.textTheme.labelLarge?.copyWith(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
