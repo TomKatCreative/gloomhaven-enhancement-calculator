@@ -122,3 +122,59 @@ Both selectors follow these conventions:
 - **SafeArea**: Bottom-only SafeArea for device navigation buttons
 - **Static show()**: Invoked via static method returning `Future<T?>`
 - **Section headers**: Use `SearchSectionHeader` widget for category grouping
+
+---
+
+## Settings Screen
+
+> **File**: `lib/ui/screens/settings_screen.dart`
+
+The settings screen uses a composition-based architecture with extracted section widgets for maintainability.
+
+### Structure
+
+```
+lib/ui/
+├── screens/
+│   └── settings_screen.dart              # ~260 lines (composition + bottom sheet)
+├── widgets/
+│   └── settings/
+│       ├── settings_section_header.dart  # Section title widget
+│       ├── gameplay_settings_section.dart
+│       ├── display_settings_section.dart
+│       ├── backup_settings_section.dart
+│       └── debug_settings_section.dart
+├── dialogs/
+│   ├── envelope_puzzle_dialog.dart       # Used by gameplay section
+│   ├── backup_dialog.dart
+│   └── restore_dialog.dart
+└── utils/
+    └── settings_helpers.dart             # Storage permission, URL launcher, device info
+```
+
+### Section Widgets
+
+Each section is a StatelessWidget that receives an `onSettingsChanged` callback:
+
+```dart
+GameplaySettingsSection(onSettingsChanged: _onSettingsChanged)
+DisplaySettingsSection(onSettingsChanged: _onSettingsChanged)
+const BackupSettingsSection()  // No callback needed
+const DebugSettingsSection()   // Only shown in kDebugMode
+```
+
+### SettingsSectionHeader
+
+Reusable section header with themed styling:
+
+```dart
+SettingsSectionHeader(title: AppLocalizations.of(context).gameplay)
+```
+
+### Bottom Sheet
+
+The settings screen includes a persistent bottom sheet with:
+- Support links (Discord, Instagram, Email)
+- Buy Me a Coffee button (Android US region only)
+- Version number and changelog link
+- License link

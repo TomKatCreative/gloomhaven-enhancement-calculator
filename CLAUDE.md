@@ -105,7 +105,8 @@ lib/
 ├── ui/
 │   ├── screens/             # Full-page views
 │   ├── widgets/             # Reusable components
-│   │   └── calculator/      # Enhancement calculator card components
+│   │   ├── calculator/      # Enhancement calculator card components
+│   │   └── settings/        # Settings screen section widgets
 │   └── dialogs/             # Modal dialogs
 ├── theme/                   # Theme system (ThemeProvider, extensions)
 ├── utils/                   # Helpers, text parsing
@@ -267,9 +268,8 @@ height: iconSize - 2.5
 
 ## Known Technical Debt
 
-1. **Oversized screens** - `settings_screen.dart` (1000+ lines) needs extraction
-2. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
-3. **No tests** - Test suite needed for models and viewmodels
+1. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
+2. **No tests** - Test suite needed for models and viewmodels
 
 ## Documentation Files
 
