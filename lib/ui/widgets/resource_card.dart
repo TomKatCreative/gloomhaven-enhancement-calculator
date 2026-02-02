@@ -1,9 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-
 import 'package:gloomhaven_enhancement_calc/models/resource.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 class ResourceCard extends StatelessWidget {
   final Resource resource;
@@ -70,10 +69,7 @@ class ResourceDetails extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.all(6.0),
           child: Center(
-            child: SvgPicture.asset(
-              resource.icon,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            ),
+            child: ThemedSvg(assetKey: resource.icon, color: color),
           ),
         ),
         Positioned(
