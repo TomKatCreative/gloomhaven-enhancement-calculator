@@ -363,4 +363,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get selectClass => 'Selecionar classe...';
+
+  @override
+  String get addNotes => 'Adicionar notas...';
 }
