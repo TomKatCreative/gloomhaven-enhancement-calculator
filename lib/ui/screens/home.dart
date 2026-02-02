@@ -110,14 +110,32 @@ class _HomeState extends State<Home> {
                   ? () => CreateCharacterScreen.show(context, charactersModel)
                   : () => charactersModel.isEditMode =
                         !charactersModel.isEditMode,
-              child: Icon(
-                appModel.page == 1
-                    ? Icons.clear_rounded
-                    : charactersModel.characters.isEmpty
-                    ? Icons.add
-                    : charactersModel.isEditMode
-                    ? Icons.edit_off_rounded
-                    : Icons.edit_rounded,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                transitionBuilder: (child, animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(opacity: animation, child: child),
+                  );
+                },
+                child: Icon(
+                  appModel.page == 1
+                      ? Icons.clear_rounded
+                      : charactersModel.characters.isEmpty
+                      ? Icons.add
+                      : charactersModel.isEditMode
+                      ? Icons.edit_off_rounded
+                      : Icons.edit_rounded,
+                  key: ValueKey<int>(
+                    appModel.page == 1
+                        ? 0
+                        : charactersModel.characters.isEmpty
+                        ? 1
+                        : charactersModel.isEditMode
+                        ? 2
+                        : 3,
+                  ),
+                ),
               ),
             ),
       bottomNavigationBar: const GHCBottomNavigationBar(),
