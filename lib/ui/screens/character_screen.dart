@@ -10,7 +10,6 @@ import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
@@ -188,7 +187,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               AutoSizeText(
-                AppLocalizations.of(context).battleGoals,
+                '${AppLocalizations.of(context).battleGoals} (${character.checkMarkProgress()}/3)',
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 minFontSize: 10,
@@ -345,9 +344,11 @@ class _StatsSectionState extends State<_StatsSection> {
   @override
   void initState() {
     super.initState();
-    _xpController = TextEditingController(text: widget.character.xp.toString());
+    _xpController = TextEditingController(
+      text: widget.character.xp == 0 ? '' : widget.character.xp.toString(),
+    );
     _goldController = TextEditingController(
-      text: widget.character.gold.toString(),
+      text: widget.character.gold == 0 ? '' : widget.character.gold.toString(),
     );
   }
 
@@ -370,30 +371,44 @@ class _StatsSectionState extends State<_StatsSection> {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // XP field with label
+          // XP field with inline icon
           Expanded(
-            child: Column(
+            child: Row(
               children: [
-                SectionLabel(
-                  label: AppLocalizations.of(context).xp,
-                  svgAssetKey: 'XP',
-                ),
-                const SizedBox(height: mediumPadding),
-                TextField(
-                  controller: _xpController,
-                  enableInteractiveSelection: false,
-                  onChanged: (String value) {
-                    charactersModel.updateCharacter(
-                      widget.character..xp = value == '' ? 0 : int.parse(value),
-                    );
-                  },
-                  textAlign: TextAlign.center,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(
-                      RegExp('[\\.|\\,|\\ |\\-]'),
+                Expanded(
+                  child: TextField(
+                    controller: _xpController,
+                    enableInteractiveSelection: false,
+                    onChanged: (String value) {
+                      charactersModel.updateCharacter(
+                        widget.character
+                          ..xp = value == '' ? 0 : int.parse(value),
+                      );
+                    },
+                    textAlign: TextAlign.right,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                        RegExp('[\\.|\\,|\\ |\\-]'),
+                      ),
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      suffixText:
+                          '/ ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ThemedSvg(assetKey: 'XP', width: 18),
+                          const SizedBox(width: smallPadding),
+                          Text(AppLocalizations.of(context).xp),
+                        ],
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: const OutlineInputBorder(),
                     ),
-                  ],
-                  keyboardType: TextInputType.number,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.exposure),
@@ -406,11 +421,13 @@ class _StatsSectionState extends State<_StatsSection> {
                       ),
                     );
                     if (value != null) {
+                      final clampedValue =
+                          value.clamp(0, double.infinity).toInt();
                       charactersModel.updateCharacter(
-                        widget.character
-                          ..xp = value.clamp(0, double.infinity).toInt(),
+                        widget.character..xp = clampedValue,
                       );
-                      _xpController.text = value.toString();
+                      _xpController.text =
+                          clampedValue == 0 ? '' : clampedValue.toString();
                     }
                   },
                 ),
@@ -418,28 +435,41 @@ class _StatsSectionState extends State<_StatsSection> {
             ),
           ),
           const SizedBox(width: mediumPadding),
-          // Gold field with label
+          // Gold field with inline icon
           Expanded(
-            child: Column(
+            child: Row(
               children: [
-                SectionLabel(
-                  label: AppLocalizations.of(context).gold,
-                  svgAssetKey: 'GOLD',
-                ),
-                const SizedBox(height: mediumPadding),
-                TextField(
-                  controller: _goldController,
-                  enableInteractiveSelection: false,
-                  onChanged: (String value) => charactersModel.updateCharacter(
-                    widget.character..gold = value == '' ? 0 : int.parse(value),
-                  ),
-                  textAlign: TextAlign.center,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(
-                      RegExp('[\\.|\\,|\\ |\\-]'),
+                Expanded(
+                  child: TextField(
+                    controller: _goldController,
+                    enableInteractiveSelection: false,
+                    onChanged: (String value) =>
+                        charactersModel.updateCharacter(
+                          widget.character
+                            ..gold = value == '' ? 0 : int.parse(value),
+                        ),
+                    textAlign: TextAlign.center,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                        RegExp('[\\.|\\,|\\ |\\-]'),
+                      ),
+                      LengthLimitingTextInputFormatter(4),
+                    ],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ThemedSvg(assetKey: 'GOLD', width: 18),
+                          const SizedBox(width: smallPadding),
+                          Text(AppLocalizations.of(context).gold),
+                        ],
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: const OutlineInputBorder(),
                     ),
-                  ],
-                  keyboardType: TextInputType.number,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.exposure),
@@ -455,52 +485,9 @@ class _StatsSectionState extends State<_StatsSection> {
                       charactersModel.updateCharacter(
                         widget.character..gold = value,
                       );
-                      _goldController.text = value.toString();
+                      _goldController.text = value == 0 ? '' : value.toString();
                     }
                   },
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: largePadding),
-          // Battle Goals (fixed width, always visible) - icon beside text
-          Tooltip(
-            message: AppLocalizations.of(context).battleGoals,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ThemedSvg(assetKey: 'GOAL', width: iconSize),
-                const SizedBox(width: smallPadding),
-                Text(widget.character.checkMarkProgress().toString()),
-                Text(
-                  '/3',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(letterSpacing: 2),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: largePadding),
-          // Pocket Items (fixed width, always visible)
-          Tooltip(
-            message: AppLocalizations.of(context).pocketItemsAllowed(
-              (Character.level(widget.character.xp) / 2).round(),
-            ),
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: <Widget>[
-                ThemedSvg(assetKey: 'Pocket', width: iconSize),
-                Padding(
-                  padding: const EdgeInsets.only(left: 3.5),
-                  child: Text(
-                    '${(Character.level(widget.character.xp) / 2).round()}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: Theme.of(context).colorScheme.surface,
-                    ),
-                  ),
                 ),
               ],
             ),
