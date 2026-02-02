@@ -55,10 +55,10 @@ class VariantSelectorDialog extends StatelessWidget {
         children: [
           ClassIconSvg(
             playerClass: playerClass,
-            width: iconSize + 5,
-            height: iconSize + 5,
+            width: iconSizeXL,
+            height: iconSizeXL,
           ),
-          const SizedBox(width: mediumPadding * 2),
+          const SizedBox(width: largePadding),
           Text(playerClass.name, style: theme.textTheme.headlineLarge),
         ],
       ),

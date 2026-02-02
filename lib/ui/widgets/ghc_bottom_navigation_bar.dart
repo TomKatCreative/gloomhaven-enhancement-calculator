@@ -16,14 +16,14 @@ class GHCBottomNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(
           icon: SizedBox(
             height: 35,
-            child: Icon(Icons.history_edu_rounded, size: iconSize),
+            child: Icon(Icons.history_edu_rounded, size: iconSizeLarge),
           ),
           label: 'CHARACTERS',
         ),
         BottomNavigationBarItem(
           icon: SizedBox(
             height: 35,
-            child: Icon(Icons.auto_awesome_rounded, size: iconSize),
+            child: Icon(Icons.auto_awesome_rounded, size: iconSizeLarge),
           ),
           label: 'ENHANCEMENTS',
         ),

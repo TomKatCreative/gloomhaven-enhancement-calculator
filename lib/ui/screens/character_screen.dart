@@ -41,14 +41,14 @@ class CharacterScreen extends StatelessWidget {
     return SingleChildScrollView(
       controller: context.read<CharactersModel>().charScreenScrollController,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+        padding: const EdgeInsets.symmetric(horizontal: smallPadding),
         child: Column(
           children: <Widget>[
             // NAME and CLASS
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: _NameAndClassSection(character: character),
               ),
             ),
@@ -56,7 +56,7 @@ class CharacterScreen extends StatelessWidget {
             Container(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: _StatsSection(character: character),
               ),
             ),
@@ -65,20 +65,20 @@ class CharacterScreen extends StatelessWidget {
               Container(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Padding(
-                  padding: const EdgeInsets.all(mediumPadding),
+                  padding: const EdgeInsets.all(smallPadding),
                   child: _CheckmarksAndRetirementsRow(character: character),
                 ),
               ),
             // RESOURCES
             Padding(
-              padding: const EdgeInsets.all(mediumPadding),
+              padding: const EdgeInsets.all(smallPadding),
               child: _ResourcesSection(character: character),
             ),
             // NOTES
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child:
                     character.notes.isNotEmpty ||
                         context.read<CharactersModel>().isEditMode
@@ -88,13 +88,13 @@ class CharacterScreen extends StatelessWidget {
             ),
             // PERKS
             Padding(
-              padding: const EdgeInsets.all(mediumPadding),
+              padding: const EdgeInsets.all(smallPadding),
               child: PerksSection(character: character),
             ),
             // MASTERIES
             if (character.characterMasteries.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: MasteriesSection(
                   character: character,
                   charactersModel: context.watch<CharactersModel>(),
@@ -136,14 +136,14 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 minFontSize: 10,
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: smallPadding),
+              const SizedBox(height: tinyPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -159,7 +159,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.add_circle),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -193,14 +193,14 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 minFontSize: 10,
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: smallPadding),
+              const SizedBox(height: tinyPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.checkMarks > 0 && !isRetired
                         ? () => charactersModel.decreaseCheckmark(character)
@@ -212,7 +212,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.add_circle),
                     onPressed: character.checkMarks < 18 && !isRetired
                         ? () => charactersModel.increaseCheckmark(character)
@@ -282,7 +282,7 @@ class _NameAndClassSection extends StatelessWidget {
             Stack(
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
-                ThemedSvg(assetKey: 'LEVEL', width: iconSize * 1.5),
+                ThemedSvg(assetKey: 'LEVEL', width: iconSizeHero),
                 Text(
                   '${Character.level(character.xp)}',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -292,7 +292,7 @@ class _NameAndClassSection extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: mediumPadding),
+            const SizedBox(width: smallPadding),
             Flexible(
               child: AutoSizeText(
                 character.getClassSubtitle(),
@@ -303,12 +303,12 @@ class _NameAndClassSection extends StatelessWidget {
           ],
         ),
         if (character.showTraits()) ...[
-          const SizedBox(height: mediumPadding),
+          const SizedBox(height: smallPadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ThemedSvg(assetKey: 'TRAIT', width: iconSize),
-              const SizedBox(width: mediumPadding),
+              ThemedSvg(assetKey: 'TRAIT', width: iconSizeLarge),
+              const SizedBox(width: smallPadding),
               Flexible(
                 child: AutoSizeText(
                   '${character.playerClass.traits[0]} · ${character.playerClass.traits[1]} · ${character.playerClass.traits[2]}',
@@ -400,8 +400,8 @@ class _StatsSectionState extends State<_StatsSection> {
                       label: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ThemedSvg(assetKey: 'XP', width: 18),
-                          const SizedBox(width: smallPadding),
+                          ThemedSvg(assetKey: 'XP', width: iconSizeSmall),
+                          const SizedBox(width: tinyPadding),
                           Text(AppLocalizations.of(context).xp),
                         ],
                       ),
@@ -421,20 +421,22 @@ class _StatsSectionState extends State<_StatsSection> {
                       ),
                     );
                     if (value != null) {
-                      final clampedValue =
-                          value.clamp(0, double.infinity).toInt();
+                      final clampedValue = value
+                          .clamp(0, double.infinity)
+                          .toInt();
                       charactersModel.updateCharacter(
                         widget.character..xp = clampedValue,
                       );
-                      _xpController.text =
-                          clampedValue == 0 ? '' : clampedValue.toString();
+                      _xpController.text = clampedValue == 0
+                          ? ''
+                          : clampedValue.toString();
                     }
                   },
                 ),
               ],
             ),
           ),
-          const SizedBox(width: mediumPadding),
+          const SizedBox(width: smallPadding),
           // Gold field with inline icon
           Expanded(
             child: Row(
@@ -461,8 +463,8 @@ class _StatsSectionState extends State<_StatsSection> {
                       label: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          ThemedSvg(assetKey: 'GOLD', width: 18),
-                          const SizedBox(width: smallPadding),
+                          ThemedSvg(assetKey: 'GOLD', width: iconSizeSmall),
+                          const SizedBox(width: tinyPadding),
                           Text(AppLocalizations.of(context).gold),
                         ],
                       ),
@@ -504,8 +506,8 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).xp,
           child: Row(
             children: <Widget>[
-              ThemedSvg(assetKey: 'XP', width: iconSize),
-              const SizedBox(width: mediumPadding),
+              ThemedSvg(assetKey: 'XP', width: iconSizeLarge),
+              const SizedBox(width: smallPadding),
               Text(
                 widget.character.xp.toString(),
                 style: Theme.of(context).textTheme.bodyMedium,
@@ -528,7 +530,7 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).gold,
           child: Row(
             children: <Widget>[
-              ThemedSvg(assetKey: 'GOLD', width: iconSize),
+              ThemedSvg(assetKey: 'GOLD', width: iconSizeLarge),
               const SizedBox(width: 5),
               Text(
                 ' ${widget.character.gold}',
@@ -544,7 +546,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                ThemedSvg(assetKey: 'GOAL', width: iconSize),
+                ThemedSvg(assetKey: 'GOAL', width: iconSizeLarge),
                 SizedBox(
                   width: 5,
                   child: Text(widget.character.checkMarkProgress().toString()),
@@ -567,7 +569,7 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
-              ThemedSvg(assetKey: 'Pocket', width: iconSize),
+              ThemedSvg(assetKey: 'Pocket', width: iconSizeLarge),
               Padding(
                 padding: const EdgeInsets.only(left: 3.5),
                 child: Text(
@@ -617,10 +619,10 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
           title: Text(AppLocalizations.of(context).resources),
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: mediumPadding),
+              padding: const EdgeInsets.only(bottom: smallPadding),
               child: Wrap(
-                runSpacing: mediumPadding,
-                spacing: mediumPadding,
+                runSpacing: smallPadding,
+                spacing: smallPadding,
                 alignment: WrapAlignment.spaceEvenly,
                 children: _buildResourceCards(
                   context,
@@ -685,7 +687,7 @@ class _NotesSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-          const SizedBox(height: mediumPadding),
+          const SizedBox(height: smallPadding),
         ],
         isEditMode
             ? TextFormField(

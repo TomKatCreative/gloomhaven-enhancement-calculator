@@ -89,7 +89,7 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text(AppLocalizations.of(context).pleaseWait),
-                      const SizedBox(height: mediumPadding),
+                      const SizedBox(height: smallPadding),
                       const CircularProgressIndicator(),
                     ],
                   ),

@@ -251,12 +251,12 @@ class _EnhancementTypeSelectorScreenState
         enhancement.category == EnhancementCategory.summonPlusOne;
 
     if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: iconSize);
+      return ElementStackIcon(size: iconSizeLarge);
     }
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: iconSize,
+      width: iconSizeLarge,
       showPlusOneOverlay: isPlusOne,
     );
   }

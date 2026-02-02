@@ -28,10 +28,10 @@ class MasteriesSectionState extends State<MasteriesSection> {
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineMedium,
         ),
-        const SizedBox(height: mediumPadding + 5),
+        const SizedBox(height: mediumPadding),
         ...widget.character.masteries.map(
           (mastery) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: mediumPadding / 2),
+            padding: const EdgeInsets.symmetric(vertical: tinyPadding),
             child: MasteryRow(character: widget.character, mastery: mastery),
           ),
         ),

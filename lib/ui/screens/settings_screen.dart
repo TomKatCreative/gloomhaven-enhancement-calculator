@@ -208,13 +208,13 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   children: [
                                     ThemedSvg(
                                       assetKey: 'Bladeswarm',
-                                      width: iconSize,
-                                      height: iconSize,
+                                      width: iconSizeLarge,
+                                      height: iconSizeLarge,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.onSurface,
                                     ),
-                                    const SizedBox(width: mediumPadding),
+                                    const SizedBox(width: smallPadding),
                                     Text(
                                       AppLocalizations.of(
                                         context,
@@ -334,13 +334,13 @@ class SettingsScreenState extends State<SettingsScreen> {
                                   children: [
                                     ThemedSvg(
                                       assetKey: 'RAGE',
-                                      width: iconSize,
-                                      height: iconSize,
+                                      width: iconSizeLarge,
+                                      height: iconSizeLarge,
                                       color: Theme.of(
                                         context,
                                       ).colorScheme.onSurface,
                                     ),
-                                    const SizedBox(width: mediumPadding),
+                                    const SizedBox(width: smallPadding),
                                     Text(
                                       AppLocalizations.of(
                                         context,
@@ -967,7 +967,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                       IconButton(
                         icon: const ThemedSvg(
                           assetKey: 'BMC_BUTTON',
-                          height: 32,
+                          height: iconSizeXL,
                         ),
                         tooltip: 'Buy Me a Coffee',
                         onPressed: () {
@@ -982,8 +982,8 @@ class SettingsScreenState extends State<SettingsScreen> {
                       ),
                     Padding(
                       padding: const EdgeInsets.only(
-                        bottom: mediumPadding,
-                        right: mediumPadding,
+                        bottom: smallPadding,
+                        right: smallPadding,
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

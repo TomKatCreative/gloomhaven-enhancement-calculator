@@ -78,7 +78,7 @@ class ResourceDetails extends StatelessWidget {
         ),
         if (canEdit) ...[
           Positioned(
-            bottom: -mediumPadding,
+            bottom: -smallPadding,
             left: -2,
             child: IconButton(
               onPressed: () => decreaseCount(),
@@ -86,7 +86,7 @@ class ResourceDetails extends StatelessWidget {
             ),
           ),
           Positioned(
-            bottom: -mediumPadding,
+            bottom: -smallPadding,
             right: -2,
             child: IconButton(
               onPressed: () => increaseCount(),

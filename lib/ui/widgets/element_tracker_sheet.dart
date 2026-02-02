@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/element_state.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/animated_element_icon.dart';
@@ -33,9 +34,8 @@ class _ElementTrackerSheetState extends State<ElementTrackerSheet> {
   static const double _expansionThreshold = 0.10;
   static const double _fullExpansionThreshold = 0.50;
 
-  // Icon sizes for each state
-  static const double _collapsedIconSize = 16.0;
-  static const double _expandedIconSize = 36.0;
+  // Icon sizes for each state (uses standard sizes where applicable)
+  // Note: _fullExpandedIconSize is unique to this widget and kept as local constant
   static const double _fullExpandedIconSize = 100.0;
 
   // Padding values
@@ -279,11 +279,7 @@ class _ElementTrackerSheetState extends State<ElementTrackerSheet> {
 
   Widget _buildElementLayout(double progress, double fullProgress) {
     // Two-stage icon size interpolation
-    final iconSize1 = lerpDouble(
-      _collapsedIconSize,
-      _expandedIconSize,
-      progress,
-    )!;
+    final iconSize1 = lerpDouble(iconSizeSmall, iconSizeXL, progress)!;
     final iconSize = lerpDouble(
       iconSize1,
       _fullExpandedIconSize,

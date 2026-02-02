@@ -93,7 +93,7 @@ class LabeledTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SectionLabel(label: label, icon: icon, svgAssetKey: svgAssetKey),
-        const SizedBox(height: mediumPadding),
+        const SizedBox(height: smallPadding),
         TextFormField(
           controller: controller,
           autofocus: autofocus,
@@ -129,6 +129,7 @@ class SectionLabel extends StatelessWidget {
     this.icon,
     this.svgAssetKey,
     this.textStyle,
+    this.iconSize,
   }) : assert(
          icon != null || svgAssetKey != null,
          'Either icon or svgAssetKey must be provided',
@@ -146,24 +147,28 @@ class SectionLabel extends StatelessWidget {
   /// Custom text style for the label. If null, uses labelLarge.
   final TextStyle? textStyle;
 
+  /// Custom icon size. If null, uses iconSizeSmall.
+  final double? iconSize;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final defaultStyle = theme.textTheme.labelLarge?.copyWith(
       color: theme.colorScheme.onSurfaceVariant,
     );
+    final size = iconSize ?? iconSizeSmall;
 
     return Row(
       children: [
         if (icon != null)
-          Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
+          Icon(icon, size: size, color: theme.colorScheme.onSurfaceVariant),
         if (svgAssetKey != null)
           ThemedSvg(
             assetKey: svgAssetKey!,
-            width: 20,
+            width: size,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-        const SizedBox(width: mediumPadding),
+        const SizedBox(width: smallPadding),
         Text(label, style: textStyle ?? defaultStyle),
       ],
     );

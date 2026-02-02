@@ -31,11 +31,11 @@ class _InfoDialogState extends State<InfoDialog> {
     if (list == null) {
       icons.add(
         Padding(
-          padding: const EdgeInsets.only(right: mediumPadding / 2),
+          padding: const EdgeInsets.only(right: tinyPadding),
           child: ThemedSvg(
             assetKey: 'plus_one',
-            height: iconSize,
-            width: iconSize,
+            height: iconSizeLarge,
+            width: iconSizeLarge,
           ),
         ),
       );
@@ -43,11 +43,11 @@ class _InfoDialogState extends State<InfoDialog> {
       for (final Enhancement enhancement in list) {
         icons.add(
           Padding(
-            padding: const EdgeInsets.only(right: mediumPadding / 2),
+            padding: const EdgeInsets.only(right: tinyPadding),
             child: ThemedSvg(
               assetKey: enhancement.assetKey!,
-              height: iconSize,
-              width: iconSize,
+              height: iconSizeLarge,
+              width: iconSizeLarge,
             ),
           ),
         );
@@ -310,8 +310,8 @@ class _InfoDialogState extends State<InfoDialog> {
       title: widget.title == null
           ? Center(
               child: Wrap(
-                runSpacing: mediumPadding,
-                spacing: mediumPadding,
+                runSpacing: smallPadding,
+                spacing: smallPadding,
                 alignment: WrapAlignment.center,
                 children: _createIconsListForDialog(_titleIcons),
               ),
@@ -340,20 +340,20 @@ class _InfoDialogState extends State<InfoDialog> {
                     ),
                     const Padding(
                       padding: EdgeInsets.only(
-                        top: mediumPadding,
-                        bottom: mediumPadding,
+                        top: smallPadding,
+                        bottom: smallPadding,
                       ),
                     ),
                     Wrap(
-                      runSpacing: mediumPadding,
-                      spacing: mediumPadding,
+                      runSpacing: smallPadding,
+                      spacing: smallPadding,
                       alignment: WrapAlignment.center,
                       children: _createIconsListForDialog(_eligibleForIcons),
                     ),
                     const Padding(
                       padding: EdgeInsets.only(
-                        top: mediumPadding,
-                        bottom: mediumPadding,
+                        top: smallPadding,
+                        bottom: smallPadding,
                       ),
                     ),
                   ],

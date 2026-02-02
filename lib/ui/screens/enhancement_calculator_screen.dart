@@ -41,7 +41,7 @@ class _EnhancementCalculatorScreenState
       children: [
         Container(
           constraints: const BoxConstraints(maxWidth: maxWidth),
-          padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+          padding: const EdgeInsets.symmetric(horizontal: smallPadding),
           child: ListView(
             controller: context
                 .read<CharactersModel>()
@@ -195,7 +195,7 @@ class _CardDetailsGroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
+        padding: const EdgeInsets.symmetric(vertical: smallPadding),
         child: Column(
           children: [
             _buildCardLevelSection(context),
@@ -270,8 +270,8 @@ class _CardDetailsGroupCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(
               left: 48 + largePadding,
-              top: mediumPadding,
-              bottom: mediumPadding,
+              top: smallPadding,
+              bottom: smallPadding,
             ),
             child: CostDisplay(
               config: CostDisplayConfig(
@@ -330,8 +330,8 @@ class _CardDetailsGroupCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(
               left: 48 + largePadding,
-              top: mediumPadding,
-              bottom: mediumPadding,
+              top: smallPadding,
+              bottom: smallPadding,
             ),
             child: CostDisplay(
               config: CostDisplayConfig(
@@ -393,21 +393,21 @@ class _CardDetailsGroupCard extends StatelessWidget {
       titleWidget: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ThemedSvg(assetKey: 'LOSS', width: iconSize),
+          ThemedSvg(assetKey: 'LOSS', width: iconSizeLarge),
           if (edition.hasPersistentModifier) ...[
             const SizedBox(width: largePadding),
             SizedBox(
-              width: iconSize + 16,
-              height: iconSize + 11,
+              width: iconSizeLarge + 16,
+              height: iconSizeLarge + 11,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
-                  ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+                  ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
                   Positioned(
                     right: 5,
                     child: SvgPicture.asset(
                       'images/ui/not.svg',
-                      width: iconSize + 11,
+                      width: iconSizeLarge + 11,
                     ),
                   ),
                 ],
@@ -431,7 +431,7 @@ class _CardDetailsGroupCard extends StatelessWidget {
       context,
       infoTitle: Strings.persistentInfoTitle,
       infoMessage: Strings.persistentInfoBody(context, darkTheme),
-      titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSize),
+      titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
       subtitle: AppLocalizations.of(context).persistent,
       value: model.persistent,
       enabled:
@@ -483,8 +483,8 @@ class _CardDetailsGroupCard extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: largePadding,
-                  top: mediumPadding,
-                  bottom: mediumPadding,
+                  top: smallPadding,
+                  bottom: smallPadding,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
