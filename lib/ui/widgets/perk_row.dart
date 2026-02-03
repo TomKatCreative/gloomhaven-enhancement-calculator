@@ -111,8 +111,11 @@ class PerkRowState extends State<PerkRow> {
     return Container(
       margin: const EdgeInsets.only(right: 6, left: 1),
       decoration: BoxDecoration(
+        color: allSelected
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
+            : null,
         border: Border.all(color: borderColor),
-        borderRadius: BorderRadius.circular(4.0),
+        borderRadius: BorderRadius.circular(borderRadiusSmall),
       ),
       child: Column(
         children: List.generate(widget.perks.length, (index) {
