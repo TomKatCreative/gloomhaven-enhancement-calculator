@@ -1,3 +1,5 @@
+import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
+
 // ============================================================================
 // SVG THEME MODE
 // ============================================================================
@@ -239,7 +241,7 @@ const Map<String, AssetConfig> assets = {
   ),
 
   // ===========================================================================
-  // class_icons/
+  // class_icons/ - Named assets (used for perk descriptions)
   // ===========================================================================
   'Berserker': AssetConfig(
     'class_icons/berserker.svg',
@@ -280,6 +282,348 @@ const Map<String, AssetConfig> assets = {
   ),
   'Spirit': AssetConfig(
     'class_icons/spirit_caller.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // ===========================================================================
+  // class_icons/ - All player class icons (keyed by ClassCodes values)
+  // ===========================================================================
+  // Gloomhaven starting classes
+  ClassCodes.brute: AssetConfig(
+    'class_icons/brute.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.tinkerer: AssetConfig(
+    'class_icons/tinkerer.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.spellweaver: AssetConfig(
+    'class_icons/spellweaver.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.scoundrel: AssetConfig(
+    'class_icons/scoundrel.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.cragheart: AssetConfig(
+    'class_icons/cragheart.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.mindthief: AssetConfig(
+    'class_icons/mindthief.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Gloomhaven unlockable classes
+  ClassCodes.sunkeeper: AssetConfig(
+    'class_icons/sunkeeper.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.quartermaster: AssetConfig(
+    'class_icons/quartermaster.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.summoner: AssetConfig(
+    'class_icons/summoner.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.nightshroud: AssetConfig(
+    'class_icons/nightshroud.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.plagueherald: AssetConfig(
+    'class_icons/plagueherald.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.berserker: AssetConfig(
+    'class_icons/berserker.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.soothsinger: AssetConfig(
+    'class_icons/soothsinger.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.doomstalker: AssetConfig(
+    'class_icons/doomstalker.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.sawbones: AssetConfig(
+    'class_icons/sawbones.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.elementalist: AssetConfig(
+    'class_icons/elementalist.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.beastTyrant: AssetConfig(
+    'class_icons/beast_tyrant.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Envelope X
+  ClassCodes.bladeswarm: AssetConfig(
+    'class_icons/bladeswarm.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Forgotten Circles
+  ClassCodes.diviner: AssetConfig(
+    'class_icons/diviner.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Jaws of the Lion
+  ClassCodes.demolitionist: AssetConfig(
+    'class_icons/demolitionist.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.hatchet: AssetConfig(
+    'class_icons/hatchet.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.redGuard: AssetConfig(
+    'class_icons/red_guard.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.voidwarden: AssetConfig(
+    'class_icons/voidwarden.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Frosthaven starting classes
+  ClassCodes.drifter: AssetConfig(
+    'class_icons/drifter.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.blinkBlade: AssetConfig(
+    'class_icons/blink_blade.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.bannerSpear: AssetConfig(
+    'class_icons/banner_spear.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.deathwalker: AssetConfig(
+    'class_icons/deathwalker.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.boneshaper: AssetConfig(
+    'class_icons/boneshaper.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.geminate: AssetConfig(
+    'class_icons/geminate.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Frosthaven unlockable classes
+  ClassCodes.infuser: AssetConfig(
+    'class_icons/infuser.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.pyroclast: AssetConfig(
+    'class_icons/pyroclast.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.shattersong: AssetConfig(
+    'class_icons/shattersong.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.trapper: AssetConfig(
+    'class_icons/trapper.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.painConduit: AssetConfig(
+    'class_icons/pain_conduit.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.snowdancer: AssetConfig(
+    'class_icons/snowdancer.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.frozenFist: AssetConfig(
+    'class_icons/frozen_fist.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.hive: AssetConfig(
+    'class_icons/hive.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.metalMosaic: AssetConfig(
+    'class_icons/metal_mosaic.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.deepwraith: AssetConfig(
+    'class_icons/deepwraith.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.crashingTide: AssetConfig(
+    'class_icons/crashing_tide.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Mercenary Packs (2025)
+  ClassCodes.anaphi: AssetConfig(
+    'class_icons/anaphi.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.cassandra: AssetConfig(
+    'class_icons/cassandra.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.hail: AssetConfig(
+    'class_icons/hail.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.satha: AssetConfig(
+    'class_icons/satha.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Crimson Scales
+  ClassCodes.amberAegis: AssetConfig(
+    'class_icons/amber_aegis.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.artificer: AssetConfig(
+    'class_icons/artificer.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.bombard: AssetConfig(
+    'class_icons/bombard.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.brightspark: AssetConfig(
+    'class_icons/brightspark.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.chainguard: AssetConfig(
+    'class_icons/chainguard.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.chieftain: AssetConfig(
+    'class_icons/chieftain.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.fireKnight: AssetConfig(
+    'class_icons/fire_knight.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.hierophant: AssetConfig(
+    'class_icons/hierophant.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.hollowpact: AssetConfig(
+    'class_icons/hollowpact.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.luminary: AssetConfig(
+    'class_icons/luminary.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.mirefoot: AssetConfig(
+    'class_icons/mirefoot.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.ruinmaw: AssetConfig(
+    'class_icons/ruinmaw.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.spiritCaller: AssetConfig(
+    'class_icons/spirit_caller.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.starslinger: AssetConfig(
+    'class_icons/starslinger.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.thornreaper: AssetConfig(
+    'class_icons/thornreaper.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.vanquisher: AssetConfig(
+    'class_icons/vanquisher.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // Custom classes
+  ClassCodes.brewmaster: AssetConfig(
+    'class_icons/brewmaster.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.frostborn: AssetConfig(
+    'class_icons/frostborn.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.incarnate: AssetConfig(
+    'class_icons/incarnate.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.rimehearth: AssetConfig(
+    'class_icons/rimehearth.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.rootwhisperer: AssetConfig(
+    'class_icons/rootwhisperer.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.shardrender: AssetConfig(
+    'class_icons/shardrender.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.tempest: AssetConfig(
+    'class_icons/tempest.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.vimthreader: AssetConfig(
+    'class_icons/vimthreader.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.core: AssetConfig(
+    'class_icons/core.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.dome: AssetConfig(
+    'class_icons/dome.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.skitterclaw: AssetConfig(
+    'class_icons/skitterclaw.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  ClassCodes.alchemancer: AssetConfig(
+    'class_icons/alchemancer.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+
+  // ===========================================================================
+  // resources/ - Frosthaven crafting resources
+  // ===========================================================================
+  'lumber': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
+  'metal': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
+  'hide': AssetConfig('resources/hide.svg', themeMode: CurrentColorTheme()),
+  'arrowvine': AssetConfig(
+    'resources/arrow_vine.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'axenut': AssetConfig(
+    'resources/axe_nut.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'corpsecap': AssetConfig(
+    'resources/corpse_cap.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'flamefruit': AssetConfig(
+    'resources/flame_fruit.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'rockroot': AssetConfig(
+    'resources/rock_root.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'snowthistle': AssetConfig(
+    'resources/snow_thistle.svg',
     themeMode: CurrentColorTheme(),
   ),
 
@@ -485,12 +829,12 @@ const Map<String, AssetConfig> assets = {
   // ===========================================================================
   // pips/
   // ===========================================================================
-  'pip_circle': AssetConfig('pips/circle.svg'),
-  'pip_diamond': AssetConfig('pips/diamond.svg'),
-  'pip_diamond_plus': AssetConfig('pips/diamond_plus.svg'),
-  'pip_hex': AssetConfig('pips/hex.svg'),
-  'pip_plus_one': AssetConfig('pips/pip_plus_one.svg'),
-  'pip_square': AssetConfig('pips/square.svg'),
+  'PIP_CIRCLE': AssetConfig('pips/circle.svg'),
+  'PIP_DIAMOND': AssetConfig('pips/diamond.svg'),
+  'PIP_DIAMOND_PLUS': AssetConfig('pips/diamond_plus.svg'),
+  'PIP_HEX': AssetConfig('pips/hex.svg'),
+  'PIP_PLUS_ONE': AssetConfig('pips/pip_plus_one.svg'),
+  'PIP_SQUARE': AssetConfig('pips/square.svg'),
 
   // ===========================================================================
   // status_effects/
@@ -520,14 +864,22 @@ const Map<String, AssetConfig> assets = {
   'WOUND': AssetConfig('status_effects/wound.svg'),
 
   // ===========================================================================
+  // branding/
+  // ===========================================================================
+  'BMC_BUTTON': AssetConfig('branding/bmc-button.svg'),
+
+  // ===========================================================================
   // ui/
   // ===========================================================================
   'CLASS': AssetConfig('ui/class.svg', themeMode: CurrentColorTheme()),
+  'GOAL': AssetConfig('ui/goal.svg', themeMode: CurrentColorTheme()),
+  'TRAIT': AssetConfig('ui/trait.svg', themeMode: CurrentColorTheme()),
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),
+  'GOLD': AssetConfig('ui/gold.svg', themeMode: CurrentColorTheme()),
   'hex': AssetConfig('ui/hex.svg'),
   'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),
-  'item_minus_one': AssetConfig(
+  'ITEM_MINUS_ONE': AssetConfig(
     'ui/item_minus_one.svg',
     lightPath: 'ui/item_minus_one_light.svg',
     widthMultiplier: 1.5,
@@ -537,6 +889,7 @@ const Map<String, AssetConfig> assets = {
     lightPath: 'ui/plus_one_light.svg',
   ),
   'SECTION': AssetConfig('ui/section.svg', themeMode: CurrentColorTheme()),
+  'XP': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
   'xp': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
 };
 
@@ -595,6 +948,17 @@ AssetConfig? tryGetAssetConfig(String element) {
     ),
     '',
   );
+
+  // Skip all-lowercase words to prevent matching class codes
+  // that happen to be English words (e.g., 'be', 'hive', 'core')
+  // Intentional icon tokens use UPPERCASE (ATTACK, MOVE) or PascalCase (Berserker)
+  if (cleanElement.isNotEmpty &&
+      cleanElement == cleanElement.toLowerCase() &&
+      !RegExp(r'^[+-]?\d').hasMatch(cleanElement) && // Allow +1, -1, 2x
+      !cleanElement.startsWith('xp')) {
+    // Allow xp8, xp10
+    return null;
+  }
 
   // Handle XP pattern (xp8, xp10, etc.)
   if (RegExp(r'^xp\d+$').hasMatch(cleanElement)) {

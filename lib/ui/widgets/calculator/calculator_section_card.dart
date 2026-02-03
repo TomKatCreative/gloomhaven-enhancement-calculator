@@ -96,7 +96,7 @@ class CalculatorSectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
+        padding: const EdgeInsets.symmetric(vertical: smallPadding),
         child: layout == CardLayoutVariant.toggle
             ? _buildToggleLayout(context)
             : _buildStandardLayout(context),
@@ -116,7 +116,7 @@ class CalculatorSectionCard extends StatelessWidget {
           if (body != null) body!,
           // Cost display
           if (costConfig != null) ...[
-            const SizedBox(height: mediumPadding),
+            const SizedBox(height: smallPadding),
             CostDisplay(config: costConfig!),
           ],
         ],
@@ -135,7 +135,7 @@ class CalculatorSectionCard extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.only(left: largePadding, right: smallPadding),
+      padding: const EdgeInsets.only(left: largePadding, right: tinyPadding),
       child: Row(
         children: [
           // Info button (not tappable for toggle)
@@ -179,7 +179,7 @@ class CalculatorSectionCard extends StatelessWidget {
               onChanged: toggleEnabled ? onToggleChanged : null,
             ),
           ),
-          const SizedBox(width: mediumPadding),
+          const SizedBox(width: smallPadding),
         ],
       ),
     );

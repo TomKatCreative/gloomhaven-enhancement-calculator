@@ -62,7 +62,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
+        padding: const EdgeInsets.symmetric(vertical: smallPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: _buildItemsWithDividers(context),
@@ -126,8 +126,8 @@ class CalculatorToggleGroupCard extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.only(
                   left: item.infoConfig != null ? largePadding : 0,
-                  top: mediumPadding,
-                  bottom: mediumPadding,
+                  top: smallPadding,
+                  bottom: smallPadding,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

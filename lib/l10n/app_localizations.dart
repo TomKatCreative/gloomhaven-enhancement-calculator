@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupAndRestore.
   ///
   /// In en, this message translates to:
-  /// **'BACKUP & RESTORE'**
+  /// **'LOCAL BACKUP & RESTORE'**
   String get backupAndRestore;
 
   /// No description provided for @testing.
@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Saved to {path}'**
   String savedTo(String path);
 
+  /// No description provided for @filenameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a filename'**
+  String get filenameRequired;
+
   /// No description provided for @backupError.
   ///
   /// In en, this message translates to:
@@ -757,6 +763,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select class...'**
   String get selectClass;
+
+  /// No description provided for @addNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add notes...'**
+  String get addNotes;
 }
 
 class _AppLocalizationsDelegate

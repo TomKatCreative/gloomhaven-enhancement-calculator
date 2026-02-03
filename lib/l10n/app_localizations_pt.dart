@@ -203,7 +203,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get display => 'EXIBIÇÃO';
 
   @override
-  String get backupAndRestore => 'BACKUP E RESTAURAÇÃO';
+  String get backupAndRestore => 'BACKUP E RESTAURAÇÃO LOCAL';
 
   @override
   String get testing => 'TESTE';
@@ -294,6 +294,9 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
+  String get filenameRequired => 'Por favor, insira um nome de arquivo';
+
+  @override
   String get backupError =>
       'Falha ao criar backup. Por favor, tente novamente.';
 
@@ -363,4 +366,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get selectClass => 'Selecionar classe...';
+
+  @override
+  String get addNotes => 'Adicionar notas...';
 }

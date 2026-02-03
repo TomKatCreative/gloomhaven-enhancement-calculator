@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/custom_class_warning_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/variant_selector_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
 
@@ -222,12 +222,12 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                   // Category filter chips
                   Padding(
                     padding: const EdgeInsets.only(
-                      left: mediumPadding,
-                      top: mediumPadding,
+                      left: smallPadding,
+                      top: smallPadding,
                     ),
                     child: Wrap(
-                      runSpacing: mediumPadding,
-                      spacing: mediumPadding,
+                      runSpacing: smallPadding,
+                      spacing: smallPadding,
                       children: [
                         _buildCategoryFilterChip(
                           category: ClassCategory.gloomhaven,
@@ -345,14 +345,10 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     );
 
     return ListTile(
-      leading: SvgPicture.asset(
-        'images/class_icons/${playerClass.icon}',
-        width: iconSize + 5,
-        height: iconSize + 5,
-        colorFilter: ColorFilter.mode(
-          Color(playerClass.primaryColor),
-          BlendMode.srcIn,
-        ),
+      leading: ClassIconSvg(
+        playerClass: playerClass,
+        width: iconSizeXL,
+        height: iconSizeXL,
       ),
       title: Text(
         isUnlocked || !playerClass.locked

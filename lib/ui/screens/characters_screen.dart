@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -40,8 +40,8 @@ class _CharactersScreenState extends State<CharactersScreen>
         child: Center(
           child: Container(
             padding: const EdgeInsets.only(
-              left: mediumPadding * 2,
-              right: mediumPadding * 2,
+              left: largePadding,
+              right: largePadding,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -55,9 +55,9 @@ class _CharactersScreenState extends State<CharactersScreen>
                   textAlign: TextAlign.center,
                 ),
                 if (charactersModel.retiredCharactersAreHidden) ...[
-                  const SizedBox(height: mediumPadding),
+                  const SizedBox(height: smallPadding),
                   const Padding(
-                    padding: EdgeInsets.only(top: mediumPadding),
+                    padding: EdgeInsets.only(top: smallPadding),
                     child: Divider(),
                   ),
                   TextButton(
@@ -97,14 +97,11 @@ class _CharactersScreenState extends State<CharactersScreen>
                     width: 500,
                     height: 500,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: SvgPicture.asset(
-                      'images/class_icons/${character.playerClass.icon}',
-                      colorFilter: ColorFilter.mode(
-                        character
-                            .getEffectiveColor(Theme.of(context).brightness)
-                            .withValues(alpha: 0.1),
-                        BlendMode.srcIn,
-                      ),
+                    child: ClassIconSvg(
+                      playerClass: character.playerClass,
+                      color: character
+                          .getEffectiveColor(Theme.of(context).brightness)
+                          .withValues(alpha: 0.1),
                     ),
                   ),
                 ),

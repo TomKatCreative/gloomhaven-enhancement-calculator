@@ -91,7 +91,7 @@ class IconToken extends GameTextToken {
 
   @override
   InlineSpan toSpan(BuildContext context, bool darkTheme) {
-    final baseSize = iconSize - 2.5;
+    final baseSize = iconSizeMedium;
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
@@ -178,8 +178,8 @@ class IconToken extends GameTextToken {
           _buildSvgPicture(assetPath, darkTheme),
           SvgPicture.asset(
             'images/ui/plus_one.svg',
-            width: iconSize * 0.5,
-            height: iconSize * 0.5,
+            width: iconSizeTiny,
+            height: iconSizeTiny,
           ),
         ],
       );
@@ -222,8 +222,8 @@ class StackedElementToken extends GameTextToken {
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: SizedBox(
-        height: iconSize,
-        width: iconSize,
+        height: iconSizeLarge,
+        width: iconSizeLarge,
         child: Stack(
           children: [
             Positioned(
@@ -231,8 +231,8 @@ class StackedElementToken extends GameTextToken {
               left: 0,
               child: SvgPicture.asset(
                 'images/elements/elem_${element1.toLowerCase()}.svg',
-                width: iconSize * 0.7,
-                height: iconSize * 0.7,
+                width: iconSizeSmall,
+                height: iconSizeSmall,
               ),
             ),
             Positioned(
@@ -240,8 +240,8 @@ class StackedElementToken extends GameTextToken {
               right: 0,
               child: SvgPicture.asset(
                 'images/elements/elem_${element2.toLowerCase()}.svg',
-                width: iconSize * 0.7,
-                height: iconSize * 0.7,
+                width: iconSizeSmall,
+                height: iconSizeSmall,
               ),
             ),
           ],

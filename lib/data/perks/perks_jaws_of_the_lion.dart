@@ -1,3 +1,4 @@
+import 'package:gloomhaven_enhancement_calc/data/perks/perk_text_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
@@ -6,52 +7,41 @@ import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 ///
 /// Includes: Demolitionist, Hatchet, Red Guard, Voidwarden
 class JawsOfTheLionPerks {
-  // Action verbs
-  static const _add = 'Add';
-  static const _remove = 'Remove';
-  static const _replace = 'Replace';
-
-  // Numbers
-  static const _one = 'one';
-  static const _two = 'two';
-  static const _four = 'four';
-
-  // Card-related terms
-  static const _card = 'card';
-  static const _cards = 'cards';
-
-  // Effects and conditions
-  static const _damage = 'DAMAGE';
-  static const _immobilize = 'IMMOBILIZE';
-  static const _shield = 'SHIELD';
-  static const _ward = 'WARD';
-  static const _push = 'PUSH';
-  static const _targetCircle = 'TARGET_CIRCLE';
-  static const _stun = 'STUN';
-  static const _muddle = 'MUDDLE';
-  static const _wound = 'WOUND';
-  static const _heal = 'HEAL';
-  static const _curse = 'CURSE';
-  static const _poison = 'POISON';
-
-  static const _range = 'RANGE';
-
-  // Elements
-  static const _fire = 'FIRE';
-  static const _light = 'LIGHT';
-  static const _dark = 'DARK';
-  static const _earth = 'EARTH';
-  static const _air = 'AIR';
-  static const _ice = 'ICE';
-  static const _consume = 'consume_';
-
-  // Scenario and Item related
+  // Short aliases for PerkTextConstants to keep perk definitions readable
+  static const _add = PerkTextConstants.add;
+  static const _remove = PerkTextConstants.remove;
+  static const _replace = PerkTextConstants.replace;
+  static const _one = PerkTextConstants.one;
+  static const _two = PerkTextConstants.two;
+  static const _four = PerkTextConstants.four;
+  static const _card = PerkTextConstants.card;
+  static const _cards = PerkTextConstants.cards;
+  static const _damage = PerkTextConstants.damage;
+  static const _immobilize = PerkTextConstants.immobilize;
+  static const _shield = PerkTextConstants.shield;
+  static const _ward = PerkTextConstants.ward;
+  static const _push = PerkTextConstants.push;
+  static const _targetCircle = PerkTextConstants.targetCircle;
+  static const _stun = PerkTextConstants.stun;
+  static const _muddle = PerkTextConstants.muddle;
+  static const _wound = PerkTextConstants.wound;
+  static const _heal = PerkTextConstants.heal;
+  static const _curse = PerkTextConstants.curse;
+  static const _poison = PerkTextConstants.poison;
+  static const _range = PerkTextConstants.range;
+  static const _fire = PerkTextConstants.fire;
+  static const _light = PerkTextConstants.light;
+  static const _dark = PerkTextConstants.dark;
+  static const _earth = PerkTextConstants.earth;
+  static const _air = PerkTextConstants.air;
+  static const _ice = PerkTextConstants.ice;
+  static const _consume = PerkTextConstants.consume;
   static const _ignoreItemMinusOneEffectsAndAdd =
-      'Ignore item item_minus_one effects and add';
-  static const _ignoreScenarioEffects = 'Ignore scenario effects';
+      PerkTextConstants.ignoreItemMinusOneEffectsAndAdd;
+  static const _ignoreScenarioEffects = PerkTextConstants.ignoreScenarioEffects;
   static const _ignoreScenarioEffectsAndRemove =
-      'Ignore scenario effects and remove';
-  static const _onceEachScenario = 'Once each scenario';
+      PerkTextConstants.ignoreScenarioEffectsAndRemove;
+  static const _onceEachScenario = PerkTextConstants.onceEachScenario;
 
   static final Map<String, List<Perks>> perks = {
     ClassCodes.demolitionist: [

@@ -94,7 +94,7 @@ class MasteryRowState extends State<MasteryRow>
           );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: mediumPadding / 2),
+          padding: const EdgeInsets.symmetric(vertical: tinyPadding),
           child: Row(
             children: <Widget>[
               ConditionalCheckbox(
@@ -137,7 +137,7 @@ class MasteryRowState extends State<MasteryRow>
                 },
                 child: Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.only(right: mediumPadding),
+                    padding: const EdgeInsets.only(right: smallPadding),
                     child: RichText(
                       text: TextSpan(
                         style: Theme.of(

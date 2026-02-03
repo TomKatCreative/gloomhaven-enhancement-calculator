@@ -41,8 +41,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   bool _isExpanded = false;
 
   // Chip dimensions
-  static const double _chipHeight = 48.0;
-  static const double _chipBorderRadius = 24.0;
+  static const double _chipHeight = 56.0;
+  static const double _chipBorderRadius = 28.0;
 
   // Card dimensions
   static const double _cardTopRadius = 28.0;
@@ -50,8 +50,8 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   static const double _cardMaxWidth = 468.0;
   static const double _cardExpandedFraction = 0.85;
 
-  // Positioning - 20dp aligns chip center with FAB center (FAB is 56dp at 16dp offset)
-  static const double _bottomOffset = 20.0;
+  // Positioning - same as FAB (both are 56dp height)
+  static const double _bottomOffset = 16.0;
   static const double _horizontalPadding = 16.0;
 
   @override
@@ -278,18 +278,20 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.enhancement != null) ...[
-              _buildEnhancementIcon(widget.enhancement!, 22),
-              const SizedBox(width: mediumPadding),
+              _buildEnhancementIcon(widget.enhancement!, 26),
+              const SizedBox(width: smallPadding),
             ],
             Text(
               '${widget.totalCost}g',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
+                fontSize: 26,
               ),
             ),
             const SizedBox(width: 4),
             Icon(
               Icons.keyboard_arrow_up,
+              size: 28,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ],
@@ -355,7 +357,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(mediumPadding * 2),
+        padding: const EdgeInsets.all(largePadding),
         child: Text(
           'Select options to see cost breakdown',
           style: theme.textTheme.bodyMedium?.copyWith(

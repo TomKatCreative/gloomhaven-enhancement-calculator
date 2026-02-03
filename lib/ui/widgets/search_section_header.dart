@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
@@ -41,7 +42,11 @@ class SearchSectionHeader extends StatelessWidget {
           Expanded(child: Divider(color: theme.dividerTheme.color)),
           const SizedBox(width: 12),
           if (assetKey != null) ...[
-            ThemedSvg(assetKey: assetKey!, width: 24, height: 24),
+            ThemedSvg(
+              assetKey: assetKey!,
+              width: iconSizeMedium,
+              height: iconSizeMedium,
+            ),
             const SizedBox(width: 8),
           ],
           Text(

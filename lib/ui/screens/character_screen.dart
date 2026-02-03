@@ -1,8 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/resources_repository.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -41,14 +41,14 @@ class CharacterScreen extends StatelessWidget {
     return SingleChildScrollView(
       controller: context.read<CharactersModel>().charScreenScrollController,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
+        padding: const EdgeInsets.symmetric(horizontal: smallPadding),
         child: Column(
           children: <Widget>[
             // NAME and CLASS
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: _NameAndClassSection(character: character),
               ),
             ),
@@ -56,7 +56,7 @@ class CharacterScreen extends StatelessWidget {
             Container(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: _StatsSection(character: character),
               ),
             ),
@@ -65,20 +65,20 @@ class CharacterScreen extends StatelessWidget {
               Container(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Padding(
-                  padding: const EdgeInsets.all(mediumPadding),
+                  padding: const EdgeInsets.all(smallPadding),
                   child: _CheckmarksAndRetirementsRow(character: character),
                 ),
               ),
             // RESOURCES
             Padding(
-              padding: const EdgeInsets.all(mediumPadding),
+              padding: const EdgeInsets.all(smallPadding),
               child: _ResourcesSection(character: character),
             ),
             // NOTES
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child:
                     character.notes.isNotEmpty ||
                         context.read<CharactersModel>().isEditMode
@@ -88,13 +88,13 @@ class CharacterScreen extends StatelessWidget {
             ),
             // PERKS
             Padding(
-              padding: const EdgeInsets.all(mediumPadding),
+              padding: const EdgeInsets.all(smallPadding),
               child: PerksSection(character: character),
             ),
             // MASTERIES
             if (character.characterMasteries.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.all(mediumPadding),
+                padding: const EdgeInsets.all(smallPadding),
                 child: MasteriesSection(
                   character: character,
                   charactersModel: context.watch<CharactersModel>(),
@@ -109,7 +109,7 @@ class CharacterScreen extends StatelessWidget {
   }
 }
 
-/// Combined section showing Battle Goal Checkmarks and Previous Retirements.
+/// Combined section showing Previous Retirements and Battle Goal Checkmarks.
 /// Layout: Row with two columns side by side.
 class _CheckmarksAndRetirementsRow extends StatelessWidget {
   const _CheckmarksAndRetirementsRow({required this.character});
@@ -124,56 +124,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Battle Goal Checkmarks (left column)
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AutoSizeText(
-                AppLocalizations.of(context).battleGoals,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                minFontSize: 10,
-                style: theme.textTheme.bodyMedium,
-              ),
-              const SizedBox(height: smallPadding),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 20,
-                    icon: const Icon(Icons.remove_circle),
-                    onPressed: character.checkMarks > 0 && !isRetired
-                        ? () => charactersModel.decreaseCheckmark(character)
-                        : null,
-                  ),
-                  Text(
-                    '${character.checkMarks}/18',
-                    style: theme.textTheme.bodyMedium,
-                  ),
-                  IconButton(
-                    padding: EdgeInsets.zero,
-                    iconSize: 20,
-                    icon: const Icon(Icons.add_circle),
-                    onPressed: character.checkMarks < 18 && !isRetired
-                        ? () => charactersModel.increaseCheckmark(character)
-                        : null,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        // Vertical divider (matches CheckRowDivider style from perk rows)
-        Container(
-          width: 1,
-          height: 52,
-          margin: const EdgeInsets.symmetric(horizontal: largePadding),
-          color: theme.dividerTheme.color,
-        ),
-        // Previous Retirements (right column)
+        // Previous Retirements (left column)
         Expanded(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -185,14 +136,14 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 minFontSize: 10,
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: smallPadding),
+              const SizedBox(height: tinyPadding),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -208,7 +159,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: 20,
+                    iconSize: iconSizeSmall,
                     icon: const Icon(Icons.add_circle),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -216,6 +167,55 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                               ..previousRetirements =
                                   character.previousRetirements + 1,
                           )
+                        : null,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        // Vertical divider (matches CheckRowDivider style from perk rows)
+        Container(
+          width: 1,
+          height: 52,
+          margin: const EdgeInsets.symmetric(horizontal: largePadding),
+          color: theme.dividerTheme.color,
+        ),
+        // Battle Goal Checkmarks (right column)
+        Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AutoSizeText(
+                '${AppLocalizations.of(context).battleGoals} (${character.checkMarkProgress()}/3)',
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                minFontSize: 10,
+                style: theme.textTheme.bodyMedium,
+              ),
+              const SizedBox(height: tinyPadding),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: iconSizeSmall,
+                    icon: const Icon(Icons.remove_circle),
+                    onPressed: character.checkMarks > 0 && !isRetired
+                        ? () => charactersModel.decreaseCheckmark(character)
+                        : null,
+                  ),
+                  Text(
+                    '${character.checkMarks}/18',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: iconSizeSmall,
+                    icon: const Icon(Icons.add_circle),
+                    onPressed: character.checkMarks < 18 && !isRetired
+                        ? () => charactersModel.increaseCheckmark(character)
                         : null,
                   ),
                 ],
@@ -245,7 +245,7 @@ class _NameAndClassSection extends StatelessWidget {
                   charactersModel.updateCharacter(character..name = value);
                 },
                 decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context).name),
+                  labelText: AppLocalizations.of(context).name,
                 ),
                 minLines: 1,
                 maxLines: 2,
@@ -275,20 +275,14 @@ class _NameAndClassSection extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
+        const SizedBox(height: largePadding),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Stack(
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
-                SvgPicture.asset(
-                  'images/ui/level.svg',
-                  width: iconSize * 1.5,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'LEVEL', width: iconSizeHero),
                 Text(
                   '${Character.level(character.xp)}',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -298,7 +292,7 @@ class _NameAndClassSection extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(width: mediumPadding),
+            const SizedBox(width: smallPadding),
             Flexible(
               child: AutoSizeText(
                 character.getClassSubtitle(),
@@ -309,19 +303,12 @@ class _NameAndClassSection extends StatelessWidget {
           ],
         ),
         if (character.showTraits()) ...[
-          const SizedBox(height: mediumPadding),
+          const SizedBox(height: smallPadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                'images/ui/trait.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: mediumPadding),
+              ThemedSvg(assetKey: 'TRAIT', width: iconSizeLarge),
+              const SizedBox(width: smallPadding),
               Flexible(
                 child: AutoSizeText(
                   '${character.playerClass.traits[0]} · ${character.playerClass.traits[1]} · ${character.playerClass.traits[2]}',
@@ -357,9 +344,11 @@ class _StatsSectionState extends State<_StatsSection> {
   @override
   void initState() {
     super.initState();
-    _xpController = TextEditingController(text: widget.character.xp.toString());
+    _xpController = TextEditingController(
+      text: widget.character.xp == 0 ? '' : widget.character.xp.toString(),
+    );
     _goldController = TextEditingController(
-      text: widget.character.gold.toString(),
+      text: widget.character.gold == 0 ? '' : widget.character.gold.toString(),
     );
   }
 
@@ -372,7 +361,144 @@ class _StatsSectionState extends State<_StatsSection> {
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.read<CharactersModel>();
+    final charactersModel = context.read<CharactersModel>();
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode &&
+        !widget.character.isRetired;
+
+    // Edit mode: Show XP and Gold with external labels, plus Battle Goals and Pocket
+    if (isEditMode) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // XP field with inline icon
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _xpController,
+                    enableInteractiveSelection: false,
+                    onChanged: (String value) {
+                      charactersModel.updateCharacter(
+                        widget.character
+                          ..xp = value == '' ? 0 : int.parse(value),
+                      );
+                    },
+                    textAlign: TextAlign.right,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                        RegExp('[\\.|\\,|\\ |\\-]'),
+                      ),
+                      LengthLimitingTextInputFormatter(3),
+                    ],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      suffixText:
+                          '/ ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ThemedSvg(assetKey: 'XP', width: iconSizeSmall),
+                          const SizedBox(width: tinyPadding),
+                          Text(AppLocalizations.of(context).xp),
+                        ],
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.exposure),
+                  onPressed: () async {
+                    int? value = await showDialog<int?>(
+                      context: context,
+                      builder: (_) => AddSubtractDialog(
+                        widget.character.xp,
+                        AppLocalizations.of(context).xp,
+                      ),
+                    );
+                    if (value != null) {
+                      final clampedValue = value
+                          .clamp(0, double.infinity)
+                          .toInt();
+                      charactersModel.updateCharacter(
+                        widget.character..xp = clampedValue,
+                      );
+                      _xpController.text = clampedValue == 0
+                          ? ''
+                          : clampedValue.toString();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: smallPadding),
+          // Gold field with inline icon
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _goldController,
+                    enableInteractiveSelection: false,
+                    onChanged: (String value) =>
+                        charactersModel.updateCharacter(
+                          widget.character
+                            ..gold = value == '' ? 0 : int.parse(value),
+                        ),
+                    textAlign: TextAlign.center,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.deny(
+                        RegExp('[\\.|\\,|\\ |\\-]'),
+                      ),
+                      LengthLimitingTextInputFormatter(4),
+                    ],
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      label: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ThemedSvg(assetKey: 'GOLD', width: iconSizeSmall),
+                          const SizedBox(width: tinyPadding),
+                          Text(AppLocalizations.of(context).gold),
+                        ],
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
+                      border: const OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.exposure),
+                  onPressed: () async {
+                    int? value = await showDialog<int?>(
+                      context: context,
+                      builder: (_) => AddSubtractDialog(
+                        widget.character.gold,
+                        AppLocalizations.of(context).gold,
+                      ),
+                    );
+                    if (value != null) {
+                      charactersModel.updateCharacter(
+                        widget.character..gold = value,
+                      );
+                      _goldController.text = value == 0 ? '' : value.toString();
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
+    // View mode: Original inline layout
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -380,71 +506,12 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).xp,
           child: Row(
             children: <Widget>[
-              SvgPicture.asset(
-                'images/ui/xp.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
+              ThemedSvg(assetKey: 'XP', width: iconSizeLarge),
+              const SizedBox(width: smallPadding),
+              Text(
+                widget.character.xp.toString(),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(width: mediumPadding),
-              context.watch<CharactersModel>().isEditMode &&
-                      !widget.character.isRetired
-                  ? Container(
-                      constraints: const BoxConstraints(maxWidth: 75),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextField(
-                            controller: _xpController,
-                            enableInteractiveSelection: false,
-                            onChanged: (String value) {
-                              charactersModel.updateCharacter(
-                                widget.character
-                                  ..xp = value == '' ? 0 : int.parse(value),
-                              );
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.center,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.deny(
-                                RegExp('[\\.|\\,|\\ |\\-]'),
-                              ),
-                            ],
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              label: Text(AppLocalizations.of(context).xp),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.exposure),
-                            onPressed: () async {
-                              int? value = await showDialog<int?>(
-                                context: context,
-                                builder: (_) => AddSubtractDialog(
-                                  widget.character.xp,
-                                  AppLocalizations.of(context).xp,
-                                ),
-                              );
-                              if (value != null) {
-                                charactersModel.updateCharacter(
-                                  widget.character
-                                    ..xp = value
-                                        .clamp(0, double.infinity)
-                                        .toInt(),
-                                );
-                                _xpController.text = value.toString();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(
-                      widget.character.xp.toString(),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
               Consumer<CharactersModel>(
                 builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
@@ -463,66 +530,12 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).gold,
           child: Row(
             children: <Widget>[
-              SvgPicture.asset(
-                'images/ui/gold.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'GOLD', width: iconSizeLarge),
               const SizedBox(width: 5),
-              context.watch<CharactersModel>().isEditMode &&
-                      !widget.character.isRetired
-                  ? Container(
-                      constraints: const BoxConstraints(maxWidth: 75),
-                      child: Column(
-                        children: <Widget>[
-                          TextField(
-                            controller: _goldController,
-                            enableInteractiveSelection: false,
-                            onChanged: (String value) =>
-                                charactersModel.updateCharacter(
-                                  widget.character
-                                    ..gold = value == '' ? 0 : int.parse(value),
-                                ),
-                            textAlignVertical: TextAlignVertical.center,
-                            textAlign: TextAlign.center,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.deny(
-                                RegExp('[\\.|\\,|\\ |\\-]'),
-                              ),
-                            ],
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              label: Text(AppLocalizations.of(context).gold),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.exposure),
-                            onPressed: () async {
-                              int? value = await showDialog<int?>(
-                                context: context,
-                                builder: (_) => AddSubtractDialog(
-                                  widget.character.gold,
-                                  AppLocalizations.of(context).gold,
-                                ),
-                              );
-                              if (value != null) {
-                                charactersModel.updateCharacter(
-                                  widget.character..gold = value,
-                                );
-                                _goldController.text = value.toString();
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    )
-                  : Text(
-                      ' ${widget.character.gold}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+              Text(
+                ' ${widget.character.gold}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
             ],
           ),
         ),
@@ -533,14 +546,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                SvgPicture.asset(
-                  'images/ui/goal.svg',
-                  width: iconSize,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurface,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                ThemedSvg(assetKey: 'GOAL', width: iconSizeLarge),
                 SizedBox(
                   width: 5,
                   child: Text(widget.character.checkMarkProgress().toString()),
@@ -563,14 +569,7 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
-              SvgPicture.asset(
-                'images/equipment_slots/pocket.svg',
-                width: iconSize,
-                colorFilter: ColorFilter.mode(
-                  Theme.of(context).colorScheme.onSurface,
-                  BlendMode.srcIn,
-                ),
-              ),
+              ThemedSvg(assetKey: 'Pocket', width: iconSizeLarge),
               Padding(
                 padding: const EdgeInsets.only(left: 3.5),
                 child: Text(
@@ -607,7 +606,7 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
           width: 1,
           color: Theme.of(context).colorScheme.outlineVariant,
         ),
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(8),
       ),
       constraints: const BoxConstraints(maxWidth: 400),
       child: Theme(
@@ -620,10 +619,10 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
           title: Text(AppLocalizations.of(context).resources),
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: mediumPadding),
+              padding: const EdgeInsets.only(bottom: smallPadding),
               child: Wrap(
-                runSpacing: mediumPadding,
-                spacing: mediumPadding,
+                runSpacing: smallPadding,
+                spacing: smallPadding,
                 alignment: WrapAlignment.spaceEvenly,
                 children: _buildResourceCards(
                   context,
@@ -676,15 +675,21 @@ class _NotesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CharactersModel charactersModel = context.read<CharactersModel>();
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode && !character.isRetired;
+
     return Column(
       children: <Widget>[
-        Text(
-          AppLocalizations.of(context).notes,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        const SizedBox(height: mediumPadding),
-        context.watch<CharactersModel>().isEditMode && !character.isRetired
+        // Hide header in edit mode since the text field has a floating label
+        if (!isEditMode) ...[
+          Text(
+            AppLocalizations.of(context).notes,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+          const SizedBox(height: smallPadding),
+        ],
+        isEditMode
             ? TextFormField(
                 key: ValueKey('notes_${character.uuid}'),
                 initialValue: character.notes,
@@ -695,7 +700,7 @@ class _NotesSection extends StatelessWidget {
                 },
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
-                  label: Text(AppLocalizations.of(context).notes),
+                  labelText: AppLocalizations.of(context).notes,
                 ),
               )
             : Text(character.notes),
