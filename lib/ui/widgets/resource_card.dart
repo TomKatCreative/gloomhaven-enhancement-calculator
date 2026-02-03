@@ -81,6 +81,7 @@ class ResourceDetails extends StatelessWidget {
             bottom: -smallPadding,
             left: -2,
             child: IconButton(
+              iconSize: iconSizeMedium,
               onPressed: () => decreaseCount(),
               icon: const Icon(Icons.remove_circle),
             ),
@@ -89,6 +90,7 @@ class ResourceDetails extends StatelessWidget {
             bottom: -smallPadding,
             right: -2,
             child: IconButton(
+              iconSize: iconSizeMedium,
               onPressed: () => increaseCount(),
               icon: const Icon(Icons.add_circle),
             ),
