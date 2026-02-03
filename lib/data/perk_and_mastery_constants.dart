@@ -33,7 +33,7 @@ class PerkAndMasteryConstants {
   static const atTheStartOfEachScenario = 'At the start of each scenario';
 
   // Item-related
-  static const ignoreItemMinusOneEffects = 'Ignore item item_minus_one effects';
+  static const ignoreItemMinusOneEffects = 'Ignore item ITEM_MINUS_ONE effects';
   static const ignoreNegativeItemEffects = 'Ignore negative item effects';
   static const ignoreScenarioEffects = 'Ignore scenario effects';
 
