@@ -48,7 +48,12 @@ class CharacterScreen extends StatelessWidget {
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(smallPadding),
+                padding: const EdgeInsets.only(
+                  left: smallPadding,
+                  right: smallPadding,
+                  bottom: mediumPadding,
+                  top: extraLargePadding,
+                ),
                 child: _NameAndClassSection(character: character),
               ),
             ),
@@ -56,7 +61,12 @@ class CharacterScreen extends StatelessWidget {
             Container(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Padding(
-                padding: const EdgeInsets.all(smallPadding),
+                padding: const EdgeInsets.only(
+                  left: smallPadding,
+                  right: smallPadding,
+                  top: smallPadding,
+                  bottom: largePadding,
+                ),
                 child: _StatsSection(character: character),
               ),
             ),
@@ -71,14 +81,24 @@ class CharacterScreen extends StatelessWidget {
               ),
             // RESOURCES
             Padding(
-              padding: const EdgeInsets.all(smallPadding),
+              padding: EdgeInsets.only(
+                left: smallPadding,
+                right: smallPadding,
+                top: smallPadding,
+                bottom: model.isEditMode ? largePadding : smallPadding,
+              ),
               child: _ResourcesSection(character: character),
             ),
             // NOTES
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: const EdgeInsets.all(smallPadding),
+                padding: EdgeInsets.only(
+                  left: smallPadding,
+                  right: smallPadding,
+                  bottom: smallPadding,
+                  top: model.isEditMode ? largePadding : smallPadding,
+                ),
                 child:
                     character.notes.isNotEmpty ||
                         context.read<CharactersModel>().isEditMode
@@ -257,21 +277,7 @@ class _NameAndClassSection extends StatelessWidget {
                 character.name,
                 maxLines: 2,
                 style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  shadows: Theme.of(context).brightness == Brightness.dark
-                      ? [
-                          Shadow(
-                            color: Colors.white.withValues(alpha: 0.25),
-                            blurRadius: 6,
-                            offset: Offset.zero,
-                          ),
-                        ]
-                      : [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.35),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  shadows: Theme.of(context).displayTextShadow,
                 ),
                 textAlign: TextAlign.center,
               ),
