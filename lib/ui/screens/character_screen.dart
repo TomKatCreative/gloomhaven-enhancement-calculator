@@ -13,6 +13,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart'
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/rich_text_notes.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -678,15 +679,16 @@ class _ResourcesSectionState extends State<_ResourcesSection> {
 class _NotesSection extends StatelessWidget {
   const _NotesSection({required this.character});
   final Character character;
+
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.read<CharactersModel>();
+    final charactersModel = context.read<CharactersModel>();
     final isEditMode =
         context.watch<CharactersModel>().isEditMode && !character.isRetired;
 
     return Column(
       children: <Widget>[
-        // Hide header in edit mode since the text field has a floating label
+        // Header shown in view mode only
         if (!isEditMode) ...[
           Text(
             AppLocalizations.of(context).notes,
@@ -695,21 +697,15 @@ class _NotesSection extends StatelessWidget {
           ),
           const SizedBox(height: smallPadding),
         ],
-        isEditMode
-            ? TextFormField(
-                key: ValueKey('notes_${character.uuid}'),
-                initialValue: character.notes,
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                onChanged: (String value) {
-                  charactersModel.updateCharacter(character..notes = value);
-                },
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.of(context).notes,
-                ),
-              )
-            : Text(character.notes),
+        RichTextNotes(
+          key: ValueKey('notes_${character.uuid}'),
+          initialNotes: character.notes,
+          isEditMode: isEditMode,
+          isReadOnly: character.isRetired,
+          onChanged: (value) {
+            charactersModel.updateCharacter(character..notes = value);
+          },
+        ),
       ],
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
@@ -614,5 +616,40 @@ class DatabaseMigrations {
     await txn.rawUpdate(
       'ALTER TABLE $tempTableMasteries RENAME TO $tableMasteries',
     );
+  }
+
+  /// Migrates plain text notes to Delta JSON format for Flutter Quill.
+  ///
+  /// Converts existing plain text notes to Delta JSON array format:
+  /// `[{"insert":"<text>\n"}]`
+  ///
+  /// Notes that are already valid Delta JSON are left unchanged.
+  static Future<void> migrateNotesToDeltaJson(Transaction txn) async {
+    final characters = await txn.query(tableCharacters);
+    for (final char in characters) {
+      final notes = char[columnCharacterNotes] as String?;
+      if (notes != null && notes.isNotEmpty && !_isAlreadyDelta(notes)) {
+        // Convert plain text to Delta JSON
+        final delta = [
+          {'insert': '$notes\n'},
+        ];
+        await txn.update(
+          tableCharacters,
+          {columnCharacterNotes: jsonEncode(delta)},
+          where: '$columnCharacterUuid = ?',
+          whereArgs: [char[columnCharacterUuid]],
+        );
+      }
+    }
+  }
+
+  /// Checks if a notes string is already in Delta JSON format.
+  static bool _isAlreadyDelta(String notes) {
+    try {
+      final decoded = jsonDecode(notes);
+      return decoded is List && decoded.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
   }
 }
