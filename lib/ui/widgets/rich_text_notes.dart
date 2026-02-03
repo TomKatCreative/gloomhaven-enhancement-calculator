@@ -28,10 +28,14 @@ class RichTextNotes extends StatefulWidget {
 
 class _RichTextNotesState extends State<RichTextNotes> {
   late QuillController _controller;
+  late FocusNode _focusNode;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _focusNode = FocusNode();
+    _scrollController = ScrollController();
     _controller = QuillController(
       document: _parseDocument(widget.initialNotes),
       selection: const TextSelection.collapsed(offset: 0),
@@ -80,7 +84,15 @@ class _RichTextNotesState extends State<RichTextNotes> {
   void dispose() {
     _controller.removeListener(_onDocumentChange);
     _controller.dispose();
+    _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _requestFocus() {
+    if (!_focusNode.hasFocus) {
+      _focusNode.requestFocus();
+    }
   }
 
   @override
@@ -140,19 +152,28 @@ class _RichTextNotesState extends State<RichTextNotes> {
             ),
           ),
           const SizedBox(height: smallPadding),
-          // Editor
-          Container(
-            constraints: const BoxConstraints(minHeight: 100),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(borderRadiusMedium),
-            ),
-            padding: const EdgeInsets.all(smallPadding),
-            child: QuillEditor.basic(
-              controller: _controller,
-              config: QuillEditorConfig(
-                placeholder: 'Items, reminders, wishlist...',
-                customStyles: _buildEditorStyles(theme),
+          // Editor with tap-to-focus wrapper
+          GestureDetector(
+            onTap: _requestFocus,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 100),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerLow,
+                borderRadius: BorderRadius.circular(borderRadiusMedium),
+              ),
+              padding: const EdgeInsets.all(smallPadding),
+              child: QuillEditor(
+                controller: _controller,
+                focusNode: _focusNode,
+                scrollController: _scrollController,
+                config: QuillEditorConfig(
+                  placeholder: 'Items, reminders, wishlist...',
+                  customStyles: _buildEditorStyles(theme),
+                  autoFocus: false,
+                  expands: false,
+                  padding: EdgeInsets.zero,
+                ),
               ),
             ),
           ),
