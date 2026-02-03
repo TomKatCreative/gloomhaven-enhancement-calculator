@@ -47,7 +47,7 @@ const double iconSizeTiny = 14.0; // Decorative overlays (+1 badge)
 const double iconSizeSmall =
     20.0; // Form inputs, collapsed states, stacked elements
 const double iconSizeMedium =
-    28.0; // Inline text icons (perks), section headers
+    26.0; // Inline text icons (perks), section headers
 const double iconSizeLarge = 32.0; // Navigation, calculator, dialog buttons
 const double iconSizeXL = 36.0; // Class icons in lists/dialogs
 const double iconSizeHero = 48.0; // Hero elements (level badge)

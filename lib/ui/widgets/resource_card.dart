@@ -11,6 +11,7 @@ class ResourceCard extends StatelessWidget {
   final Function() onIncrease;
   final Function() onDecrease;
   final bool canEdit;
+
   const ResourceCard({
     super.key,
     required this.resource,
@@ -27,76 +28,119 @@ class ResourceCard extends StatelessWidget {
       height: canEdit ? 100 : 75,
       width: 100,
       child: Card(
-        child: ResourceDetails(
-          resource: resource,
-          color: color,
-          count: count,
-          decreaseCount: onDecrease,
-          increaseCount: onIncrease,
-          canEdit: canEdit,
+        elevation: 4,
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            // Background icon - fills the full card
+            Positioned.fill(
+              child: FittedBox(
+                fit: BoxFit.contain,
+                child: ThemedSvg(assetKey: resource.icon, color: color),
+              ),
+            ),
+            // Count positioning
+            if (canEdit)
+              // Edit mode: truly centered in full card
+              Center(child: Text('$count'))
+            else
+              // View mode: centered but offset upward
+              Align(alignment: const Alignment(0, 0.6), child: Text('$count')),
+            // Foreground content layered on top
+            Column(
+              children: [
+                _ResourceHeader(resource: resource),
+                if (canEdit) const Spacer(),
+                if (canEdit)
+                  _ResourceButtonBar(
+                    onDecrease: onDecrease,
+                    onIncrease: onIncrease,
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class ResourceDetails extends StatelessWidget {
+class _ResourceHeader extends StatelessWidget {
   final Resource resource;
-  final Color color;
-  final int count;
-  final Function() decreaseCount;
-  final Function() increaseCount;
-  final bool canEdit;
-  const ResourceDetails({
-    super.key,
-    required this.resource,
-    required this.color,
-    required this.count,
-    required this.decreaseCount,
-    required this.increaseCount,
-    required this.canEdit,
+
+  const _ResourceHeader({required this.resource});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(tinyPadding),
+      child: AutoSizeText(
+        resource.name,
+        maxLines: 1,
+        maxFontSize: 18,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
+class _ResourceButtonBar extends StatelessWidget {
+  final VoidCallback onDecrease;
+  final VoidCallback onIncrease;
+
+  const _ResourceButtonBar({
+    required this.onDecrease,
+    required this.onIncrease,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topCenter,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(4),
-          child: AutoSizeText(resource.name, maxLines: 1, maxFontSize: 18),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: Center(
-            child: ThemedSvg(assetKey: resource.icon, color: color),
-          ),
-        ),
-        Positioned(
-          bottom: canEdit ? null : 8,
-          child: Center(child: Text('$count')),
-        ),
-        if (canEdit) ...[
-          Positioned(
-            bottom: -smallPadding,
-            left: -2,
-            child: IconButton(
-              iconSize: iconSizeMedium,
-              onPressed: () => decreaseCount(),
-              icon: const Icon(Icons.remove_circle),
+    final theme = Theme.of(context);
+    final buttonColor = theme.colorScheme.inverseSurface.withValues(alpha: 0.7);
+    final iconColor = theme.colorScheme.onInverseSurface;
+
+    return SizedBox(
+      height: iconSizeMedium,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: Material(
+              color: buttonColor,
+              child: InkWell(
+                onTap: onDecrease,
+                child: Center(
+                  child: Icon(
+                    Icons.remove,
+                    color: iconColor,
+                    size: iconSizeMedium,
+                  ),
+                ),
+              ),
             ),
           ),
-          Positioned(
-            bottom: -smallPadding,
-            right: -2,
-            child: IconButton(
-              iconSize: iconSizeMedium,
-              onPressed: () => increaseCount(),
-              icon: const Icon(Icons.add_circle),
+          Container(
+            width: dividerThickness,
+            color: iconColor.withValues(alpha: 0.3),
+          ),
+          Expanded(
+            child: Material(
+              color: buttonColor,
+              child: InkWell(
+                onTap: onIncrease,
+                child: Center(
+                  child: Icon(
+                    Icons.add,
+                    color: iconColor,
+                    size: iconSizeMedium,
+                  ),
+                ),
+              ),
             ),
           ),
         ],
-      ],
+      ),
     );
   }
 }

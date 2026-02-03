@@ -80,4 +80,18 @@ extension ThemeDataContrast on ThemeData {
     final ext = extension<AppThemeExtension>();
     return ext?.contrastedPrimary ?? colorScheme.primary;
   }
+
+  /// Gets the appropriate text shadow for display text based on brightness.
+  /// Dark mode: subtle white glow, Light mode: soft drop shadow.
+  List<Shadow> get displayTextShadow {
+    return brightness == Brightness.dark
+        ? []
+        : [
+            Shadow(
+              color: Colors.black.withValues(alpha: 0.35),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ];
+  }
 }
