@@ -680,20 +680,45 @@ class _NotesSection extends StatelessWidget {
   const _NotesSection({required this.character});
   final Character character;
 
+  /// Checks if notes have actual content (not just empty or whitespace).
+  /// Handles both plain text and Delta JSON formats.
+  bool _hasContent(String notes) {
+    if (notes.isEmpty) return false;
+    // For Delta JSON, an empty document is [{"insert":"\n"}]
+    if (notes == '[{"insert":"\\n"}]') return false;
+    // Also check for the variant with actual newline character
+    if (notes == '[{"insert":"\n"}]') return false;
+    // For Delta JSON, extract text content and check if it's just whitespace
+    if (notes.startsWith('[')) {
+      // Extract all "insert" values and check if they're just whitespace
+      final insertRegex = RegExp(r'"insert"\s*:\s*"([^"]*)"');
+      final matches = insertRegex.allMatches(notes);
+      final content = matches.map((m) => m.group(1) ?? '').join();
+      // Unescape newlines and check
+      final unescaped = content.replaceAll('\\n', '\n');
+      return unescaped.trim().isNotEmpty;
+    }
+    // Plain text
+    return notes.trim().isNotEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     final charactersModel = context.read<CharactersModel>();
     final isEditMode =
         context.watch<CharactersModel>().isEditMode && !character.isRetired;
 
+    final hasNotes = _hasContent(character.notes);
+
     return Column(
       children: <Widget>[
-        // Header shown in view mode only
-        if (!isEditMode) ...[
+        // Header shown in view mode only when there are notes
+        if (!isEditMode && hasNotes) ...[
           Text(
             AppLocalizations.of(context).notes,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineMedium,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Theme.of(context).contrastedPrimary,
+            ),
           ),
           const SizedBox(height: smallPadding),
         ],
