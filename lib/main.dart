@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:device_region/device_region.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
@@ -78,7 +79,10 @@ Future<void> main() async {
                 title: Platform.isIOS
                     ? 'Gloomhaven Utility'
                     : 'Gloomhaven Companion',
-                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                localizationsDelegates: [
+                  ...AppLocalizations.localizationsDelegates,
+                  FlutterQuillLocalizations.delegate,
+                ],
                 supportedLocales: AppLocalizations.supportedLocales,
                 home: const Home(),
                 themeMode: themeProvider.themeMode,
