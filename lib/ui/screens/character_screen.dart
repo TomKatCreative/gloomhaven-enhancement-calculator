@@ -143,7 +143,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: iconSizeSmall,
+                    iconSize: iconSizeMedium,
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -159,7 +159,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: iconSizeSmall,
+                    iconSize: iconSizeMedium,
                     icon: const Icon(Icons.add_circle),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
@@ -200,7 +200,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 children: [
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: iconSizeSmall,
+                    iconSize: iconSizeMedium,
                     icon: const Icon(Icons.remove_circle),
                     onPressed: character.checkMarks > 0 && !isRetired
                         ? () => charactersModel.decreaseCheckmark(character)
@@ -212,7 +212,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   IconButton(
                     padding: EdgeInsets.zero,
-                    iconSize: iconSizeSmall,
+                    iconSize: iconSizeMedium,
                     icon: const Icon(Icons.add_circle),
                     onPressed: character.checkMarks < 18 && !isRetired
                         ? () => charactersModel.increaseCheckmark(character)
