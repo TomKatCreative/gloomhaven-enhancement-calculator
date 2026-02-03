@@ -40,11 +40,11 @@ class Strings {
         ? ''
         : '''
 
- · A pip_square symbol can hold a pip_plus_one sticker. If the action is MOVE and is not a summon ability, it can hold either a pip_plus_one sticker or a JUMP sticker.
- · A pip_circle symbol can hold anything a pip_square can hold, or an Element sticker.
- · A pip_diamond symbol can hold anything a pip_circle can hold, or a negative condition sticker.
- · A pip_diamond_plus symbol can hold anything a pip_circle can hold, or a positive condition sticker.
- · A pip_hex symbol can only hold a Hex sticker.
+ · A PIP_SQUARE symbol can hold a PIP_PLUS_ONE sticker. If the action is MOVE and is not a summon ability, it can hold either a PIP_PLUS_ONE sticker or a JUMP sticker.
+ · A PIP_CIRCLE symbol can hold anything a PIP_SQUARE can hold, or an Element sticker.
+ · A PIP_DIAMOND symbol can hold anything a PIP_CIRCLE can hold, or a negative condition sticker.
+ · A PIP_DIAMOND_PLUS symbol can hold anything a PIP_CIRCLE can hold, or a positive condition sticker.
+ · A PIP_HEX symbol can only hold a Hex sticker.
 ''';
 
     final trapInfo = isOriginalGH
@@ -58,7 +58,7 @@ Only abilities with a small translucent icon beside them can be enhanced, and on
 
 Once an enhancement is placed, **it persists through subsequent playthroughs** with that class (unless you have chosen to use the 'Temporary Enhancement' variant).
 
-A **main** ability is an ability that is written in larger font, whereas a **non-main** ability is written in a smaller font below a **main** ability. A summon's stats can **only** be augmented with pip_plus_one enhancements.$trapInfo''';
+A **main** ability is an ability that is written in larger font, whereas a **non-main** ability is written in a smaller font below a **main** ability. A summon's stats can **only** be augmented with PIP_PLUS_ONE enhancements.$trapInfo''';
   }
 
   static RichText generalInfoBody(

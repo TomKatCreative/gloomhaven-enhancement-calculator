@@ -22,7 +22,7 @@ class DatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 16;
+  static const _databaseVersion = 17;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -234,6 +234,10 @@ class DatabaseHelper {
       if (oldVersion <= 15) {
         // Add Alchemancer class
         // https://discord.com/channels/728375347732807825/1268641237955514491
+        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
+      }
+      if (oldVersion <= 16) {
+        // Rename item_minus_one to ITEM_MINUS_ONE
         await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
       }
       // Always update metadata table

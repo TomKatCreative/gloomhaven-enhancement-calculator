@@ -829,12 +829,12 @@ const Map<String, AssetConfig> assets = {
   // ===========================================================================
   // pips/
   // ===========================================================================
-  'pip_circle': AssetConfig('pips/circle.svg'),
-  'pip_diamond': AssetConfig('pips/diamond.svg'),
-  'pip_diamond_plus': AssetConfig('pips/diamond_plus.svg'),
-  'pip_hex': AssetConfig('pips/hex.svg'),
-  'pip_plus_one': AssetConfig('pips/pip_plus_one.svg'),
-  'pip_square': AssetConfig('pips/square.svg'),
+  'PIP_CIRCLE': AssetConfig('pips/circle.svg'),
+  'PIP_DIAMOND': AssetConfig('pips/diamond.svg'),
+  'PIP_DIAMOND_PLUS': AssetConfig('pips/diamond_plus.svg'),
+  'PIP_HEX': AssetConfig('pips/hex.svg'),
+  'PIP_PLUS_ONE': AssetConfig('pips/pip_plus_one.svg'),
+  'PIP_SQUARE': AssetConfig('pips/square.svg'),
 
   // ===========================================================================
   // status_effects/
@@ -879,7 +879,7 @@ const Map<String, AssetConfig> assets = {
   'hex': AssetConfig('ui/hex.svg'),
   'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),
-  'item_minus_one': AssetConfig(
+  'ITEM_MINUS_ONE': AssetConfig(
     'ui/item_minus_one.svg',
     lightPath: 'ui/item_minus_one_light.svg',
     widthMultiplier: 1.5,
