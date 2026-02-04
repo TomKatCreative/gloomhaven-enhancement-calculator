@@ -270,46 +270,46 @@ class AppThemeBuilder {
 
     return TextTheme(
       // Display - large hero text (M3 defaults)
-      displayLarge: const TextStyle(fontSize: 57, fontFamily: inter),
+      displayLarge: const TextStyle(fontSize: 59, fontFamily: inter),
       displayMedium: TextStyle(
-        fontSize: 45,
+        fontSize: 47,
         fontFamily: inter,
         shadows: shadow,
       ),
-      displaySmall: const TextStyle(fontSize: 36, fontFamily: inter),
+      displaySmall: const TextStyle(fontSize: 38, fontFamily: inter),
       // Headline - screen/section titles (M3 defaults)
-      headlineLarge: const TextStyle(fontSize: 32, fontFamily: inter),
-      headlineMedium: const TextStyle(fontSize: 28, fontFamily: inter),
-      headlineSmall: const TextStyle(fontSize: 24, fontFamily: inter),
+      headlineLarge: const TextStyle(fontSize: 34, fontFamily: inter),
+      headlineMedium: const TextStyle(fontSize: 30, fontFamily: inter),
+      headlineSmall: const TextStyle(fontSize: 26, fontFamily: inter),
       // Title - smaller titles, emphasized text (scaled up)
-      titleLarge: const TextStyle(fontSize: 22, fontFamily: inter),
+      titleLarge: const TextStyle(fontSize: 24, fontFamily: inter),
       titleMedium: const TextStyle(
-        fontSize: 18,
+        fontSize: 20,
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
       titleSmall: const TextStyle(
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
       // Body - main reading text (scaled up for readability)
-      bodyLarge: const TextStyle(fontSize: 22, fontFamily: inter),
-      bodyMedium: const TextStyle(fontSize: 20, fontFamily: inter),
-      bodySmall: const TextStyle(fontSize: 18, fontFamily: inter),
+      bodyLarge: const TextStyle(fontSize: 24, fontFamily: inter),
+      bodyMedium: const TextStyle(fontSize: 22, fontFamily: inter),
+      bodySmall: const TextStyle(fontSize: 20, fontFamily: inter),
       // Label - buttons, captions, annotations (scaled up)
       labelLarge: const TextStyle(
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
       labelMedium: const TextStyle(
-        fontSize: 14,
+        fontSize: 16,
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
       labelSmall: const TextStyle(
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
@@ -326,47 +326,47 @@ class AppThemeBuilder {
 
     return TextTheme(
       // Display
-      displayLarge: const TextStyle(fontSize: 57, fontFamily: nyala),
+      displayLarge: const TextStyle(fontSize: 59, fontFamily: nyala),
       displayMedium: TextStyle(
-        fontSize: 45,
+        fontSize: 47,
         fontFamily: pirataOne,
         letterSpacing: 1.5,
         shadows: shadow,
       ),
-      displaySmall: const TextStyle(fontSize: 36, fontFamily: nyala),
+      displaySmall: const TextStyle(fontSize: 38, fontFamily: nyala),
       // Headline
-      headlineLarge: const TextStyle(fontSize: 32, fontFamily: nyala),
-      headlineMedium: const TextStyle(fontSize: 28, fontFamily: nyala),
-      headlineSmall: const TextStyle(fontSize: 24, fontFamily: nyala),
+      headlineLarge: const TextStyle(fontSize: 34, fontFamily: nyala),
+      headlineMedium: const TextStyle(fontSize: 30, fontFamily: nyala),
+      headlineSmall: const TextStyle(fontSize: 26, fontFamily: nyala),
       // Title
-      titleLarge: const TextStyle(fontSize: 22, fontFamily: nyala),
+      titleLarge: const TextStyle(fontSize: 24, fontFamily: nyala),
       titleMedium: const TextStyle(
-        fontSize: 18,
+        fontSize: 20,
         fontFamily: nyala,
         fontWeight: FontWeight.w500,
       ),
       titleSmall: const TextStyle(
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: nyala,
         fontWeight: FontWeight.w500,
       ),
       // Body
-      bodyLarge: const TextStyle(fontSize: 22, fontFamily: nyala),
-      bodyMedium: const TextStyle(fontSize: 20, fontFamily: nyala),
-      bodySmall: const TextStyle(fontSize: 18, fontFamily: nyala),
+      bodyLarge: const TextStyle(fontSize: 24, fontFamily: nyala),
+      bodyMedium: const TextStyle(fontSize: 22, fontFamily: nyala),
+      bodySmall: const TextStyle(fontSize: 20, fontFamily: nyala),
       // Label
       labelLarge: const TextStyle(
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: nyala,
         fontWeight: FontWeight.w500,
       ),
       labelMedium: const TextStyle(
-        fontSize: 14,
+        fontSize: 16,
         fontFamily: nyala,
         fontWeight: FontWeight.w500,
       ),
       labelSmall: const TextStyle(
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: nyala,
         fontWeight: FontWeight.w500,
       ),
