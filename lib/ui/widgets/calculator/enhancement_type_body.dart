@@ -88,12 +88,12 @@ class EnhancementTypeBody extends StatelessWidget {
 
   Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
     if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: iconSizeLarge);
+      return ElementStackIcon(size: iconSizeMedium);
     }
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: iconSizeLarge,
+      width: iconSizeMedium,
       showPlusOneOverlay: isPlusOne,
     );
   }

@@ -48,14 +48,20 @@ class ThemedSvg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final darkTheme = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final darkTheme = theme.brightness == Brightness.dark;
     final config = getAssetConfig(assetKey);
     final fullPath = 'images/${config.pathForTheme(darkTheme)}';
     final effectiveWidth = width != null
         ? width! * config.widthMultiplier
         : null;
 
-    final icon = _buildThemedIcon(fullPath, effectiveWidth, darkTheme, config);
+    final icon = _buildThemedIcon(
+      fullPath,
+      effectiveWidth,
+      theme.colorScheme.onSurface,
+      config,
+    );
 
     if (showPlusOneOverlay) {
       final size = width ?? height ?? 24.0;
@@ -79,7 +85,7 @@ class ThemedSvg extends StatelessWidget {
   Widget _buildThemedIcon(
     String fullPath,
     double? effectiveWidth,
-    bool darkTheme,
+    Color onSurface,
     AssetConfig config,
   ) {
     // Handle custom color override (takes precedence over all other coloring)
@@ -99,9 +105,7 @@ class ThemedSvg extends StatelessWidget {
       CurrentColorTheme() => SvgPicture(
         SvgAssetLoader(
           fullPath,
-          theme: SvgTheme(
-            currentColor: darkTheme ? Colors.white : Colors.black,
-          ),
+          theme: SvgTheme(currentColor: onSurface),
         ),
         width: effectiveWidth,
         height: height,
