@@ -78,7 +78,7 @@ class _ResourceHeader extends StatelessWidget {
       child: AutoSizeText(
         resource.name,
         maxLines: 1,
-        maxFontSize: 18,
+        maxFontSize: fontSizeBodyLarge,
         textAlign: TextAlign.center,
       ),
     );
@@ -112,9 +112,9 @@ class _ResourceButtonBar extends StatelessWidget {
                 onTap: onDecrease,
                 child: Center(
                   child: Icon(
-                    Icons.remove,
+                    Icons.remove_rounded,
                     color: iconColor,
-                    size: iconSizeMedium,
+                    size: iconSizeSmall,
                   ),
                 ),
               ),
@@ -131,9 +131,9 @@ class _ResourceButtonBar extends StatelessWidget {
                 onTap: onIncrease,
                 child: Center(
                   child: Icon(
-                    Icons.add,
+                    Icons.add_rounded,
                     color: iconColor,
-                    size: iconSizeMedium,
+                    size: iconSizeSmall,
                   ),
                 ),
               ),

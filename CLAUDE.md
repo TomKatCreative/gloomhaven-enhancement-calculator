@@ -213,13 +213,9 @@ Where L = starting level, P = prosperity level.
 
 #### Font Sizes
 
-| Constant | Size | Usage |
-|----------|------|-------|
-| `smallLabelFontSize` | 15 | Smaller labels |
-| `labelFontSize` | 16 | Standard label text |
-| `bodyFontSize` | 20 | Common body text |
-| `secondaryFontSize` | 25 | Secondary headings |
-| `titleFontSize` | 30 | Main titles |
+The app uses Google's Material 3 type scale. **Always use `theme.textTheme` styles** (e.g., `bodyMedium`, `headlineSmall`) instead of hardcoding font sizes.
+
+See `docs/theme_system.md` for the full type scale reference and usage guidelines.
 
 #### Other Constants
 

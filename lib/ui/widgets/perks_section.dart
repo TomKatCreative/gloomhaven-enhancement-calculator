@@ -18,14 +18,14 @@ class PerksSection extends StatelessWidget {
           children: <Widget>[
             Text(
               'Perks:',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: Theme.of(context).contrastedPrimary,
               ),
             ),
             const SizedBox(width: smallPadding),
             Text(
               '${character.numOfSelectedPerks()}',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color:
                     Character.maximumPerks(character) >=
                         character.numOfSelectedPerks()
@@ -35,7 +35,7 @@ class PerksSection extends StatelessWidget {
             ),
             Text(
               ' / ${Character.maximumPerks(character)}',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: Theme.of(context).contrastedPrimary,
               ),
             ),

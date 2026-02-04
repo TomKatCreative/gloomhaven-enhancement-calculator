@@ -212,15 +212,20 @@ Platform: ${Platform.isIOS ? 'iOS' : 'Android'}
   }
 
   Widget _buildVersionInfo(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final metaStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.onSurfaceVariant,
+    );
+    final linkStyle = theme.textTheme.labelMedium?.copyWith(
+      color: theme.colorScheme.primary,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: smallPadding, right: smallPadding),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'v${packageInfo.version} ',
-            style: const TextStyle(color: Colors.grey, fontSize: labelFontSize),
-          ),
+          Text('v${packageInfo.version} ', style: metaStyle),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -230,31 +235,16 @@ Platform: ${Platform.isIOS ? 'iOS' : 'Android'}
                 ),
               );
             },
-            child: Text(
-              l10n.changelog,
-              style: const TextStyle(
-                color: Colors.blue,
-                fontSize: labelFontSize,
-              ),
-            ),
+            child: Text(l10n.changelog, style: linkStyle),
           ),
-          const Text(
-            ' • ',
-            style: TextStyle(color: Colors.grey, fontSize: labelFontSize),
-          ),
+          Text(' • ', style: metaStyle),
           GestureDetector(
             onTap: () {
               launchURL(
                 Uri.parse('https://creativecommons.org/licenses/by-nc-sa/4.0/'),
               );
             },
-            child: Text(
-              l10n.license,
-              style: const TextStyle(
-                color: Colors.blue,
-                fontSize: labelFontSize,
-              ),
-            ),
+            child: Text(l10n.license, style: linkStyle),
           ),
         ],
       ),

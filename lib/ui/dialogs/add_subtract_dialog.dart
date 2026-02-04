@@ -78,9 +78,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                     autofocus: true,
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(labelText: widget.labelText),
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(fontSize: titleFontSize),
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                 ),
                 // Add button

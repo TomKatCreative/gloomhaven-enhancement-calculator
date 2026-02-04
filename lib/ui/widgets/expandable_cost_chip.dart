@@ -285,7 +285,6 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
               '${widget.totalCost}g',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w800,
-                fontSize: 26,
               ),
             ),
             const SizedBox(width: 4),

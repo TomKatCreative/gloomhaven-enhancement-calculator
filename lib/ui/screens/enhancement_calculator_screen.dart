@@ -795,7 +795,6 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
       subtitle,
       style: theme.textTheme.titleMedium?.copyWith(
         color: isActive ? null : theme.colorScheme.onSurfaceVariant,
-        fontSize: 20,
       ),
     );
 
@@ -810,9 +809,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
     return CheckboxListTile(
       title: Text(
         _getLevelLabel(context, level),
-        style: theme.textTheme.bodyMedium?.copyWith(
-          fontSize: SharedPrefs().useDefaultFonts ? 25 : null,
-        ),
+        style: theme.textTheme.bodyLarge,
       ),
       subtitle: subtitleWidget,
       value: value,

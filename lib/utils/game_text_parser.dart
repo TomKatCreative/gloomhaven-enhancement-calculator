@@ -135,7 +135,7 @@ class IconToken extends GameTextToken {
               xpNumber,
               style: TextStyle(
                 fontFamily: pirataOne,
-                fontSize: 20,
+                fontSize: fontSizeBodyMedium,
                 color: darkTheme ? Colors.black : Colors.white,
               ),
             ),
