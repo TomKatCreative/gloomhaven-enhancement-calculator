@@ -1,6 +1,35 @@
+/// App-level state management for navigation and theme preferences.
+///
+/// [AppModel] is a lightweight ChangeNotifier that handles:
+/// - Page navigation state (Characters vs Calculator)
+/// - Theme mode (light/dark) preference
+/// - Font preference (default vs custom)
+///
+/// ## Provider Setup
+///
+/// This model is set up early in the provider tree and has no dependencies
+/// on other providers.
+///
+/// ## State Persistence
+///
+/// Theme and font preferences are persisted via [SharedPrefs]:
+/// - `darkTheme` for theme mode
+/// - `useDefaultFonts` for font preference
+///
+/// See also:
+/// - [ThemeProvider] for actual theme data generation
+/// - `docs/viewmodels_reference.md` for full documentation
+library;
+
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
+/// Manages app-level navigation and theme state.
+///
+/// This is a lightweight model primarily handling:
+/// - Current page index (0=Characters, 1=Calculator)
+/// - Theme mode delegation
+/// - Font preference
 class AppModel extends ChangeNotifier {
   AppModel();
   final PageController pageController = PageController();

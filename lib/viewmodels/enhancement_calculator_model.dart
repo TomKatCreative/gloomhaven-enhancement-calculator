@@ -1,3 +1,43 @@
+/// Enhancement calculator state management and cost calculation logic.
+///
+/// [EnhancementCalculatorModel] manages all state for the enhancement
+/// calculator screen and performs edition-specific cost calculations.
+///
+/// ## Responsibilities
+///
+/// - Enhancement selection and validation
+/// - Cost calculation with edition-specific rules
+/// - Modifier and discount tracking (multi-target, lost, persistent)
+/// - Enhancer building levels (Frosthaven)
+/// - Calculation breakdown generation for UI display
+///
+/// ## Cost Calculation Flow
+///
+/// 1. **Base Enhancement Cost** - From [Enhancement.cost]
+///    - Apply Enhancer L2 discount (FH)
+///    - Apply Hail's discount (-5g)
+/// 2. **Multipliers** - Applied to base cost
+///    - Multiple Targets (×2)
+///    - Lost/Non-Persistent (×0.5) - GH2E/FH
+///    - Persistent (×3) - FH only
+/// 3. **Card Level Penalty** - 25g × level
+///    - Apply Party Boon discount (GH/GH2E)
+///    - Apply Enhancer L3 discount (FH)
+/// 4. **Previous Enhancements Penalty** - 75g × count
+///    - Apply Enhancer L4 discount (FH)
+/// 5. **Temporary Enhancement Mode** - -20g + ×0.8
+/// 6. **Final** - max(0, total)
+///
+/// ## State Persistence
+///
+/// All calculator state is persisted via [SharedPrefs] for session continuity.
+///
+/// See also:
+/// - [Enhancement] for enhancement definitions
+/// - [GameEdition] for edition-specific rules
+/// - `docs/viewmodels_reference.md` for full documentation
+library;
+
 import 'package:flutter/material.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
@@ -6,6 +46,14 @@ import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
+/// Manages enhancement calculator state and performs cost calculations.
+///
+/// This model tracks all calculator inputs (enhancement type, card level,
+/// previous enhancements, modifiers, discounts) and computes the total
+/// cost with edition-specific rules.
+///
+/// Use [calculateCost] to recalculate after state changes.
+/// Use [getCalculationBreakdown] to get step-by-step cost breakdown for UI.
 class EnhancementCalculatorModel with ChangeNotifier {
   EnhancementCalculatorModel() {
     // Calculate initial cost based on saved state so showCost is correct

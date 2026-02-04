@@ -1,3 +1,42 @@
+/// Character management and CRUD operations.
+///
+/// [CharactersModel] is the primary model for character data, handling:
+/// - Character CRUD operations (create, read, update, delete)
+/// - Character list navigation via PageView
+/// - Edit mode state
+/// - Perk and mastery selection
+/// - Theme synchronization with character colors
+/// - Element tracker sheet expansion state
+///
+/// ## Provider Dependencies
+///
+/// This model depends on [ThemeProvider] via ProxyProvider for color sync.
+/// It also uses [DatabaseHelper] singleton for SQLite persistence.
+///
+/// ## Character Filtering
+///
+/// The [characters] getter returns a filtered list based on [showRetired].
+/// Internal operations use [_characters] for the full list.
+///
+/// ## Navigation
+///
+/// Characters are displayed in a horizontal PageView. The model manages:
+/// - [pageController] for page transitions
+/// - [currentCharacter] for the selected character
+/// - Smart index calculation when toggling retired visibility
+///
+/// ## Edition-Specific Behavior
+///
+/// Character creation uses [GameEdition] to determine:
+/// - Maximum starting level
+/// - Starting gold formula
+///
+/// See also:
+/// - [Character] for the character data model
+/// - [ThemeProvider] for theme synchronization
+/// - `docs/viewmodels_reference.md` for full documentation
+library;
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -15,6 +54,16 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:uuid/uuid.dart';
 
+/// Manages character data, CRUD operations, and list navigation.
+///
+/// This is the primary model for character management, coordinating between
+/// the UI, database, and theme system.
+///
+/// Key responsibilities:
+/// - Load/save characters to SQLite via [databaseHelper]
+/// - Track current character and page position
+/// - Handle edit mode and perk/mastery selection
+/// - Sync theme colors with current character's class
 class CharactersModel with ChangeNotifier {
   CharactersModel({
     required this.databaseHelper,
