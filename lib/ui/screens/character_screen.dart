@@ -155,7 +155,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 minFontSize: 10,
-                style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: tinyPadding),
               Row(
@@ -174,10 +173,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                           )
                         : null,
                   ),
-                  Text(
-                    '${character.previousRetirements}',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  Text('${character.previousRetirements}'),
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
@@ -212,7 +208,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 minFontSize: 10,
-                style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: tinyPadding),
               Row(
@@ -227,10 +222,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                         ? () => charactersModel.decreaseCheckmark(character)
                         : null,
                   ),
-                  Text(
-                    '${character.checkMarks}/18',
-                    style: theme.textTheme.bodyMedium,
-                  ),
+                  Text('${character.checkMarks}/18'),
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
@@ -289,11 +281,10 @@ class _NameAndClassSection extends StatelessWidget {
             Stack(
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
-                ThemedSvg(assetKey: 'LEVEL', width: iconSizeHero),
+                ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL),
                 Text(
                   '${Character.level(character.xp)}',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontSize: titleFontSize - 7,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
@@ -304,7 +295,9 @@ class _NameAndClassSection extends StatelessWidget {
               child: AutoSizeText(
                 character.getClassSubtitle(),
                 maxLines: 1,
-                style: const TextStyle(fontSize: titleFontSize),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(fontFamily: nyala),
               ),
             ),
           ],
@@ -314,23 +307,20 @@ class _NameAndClassSection extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ThemedSvg(assetKey: 'TRAIT', width: iconSizeLarge),
+              ThemedSvg(assetKey: 'TRAIT', width: iconSizeSmall),
               const SizedBox(width: smallPadding),
               Flexible(
                 child: AutoSizeText(
                   '${character.playerClass.traits[0]} · ${character.playerClass.traits[1]} · ${character.playerClass.traits[2]}',
                   maxLines: 1,
                   textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
             ],
           ),
         ],
-        if (character.isRetired)
-          Text(
-            AppLocalizations.of(context).retired,
-            style: const TextStyle(fontSize: 20),
-          ),
+        if (character.isRetired) Text(AppLocalizations.of(context).retired),
       ],
     );
   }
@@ -515,19 +505,11 @@ class _StatsSectionState extends State<_StatsSection> {
             children: <Widget>[
               ThemedSvg(assetKey: 'XP', width: iconSizeLarge),
               const SizedBox(width: smallPadding),
-              Text(
-                widget.character.xp.toString(),
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(widget.character.xp.toString()),
               Consumer<CharactersModel>(
                 builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontSize:
-                        Theme.of(context).textTheme.bodyMedium?.fontSize != null
-                        ? Theme.of(context).textTheme.bodyMedium!.fontSize! / 2
-                        : Theme.of(context).textTheme.bodyMedium?.fontSize,
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),
             ],
@@ -539,10 +521,7 @@ class _StatsSectionState extends State<_StatsSection> {
             children: <Widget>[
               ThemedSvg(assetKey: 'GOLD', width: iconSizeLarge),
               const SizedBox(width: 5),
-              Text(
-                ' ${widget.character.gold}',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
+              Text(' ${widget.character.gold}'),
             ],
           ),
         ),
@@ -581,9 +560,8 @@ class _StatsSectionState extends State<_StatsSection> {
                 padding: const EdgeInsets.only(left: 3.5),
                 child: Text(
                   '${(Character.level(widget.character.xp) / 2).round()}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
                     color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
@@ -716,7 +694,7 @@ class _NotesSection extends StatelessWidget {
         if (!isEditMode && hasNotes) ...[
           Text(
             AppLocalizations.of(context).notes,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: Theme.of(context).contrastedPrimary,
             ),
           ),

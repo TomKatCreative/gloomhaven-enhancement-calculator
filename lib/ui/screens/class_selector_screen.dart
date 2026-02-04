@@ -354,7 +354,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
         isUnlocked || !playerClass.locked
             ? playerClass.getCombinedDisplayNames()
             : '???',
-        style: theme.textTheme.bodyMedium?.copyWith(
+        style: theme.textTheme.bodyLarge?.copyWith(
           color: isUnlocked || !playerClass.locked ? null : theme.disabledColor,
         ),
       ),

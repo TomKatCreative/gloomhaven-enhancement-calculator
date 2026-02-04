@@ -252,23 +252,62 @@ class AppThemeBuilder {
     );
   }
 
+  /// Builds the complete M3 TextTheme for default fonts mode (Inter).
+  ///
+  /// Based on M3 type scale, scaled up for better readability in this app.
+  /// Display/Headline sizes kept at M3 defaults; Body/Label/Title scaled ~1.3x.
   static TextTheme _buildDefaultTextTheme(Brightness brightness) {
-    return const TextTheme().copyWith(
-      bodyMedium: const TextStyle(fontSize: bodyFontSize, fontFamily: inter),
-      bodyLarge: const TextStyle(fontSize: secondaryFontSize),
-      displayMedium: const TextStyle(fontFamily: inter),
+    return const TextTheme(
+      // Display - large hero text (M3 defaults)
+      displayLarge: TextStyle(fontSize: 57, fontFamily: inter),
+      displayMedium: TextStyle(fontSize: 45, fontFamily: inter),
+      displaySmall: TextStyle(fontSize: 36, fontFamily: inter),
+      // Headline - screen/section titles (M3 defaults)
+      headlineLarge: TextStyle(fontSize: 32, fontFamily: inter),
+      headlineMedium: TextStyle(fontSize: 28, fontFamily: inter),
+      headlineSmall: TextStyle(fontSize: 24, fontFamily: inter),
+      // Title - smaller titles, emphasized text (scaled up)
+      titleLarge: TextStyle(fontSize: 22, fontFamily: inter),
+      titleMedium: TextStyle(fontSize: 18, fontFamily: inter, fontWeight: FontWeight.w500),
+      titleSmall: TextStyle(fontSize: 16, fontFamily: inter, fontWeight: FontWeight.w500),
+      // Body - main reading text (scaled up: 16→20, 14→18, 12→16)
+      bodyLarge: TextStyle(fontSize: 20, fontFamily: inter),
+      bodyMedium: TextStyle(fontSize: 18, fontFamily: inter),
+      bodySmall: TextStyle(fontSize: 16, fontFamily: inter),
+      // Label - buttons, captions, annotations (scaled up)
+      labelLarge: TextStyle(fontSize: 16, fontFamily: inter, fontWeight: FontWeight.w500),
+      labelMedium: TextStyle(fontSize: 14, fontFamily: inter, fontWeight: FontWeight.w500),
+      labelSmall: TextStyle(fontSize: 12, fontFamily: inter, fontWeight: FontWeight.w500),
     );
   }
 
+  /// Builds the complete M3 TextTheme for custom fonts mode.
+  ///
+  /// Based on M3 type scale, scaled up for better readability in this app.
+  /// - displayMedium: PirataOne (decorative game font for character names)
+  /// - All others: Nyala (readable game-themed font)
   static TextTheme _buildCustomTextTheme(Brightness brightness) {
-    return const TextTheme().copyWith(
-      bodyMedium: const TextStyle(
-        fontSize: secondaryFontSize,
-        fontFamily: nyala,
-      ),
-      bodyLarge: const TextStyle(fontSize: secondaryFontSize),
-      displayMedium: const TextStyle(fontFamily: pirataOne, letterSpacing: 1.5),
-      headlineMedium: const TextStyle(fontSize: 35),
+    return const TextTheme(
+      // Display
+      displayLarge: TextStyle(fontSize: 57, fontFamily: nyala),
+      displayMedium: TextStyle(fontSize: 45, fontFamily: pirataOne, letterSpacing: 1.5),
+      displaySmall: TextStyle(fontSize: 36, fontFamily: nyala),
+      // Headline
+      headlineLarge: TextStyle(fontSize: 32, fontFamily: nyala),
+      headlineMedium: TextStyle(fontSize: 28, fontFamily: nyala),
+      headlineSmall: TextStyle(fontSize: 24, fontFamily: nyala),
+      // Title
+      titleLarge: TextStyle(fontSize: 22, fontFamily: nyala),
+      titleMedium: TextStyle(fontSize: 18, fontFamily: nyala, fontWeight: FontWeight.w500),
+      titleSmall: TextStyle(fontSize: 16, fontFamily: nyala, fontWeight: FontWeight.w500),
+      // Body
+      bodyLarge: TextStyle(fontSize: 20, fontFamily: nyala),
+      bodyMedium: TextStyle(fontSize: 18, fontFamily: nyala),
+      bodySmall: TextStyle(fontSize: 16, fontFamily: nyala),
+      // Label
+      labelLarge: TextStyle(fontSize: 16, fontFamily: nyala, fontWeight: FontWeight.w500),
+      labelMedium: TextStyle(fontSize: 14, fontFamily: nyala, fontWeight: FontWeight.w500),
+      labelSmall: TextStyle(fontSize: 12, fontFamily: nyala, fontWeight: FontWeight.w500),
     );
   }
 
