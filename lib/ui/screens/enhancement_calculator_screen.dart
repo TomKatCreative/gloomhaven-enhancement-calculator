@@ -685,7 +685,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
           title: Center(
             child: Text(
               AppLocalizations.of(context).enhancer,
-              style: Theme.of(context).textTheme.headlineLarge,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ),
           content: StatefulBuilder(
