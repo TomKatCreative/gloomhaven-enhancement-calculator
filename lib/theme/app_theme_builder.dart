@@ -111,7 +111,10 @@ class AppThemeBuilder {
           color: colorScheme.onSurfaceVariant,
         ),
         floatingLabelStyle: textTheme.bodySmall?.copyWith(
-          color: primaryColor,
+          color: ColorUtils.ensureTextContrast(
+            primaryColor,
+            colorScheme.surface,
+          ),
           fontWeight: FontWeight.w500,
         ),
 

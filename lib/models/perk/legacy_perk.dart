@@ -22,7 +22,7 @@ class Perk {
     perkId = map[columnPerkId];
     perkClassCode = map[columnPerkClass];
     perkDetails = map[columnPerkDetails];
-    perkIsGrouped = map[columnPerkIsGrouped] == 1 ? true : false;
+    perkIsGrouped = map[columnPerkIsGrouped] == 1;
   }
 
   Map<String, dynamic> toMap() {

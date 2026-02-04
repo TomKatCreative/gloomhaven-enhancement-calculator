@@ -101,7 +101,7 @@ class Character {
     resourceFlamefruit = map[columnResourceFlamefruit] ?? 0;
     resourceCorpsecap = map[columnResourceCorpsecap] ?? 0;
     resourceSnowthistle = map[columnResourceSnowthistle] ?? 0;
-    isRetired = map[columnIsRetired] == 1 ? true : false;
+    isRetired = map[columnIsRetired] == 1;
     variant = Variant.values.firstWhere(
       (variant) => variant.name == map[columnVariant],
     );

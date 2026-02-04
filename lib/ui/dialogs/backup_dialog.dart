@@ -105,7 +105,23 @@ class _BackupDialogState extends State<BackupDialog> {
 
     try {
       String value = await DatabaseHelper.instance.generateBackup();
-      const downloadPath = '/storage/emulated/0/Download';
+
+      // Use platform-independent path - getDownloadsDirectory() works on
+      // Android, falls back to external storage if unavailable
+      Directory? downloadsDir = await getDownloadsDirectory();
+      downloadsDir ??= await getExternalStorageDirectory();
+
+      if (downloadsDir == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context).backupError)),
+          );
+        return;
+      }
+
+      final downloadPath = downloadsDir.path;
       File backupFile = File('$downloadPath/${_fileNameController.text}.txt');
       await backupFile.writeAsString(value);
       if (!mounted) return;

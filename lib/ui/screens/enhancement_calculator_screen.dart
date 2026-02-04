@@ -1,7 +1,6 @@
 import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -405,8 +404,8 @@ class _CardDetailsGroupCard extends StatelessWidget {
                   ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
                   Positioned(
                     right: 5,
-                    child: SvgPicture.asset(
-                      'images/ui/not.svg',
+                    child: ThemedSvg(
+                      assetKey: 'NOT',
                       width: iconSizeLarge + 11,
                     ),
                   ),

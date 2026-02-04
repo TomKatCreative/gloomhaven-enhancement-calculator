@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
-class Update430Dialog extends StatelessWidget {
+class Update430Dialog extends StatefulWidget {
   const Update430Dialog({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<Update430Dialog> createState() => _Update430DialogState();
+}
+
+class _Update430DialogState extends State<Update430Dialog> {
+  @override
+  void initState() {
+    super.initState();
+    // Mark the dialog as shown so it won't appear again
     SharedPrefs().showUpdate430Dialog = false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
         'New in version 4.3.0',
