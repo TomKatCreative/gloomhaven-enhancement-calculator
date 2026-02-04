@@ -299,8 +299,9 @@ class _NameAndClassSection extends StatelessWidget {
             ),
           ],
         ),
-        if (character.showTraits()) ...[
-          const SizedBox(height: smallPadding),
+        if (character.showTraits() &&
+            !context.watch<CharactersModel>().isEditMode) ...[
+          const SizedBox(height: largePadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -502,11 +503,14 @@ class _StatsSectionState extends State<_StatsSection> {
             children: <Widget>[
               ThemedSvg(assetKey: 'XP', width: iconSizeMedium),
               const SizedBox(width: smallPadding),
-              Text(widget.character.xp.toString()),
+              Text(
+                widget.character.xp.toString(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
               Consumer<CharactersModel>(
                 builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                  style: Theme.of(context).textTheme.labelSmall,
+                  style: Theme.of(context).textTheme.labelMedium,
                 ),
               ),
             ],
@@ -517,32 +521,28 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Row(
             children: <Widget>[
               ThemedSvg(assetKey: 'GOLD', width: iconSizeMedium),
-              const SizedBox(width: 5),
-              Text(' ${widget.character.gold}'),
+              const SizedBox(width: smallPadding),
+              Text(
+                '${widget.character.gold}',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
             ],
           ),
         ),
         Tooltip(
           message: AppLocalizations.of(context).battleGoals,
-          child: SizedBox(
-            width: 90,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                ThemedSvg(assetKey: 'GOAL', width: iconSizeMedium),
-                SizedBox(
-                  width: 5,
-                  child: Text(widget.character.checkMarkProgress().toString()),
-                ),
-                Text(
-                  '/3',
-                  softWrap: false,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(letterSpacing: 4),
-                ),
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              ThemedSvg(assetKey: 'GOAL', width: iconSizeMedium),
+              SizedBox(width: smallPadding),
+              Text(
+                '${widget.character.checkMarkProgress().toString()}/3',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(letterSpacing: 2),
+              ),
+            ],
           ),
         ),
         Tooltip(
@@ -553,13 +553,16 @@ class _StatsSectionState extends State<_StatsSection> {
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
               ThemedSvg(assetKey: 'Pocket', width: iconSizeMedium),
-              Padding(
-                padding: const EdgeInsets.only(left: 3.5),
-                child: Text(
-                  '${(Character.level(widget.character.xp) / 2).round()}',
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.surface,
+              Transform.translate(
+                offset: const Offset(0, 1),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 3.5),
+                  child: Text(
+                    '${(Character.level(widget.character.xp) / 2).round()}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
                   ),
                 ),
               ),
