@@ -84,7 +84,7 @@ class PerkRowState extends State<PerkRow> {
                 text: TextSpan(
                   style: Theme.of(
                     context,
-                  ).textTheme.bodyMedium?.copyWith(letterSpacing: 0.7),
+                  ).textTheme.bodyLarge?.copyWith(letterSpacing: 0.7),
                   children: Utils.generateCheckRowDetails(
                     context,
                     widget.perks.first.perkDetails,
