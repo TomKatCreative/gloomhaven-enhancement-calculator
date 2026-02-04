@@ -269,9 +269,7 @@ class _NameAndClassSection extends StatelessWidget {
             : AutoSizeText(
                 character.name,
                 maxLines: 2,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  shadows: Theme.of(context).displayTextShadow,
-                ),
+                style: Theme.of(context).textTheme.displayMedium,
                 textAlign: TextAlign.center,
               ),
         const SizedBox(height: largePadding),
