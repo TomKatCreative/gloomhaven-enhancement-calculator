@@ -153,30 +153,32 @@ class Character {
     return sum;
   }
 
-  int checkMarkProgress() => checkMarks != 0
+  int get pocketItemsAllowed => (level(xp) / 2).round();
+
+  int get checkMarkProgress => checkMarks != 0
       ? checkMarks % 3 == 0
             ? 3
             : checkMarks % 3
       : 0;
 
-  int numOfSelectedPerks() => characterPerks.fold(
+  int get numOfSelectedPerks => characterPerks.fold(
     0,
     (previousValue, perk) =>
         previousValue + (perk.characterPerkIsSelected ? 1 : 0),
   );
 
-  bool showTraits() =>
+  bool get shouldShowTraits =>
       !(playerClass.traits.isEmpty ||
           (playerClass.category != ClassCategory.frosthaven &&
                   variant == Variant.base ||
               variant == Variant.gloomhaven2E));
 
-  String getClassSubtitle() => playerClass.getFullDisplayName(variant);
+  String get classSubtitle => playerClass.getFullDisplayName(variant);
 
   // TODO: modify this to include Custom and Crimson Scales once they have masteries
   // for now, have to manually add the Custom Classes that have masteries but aren't
   // yet Frosthaven Crossover versions
-  bool showMasteries() =>
+  bool get shouldShowMasteries =>
       playerClass.classCode == ClassCodes.vimthreader ||
       playerClass.classCode == ClassCodes.core ||
       playerClass.classCode == ClassCodes.dome ||

@@ -328,7 +328,7 @@ class DatabaseHelper {
         columnCharacterPerkIsSelected: 0,
       });
     }
-    if (character.showMasteries()) {
+    if (character.shouldShowMasteries) {
       final masteries = await queryMasteries(character);
       for (final mastery in masteries) {
         await db.insert(tableCharacterMasteries, {
