@@ -44,7 +44,6 @@ class DisplaySettingsSection extends StatelessWidget {
               theme.brightness == Brightness.dark
                   ? AppLocalizations.of(context).dark
                   : AppLocalizations.of(context).light,
-              style: theme.textTheme.titleLarge,
             ),
             activeThumbImage: const AssetImage('images/elements/elem_dark.png'),
             activeThumbColor: const Color(0xff1f272e),
@@ -63,10 +62,7 @@ class DisplaySettingsSection extends StatelessWidget {
         SwitchListTile(
           secondary: const Icon(Icons.font_download_rounded),
           title: Text(AppLocalizations.of(context).useInterFont),
-          subtitle: Text(
-            AppLocalizations.of(context).useInterFontDescription,
-            style: theme.textTheme.titleLarge,
-          ),
+          subtitle: Text(AppLocalizations.of(context).useInterFontDescription),
           value: themeProvider.useDefaultFonts,
           onChanged: (val) {
             context.read<ThemeProvider>().updateDefaultFonts(val);
@@ -81,7 +77,6 @@ class DisplaySettingsSection extends StatelessWidget {
           title: Text(AppLocalizations.of(context).showRetiredCharacters),
           subtitle: Text(
             AppLocalizations.of(context).showRetiredCharactersDescription,
-            style: theme.textTheme.titleLarge,
           ),
           value: charactersModel.showRetired,
           onChanged: (val) {

@@ -24,19 +24,13 @@ class BackupSettingsSection extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.download_rounded),
           title: Text(l10n.backup),
-          subtitle: Text(
-            l10n.backupDescription,
-            style: theme.textTheme.titleLarge,
-          ),
+          subtitle: Text(l10n.backupDescription),
           onTap: () => _handleBackup(context, l10n),
         ),
         ListTile(
           leading: const Icon(Icons.upload_rounded),
           title: Text(l10n.restore),
-          subtitle: Text(
-            l10n.restoreDescription,
-            style: theme.textTheme.titleLarge,
-          ),
+          subtitle: Text(l10n.restoreDescription),
           onTap: () => RestoreDialog.show(context: context),
         ),
       ],
