@@ -8,21 +8,21 @@ The app uses a scaled version of Google's Material 3 type scale. Display and hea
 
 | Style | Size | M3 Default | Usage |
 |-------|------|------------|-------|
-| `displayLarge` | 57 | 57 | Hero text, splash screens |
-| `displayMedium` | 45 | 45 | Character names (PirataOne in custom mode) |
-| `displaySmall` | 36 | 36 | Major headers |
-| `headlineLarge` | 32 | 32 | Screen titles |
-| `headlineMedium` | 28 | 28 | Dialog titles, section headers |
-| `headlineSmall` | 24 | 24 | Card titles, subsection headers |
-| `titleLarge` | 22 | 22 | List item titles, prominent labels |
-| `titleMedium` | 18 | 16 | Form field labels, tab labels |
-| `titleSmall` | 16 | 14 | Metadata labels, timestamps |
-| `bodyLarge` | 20 | 16 | Emphasized body text |
-| `bodyMedium` | 18 | 14 | **Default body text** |
-| `bodySmall` | 16 | 12 | Captions, helper text |
-| `labelLarge` | 16 | 14 | Button text, prominent labels |
-| `labelMedium` | 14 | 12 | Navigation labels, chips |
-| `labelSmall` | 12 | 11 | Badges, tiny annotations |
+| `displayLarge` | 59 | 57 | Hero text, splash screens |
+| `displayMedium` | 47 | 45 | Character names (PirataOne in custom mode) |
+| `displaySmall` | 38 | 36 | Major headers |
+| `headlineLarge` | 34 | 32 | Screen titles |
+| `headlineMedium` | 30 | 28 | Dialog titles, section headers |
+| `headlineSmall` | 26 | 24 | Card titles, subsection headers |
+| `titleLarge` | 24 | 22 | List item titles, prominent labels |
+| `titleMedium` | 20 | 16 | Form field labels, tab labels |
+| `titleSmall` | 18 | 14 | Metadata labels, timestamps |
+| `bodyLarge` | 24 | 16 | Emphasized body text |
+| `bodyMedium` | 22 | 14 | **Default body text** |
+| `bodySmall` | 20 | 12 | Captions, helper text |
+| `labelLarge` | 18 | 14 | Button text, prominent labels |
+| `labelMedium` | 16 | 12 | Navigation labels, chips |
+| `labelSmall` | 14 | 11 | Badges, tiny annotations |
 
 Reference: https://m3.material.io/styles/typography/type-scale-tokens
 
