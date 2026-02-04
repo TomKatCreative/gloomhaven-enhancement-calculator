@@ -195,8 +195,12 @@ class AppThemeBuilder {
       ),
 
       listTileTheme: ListTileThemeData(
-        titleTextStyle: textTheme.titleLarge,
-        subtitleTextStyle: textTheme.bodyMedium,
+        titleTextStyle: textTheme.titleLarge?.copyWith(
+          color: colorScheme.onSurface,
+        ),
+        subtitleTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
       ),
 
       dividerTheme: DividerThemeData(
