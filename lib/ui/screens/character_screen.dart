@@ -694,7 +694,7 @@ class _NotesSection extends StatelessWidget {
         if (!isEditMode && hasNotes) ...[
           Text(
             AppLocalizations.of(context).notes,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               color: Theme.of(context).contrastedPrimary,
             ),
           ),

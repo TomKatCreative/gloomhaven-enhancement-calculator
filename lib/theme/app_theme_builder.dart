@@ -194,6 +194,11 @@ class AppThemeBuilder {
         ),
       ),
 
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: textTheme.titleLarge,
+        subtitleTextStyle: textTheme.bodyMedium,
+      ),
+
       dividerTheme: DividerThemeData(
         color: colorScheme.outlineVariant,
         thickness: hairlineThickness,
