@@ -46,7 +46,13 @@ class ResourceCard extends StatelessWidget {
               Center(child: Text('$count'))
             else
               // View mode: centered but offset upward
-              Align(alignment: const Alignment(0, 0.6), child: Text('$count')),
+              Align(
+                alignment: const Alignment(0, 0.6),
+                child: Text(
+                  '$count',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
             // Foreground content layered on top
             Column(
               children: [
@@ -78,7 +84,7 @@ class _ResourceHeader extends StatelessWidget {
       child: AutoSizeText(
         resource.name,
         maxLines: 1,
-        maxFontSize: fontSizeBodyLarge,
+        maxFontSize: Theme.of(context).textTheme.bodyLarge?.fontSize ?? 18,
         textAlign: TextAlign.center,
       ),
     );

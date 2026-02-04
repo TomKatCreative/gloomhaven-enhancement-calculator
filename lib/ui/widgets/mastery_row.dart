@@ -142,7 +142,7 @@ class MasteryRowState extends State<MasteryRow>
                       text: TextSpan(
                         style: Theme.of(
                           context,
-                        ).textTheme.bodyMedium?.copyWith(letterSpacing: 0.7),
+                        ).textTheme.bodyLarge?.copyWith(letterSpacing: 0.7),
                         children: Utils.generateCheckRowDetails(
                           context,
                           widget.mastery.masteryDetails,

@@ -26,7 +26,7 @@ class MasteriesSectionState extends State<MasteriesSection> {
       children: [
         Text(
           'Masteries',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             color: Theme.of(context).contrastedPrimary,
           ),
         ),
