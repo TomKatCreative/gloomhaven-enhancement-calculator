@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perk_row.dart';
 
@@ -16,12 +15,7 @@ class PerksSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Perks:',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Theme.of(context).contrastedPrimary,
-              ),
-            ),
+            Text('Perks:', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(width: smallPadding),
             Text(
               '${character.numOfSelectedPerks()}',
@@ -29,15 +23,13 @@ class PerksSection extends StatelessWidget {
                 color:
                     Character.maximumPerks(character) >=
                         character.numOfSelectedPerks()
-                    ? Theme.of(context).contrastedPrimary
+                    ? null
                     : Colors.red,
               ),
             ),
             Text(
               ' / ${Character.maximumPerks(character)}',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Theme.of(context).contrastedPrimary,
-              ),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
           ],
         ),
