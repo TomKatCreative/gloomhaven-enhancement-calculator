@@ -319,7 +319,7 @@ class _InfoDialogState extends State<InfoDialog> {
           : Center(
               child: Text(
                 widget.title!,
-                style: Theme.of(context).textTheme.headlineLarge,
+                style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -334,9 +334,7 @@ class _InfoDialogState extends State<InfoDialog> {
                   children: <Widget>[
                     Text(
                       AppLocalizations.of(context).eligibleFor,
-                      style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const Padding(
                       padding: EdgeInsets.only(

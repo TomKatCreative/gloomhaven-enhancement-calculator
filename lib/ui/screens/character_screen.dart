@@ -500,7 +500,7 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).xp,
           child: Row(
             children: <Widget>[
-              ThemedSvg(assetKey: 'XP', width: iconSizeLarge),
+              ThemedSvg(assetKey: 'XP', width: iconSizeMedium),
               const SizedBox(width: smallPadding),
               Text(widget.character.xp.toString()),
               Consumer<CharactersModel>(
@@ -516,7 +516,7 @@ class _StatsSectionState extends State<_StatsSection> {
           message: AppLocalizations.of(context).gold,
           child: Row(
             children: <Widget>[
-              ThemedSvg(assetKey: 'GOLD', width: iconSizeLarge),
+              ThemedSvg(assetKey: 'GOLD', width: iconSizeMedium),
               const SizedBox(width: 5),
               Text(' ${widget.character.gold}'),
             ],
@@ -529,7 +529,7 @@ class _StatsSectionState extends State<_StatsSection> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                ThemedSvg(assetKey: 'GOAL', width: iconSizeLarge),
+                ThemedSvg(assetKey: 'GOAL', width: iconSizeMedium),
                 SizedBox(
                   width: 5,
                   child: Text(widget.character.checkMarkProgress().toString()),
@@ -552,7 +552,7 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
-              ThemedSvg(assetKey: 'Pocket', width: iconSizeLarge),
+              ThemedSvg(assetKey: 'Pocket', width: iconSizeMedium),
               Padding(
                 padding: const EdgeInsets.only(left: 3.5),
                 child: Text(

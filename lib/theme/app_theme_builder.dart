@@ -198,7 +198,7 @@ class AppThemeBuilder {
         titleTextStyle: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
         ),
-        subtitleTextStyle: textTheme.bodyMedium?.copyWith(
+        subtitleTextStyle: textTheme.bodySmall?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),
       ),
@@ -279,11 +279,7 @@ class AppThemeBuilder {
       displaySmall: const TextStyle(fontSize: 36, fontFamily: inter),
       // Headline - screen/section titles (M3 defaults)
       headlineLarge: const TextStyle(fontSize: 32, fontFamily: inter),
-      headlineMedium: TextStyle(
-        fontSize: 28,
-        fontFamily: inter,
-        shadows: shadow,
-      ),
+      headlineMedium: const TextStyle(fontSize: 28, fontFamily: inter),
       headlineSmall: const TextStyle(fontSize: 24, fontFamily: inter),
       // Title - smaller titles, emphasized text (scaled up)
       titleLarge: const TextStyle(fontSize: 22, fontFamily: inter),
@@ -297,10 +293,10 @@ class AppThemeBuilder {
         fontFamily: inter,
         fontWeight: FontWeight.w500,
       ),
-      // Body - main reading text (scaled up: 16→20, 14→18, 12→16)
-      bodyLarge: const TextStyle(fontSize: 20, fontFamily: inter),
-      bodyMedium: const TextStyle(fontSize: 18, fontFamily: inter),
-      bodySmall: const TextStyle(fontSize: 16, fontFamily: inter),
+      // Body - main reading text (scaled up for readability)
+      bodyLarge: const TextStyle(fontSize: 22, fontFamily: inter),
+      bodyMedium: const TextStyle(fontSize: 20, fontFamily: inter),
+      bodySmall: const TextStyle(fontSize: 18, fontFamily: inter),
       // Label - buttons, captions, annotations (scaled up)
       labelLarge: const TextStyle(
         fontSize: 16,
@@ -340,11 +336,7 @@ class AppThemeBuilder {
       displaySmall: const TextStyle(fontSize: 36, fontFamily: nyala),
       // Headline
       headlineLarge: const TextStyle(fontSize: 32, fontFamily: nyala),
-      headlineMedium: TextStyle(
-        fontSize: 28,
-        fontFamily: nyala,
-        shadows: shadow,
-      ),
+      headlineMedium: const TextStyle(fontSize: 28, fontFamily: nyala),
       headlineSmall: const TextStyle(fontSize: 24, fontFamily: nyala),
       // Title
       titleLarge: const TextStyle(fontSize: 22, fontFamily: nyala),
@@ -359,9 +351,9 @@ class AppThemeBuilder {
         fontWeight: FontWeight.w500,
       ),
       // Body
-      bodyLarge: const TextStyle(fontSize: 20, fontFamily: nyala),
-      bodyMedium: const TextStyle(fontSize: 18, fontFamily: nyala),
-      bodySmall: const TextStyle(fontSize: 16, fontFamily: nyala),
+      bodyLarge: const TextStyle(fontSize: 22, fontFamily: nyala),
+      bodyMedium: const TextStyle(fontSize: 20, fontFamily: nyala),
+      bodySmall: const TextStyle(fontSize: 18, fontFamily: nyala),
       // Label
       labelLarge: const TextStyle(
         fontSize: 16,

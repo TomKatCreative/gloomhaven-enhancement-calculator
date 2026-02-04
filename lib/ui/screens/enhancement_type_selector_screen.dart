@@ -256,7 +256,7 @@ class _EnhancementTypeSelectorScreenState
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: iconSizeLarge,
+      width: iconSizeMedium,
       showPlusOneOverlay: isPlusOne,
     );
   }
