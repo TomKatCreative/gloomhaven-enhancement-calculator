@@ -48,10 +48,7 @@ class GameplaySettingsSection extends StatelessWidget {
       secondary: Icon(
         SharedPrefs().customClasses ? MdiIcons.testTube : MdiIcons.testTubeOff,
       ),
-      subtitle: Text(
-        l10n.customClassesDescription,
-        style: theme.textTheme.titleLarge,
-      ),
+      subtitle: Text(l10n.customClassesDescription),
       title: Text(l10n.customClasses),
       value: SharedPrefs().customClasses,
       onChanged: (val) {
@@ -71,10 +68,7 @@ class GameplaySettingsSection extends StatelessWidget {
         SharedPrefs().envelopeX ? Icons.drafts_rounded : Icons.mail_rounded,
       ),
       title: Text(l10n.solveEnvelopeX),
-      subtitle: Text(
-        l10n.gloomhavenSpoilers,
-        style: theme.textTheme.titleLarge,
-      ),
+      subtitle: Text(l10n.gloomhavenSpoilers),
       value: SharedPrefs().envelopeX,
       onChanged: (val) => _handleEnvelopeXToggle(context, l10n, val),
     );
@@ -142,10 +136,7 @@ class GameplaySettingsSection extends StatelessWidget {
         SharedPrefs().envelopeV ? Icons.drafts_rounded : Icons.mail_rounded,
       ),
       title: Text(l10n.unlockEnvelopeV),
-      subtitle: Text(
-        l10n.crimsonScalesSpoilers,
-        style: theme.textTheme.titleLarge,
-      ),
+      subtitle: Text(l10n.crimsonScalesSpoilers),
       value: SharedPrefs().envelopeV,
       onChanged: (val) => _handleEnvelopeVToggle(context, l10n, val),
     );
