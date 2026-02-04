@@ -421,7 +421,7 @@ class CharactersModel with ChangeNotifier {
   }
 
   Future<List<CharacterMastery>> _loadMasteries(Character character) async {
-    if (!character.showMasteries()) {
+    if (!character.shouldShowMasteries) {
       return [];
     }
     List<Map<String, Object?>> masteries = await databaseHelper.queryMasteries(

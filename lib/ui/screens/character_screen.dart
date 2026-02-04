@@ -203,7 +203,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               AutoSizeText(
-                '${AppLocalizations.of(context).battleGoals} (${character.checkMarkProgress()}/3)',
+                '${AppLocalizations.of(context).battleGoals} (${character.checkMarkProgress}/3)',
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 minFontSize: 10,
@@ -290,7 +290,7 @@ class _NameAndClassSection extends StatelessWidget {
             const SizedBox(width: smallPadding),
             Flexible(
               child: AutoSizeText(
-                character.getClassSubtitle(),
+                character.classSubtitle,
                 maxLines: 1,
                 style: Theme.of(
                   context,
@@ -299,7 +299,7 @@ class _NameAndClassSection extends StatelessWidget {
             ),
           ],
         ),
-        if (character.showTraits() &&
+        if (character.shouldShowTraits &&
             !context.watch<CharactersModel>().isEditMode) ...[
           const SizedBox(height: largePadding),
           Row(
@@ -537,7 +537,7 @@ class _StatsSectionState extends State<_StatsSection> {
               ThemedSvg(assetKey: 'GOAL', width: iconSizeMedium),
               SizedBox(width: smallPadding),
               Text(
-                '${widget.character.checkMarkProgress().toString()}/3',
+                '${widget.character.checkMarkProgress.toString()}/3',
                 style: Theme.of(
                   context,
                 ).textTheme.bodyLarge?.copyWith(letterSpacing: 2),
@@ -546,9 +546,9 @@ class _StatsSectionState extends State<_StatsSection> {
           ),
         ),
         Tooltip(
-          message: AppLocalizations.of(context).pocketItemsAllowed(
-            (Character.level(widget.character.xp) / 2).round(),
-          ),
+          message: AppLocalizations.of(
+            context,
+          ).pocketItemsAllowed(widget.character.pocketItemsAllowed),
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
@@ -558,7 +558,7 @@ class _StatsSectionState extends State<_StatsSection> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 3.5),
                   child: Text(
-                    '${(Character.level(widget.character.xp) / 2).round()}',
+                    '${widget.character.pocketItemsAllowed}',
                     style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.surface,

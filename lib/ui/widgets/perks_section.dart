@@ -18,11 +18,11 @@ class PerksSection extends StatelessWidget {
             Text('Perks:', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(width: smallPadding),
             Text(
-              '${character.numOfSelectedPerks()}',
+              '${character.numOfSelectedPerks}',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                 color:
                     Character.maximumPerks(character) >=
-                        character.numOfSelectedPerks()
+                        character.numOfSelectedPerks
                     ? null
                     : Colors.red,
               ),
