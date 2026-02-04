@@ -410,19 +410,20 @@ gh workflow run deploy-internal.yml -f version_name=4.3.3
 
 ## Tips for AI Assistants
 
-1. **Read before modifying** - Always read files before suggesting changes
-2. **Check variants** - Many features branch based on `ClassCategory` or `Variant`
-3. **SharedPrefs keys** - Settings stored in `shared_prefs.dart` - check existing keys before adding
-4. **Database migrations** - New schema changes need migration code in `database_migrations.dart`
-5. **Theme awareness** - Use `Theme.of(context)` and ThemeProvider for colors/styling
-6. **SVG icons** - NEVER use `SvgPicture.asset()` directly. Always use:
+1. **NEVER commit or push without explicit instructions** - Do not run `git commit`, `git push`, or create pull requests unless the user explicitly asks you to. Always wait for the user to review changes and give the go-ahead before touching git history.
+2. **Read before modifying** - Always read files before suggesting changes
+3. **Check variants** - Many features branch based on `ClassCategory` or `Variant`
+4. **SharedPrefs keys** - Settings stored in `shared_prefs.dart` - check existing keys before adding
+5. **Database migrations** - New schema changes need migration code in `database_migrations.dart`
+6. **Theme awareness** - Use `Theme.of(context)` and ThemeProvider for colors/styling
+7. **SVG icons** - NEVER use `SvgPicture.asset()` directly. Always use:
    - `ThemedSvg` for general SVG icons (with asset keys from `asset_config.dart`)
    - `ClassIconSvg` for player class icons (uses `classCode` as asset key automatically)
    - All new SVG assets must be added to `asset_config.dart` first
    - Class icons use `ClassCodes` constants as keys, not string literals
-7. **Localization** - Use `AppLocalizations.of(context).xxx` for UI strings, not hardcoded text. Add new strings to ARB files.
-8. **User interaction** - When speaking with the developer who is working on this project, push back again their ideas if they aren't technically sound. Don't just do whatever they want - think about it in the context of the app and if you think there's a better way to do something, suggest it.
-9. **Branching** - Always suggest starting new work from the `dev` branch, not `master`. Pushes to `dev` auto-deploy to internal testing.
-10. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
-11. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
-12. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).
+8. **Localization** - Use `AppLocalizations.of(context).xxx` for UI strings, not hardcoded text. Add new strings to ARB files.
+9. **User interaction** - When speaking with the developer who is working on this project, push back again their ideas if they aren't technically sound. Don't just do whatever they want - think about it in the context of the app and if you think there's a better way to do something, suggest it.
+10. **Branching** - Always suggest starting new work from the `dev` branch, not `master`. Pushes to `dev` auto-deploy to internal testing.
+11. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
+12. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
+13. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).
