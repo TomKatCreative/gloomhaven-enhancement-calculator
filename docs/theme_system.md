@@ -1,5 +1,69 @@
 # Theme System
 
+## Typography (Scaled M3 Type Scale)
+
+The app uses a scaled version of Google's Material 3 type scale. Display and headline sizes use M3 defaults, while body/title/label sizes are scaled up (~1.3x) for better readability.
+
+### Type Scale Reference
+
+| Style | Size | M3 Default | Usage |
+|-------|------|------------|-------|
+| `displayLarge` | 57 | 57 | Hero text, splash screens |
+| `displayMedium` | 45 | 45 | Character names (PirataOne in custom mode) |
+| `displaySmall` | 36 | 36 | Major headers |
+| `headlineLarge` | 32 | 32 | Screen titles |
+| `headlineMedium` | 28 | 28 | Dialog titles, section headers |
+| `headlineSmall` | 24 | 24 | Card titles, subsection headers |
+| `titleLarge` | 22 | 22 | List item titles, prominent labels |
+| `titleMedium` | 18 | 16 | Form field labels, tab labels |
+| `titleSmall` | 16 | 14 | Metadata labels, timestamps |
+| `bodyLarge` | 20 | 16 | Emphasized body text |
+| `bodyMedium` | 18 | 14 | **Default body text** |
+| `bodySmall` | 16 | 12 | Captions, helper text |
+| `labelLarge` | 16 | 14 | Button text, prominent labels |
+| `labelMedium` | 14 | 12 | Navigation labels, chips |
+| `labelSmall` | 12 | 11 | Badges, tiny annotations |
+
+Reference: https://m3.material.io/styles/typography/type-scale-tokens
+
+### Font Families
+
+The app supports two font modes (toggled in Settings):
+
+| Mode | displayMedium | All Other Styles |
+|------|---------------|------------------|
+| Default | Inter | Inter |
+| Custom | PirataOne (with letterSpacing: 1.5) | Nyala |
+
+In custom mode, only `displayMedium` uses the decorative PirataOne font (for character names). All other text uses Nyala for readability.
+
+### Usage Guidelines
+
+**Always use TextTheme styles** instead of hardcoding font sizes:
+
+```dart
+// ✅ Correct - uses theme
+Text('Hello', style: theme.textTheme.bodyMedium)
+Text('Title', style: theme.textTheme.headlineMedium)
+
+// ❌ Wrong - hardcoded size
+Text('Hello', style: TextStyle(fontSize: 14))
+```
+
+**For cases without BuildContext** (e.g., `game_text_parser.dart`), use the constants from `constants.dart`:
+
+```dart
+// Only when theme is unavailable
+TextStyle(fontSize: fontSizeBodyMedium, fontFamily: pirataOne)
+```
+
+### Key Files
+
+- `lib/theme/app_theme_builder.dart` - TextTheme definitions for both font modes
+- `lib/data/constants.dart` - Font size constants (for edge cases only)
+
+---
+
 ## Color Contrast for Accessibility
 
 The app uses a centralized contrast system to ensure text and UI elements meet WCAG AA accessibility standards (4.5:1 contrast ratio).

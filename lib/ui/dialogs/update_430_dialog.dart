@@ -8,10 +8,10 @@ class Update430Dialog extends StatelessWidget {
   Widget build(BuildContext context) {
     SharedPrefs().showUpdate430Dialog = false;
     return AlertDialog(
-      title: const Text(
+      title: Text(
         'New in version 4.3.0',
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 30),
+        style: Theme.of(context).textTheme.headlineMedium,
       ),
       content: SingleChildScrollView(
         child: Column(

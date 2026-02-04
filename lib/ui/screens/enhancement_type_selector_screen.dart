@@ -206,7 +206,7 @@ class _EnhancementTypeSelectorScreenState
   /// Shows:
   /// - Enhancement icon (with +1 overlay for stat boosts)
   /// - Enhancement name
-  /// - Cost chip (base cost, or strikethrough + discounted if applicable)
+  /// - Cost display (base cost, or strikethrough + discounted if applicable)
   Widget _buildEnhancementTile(
     BuildContext context,
     Enhancement enhancement, {
@@ -225,7 +225,7 @@ class _EnhancementTypeSelectorScreenState
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: _buildEnhancementIcon(enhancement),
       title: Text(enhancement.name, style: theme.textTheme.bodyLarge),
-      trailing: _buildCostChip(
+      trailing: _buildCostDisplay(
         context,
         baseCost: baseCost,
         discountedCost: discountedCost,
@@ -261,12 +261,12 @@ class _EnhancementTypeSelectorScreenState
     );
   }
 
-  /// Builds the cost display chip for an enhancement.
+  /// Builds the cost display for an enhancement.
   ///
   /// If there's a discount (from enhancer level, Hail's discount, etc.),
   /// shows the base cost with strikethrough and the discounted cost.
   /// The ‡ marker indicates Hail's discount is active.
-  Widget _buildCostChip(
+  Widget _buildCostDisplay(
     BuildContext context, {
     required int baseCost,
     required int discountedCost,
@@ -276,9 +276,8 @@ class _EnhancementTypeSelectorScreenState
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return Container(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
       child: hasDiscount
           ? Row(
               mainAxisSize: MainAxisSize.min,
