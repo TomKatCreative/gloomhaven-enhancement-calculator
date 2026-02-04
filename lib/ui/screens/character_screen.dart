@@ -13,7 +13,6 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart'
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/rich_text_notes.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -656,55 +655,38 @@ class _NotesSection extends StatelessWidget {
   const _NotesSection({required this.character});
   final Character character;
 
-  /// Checks if notes have actual content (not just empty or whitespace).
-  /// Handles both plain text and Delta JSON formats.
-  bool _hasContent(String notes) {
-    if (notes.isEmpty) return false;
-    // For Delta JSON, an empty document is [{"insert":"\n"}]
-    if (notes == '[{"insert":"\\n"}]') return false;
-    // Also check for the variant with actual newline character
-    if (notes == '[{"insert":"\n"}]') return false;
-    // For Delta JSON, extract text content and check if it's just whitespace
-    if (notes.startsWith('[')) {
-      // Extract all "insert" values and check if they're just whitespace
-      final insertRegex = RegExp(r'"insert"\s*:\s*"([^"]*)"');
-      final matches = insertRegex.allMatches(notes);
-      final content = matches.map((m) => m.group(1) ?? '').join();
-      // Unescape newlines and check
-      final unescaped = content.replaceAll('\\n', '\n');
-      return unescaped.trim().isNotEmpty;
-    }
-    // Plain text
-    return notes.trim().isNotEmpty;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final charactersModel = context.read<CharactersModel>();
+    CharactersModel charactersModel = context.read<CharactersModel>();
     final isEditMode =
         context.watch<CharactersModel>().isEditMode && !character.isRetired;
 
-    final hasNotes = _hasContent(character.notes);
-
     return Column(
       children: <Widget>[
-        // Header shown in view mode only when there are notes
-        if (!isEditMode && hasNotes) ...[
+        // Hide header in edit mode since the text field has a floating label
+        if (!isEditMode) ...[
           Text(
             AppLocalizations.of(context).notes,
+            textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: smallPadding),
         ],
-        RichTextNotes(
-          key: ValueKey('notes_${character.uuid}'),
-          initialNotes: character.notes,
-          isEditMode: isEditMode,
-          isReadOnly: character.isRetired,
-          onChanged: (value) {
-            charactersModel.updateCharacter(character..notes = value);
-          },
-        ),
+        isEditMode
+            ? TextFormField(
+                key: ValueKey('notes_${character.uuid}'),
+                initialValue: character.notes,
+                maxLines: null,
+                keyboardType: TextInputType.multiline,
+                onChanged: (String value) {
+                  charactersModel.updateCharacter(character..notes = value);
+                },
+                textCapitalization: TextCapitalization.sentences,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context).notes,
+                ),
+              )
+            : Text(character.notes),
       ],
     );
   }
