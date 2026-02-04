@@ -239,8 +239,6 @@ class DatabaseHelper {
       if (oldVersion <= 16) {
         // Rename item_minus_one to ITEM_MINUS_ONE
         await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-        // Convert plain text notes to Delta JSON for Flutter Quill
-        await DatabaseMigrations.migrateNotesToDeltaJson(txn);
       }
       // Always update metadata table
       await DatabaseMigrations.updateMetaDataTable(txn, newVersion);
