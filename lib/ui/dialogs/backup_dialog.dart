@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/utils/settings_helpers.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -29,6 +31,9 @@ enum BackupAction {
 
   /// User saved the backup to device storage (Android only).
   saved,
+
+  /// User saved the backup to a custom location.
+  custom,
 
   /// User shared the backup file.
   shared,
@@ -106,12 +111,20 @@ class _BackupDialogState extends State<BackupDialog> {
     try {
       String value = await DatabaseHelper.instance.generateBackup();
 
-      // Use platform-independent path - getDownloadsDirectory() works on
-      // Android, falls back to external storage if unavailable
-      Directory? downloadsDir = await getDownloadsDirectory();
-      downloadsDir ??= await getExternalStorageDirectory();
+      // Check if user has a custom backup path saved
+      final customPath = SharedPrefs().customBackupPath;
+      Directory? targetDir;
 
-      if (downloadsDir == null) {
+      if (customPath != null && await Directory(customPath).exists()) {
+        targetDir = Directory(customPath);
+      } else {
+        // Use platform-independent path - getDownloadsDirectory() works on
+        // Android, falls back to external storage if unavailable
+        targetDir = await getDownloadsDirectory();
+        targetDir ??= await getExternalStorageDirectory();
+      }
+
+      if (targetDir == null) {
         if (!mounted) return;
         ScaffoldMessenger.of(context)
           ..clearSnackBars()
@@ -121,13 +134,51 @@ class _BackupDialogState extends State<BackupDialog> {
         return;
       }
 
-      final downloadPath = downloadsDir.path;
+      final downloadPath = targetDir.path;
       File backupFile = File('$downloadPath/${_fileNameController.text}.txt');
       await backupFile.writeAsString(value);
       if (!mounted) return;
       Navigator.of(
         context,
       ).pop(BackupResult(action: BackupAction.saved, savedPath: downloadPath));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).backupError)),
+        );
+    }
+  }
+
+  Future<void> _handleChooseLocation() async {
+    if (!_validateFilename()) return;
+
+    if (!await getStoragePermission()) {
+      return;
+    }
+
+    try {
+      // Let user pick a directory
+      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+      if (selectedDirectory == null) {
+        // User cancelled the picker
+        return;
+      }
+
+      // Save the backup to the selected location
+      String value = await DatabaseHelper.instance.generateBackup();
+      File backupFile = File('$selectedDirectory/${_fileNameController.text}.txt');
+      await backupFile.writeAsString(value);
+
+      // Save this path as the new default for future backups
+      SharedPrefs().customBackupPath = selectedDirectory;
+
+      if (!mounted) return;
+      Navigator.of(
+        context,
+      ).pop(BackupResult(action: BackupAction.custom, savedPath: selectedDirectory));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -218,12 +269,18 @@ class _BackupDialogState extends State<BackupDialog> {
             context,
           ).pop(const BackupResult(action: BackupAction.cancelled)),
         ),
-        if (Platform.isAndroid)
+        if (Platform.isAndroid) ...[
           TextButton.icon(
             icon: Icon(MdiIcons.contentSave, color: theme.colorScheme.primary),
             label: Text(l10n.save),
             onPressed: _handleSave,
           ),
+          TextButton.icon(
+            icon: Icon(MdiIcons.folderOpen, color: theme.colorScheme.primary),
+            label: const Text('Choose location...'),
+            onPressed: _handleChooseLocation,
+          ),
+        ],
         TextButton.icon(
           onPressed: _handleShare,
           icon: Platform.isAndroid
