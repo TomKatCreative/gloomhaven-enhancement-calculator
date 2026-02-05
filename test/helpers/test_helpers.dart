@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -84,6 +85,12 @@ class MockThemeProvider extends ThemeProvider {
 /// - [CharactersModel] for character state
 /// - [MaterialApp] wrapper for navigation and theming
 ///
+/// When [withLocalization] is true, adds [AppLocalizations] delegates
+/// so widgets that call `AppLocalizations.of(context)` work correctly.
+///
+/// Use [themeData] to supply a custom [ThemeData] (e.g., with
+/// [DividerThemeData] or [AppThemeExtension]).
+///
 /// Example:
 /// ```dart
 /// await tester.pumpWidget(
@@ -97,6 +104,8 @@ Widget wrapWithProviders({
   required Widget child,
   CharactersModel? charactersModel,
   ThemeProvider? themeProvider,
+  bool withLocalization = false,
+  ThemeData? themeData,
 }) {
   final theme = themeProvider ?? MockThemeProvider();
   final characters =
@@ -107,7 +116,16 @@ Widget wrapWithProviders({
       ChangeNotifierProvider<ThemeProvider>.value(value: theme),
       ChangeNotifierProvider<CharactersModel>.value(value: characters),
     ],
-    child: MaterialApp(home: child),
+    child: MaterialApp(
+      theme: themeData,
+      localizationsDelegates: withLocalization
+          ? AppLocalizations.localizationsDelegates
+          : null,
+      supportedLocales: withLocalization
+          ? AppLocalizations.supportedLocales
+          : const [Locale('en')],
+      home: child,
+    ),
   );
 }
 

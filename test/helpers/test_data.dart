@@ -54,6 +54,7 @@ class TestData {
     int xp = 0,
     int gold = 0,
     int checkMarks = 0,
+    String? notes,
     Variant variant = Variant.base,
     List<CharacterMastery>? characterMasteries,
     List<CharacterPerk>? characterPerks,
@@ -69,6 +70,9 @@ class TestData {
       checkMarks: checkMarks,
       variant: variant,
     );
+    if (notes != null) {
+      character.notes = notes;
+    }
     if (characterMasteries != null) {
       character.characterMasteries = characterMasteries;
     }
