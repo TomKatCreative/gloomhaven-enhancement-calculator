@@ -27,15 +27,8 @@ class CharacterScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use targeted selects to only rebuild when specific properties change,
-    // not during PageView transitions which would cause jank
-    final isEditMode = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
-    final isSheetExpanded = context.select<CharactersModel, bool>(
-      (m) => m.isElementSheetExpanded,
-    );
-    final charactersModel = context.read<CharactersModel>();
+    final model = context.watch<CharactersModel>();
+    final isSheetExpanded = model.isElementSheetExpanded;
     final screenHeight = MediaQuery.of(context).size.height;
 
     // Calculate bottom padding based on sheet state
@@ -46,7 +39,7 @@ class CharacterScreen extends StatelessWidget {
         : _baseFabPadding;
 
     return SingleChildScrollView(
-      controller: charactersModel.charScreenScrollController,
+      controller: context.read<CharactersModel>().charScreenScrollController,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: smallPadding),
         child: Column(
@@ -78,7 +71,7 @@ class CharacterScreen extends StatelessWidget {
               ),
             ),
             // BATTLE GOAL CHECKMARKS & PREVIOUS RETIREMENTS (edit mode only)
-            if (isEditMode && !character.isRetired)
+            if (model.isEditMode && !character.isRetired)
               Container(
                 constraints: const BoxConstraints(maxWidth: 400),
                 child: Padding(
@@ -92,7 +85,7 @@ class CharacterScreen extends StatelessWidget {
                 left: smallPadding,
                 right: smallPadding,
                 top: smallPadding,
-                bottom: isEditMode ? largePadding : smallPadding,
+                bottom: model.isEditMode ? largePadding : smallPadding,
               ),
               child: _ResourcesSection(character: character),
             ),
@@ -104,9 +97,11 @@ class CharacterScreen extends StatelessWidget {
                   left: smallPadding,
                   right: smallPadding,
                   bottom: smallPadding,
-                  top: isEditMode ? largePadding : smallPadding,
+                  top: model.isEditMode ? largePadding : smallPadding,
                 ),
-                child: character.notes.isNotEmpty || isEditMode
+                child:
+                    character.notes.isNotEmpty ||
+                        context.read<CharactersModel>().isEditMode
                     ? _NotesSection(character: character)
                     : const SizedBox(),
               ),
@@ -122,7 +117,7 @@ class CharacterScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(smallPadding),
                 child: MasteriesSection(
                   character: character,
-                  charactersModel: charactersModel,
+                  charactersModel: context.watch<CharactersModel>(),
                 ),
               ),
             // PADDING FOR FAB AND BOTTOM SHEET
@@ -142,9 +137,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use read instead of watch - this widget only shows in edit mode,
-    // which is already handled by the parent's select
-    final charactersModel = context.read<CharactersModel>();
+    final charactersModel = context.watch<CharactersModel>();
     final theme = Theme.of(context);
     final isRetired = character.isRetired;
 
@@ -252,14 +245,10 @@ class _NameAndClassSection extends StatelessWidget {
   final Character character;
   @override
   Widget build(BuildContext context) {
-    // Use targeted select to only rebuild when isEditMode changes
-    final isEditMode = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
-    final charactersModel = context.read<CharactersModel>();
+    CharactersModel charactersModel = context.read<CharactersModel>();
     return Column(
       children: <Widget>[
-        isEditMode && !character.isRetired
+        context.watch<CharactersModel>().isEditMode && !character.isRetired
             ? TextFormField(
                 key: ValueKey('name_${character.uuid}'),
                 initialValue: character.name,
@@ -310,7 +299,8 @@ class _NameAndClassSection extends StatelessWidget {
             ),
           ],
         ),
-        if (character.shouldShowTraits && !isEditMode) ...[
+        if (character.shouldShowTraits &&
+            !context.watch<CharactersModel>().isEditMode) ...[
           const SizedBox(height: largePadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -366,12 +356,10 @@ class _StatsSectionState extends State<_StatsSection> {
 
   @override
   Widget build(BuildContext context) {
-    // Use targeted select to only rebuild when isEditMode changes
-    final isEditModeFromModel = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
     final charactersModel = context.read<CharactersModel>();
-    final isEditMode = isEditModeFromModel && !widget.character.isRetired;
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode &&
+        !widget.character.isRetired;
 
     // Edit mode: Show XP and Gold with external labels, plus Battle Goals and Pocket
     if (isEditMode) {
@@ -672,12 +660,9 @@ class _NotesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use targeted select to only rebuild when isEditMode changes
-    final isEditModeFromModel = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
-    final charactersModel = context.read<CharactersModel>();
-    final isEditMode = isEditModeFromModel && !character.isRetired;
+    CharactersModel charactersModel = context.read<CharactersModel>();
+    final isEditMode =
+        context.watch<CharactersModel>().isEditMode && !character.isRetired;
 
     return Column(
       children: <Widget>[
