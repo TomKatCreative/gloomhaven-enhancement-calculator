@@ -77,7 +77,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // TEMPORARY ENHANCEMENT
   // ============================================================================
 
-  static const String temporaryEnhancement = "'Temporary Enhancement' Variant";
+  static const String temporaryEnhancement = "Temporary enhancements";
 
   static const String _temporaryEnhancementContent =
       "With this variant, enhancement stickers are removed when a character retires. This "
@@ -103,7 +103,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // SCENARIO 114 REWARD (PARTY BOON)
   // ============================================================================
 
-  static const String scenario114RewardTitle = "Scenario 114 Reward";
+  static const String scenario114RewardTitle = "Scenario 114 reward";
 
   static const String _scenario114RewardContent =
       "After completing Scenario 114 (from the Forgotten Circles expansion), your party "
@@ -141,7 +141,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // HAIL'S DISCOUNT
   // ============================================================================
 
-  static const String hailsDiscountTitle = "Hail's Discount";
+  static const String hailsDiscountTitle = "Hail's discount";
 
   static const String _hailsDiscountContent =
       "Hail from the Mercenary Pack has a Perk that reduces the cost of the party's "
@@ -155,7 +155,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // CARD LEVEL
   // ============================================================================
 
-  static const String cardLevelInfoTitle = "Card Level Fee";
+  static const String cardLevelInfoTitle = "Card level fee";
 
   static String _cardLevelContent({
     required GameEdition edition,
@@ -203,7 +203,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // ============================================================================
 
   static const String previousEnhancementsInfoTitle =
-      "Previous Enhancements Fee";
+      "Previous enhancements fee";
 
   static String _previousEnhancementsContent({
     required GameEdition edition,
@@ -412,7 +412,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // MULTIPLE TARGETS
   // ============================================================================
 
-  static const String multipleTargetsInfoTitle = "Multiple Targets Multiplier";
+  static const String multipleTargetsInfoTitle = "Multiple targets multiplier";
 
   static String _multipleTargetsContent({
     required GameEdition edition,
@@ -456,7 +456,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
 
   static String lostNonPersistentInfoTitle({required GameEdition edition}) {
     // GH2E doesn't have persistent modifier, so title is just "Lost"
-    return edition.hasPersistentModifier ? "Lost & Non-Persistent" : "Lost";
+    return edition.hasPersistentModifier ? "Lost & non-persistent" : "Lost";
   }
 
   static String _lostNonPersistentContent({required GameEdition edition}) {
@@ -499,7 +499,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // NEW CHARACTER
   // ============================================================================
 
-  static const String newCharacterInfoTitle = "New Character";
+  static const String newCharacterInfoTitle = "New character";
 
   static String _newCharacterContent({required GameEdition edition}) {
     switch (edition) {

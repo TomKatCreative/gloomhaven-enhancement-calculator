@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportAndFeedback.
   ///
   /// In en, this message translates to:
-  /// **'Support & Feedback'**
+  /// **'Support & feedback'**
   String get supportAndFeedback;
 
   /// No description provided for @name.
@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @previousRetirements.
   ///
   /// In en, this message translates to:
-  /// **'Previous Retirements'**
+  /// **'Previous retirements'**
   String get previousRetirements;
 
   /// No description provided for @pocketItemsAllowed.
@@ -269,25 +269,25 @@ abstract class AppLocalizations {
   /// No description provided for @battleGoals.
   ///
   /// In en, this message translates to:
-  /// **'Battle Goals'**
+  /// **'Battle goals'**
   String get battleGoals;
 
   /// No description provided for @cardLevel.
   ///
   /// In en, this message translates to:
-  /// **'Card Level'**
+  /// **'Card level'**
   String get cardLevel;
 
   /// No description provided for @previousEnhancements.
   ///
   /// In en, this message translates to:
-  /// **'Previous Enhancements'**
+  /// **'Previous enhancements'**
   String get previousEnhancements;
 
   /// No description provided for @enhancementType.
   ///
   /// In en, this message translates to:
-  /// **'Enhancement Type'**
+  /// **'Enhancement type'**
   String get enhancementType;
 
   /// No description provided for @actionDetails.
@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// No description provided for @cardDetails.
   ///
   /// In en, this message translates to:
-  /// **'Card Details'**
+  /// **'Card details'**
   String get cardDetails;
 
   /// No description provided for @discounts.
@@ -311,13 +311,13 @@ abstract class AppLocalizations {
   /// No description provided for @enhancementCalculator.
   ///
   /// In en, this message translates to:
-  /// **'Enhancement Calculator'**
+  /// **'Enhancement calculator'**
   String get enhancementCalculator;
 
   /// No description provided for @enhancementGuidelines.
   ///
   /// In en, this message translates to:
-  /// **'Enhancement Guidelines'**
+  /// **'Enhancement guidelines'**
   String get enhancementGuidelines;
 
   /// No description provided for @type.
@@ -329,19 +329,19 @@ abstract class AppLocalizations {
   /// No description provided for @multipleTargets.
   ///
   /// In en, this message translates to:
-  /// **'Multiple Targets'**
+  /// **'Multiple targets'**
   String get multipleTargets;
 
   /// No description provided for @generalGuidelines.
   ///
   /// In en, this message translates to:
-  /// **'General Guidelines'**
+  /// **'General guidelines'**
   String get generalGuidelines;
 
   /// No description provided for @scenario114Reward.
   ///
   /// In en, this message translates to:
-  /// **'Scenario 114 Reward'**
+  /// **'Scenario 114 reward'**
   String get scenario114Reward;
 
   /// No description provided for @forgottenCirclesSpoilers.
@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @temporaryEnhancement.
   ///
   /// In en, this message translates to:
-  /// **'Temporary Enhancement'**
+  /// **'Temporary enhancements'**
   String get temporaryEnhancement;
 
   /// No description provided for @variant.
@@ -431,7 +431,7 @@ abstract class AppLocalizations {
   /// No description provided for @hailsDiscount.
   ///
   /// In en, this message translates to:
-  /// **'Hail\'s Discount'**
+  /// **'Hail\'s discount'**
   String get hailsDiscount;
 
   /// No description provided for @lossNonPersistent.
@@ -479,7 +479,7 @@ abstract class AppLocalizations {
   /// No description provided for @customClasses.
   ///
   /// In en, this message translates to:
-  /// **'Custom Classes'**
+  /// **'Custom classes'**
   String get customClasses;
 
   /// No description provided for @customClassesDescription.
@@ -569,7 +569,7 @@ abstract class AppLocalizations {
   /// No description provided for @useInterFont.
   ///
   /// In en, this message translates to:
-  /// **'Use Inter Font'**
+  /// **'Use Inter font'**
   String get useInterFont;
 
   /// No description provided for @useInterFontDescription.
@@ -581,7 +581,7 @@ abstract class AppLocalizations {
   /// No description provided for @showRetiredCharacters.
   ///
   /// In en, this message translates to:
-  /// **'Show Retired Characters'**
+  /// **'Show retired characters'**
   String get showRetiredCharacters;
 
   /// No description provided for @showRetiredCharactersDescription.
@@ -599,7 +599,7 @@ abstract class AppLocalizations {
   /// No description provided for @backupDescription.
   ///
   /// In en, this message translates to:
-  /// **'Backup your current characters'**
+  /// **'Backup your current characters to your device'**
   String get backupDescription;
 
   /// No description provided for @restore.
@@ -611,7 +611,7 @@ abstract class AppLocalizations {
   /// No description provided for @restoreDescription.
   ///
   /// In en, this message translates to:
-  /// **'Restore your characters from a backup file'**
+  /// **'Restore your characters from a backup file on your device'**
   String get restoreDescription;
 
   /// No description provided for @backupFileWarning.
@@ -665,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @createAll.
   ///
   /// In en, this message translates to:
-  /// **'Create All'**
+  /// **'Create all'**
   String get createAll;
 
   /// No description provided for @gloomhaven.
@@ -749,13 +749,13 @@ abstract class AppLocalizations {
   /// No description provided for @createCharacter.
   ///
   /// In en, this message translates to:
-  /// **'Create Character'**
+  /// **'Create character'**
   String get createCharacter;
 
   /// No description provided for @gameEdition.
   ///
   /// In en, this message translates to:
-  /// **'Game Edition'**
+  /// **'Game edition'**
   String get gameEdition;
 
   /// No description provided for @selectClass.

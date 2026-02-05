@@ -9,21 +9,21 @@ import 'dart:ui';
 // Prefer using theme.textTheme styles. These constants are for edge cases
 // where BuildContext is unavailable (e.g., game_text_parser.dart).
 // Based on M3 type scale, with body/label/title sizes scaled up for readability.
-const double fontSizeDisplayLarge = 57.0;
-const double fontSizeDisplayMedium = 45.0;
-const double fontSizeDisplaySmall = 36.0;
-const double fontSizeHeadlineLarge = 32.0;
-const double fontSizeHeadlineMedium = 28.0;
-const double fontSizeHeadlineSmall = 24.0;
-const double fontSizeTitleLarge = 22.0;
-const double fontSizeTitleMedium = 18.0;
-const double fontSizeTitleSmall = 16.0;
-const double fontSizeBodyLarge = 20.0;
-const double fontSizeBodyMedium = 18.0;
-const double fontSizeBodySmall = 16.0;
-const double fontSizeLabelLarge = 16.0;
-const double fontSizeLabelMedium = 14.0;
-const double fontSizeLabelSmall = 12.0;
+const double fontSizeDisplayLarge = 59.0;
+const double fontSizeDisplayMedium = 47.0;
+const double fontSizeDisplaySmall = 38.0;
+const double fontSizeHeadlineLarge = 34.0;
+const double fontSizeHeadlineMedium = 30.0;
+const double fontSizeHeadlineSmall = 26.0;
+const double fontSizeTitleLarge = 24.0;
+const double fontSizeTitleMedium = 20.0;
+const double fontSizeTitleSmall = 18.0;
+const double fontSizeBodyLarge = 24.0;
+const double fontSizeBodyMedium = 22.0;
+const double fontSizeBodySmall = 20.0;
+const double fontSizeLabelLarge = 18.0;
+const double fontSizeLabelMedium = 16.0;
+const double fontSizeLabelSmall = 14.0;
 
 // Padding - use these for all spacing (never hardcode values like 4, 8, 16)
 const double tinyPadding = 4.0; // Minimal spacing, tight layouts

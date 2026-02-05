@@ -103,10 +103,7 @@ class ThemedSvg extends StatelessWidget {
       // Use SvgTheme so only parts with fill="currentColor" or
       // stroke="currentColor" change color
       CurrentColorTheme() => SvgPicture(
-        SvgAssetLoader(
-          fullPath,
-          theme: SvgTheme(currentColor: onSurface),
-        ),
+        SvgAssetLoader(fullPath, theme: SvgTheme(currentColor: onSurface)),
         width: effectiveWidth,
         height: height,
       ),

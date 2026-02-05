@@ -90,7 +90,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         scrollController: _scrollController,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: smallPadding),
+            padding: const EdgeInsets.only(right: largePadding),
             child: TextButton.icon(
               icon: const Icon(Icons.how_to_reg_rounded),
               label: Text(AppLocalizations.of(context).create),
@@ -212,12 +212,12 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           height: 48,
           child: Center(
             child: SizedBox(
-              width: iconSizeLarge,
-              height: iconSizeLarge,
+              width: iconSizeMedium,
+              height: iconSizeMedium,
               child: _selectedClass == null
                   ? ThemedSvg(
                       assetKey: 'CLASS',
-                      width: iconSizeLarge,
+                      width: iconSizeMedium,
                       color: theme.colorScheme.onSurfaceVariant,
                     )
                   : ClassIconSvg(playerClass: _selectedClass!),
@@ -240,8 +240,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           label:
               '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
           svgAssetKey: 'LEVEL',
-          iconSize: iconSizeLarge,
-          textStyle: theme.textTheme.bodyLarge?.copyWith(
+          iconSize: iconSizeMedium,
+          textStyle: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
@@ -314,11 +314,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         // Custom label row with info button instead of standard icon
         Row(
           children: [
-            IconButton(
-              icon: const Icon(Icons.info_outline_rounded, size: iconSizeLarge),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-              onPressed: () => showDialog<void>(
+            InkWell(
+              borderRadius: BorderRadius.circular(borderRadiusMedium),
+              onTap: () => showDialog<void>(
                 context: context,
                 builder: (_) {
                   return InfoDialog(
@@ -331,11 +329,16 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   );
                 },
               ),
+              child: Icon(
+                Icons.info_outline_rounded,
+                size: iconSizeMedium,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(width: smallPadding),
             Text(
               AppLocalizations.of(context).gameEdition,
-              style: theme.textTheme.bodyLarge?.copyWith(
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
@@ -354,7 +357,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               ),
               ButtonSegment(
                 value: GameEdition.gloomhaven2e,
-                label: const Text('GH2E'),
+                label: const Text('GH2e'),
                 tooltip: 'Gloomhaven 2nd Edition',
               ),
               ButtonSegment(

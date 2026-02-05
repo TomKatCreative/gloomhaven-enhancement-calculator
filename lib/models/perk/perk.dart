@@ -21,7 +21,7 @@ class Perk {
     perkId = map[columnPerkId];
     classCode = map[columnPerkClass];
     perkDetails = map[columnPerkDetails];
-    grouped = map[columnPerkIsGrouped] == 1 ? true : false;
+    grouped = map[columnPerkIsGrouped] == 1;
     variant = Variant.values.firstWhere(
       (element) => element.name == map[columnPerkVariant],
     );

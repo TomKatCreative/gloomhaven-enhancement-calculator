@@ -239,17 +239,6 @@ Add to ARB files:
 
 ---
 
-## Enhancement Type Card - Make it stand out ✅ DONE
-
-**Implemented:** Pinned header with animated primary-colored glow.
-
-- Card is now pinned at the top (stays visible when scrolling)
-- Pulsing glow animation when no enhancement is selected (draws attention)
-- Subtle static glow when enhancement is selected
-- Larger icon (40px vs 30px) and text (titleLarge vs bodyMedium) for prominence
-
----
-
 ## Font Consolidation - Investigate
 
 Consider changing fonts to use **Tinos** for body text and **Germania One** for subtitles (keeping Pirata One for select large titles). This would mean we could potentially remove some of the font assets and use Google Fonts or built-in alternatives.
@@ -259,3 +248,96 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 - Which current font assets could be removed (HighTower, Nyala, OpenSans, Roboto)?
 - How would this affect app bundle size?
 - Visual comparison of current fonts vs proposed alternatives
+
+---
+
+## Code Audit Refactors - Remaining Issue
+
+**Added:** 2026-02-04
+**Status:** Pending
+
+### Convert `_build*` Methods to Proper Widgets
+
+**Problem:** Throughout the codebase, there are methods like `Widget _buildMyWidget()` that return widgets. This pattern:
+- Doesn't benefit from Flutter's widget lifecycle optimizations
+- Makes the code harder to test in isolation
+- Mixes widget building logic with parent widget state
+
+**Goal:** Scan the app for `Widget _build` method patterns and convert them to proper StatelessWidget or StatefulWidget classes.
+
+**Files to scan:**
+- `lib/ui/screens/*.dart`
+- `lib/ui/widgets/**/*.dart`
+
+**Exceptions (acceptable patterns):**
+- Methods that need direct access to parent state/controllers that would be awkward to pass as props
+- Very simple one-liner builders
+
+---
+
+## Enhanced Backup System
+
+**Added:** 2026-02-04
+**Status:** Pending
+
+Currently, backup only exports SQLite database (characters, perks, masteries). SharedPreferences (39 keys including theme, calculator state, unlocked classes, element tracker) are NOT backed up.
+
+### Improvements
+
+#### 1. Include SharedPreferences in Backup (High Priority)
+
+**Files to modify:**
+- `lib/shared_prefs.dart` - Add `toJson()` and `fromJson()` methods
+- `lib/data/database_helpers.dart` - Include SharedPrefs in `generateBackup()` output
+- `lib/ui/dialogs/restore_dialog.dart` - Restore SharedPrefs from backup
+
+**Backup JSON structure:**
+```json
+{
+  "version": 2,
+  "database": [...current backup format...],
+  "settings": {
+    "darkTheme": true,
+    "gameEdition": 0,
+    "primaryClassColor": 0xff4e7ec1,
+    ...
+  }
+}
+```
+
+**Exclude from backup:** Transient keys like `showUpdate4Dialog`, `clearOldPrefs`
+
+#### 2. One-Tap Backup Sharing
+
+Currently: Backup → Save to Downloads → User must find file to share
+Improved: Backup → Immediate share sheet option (keep save option too)
+
+**File:** `lib/ui/dialogs/backup_dialog.dart`
+
+#### 3. Auto-Backup to App Documents
+
+- Write backup to app documents directory after each character save
+- Keep last 5 auto-backups, rotate oldest
+- No user action required
+
+**Files to modify:**
+- `lib/viewmodels/characters_model.dart` - Trigger auto-backup on character save
+- New file: `lib/data/auto_backup_service.dart` - Handle rotation logic
+
+#### 4. Backup Age Reminder
+
+- Track last manual backup date in SharedPrefs
+- Show subtle indicator in Settings if >30 days since last backup
+- "Last backed up: 45 days ago" with warning color
+
+**Files to modify:**
+- `lib/shared_prefs.dart` - Add `lastManualBackupDate` key
+- `lib/ui/widgets/settings/backup_settings_section.dart` - Show last backup indicator
+- `lib/ui/dialogs/backup_dialog.dart` - Update timestamp on successful backup
+
+### Implementation Order
+
+1. SharedPrefs in backup (most value, lowest effort)
+2. Backup age reminder (quick win)
+3. One-tap sharing (UX improvement)
+4. Auto-backup (nice-to-have)

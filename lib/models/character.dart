@@ -1,3 +1,30 @@
+/// Character model representing a player's character instance.
+///
+/// A [Character] is an instance of a [PlayerClass] with stats, resources,
+/// and progression tracking. Characters are persisted to SQLite via
+/// [DatabaseHelper].
+///
+/// ## Key Concepts
+///
+/// - **Level**: Derived from XP using thresholds (1-9)
+/// - **Perks**: Selected from class-specific perk lists, earned through
+///   leveling, check marks, retirements, and masteries
+/// - **Masteries**: Frosthaven feature - achievement goals that grant
+///   additional perks when completed
+/// - **Resources**: Frosthaven crafting materials (9 types)
+/// - **Variant**: Class variant affecting perks (base, crossover, 2E, etc.)
+///
+/// ## Database Columns
+///
+/// The `column*` constants define SQLite column names. The model supports
+/// both UUID-based identification (current) and legacy integer IDs.
+///
+/// See also:
+/// - [PlayerClass] for class definitions
+/// - [CharacterPerk] and [CharacterMastery] for join tables
+/// - `docs/models_reference.md` for full documentation
+library;
+
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
@@ -8,6 +35,7 @@ import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 
 import 'player_class.dart';
 
+// Database table name
 const String tableCharacters = 'Characters';
 
 const String columnCharacterId = '_id';
@@ -31,6 +59,27 @@ const String columnResourceSnowthistle = 'ResourceSnowThistle';
 const String columnIsRetired = 'IsRetired';
 const String columnVariant = 'Variant';
 
+/// A player character instance with stats, resources, and progression.
+///
+/// Characters belong to a [PlayerClass] and track:
+/// - Core stats: XP, gold, check marks, notes
+/// - Frosthaven resources: 9 crafting material types
+/// - Perks: Selected attack modifier deck changes
+/// - Masteries: Achievement goals (Frosthaven+ only)
+///
+/// ## Level Calculation
+///
+/// Level is derived from XP using thresholds defined in [PlayerClasses]:
+/// - Level 2: 45 XP
+/// - Level 3: 95 XP
+/// - Level 4: 150 XP
+/// - ... up to Level 9: 500 XP
+///
+/// ## Maximum Perks Formula
+///
+/// ```
+/// maxPerks = (level - 1) + (checkMarks / 3) + retirements + masteryCount
+/// ```
 class Character {
   int? id;
   late String uuid;
@@ -101,7 +150,7 @@ class Character {
     resourceFlamefruit = map[columnResourceFlamefruit] ?? 0;
     resourceCorpsecap = map[columnResourceCorpsecap] ?? 0;
     resourceSnowthistle = map[columnResourceSnowthistle] ?? 0;
-    isRetired = map[columnIsRetired] == 1 ? true : false;
+    isRetired = map[columnIsRetired] == 1;
     variant = Variant.values.firstWhere(
       (variant) => variant.name == map[columnVariant],
     );
@@ -130,16 +179,25 @@ class Character {
     columnVariant: variant.name,
   };
 
+  /// Returns the effective theme color for this character.
+  ///
+  /// Retired characters return a neutral color (white in dark mode,
+  /// black in light mode). Active characters return the class primary color.
   Color getEffectiveColor(Brightness brightness) {
     return isRetired
         ? (brightness == Brightness.dark ? Colors.white : Colors.black)
         : Color(playerClass.primaryColor);
   }
 
+  /// Converts XP to character level (1-9).
   static int level(int xp) => PlayerClasses.levelByXp(xp);
 
+  /// Returns the XP threshold for the next level, or null at max level.
   static int xpForNextLevel(int level) => PlayerClasses.nextXpByLevel(level);
 
+  /// Calculates the maximum number of perks available for a character.
+  ///
+  /// Formula: (level - 1) + (checkMarks / 3) + retirements + achievedMasteries
   static int maximumPerks(Character character) {
     int sum = 0;
     sum += level(character.xp) - 1;
@@ -153,30 +211,45 @@ class Character {
     return sum;
   }
 
-  int checkMarkProgress() => checkMarks != 0
+  /// Maximum pocket items allowed, calculated as level / 2 (rounded).
+  int get pocketItemsAllowed => (level(xp) / 2).round();
+
+  /// Progress toward the next perk from check marks (0, 1, 2, or 3).
+  ///
+  /// Every 3 check marks grants 1 additional perk. This getter returns
+  /// the current progress within the current cycle.
+  int get checkMarkProgress => checkMarks != 0
       ? checkMarks % 3 == 0
             ? 3
             : checkMarks % 3
       : 0;
 
-  int numOfSelectedPerks() => characterPerks.fold(
+  /// Count of perks currently selected for this character.
+  int get numOfSelectedPerks => characterPerks.fold(
     0,
     (previousValue, perk) =>
         previousValue + (perk.characterPerkIsSelected ? 1 : 0),
   );
 
-  bool showTraits() =>
+  /// Whether to display class traits for this character.
+  ///
+  /// Traits are hidden when:
+  /// - The class has no traits defined
+  /// - Base variant of non-Frosthaven classes
+  /// - Gloomhaven 2E variant (different trait system)
+  bool get shouldShowTraits =>
       !(playerClass.traits.isEmpty ||
           (playerClass.category != ClassCategory.frosthaven &&
                   variant == Variant.base ||
               variant == Variant.gloomhaven2E));
 
-  String getClassSubtitle() => playerClass.getFullDisplayName(variant);
+  /// Full display name including race and variant name (e.g., "Inox Brute").
+  String get classSubtitle => playerClass.getFullDisplayName(variant);
 
   // TODO: modify this to include Custom and Crimson Scales once they have masteries
   // for now, have to manually add the Custom Classes that have masteries but aren't
   // yet Frosthaven Crossover versions
-  bool showMasteries() =>
+  bool get shouldShowMasteries =>
       playerClass.classCode == ClassCodes.vimthreader ||
       playerClass.classCode == ClassCodes.core ||
       playerClass.classCode == ClassCodes.dome ||

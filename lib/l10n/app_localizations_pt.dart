@@ -66,7 +66,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get license => 'Licença';
 
   @override
-  String get supportAndFeedback => 'Suporte e Feedback';
+  String get supportAndFeedback => 'Suporte e feedback';
 
   @override
   String get name => 'Nome';
@@ -87,7 +87,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get retired => '(aposentado)';
 
   @override
-  String get previousRetirements => 'Aposentadorias Anteriores';
+  String get previousRetirements => 'Aposentadorias anteriores';
 
   @override
   String pocketItemsAllowed(int count) {
@@ -101,49 +101,49 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get battleGoals => 'Objetivo de Batalha';
+  String get battleGoals => 'Objetivo de batalha';
 
   @override
-  String get cardLevel => 'Nível da Carta';
+  String get cardLevel => 'Nível da carta';
 
   @override
-  String get previousEnhancements => 'Melhorias Anteriores';
+  String get previousEnhancements => 'Melhorias anteriores';
 
   @override
-  String get enhancementType => 'Tipo de Melhoria';
+  String get enhancementType => 'Tipo de melhoria';
 
   @override
   String get actionDetails => 'Melhoria';
 
   @override
-  String get cardDetails => 'Detalhes do Cartão';
+  String get cardDetails => 'Detalhes do cartão';
 
   @override
   String get discounts => 'Descontos';
 
   @override
-  String get enhancementCalculator => 'Calculadora de Melhorias';
+  String get enhancementCalculator => 'Calculadora de melhorias';
 
   @override
-  String get enhancementGuidelines => 'Diretrizes de Melhoria';
+  String get enhancementGuidelines => 'Diretrizes de melhoria';
 
   @override
   String get type => 'Selecionar tipo...';
 
   @override
-  String get multipleTargets => 'Múltiplos Alvos';
+  String get multipleTargets => 'Múltiplos alvos';
 
   @override
-  String get generalGuidelines => 'Diretrizes Gerais';
+  String get generalGuidelines => 'Diretrizes gerais';
 
   @override
-  String get scenario114Reward => 'Recompensa do Cenário 114';
+  String get scenario114Reward => 'Recompensa do cenário 114';
 
   @override
   String get forgottenCirclesSpoilers => 'Spoilers de Forgotten Circles';
 
   @override
-  String get temporaryEnhancement => 'Melhoria Temporária';
+  String get temporaryEnhancement => 'Melhorias temporárias';
 
   @override
   String get variant => 'Variante';
@@ -194,7 +194,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get persistent => 'Persistente';
 
   @override
-  String get eligibleFor => 'Elegível Para';
+  String get eligibleFor => 'Elegível para';
 
   @override
   String get gameplay => 'JOGABILIDADE';
@@ -209,7 +209,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get testing => 'TESTE';
 
   @override
-  String get customClasses => 'Classes Personalizadas';
+  String get customClasses => 'Classes personalizadas';
 
   @override
   String get customClassesDescription =>
@@ -255,14 +255,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get light => 'Claro';
 
   @override
-  String get useInterFont => 'Usar Fonte Inter';
+  String get useInterFont => 'Usar fonte Inter';
 
   @override
   String get useInterFontDescription =>
       'Substituir fontes estilizadas por Inter para melhorar a legibilidade';
 
   @override
-  String get showRetiredCharacters => 'Mostrar Personagens Aposentados';
+  String get showRetiredCharacters => 'Mostrar personagens aposentados';
 
   @override
   String get showRetiredCharactersDescription =>
@@ -272,14 +272,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backup => 'Backup';
 
   @override
-  String get backupDescription => 'Fazer backup dos seus personagens atuais';
+  String get backupDescription =>
+      'Fazer backup dos seus personagens atuais para o seu dispositivo';
 
   @override
   String get restore => 'Restaurar';
 
   @override
   String get restoreDescription =>
-      'Restaurar seus personagens de um arquivo de backup';
+      'Restaurar seus personagens de um arquivo de backup no seu dispositivo';
 
   @override
   String get backupFileWarning =>
@@ -305,7 +306,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Restaurar um arquivo de backup substituirá todos os personagens atuais. Deseja continuar?';
 
   @override
-  String get errorDuringRestore => 'Erro Durante a Operação de Restauração';
+  String get errorDuringRestore => 'Erro durante a operação de restauração';
 
   @override
   String restoreErrorMessage(String error) {
@@ -313,7 +314,7 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get createAll => 'Criar Todos';
+  String get createAll => 'Criar todos';
 
   @override
   String get gloomhaven => 'Gloomhaven';
@@ -359,10 +360,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pleaseSelectClass => 'Por favor, selecione uma Classe';
 
   @override
-  String get createCharacter => 'Criar Personagem';
+  String get createCharacter => 'Criar personagem';
 
   @override
-  String get gameEdition => 'Edição do Jogo';
+  String get gameEdition => 'Edição do jogo';
 
   @override
   String get selectClass => 'Selecionar classe...';

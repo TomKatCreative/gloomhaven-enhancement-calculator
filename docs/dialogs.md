@@ -133,6 +133,39 @@ await RestoreDialog.show(context: context);
 - Error dialog with copy-to-clipboard option
 - Automatic navigation after success
 
+## EnhancerDialog
+
+Dialog for configuring Frosthaven Building 44 (Enhancer) levels, which provide progressive discounts on enhancement costs.
+
+**Usage:**
+```dart
+// Typically opened from the Enhancement Calculator screen
+EnhancerDialog.show(
+  context: context,
+  model: enhancementCalculatorModel,
+);
+```
+
+**Features:**
+- Four checkbox levels representing Enhancer building progression
+- Level 1 is always enabled (baseline: ability to buy enhancements)
+- Levels 2-4 have blurred subtitles when unchecked (spoiler prevention)
+- Each level unlocks specific cost reductions:
+  - **Level 2**: Reduces base enhancement costs
+  - **Level 3**: Reduces card level penalties
+  - **Level 4**: Reduces previous enhancement penalties
+- State persisted via SharedPrefs (enhancerLvl2/3/4 keys)
+- Triggers `model.calculateCost()` on checkbox changes
+- Cascading level logic enforced in SharedPrefs setters (see `docs/shared_prefs_keys.md`)
+
+**Internal Widgets:**
+- `_EnhancerLevelTile` - Individual level row with checkbox, title, and conditionally-blurred subtitle
+
+**Design Notes:**
+- Frosthaven-specific feature (only shown when edition = Frosthaven)
+- Uses `ImageFiltered` with blur for spoiler prevention on locked levels
+- AlertDialog with centered title, scrollable content, and close button
+
 ## Best Practices
 
 - Use `ConfirmationDialog` for simple yes/no confirmations

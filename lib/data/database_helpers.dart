@@ -76,119 +76,155 @@ class DatabaseHelper {
   Future _onCreate(Database db, int version) async {
     await db.transaction((txn) async {
       await DatabaseMigrations.createMetaDataTable(txn, version);
-      await txn.execute('''
-        $createTable $tableCharacters (
-          $columnCharacterId $idType,
-          $columnCharacterUuid $textType,
-          $columnCharacterName $textType,
-          $columnCharacterClassCode $textType,
-          $columnPreviousRetirements $integerType,
-          $columnCharacterXp $integerType,
-          $columnCharacterGold $integerType,
-          $columnCharacterNotes $textType,
-          $columnCharacterCheckMarks $integerType,
-          $columnIsRetired $boolType,
-          $columnResourceHide $integerType,
-          $columnResourceMetal $integerType,
-          $columnResourceLumber $integerType,
-          $columnResourceArrowvine $integerType,
-          $columnResourceAxenut $integerType,
-          $columnResourceRockroot $integerType,
-          $columnResourceFlamefruit $integerType,
-          $columnResourceCorpsecap $integerType,
-          $columnResourceSnowthistle $integerType,
-          $columnVariant $textType
-        )''');
-      await txn.execute('''
-        $createTable $tablePerks (
-          $columnPerkId $idTextPrimaryType,
-          $columnPerkClass $textType,
-          $columnPerkDetails $textType,
-          $columnPerkIsGrouped $boolType DEFAULT 0,
-          $columnPerkVariant $textType
-        )''');
-      await Future.forEach(PerksRepository.perksMap.entries, (entry) async {
-        final classCode = entry.key;
-        final perkLists = entry.value;
-        for (Perks list in perkLists) {
-          for (Perk perk in list.perks) {
-            perk.variant = list.variant;
-            perk.classCode = classCode;
-            for (int i = 0; i < perk.quantity; i++) {
-              String index = (list.perks.indexOf(perk) + 1).toString().padLeft(
-                2,
-                '0',
-              );
-              await txn.insert(
-                tablePerks,
-                perk.toMap('$index${indexToLetter(i)}'),
-              );
-            }
-          }
-        }
-      });
-      await txn.execute('''
-        $createTable $tableCharacterPerks (
-          $columnAssociatedCharacterUuid $textType,
-          $columnAssociatedPerkId $textType,
-          $columnCharacterPerkIsSelected $boolType
-        )''');
-      await txn.execute('''
-        $createTable $tableMasteries (
-          $columnMasteryId $idTextPrimaryType,
-          $columnMasteryClass $textType,
-          $columnMasteryDetails $textType,
-          $columnMasteryVariant $textType
-        )''');
-      await Future.forEach(MasteriesRepository.masteriesMap.entries, (
-        entry,
-      ) async {
-        final classCode = entry.key;
-        final masteriesList = entry.value;
-        for (Masteries list in masteriesList) {
-          for (Mastery mastery in list.masteries) {
-            mastery.variant = list.variant;
-            mastery.classCode = classCode;
+      await _createTables(txn);
+      await _seedPerks(txn);
+      await _seedMasteries(txn);
+    });
+  }
+
+  /// Creates all database tables (Characters, Perks, CharacterPerks,
+  /// Masteries, CharacterMasteries).
+  Future<void> _createTables(Transaction txn) async {
+    await txn.execute('''
+      $createTable $tableCharacters (
+        $columnCharacterId $idType,
+        $columnCharacterUuid $textType,
+        $columnCharacterName $textType,
+        $columnCharacterClassCode $textType,
+        $columnPreviousRetirements $integerType,
+        $columnCharacterXp $integerType,
+        $columnCharacterGold $integerType,
+        $columnCharacterNotes $textType,
+        $columnCharacterCheckMarks $integerType,
+        $columnIsRetired $boolType,
+        $columnResourceHide $integerType,
+        $columnResourceMetal $integerType,
+        $columnResourceLumber $integerType,
+        $columnResourceArrowvine $integerType,
+        $columnResourceAxenut $integerType,
+        $columnResourceRockroot $integerType,
+        $columnResourceFlamefruit $integerType,
+        $columnResourceCorpsecap $integerType,
+        $columnResourceSnowthistle $integerType,
+        $columnVariant $textType
+      )''');
+
+    await txn.execute('''
+      $createTable $tablePerks (
+        $columnPerkId $idTextPrimaryType,
+        $columnPerkClass $textType,
+        $columnPerkDetails $textType,
+        $columnPerkIsGrouped $boolType DEFAULT 0,
+        $columnPerkVariant $textType
+      )''');
+
+    await txn.execute('''
+      $createTable $tableCharacterPerks (
+        $columnAssociatedCharacterUuid $textType,
+        $columnAssociatedPerkId $textType,
+        $columnCharacterPerkIsSelected $boolType
+      )''');
+
+    await txn.execute('''
+      $createTable $tableMasteries (
+        $columnMasteryId $idTextPrimaryType,
+        $columnMasteryClass $textType,
+        $columnMasteryDetails $textType,
+        $columnMasteryVariant $textType
+      )''');
+
+    await txn.execute('''
+      $createTable $tableCharacterMasteries (
+        $columnAssociatedCharacterUuid $textType,
+        $columnAssociatedMasteryId $textType,
+        $columnCharacterMasteryAchieved $boolType
+      )''');
+  }
+
+  /// Seeds the Perks table from PerksRepository.
+  Future<void> _seedPerks(Transaction txn) async {
+    for (final entry in PerksRepository.perksMap.entries) {
+      final classCode = entry.key;
+      final perkLists = entry.value;
+
+      for (final list in perkLists) {
+        for (int perkIndex = 0; perkIndex < list.perks.length; perkIndex++) {
+          final perk = list.perks[perkIndex];
+          perk.variant = list.variant;
+          perk.classCode = classCode;
+
+          final paddedIndex = (perkIndex + 1).toString().padLeft(2, '0');
+          for (int i = 0; i < perk.quantity; i++) {
             await txn.insert(
-              tableMasteries,
-              mastery.toMap('${list.masteries.indexOf(mastery)}'),
+              tablePerks,
+              perk.toMap('$paddedIndex${indexToLetter(i)}'),
             );
           }
         }
-      });
-      await txn.execute('''
-        $createTable $tableCharacterMasteries (
-          $columnAssociatedCharacterUuid $textType,
-          $columnAssociatedMasteryId $textType,
-          $columnCharacterMasteryAchieved $boolType
-        )''');
-    });
+      }
+    }
+  }
+
+  /// Seeds the Masteries table from MasteriesRepository.
+  Future<void> _seedMasteries(Transaction txn) async {
+    for (final entry in MasteriesRepository.masteriesMap.entries) {
+      final classCode = entry.key;
+      final masteriesList = entry.value;
+
+      for (final list in masteriesList) {
+        for (int i = 0; i < list.masteries.length; i++) {
+          final mastery = list.masteries[i];
+          mastery.variant = list.variant;
+          mastery.classCode = classCode;
+
+          await txn.insert(tableMasteries, mastery.toMap('$i'));
+        }
+      }
+    }
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     await db.transaction((txn) async {
-      if (oldVersion <= 4) {
-        // Add perks for Crimson Scales classes
+      await _runMigrations(txn, oldVersion, newVersion);
+      await DatabaseMigrations.updateMetaDataTable(txn, newVersion);
+    });
+  }
+
+  /// Runs all applicable migrations between oldVersion and newVersion.
+  Future<void> _runMigrations(
+    Transaction txn,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    // Migration map: version -> migration function
+    // Each migration runs for users upgrading FROM a version <= the key
+    final migrations = <int, Future<void> Function()>{
+      // v5: Add perks for Crimson Scales classes
+      // Add Uuid column to CharactersTable and CharacterPerks table,
+      // and change schema for both
+      4: () async {
+        // ignore: deprecated_member_use_from_same_package
         await DatabaseMigrations.regenerateLegacyPerksTable(txn);
-        // Add Uuid column to CharactersTable and CharacterPerks table,
-        // and change schema for both
         await DatabaseMigrations.migrateToUuids(txn);
-      }
-      if (oldVersion <= 5) {
-        // Cleanup perks and add Ruinmaw
-        // https://discord.com/channels/728375347732807825/755811690159013925
+      },
+      // v6: Cleanup perks and add Ruinmaw
+      // https://discord.com/channels/728375347732807825/755811690159013925
+      5: () async {
+        // ignore: deprecated_member_use_from_same_package
         await DatabaseMigrations.regenerateLegacyPerksTable(txn);
-      }
-      if (oldVersion <= 6) {
-        // Include all Frosthaven class perks
-        // Include Thornreaper, Incarnate, and Rimehearth perks
+      },
+      // v7: Include all Frosthaven class perks
+      // Include Thornreaper, Incarnate, and Rimehearth perks
+      // Include class Masteries
+      // Include Resources
+      6: () async {
+        // ignore: deprecated_member_use_from_same_package
         await DatabaseMigrations.regenerateLegacyPerksTable(txn);
-        // Include class Masteries
         await DatabaseMigrations.includeClassMasteries(txn);
-        // Include Resources
         await DatabaseMigrations.includeResources(txn);
-      }
-      if (oldVersion <= 7) {
+      },
+      // v8: Metadata table, variants, schema changes
+      7: () async {
         await DatabaseMigrations.createMetaDataTable(txn, newVersion);
         await DatabaseMigrations.addVariantColumnToCharacterTable(txn);
         await DatabaseMigrations.convertCharacterPerkIdColumnFromIntToText(txn);
@@ -197,52 +233,40 @@ class DatabaseHelper {
         );
         await DatabaseMigrations.includeClassVariantsAndPerksAsMap(txn);
         await DatabaseMigrations.includeClassVariantsAndMasteriesAsMap(txn);
+      },
+      // v9: Added Vimthreader class
+      // https://discord.com/channels/728375347732807825/732003202458714193
+      8: () => DatabaseMigrations.regeneratePerksTable(txn),
+      // v10: Added CORE class
+      // https://discord.com/channels/728375347732807825/880838569734852638
+      9: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v11: Added DOME class
+      // https://discord.com/channels/728375347732807825/756851069471948800
+      10: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v12: Added Skitterclaw class
+      // https://discord.com/channels/728375347732807825/1115885987415998574
+      11: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v13: Added Bruiser, Tinkerer, Spellweaver, Silent Knife, Cragheart,
+      // and Mindthief Gloomhaven Second Edition classes
+      12: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v14: Added Mercenary Pack 2025 classes
+      13: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v15: Minor fix for 'consume_X' icons in Perks Repository
+      14: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v16: Add Alchemancer class
+      // https://discord.com/channels/728375347732807825/1268641237955514491
+      15: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v17: Rename item_minus_one to ITEM_MINUS_ONE
+      16: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+    };
+
+    // Run migrations in order for versions > oldVersion
+    final sortedVersions = migrations.keys.toList()..sort();
+    for (final version in sortedVersions) {
+      if (oldVersion <= version) {
+        await migrations[version]!();
       }
-      if (oldVersion <= 8) {
-        // Added Vimthreader class
-        // https://discord.com/channels/728375347732807825/732003202458714193
-        await DatabaseMigrations.regeneratePerksTable(txn);
-      }
-      if (oldVersion <= 9) {
-        // Added CORE class
-        // https://discord.com/channels/728375347732807825/880838569734852638
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 10) {
-        // Added DOME class
-        // https://discord.com/channels/728375347732807825/756851069471948800
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 11) {
-        // Added Skitterclaw class
-        // https://discord.com/channels/728375347732807825/1115885987415998574
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 12) {
-        // Added Bruiser, Tinkerer, Spellweaver, Silent Knife, Cragheart,
-        // and Mindthief Gloomhaven Second Edition classes
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 13) {
-        // Added Mercenary Pack 2025 classes
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 14) {
-        // Minor fix for 'consume_X' icons in Perks Repository
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 15) {
-        // Add Alchemancer class
-        // https://discord.com/channels/728375347732807825/1268641237955514491
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      if (oldVersion <= 16) {
-        // Rename item_minus_one to ITEM_MINUS_ONE
-        await DatabaseMigrations.regeneratePerksAndMasteriesTables(txn);
-      }
-      // Always update metadata table
-      await DatabaseMigrations.updateMetaDataTable(txn, newVersion);
-    });
+    }
   }
 
   Future<String> generateBackup() async {
@@ -328,7 +352,7 @@ class DatabaseHelper {
         columnCharacterPerkIsSelected: 0,
       });
     }
-    if (character.showMasteries()) {
+    if (character.shouldShowMasteries) {
       final masteries = await queryMasteries(character);
       for (final mastery in masteries) {
         await db.insert(tableCharacterMasteries, {
