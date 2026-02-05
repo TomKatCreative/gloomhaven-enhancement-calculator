@@ -2,7 +2,9 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/character_consta
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
 /// Test data fixtures for unit and widget tests.
@@ -151,5 +153,135 @@ class TestData {
       associatedMasteryId,
       characterMasteryAchieved,
     );
+  }
+
+  // ── Perk Definition Factories ──
+
+  /// SVG-safe perk description texts (no uppercase asset keywords, no +1/-1).
+  static const _perkTexts = [
+    'Remove two minus one cards',
+    'Gain advantage on the next three attacks',
+    'Add two rolling push cards',
+    'Replace one normal card with one better card',
+    'Ignore negative effects and add one card',
+  ];
+
+  /// Creates a [Perk] definition with fields set directly.
+  ///
+  /// The [Perk] constructor doesn't accept perkId/classCode, so this factory
+  /// sets those late fields after construction.
+  static Perk createPerk({
+    String? perkId,
+    String classCode = ClassCodes.brute,
+    String? perkDetails,
+    bool grouped = false,
+    Variant variant = Variant.base,
+    int index = 0,
+  }) {
+    final perk = Perk(
+      perkDetails ?? _perkTexts[index % _perkTexts.length],
+      grouped: grouped,
+    );
+    perk.classCode = classCode;
+    perk.variant = variant;
+    perk.perkId = perkId ?? '${classCode}_${variant.name}_$index';
+    return perk;
+  }
+
+  /// Creates a list of [Perk] definitions.
+  ///
+  /// When [sharedDetails] is provided, all perks share the same text,
+  /// which triggers grouping into a single PerkRow in the UI.
+  static List<Perk> createPerkList({
+    int count = 3,
+    bool grouped = false,
+    String? sharedDetails,
+    String classCode = ClassCodes.brute,
+    Variant variant = Variant.base,
+  }) {
+    return List.generate(count, (i) {
+      return createPerk(
+        perkId: '${classCode}_${variant.name}_$i',
+        classCode: classCode,
+        perkDetails: sharedDetails ?? _perkTexts[i % _perkTexts.length],
+        grouped: grouped,
+        variant: variant,
+        index: i,
+      );
+    });
+  }
+
+  /// Creates [CharacterPerk] join records matching the given [Perk] list.
+  ///
+  /// The first [selectedCount] perks will be marked as selected.
+  static List<CharacterPerk> createCharacterPerksForPerks({
+    required List<Perk> perks,
+    String characterUuid = 'test-1',
+    int selectedCount = 0,
+  }) {
+    return List.generate(perks.length, (i) {
+      return CharacterPerk(characterUuid, perks[i].perkId, i < selectedCount);
+    });
+  }
+
+  // ── Mastery Definition Factories ──
+
+  /// SVG-safe mastery description texts.
+  static const _masteryTexts = [
+    'End a scenario with full health',
+    'Complete a scenario without resting',
+    'Defeat three enemies in a single round',
+  ];
+
+  /// Creates a [Mastery] definition with fields set directly.
+  static Mastery createMastery({
+    String? id,
+    String classCode = ClassCodes.drifter,
+    String? masteryDetails,
+    Variant variant = Variant.base,
+    int index = 0,
+  }) {
+    final mastery = Mastery(
+      masteryDetails:
+          masteryDetails ?? _masteryTexts[index % _masteryTexts.length],
+    );
+    mastery.classCode = classCode;
+    mastery.variant = variant;
+    mastery.id = id ?? '${classCode}_${variant.name}_$index';
+    return mastery;
+  }
+
+  /// Creates a list of [Mastery] definitions.
+  static List<Mastery> createMasteryList({
+    int count = 3,
+    String classCode = ClassCodes.drifter,
+    Variant variant = Variant.base,
+  }) {
+    return List.generate(count, (i) {
+      return createMastery(
+        id: '${classCode}_${variant.name}_$i',
+        classCode: classCode,
+        masteryDetails: _masteryTexts[i % _masteryTexts.length],
+        variant: variant,
+        index: i,
+      );
+    });
+  }
+
+  /// Creates [CharacterMastery] join records matching the given [Mastery] list.
+  ///
+  /// The first [achievedCount] masteries will be marked as achieved.
+  static List<CharacterMastery> createCharacterMasteriesForMasteries({
+    required List<Mastery> masteries,
+    String characterUuid = 'test-1',
+    int achievedCount = 0,
+  }) {
+    return List.generate(masteries.length, (i) {
+      return CharacterMastery(
+        characterUuid,
+        masteries[i].id,
+        i < achievedCount,
+      );
+    });
   }
 }

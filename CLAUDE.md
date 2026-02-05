@@ -34,6 +34,15 @@ flutter analyze
 
 # Format code (run after making changes)
 dart format .
+
+# Run all tests
+flutter test
+
+# Run a specific test file
+flutter test test/widgets/perk_widgets_test.dart
+
+# Run tests matching a name pattern
+flutter test --name "PerkRow"
 ```
 
 ## Git Branching Strategy
@@ -111,6 +120,14 @@ lib/
 ├── theme/                   # Theme system (ThemeProvider, extensions)
 ├── utils/                   # Helpers, text parsing
 └── shared_prefs.dart        # SharedPreferences wrapper (singleton)
+test/
+├── helpers/                  # Test infrastructure
+│   ├── fake_database_helper.dart  # In-memory DB for testing
+│   ├── test_data.dart        # Factory methods for test fixtures
+│   └── test_helpers.dart     # MockThemeProvider, wrapWithProviders()
+├── models/                   # Model unit tests
+├── viewmodels/               # ViewModel unit tests
+└── widgets/                  # Widget integration tests
 ```
 
 ### Data Persistence
@@ -265,7 +282,6 @@ height: iconSize - 2.5
 ## Known Technical Debt
 
 1. **Legacy files** - `*_legacy.dart` files exist for backward compatibility
-2. **No tests** - Test suite needed for models and viewmodels
 
 ## Documentation Files
 
@@ -427,4 +443,4 @@ gh workflow run deploy-internal.yml -f version_name=4.3.3
 11. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
 12. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
 13. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).
-14. **Run tests after changes** - After modifying code in `lib/`, always run relevant tests with `flutter test` (or a specific test file if the scope is narrow). Ensure all tests pass before considering the work complete. If a change touches models or viewmodels, run the corresponding tests in `test/models/` or `test/viewmodels/`.
+14. **Run tests after changes** - After modifying code in `lib/`, always run relevant tests with `flutter test` (or a specific test file if the scope is narrow). Ensure all tests pass before considering the work complete. If a change touches models or viewmodels, run the corresponding tests in `test/models/` or `test/viewmodels/`. If a change touches widgets (perk_row, perks_section, mastery_row, masteries_section, conditional_checkbox), also run `test/widgets/`.
