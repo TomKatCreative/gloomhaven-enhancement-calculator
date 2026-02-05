@@ -162,16 +162,30 @@ class _EnhancementCalculatorScreenState
             ],
           ),
         ),
-        // Cost chip overlay
-        if (enhancementCalculatorModel.showCost)
-          ExpandableCostChip(
-            totalCost: enhancementCalculatorModel.totalCost,
-            steps: enhancementCalculatorModel.getCalculationBreakdown(),
-            enhancement: enhancementCalculatorModel.enhancement,
-            scrollController: context
-                .read<CharactersModel>()
-                .enhancementCalcScrollController,
-          ),
+        // Cost chip overlay with animated appearance
+        AnimatedSwitcher(
+          duration: animationDuration,
+          switchInCurve: Curves.easeOut,
+          switchOutCurve: Curves.easeIn,
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              alignment: Alignment.bottomCenter,
+              child: child,
+            );
+          },
+          child: enhancementCalculatorModel.showCost
+              ? ExpandableCostChip(
+                  key: const ValueKey('cost-chip'),
+                  totalCost: enhancementCalculatorModel.totalCost,
+                  steps: enhancementCalculatorModel.getCalculationBreakdown(),
+                  enhancement: enhancementCalculatorModel.enhancement,
+                  scrollController: context
+                      .read<CharactersModel>()
+                      .enhancementCalcScrollController,
+                )
+              : const SizedBox.shrink(key: ValueKey('empty')),
+        ),
       ],
     );
   }
@@ -360,6 +374,7 @@ class _PreviousEnhancementsSection extends StatelessWidget {
                       darkTheme,
                       edition: edition,
                       enhancerLvl4: enhancerLvl4,
+                      temporaryEnhancementMode: model.temporaryEnhancementMode,
                     ),
                   ),
                 ),
@@ -431,7 +446,7 @@ class _MultipleTargetsToggle extends StatelessWidget {
   }
 }
 
-/// Loss/non-persistent action toggle row.
+/// Lost/non-persistent action toggle row (FH) or just Lost (GH2E).
 class _LossNonPersistentToggle extends StatelessWidget {
   final dynamic edition;
   final EnhancementCalculatorModel model;
@@ -478,7 +493,7 @@ class _LossNonPersistentToggle extends StatelessWidget {
           ],
         ],
       ),
-      subtitle: AppLocalizations.of(context).lossNonPersistent,
+      subtitle: Strings.lostNonPersistentInfoTitle(edition: edition),
       value: model.lostNonPersistent,
       enabled:
           !model.persistent &&

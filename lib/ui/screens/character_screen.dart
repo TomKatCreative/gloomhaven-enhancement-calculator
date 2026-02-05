@@ -163,7 +163,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
-                    icon: const Icon(Icons.remove_circle),
+                    icon: const Icon(Icons.indeterminate_check_box_rounded),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
                             character
@@ -172,11 +172,19 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                           )
                         : null,
                   ),
-                  Text('${character.previousRetirements}'),
+                  IntrinsicWidth(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Opacity(opacity: 0, child: Text('99')),
+                        Text('${character.previousRetirements}'),
+                      ],
+                    ),
+                  ),
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
-                    icon: const Icon(Icons.add_circle),
+                    icon: const Icon(Icons.add_box_rounded),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
                             character
@@ -202,11 +210,29 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AutoSizeText(
-                '${AppLocalizations.of(context).battleGoals} (${character.checkMarkProgress}/3)',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                minFontSize: 10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: AutoSizeText(
+                      AppLocalizations.of(context).battleGoals,
+                      maxLines: 1,
+                      minFontSize: 10,
+                    ),
+                  ),
+                  const Text(' ('),
+                  IntrinsicWidth(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Opacity(opacity: 0, child: Text('3')),
+                        Text('${character.checkMarkProgress}'),
+                      ],
+                    ),
+                  ),
+                  const Text('/3)'),
+                ],
               ),
               const SizedBox(height: tinyPadding),
               Row(
@@ -216,16 +242,27 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
-                    icon: const Icon(Icons.remove_circle),
+                    icon: const Icon(Icons.indeterminate_check_box_rounded),
                     onPressed: character.checkMarks > 0 && !isRetired
                         ? () => charactersModel.decreaseCheckmark(character)
                         : null,
                   ),
-                  Text('${character.checkMarks}/18'),
+                  IntrinsicWidth(
+                    child: Stack(
+                      alignment: Alignment.centerRight,
+                      children: [
+                        // We use 16 here because it's the widest of the numbers
+                        // between 0-18
+                        const Opacity(opacity: 0, child: Text('16')),
+                        Text('${character.checkMarks}'),
+                      ],
+                    ),
+                  ),
+                  const Text('/18'),
                   IconButton(
                     padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
-                    icon: const Icon(Icons.add_circle),
+                    icon: const Icon(Icons.add_box_rounded),
                     onPressed: character.checkMarks < 18 && !isRetired
                         ? () => charactersModel.increaseCheckmark(character)
                         : null,

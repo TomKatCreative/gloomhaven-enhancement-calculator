@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 
 /// Configuration for displaying cost with optional discount.
@@ -40,14 +41,22 @@ class CostDisplay extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return _buildCostContent(theme, colorScheme);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: animationDuration,
+      curve: Curves.easeOut,
+      builder: (context, scale, child) {
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: _buildCostContent(theme, colorScheme),
+    );
   }
 
   Widget _buildCostContent(ThemeData theme, ColorScheme colorScheme) {
     if (config.baseCost == 0 && !config.hasDiscount) {
       return Text(
         '0g',
-        style: theme.textTheme.bodyMedium?.copyWith(
+        style: theme.textTheme.bodyLarge?.copyWith(
           color: colorScheme.onSurfaceVariant,
         ),
       );
@@ -66,7 +75,7 @@ class CostDisplay extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '${config.displayCost}g',
-            style: theme.textTheme.bodyMedium?.copyWith(
+            style: theme.textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
             ),
@@ -74,7 +83,7 @@ class CostDisplay extends StatelessWidget {
           if (config.marker != null)
             Text(
               ' ${config.marker}',
-              style: theme.textTheme.bodyMedium?.copyWith(
+              style: theme.textTheme.bodyLarge?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -84,7 +93,7 @@ class CostDisplay extends StatelessWidget {
 
     return Text(
       '${config.baseCost}g',
-      style: theme.textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+      style: theme.textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
     );
   }
 }

@@ -111,5 +111,8 @@
   "createCharacter": "Criar personagem",
   "gameEdition": "Edição do jogo",
   "selectClass": "Selecionar classe...",
-  "addNotes": "Adicionar notas..."
+  "addNotes": "Adicionar notas...",
+  "folderAccessTitle": "Escolher pasta de backup",
+  "folderAccessExplanation": "Na próxima tela, o Android pedirá que você escolha uma pasta para salvar backups. Isso concede ao aplicativo permissão para salvar arquivos apenas nessa pasta específica.",
+  "folderAccessTip": "Dica: Crie uma nova pasta chamada 'Backups' para manter seus arquivos de backup organizados."
 }

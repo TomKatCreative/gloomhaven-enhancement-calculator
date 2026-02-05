@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @lossNonPersistent.
   ///
   /// In en, this message translates to:
-  /// **'Loss non-persistent'**
+  /// **'Lost & non-persistent'**
   String get lossNonPersistent;
 
   /// No description provided for @persistent.
@@ -449,7 +449,7 @@ abstract class AppLocalizations {
   /// No description provided for @eligibleFor.
   ///
   /// In en, this message translates to:
-  /// **'Eligible For'**
+  /// **'Eligible for'**
   String get eligibleFor;
 
   /// No description provided for @gameplay.
@@ -769,6 +769,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add notes...'**
   String get addNotes;
+
+  /// No description provided for @folderAccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose backup folder'**
+  String get folderAccessTitle;
+
+  /// No description provided for @folderAccessExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.'**
+  String get folderAccessExplanation;
+
+  /// No description provided for @folderAccessTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: Create a new folder called \'Backups\' to keep your backup files organized.'**
+  String get folderAccessTip;
 }
 
 class _AppLocalizationsDelegate

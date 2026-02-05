@@ -47,7 +47,7 @@ class EnhancementTypeBody extends StatelessWidget {
             ? _buildSelectedEnhancement(context, enhancement)
             : Text(
                 AppLocalizations.of(context).type,
-                style: theme.textTheme.bodyMedium?.copyWith(
+                style: theme.textTheme.bodyLarge?.copyWith(
                   color: theme.disabledColor,
                 ),
               ),
@@ -74,7 +74,7 @@ class EnhancementTypeBody extends StatelessWidget {
         Flexible(
           child: Text(
             enhancement.name,
-            style: theme.textTheme.bodyMedium,
+            style: theme.textTheme.bodyLarge,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -88,12 +88,12 @@ class EnhancementTypeBody extends StatelessWidget {
 
   Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
     if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: iconSizeMedium);
+      return ElementStackIcon(size: iconSizeLarge);
     }
 
     return ThemedSvg(
       assetKey: enhancement.assetKey!,
-      width: iconSizeMedium,
+      width: iconSizeLarge,
       showPlusOneOverlay: isPlusOne,
     );
   }

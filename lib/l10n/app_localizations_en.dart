@@ -188,13 +188,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hailsDiscount => 'Hail\'s discount';
 
   @override
-  String get lossNonPersistent => 'Loss non-persistent';
+  String get lossNonPersistent => 'Lost & non-persistent';
 
   @override
   String get persistent => 'Persistent';
 
   @override
-  String get eligibleFor => 'Eligible For';
+  String get eligibleFor => 'Eligible for';
 
   @override
   String get gameplay => 'GAMEPLAY';
@@ -370,4 +370,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNotes => 'Add notes...';
+
+  @override
+  String get folderAccessTitle => 'Choose backup folder';
+
+  @override
+  String get folderAccessExplanation =>
+      'On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.';
+
+  @override
+  String get folderAccessTip =>
+      'Tip: Create a new folder called \'Backups\' to keep your backup files organized.';
 }

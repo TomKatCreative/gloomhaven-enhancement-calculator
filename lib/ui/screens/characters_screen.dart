@@ -78,6 +78,13 @@ class _CharactersScreenState extends State<CharactersScreen>
         ),
       );
     } else {
+      // TODO: Performance improvements to investigate if swiping is still not smooth:
+      // 1. Add `allowImplicitScrolling: true` to PageView.builder to preload adjacent pages
+      // 2. Change `context.watch<CharactersModel>()` on line 37 to more targeted selectors
+      //    or move it to child widgets to reduce unnecessary rebuilds
+      // 3. Consider wrapping entire CharacterScreen in RepaintBoundary if needed
+      // 4. Profile with Flutter DevTools Performance overlay to identify actual jank
+      // 5. Consider caching the rasterized class icon background image
       return PageView.builder(
         controller: charactersModel.pageController,
         onPageChanged: (index) {
@@ -90,18 +97,21 @@ class _CharactersScreenState extends State<CharactersScreen>
           return Stack(
             alignment: Alignment.center,
             children: <Widget>[
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 80),
-                  child: Container(
-                    width: 500,
-                    height: 500,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ClassIconSvg(
-                      playerClass: character.playerClass,
-                      color: character
-                          .getEffectiveColor(Theme.of(context).brightness)
-                          .withValues(alpha: 0.1),
+              // RepaintBoundary isolates repaints of the expensive background SVG
+              RepaintBoundary(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 80),
+                    child: Container(
+                      width: 500,
+                      height: 500,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ClassIconSvg(
+                        playerClass: character.playerClass,
+                        color: character
+                            .getEffectiveColor(Theme.of(context).brightness)
+                            .withValues(alpha: 0.1),
+                      ),
                     ),
                   ),
                 ),

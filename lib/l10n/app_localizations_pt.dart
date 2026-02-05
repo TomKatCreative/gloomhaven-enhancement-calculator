@@ -370,4 +370,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get addNotes => 'Adicionar notas...';
+
+  @override
+  String get folderAccessTitle => 'Escolher pasta de backup';
+
+  @override
+  String get folderAccessExplanation =>
+      'Na próxima tela, o Android pedirá que você escolha uma pasta para salvar backups. Isso concede ao aplicativo permissão para salvar arquivos apenas nessa pasta específica.';
+
+  @override
+  String get folderAccessTip =>
+      'Dica: Crie uma nova pasta chamada \'Backups\' para manter seus arquivos de backup organizados.';
 }

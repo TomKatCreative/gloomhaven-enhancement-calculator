@@ -239,17 +239,6 @@ Add to ARB files:
 
 ---
 
-## Enhancement Type Card - Make it stand out ✅ DONE
-
-**Implemented:** Pinned header with animated primary-colored glow.
-
-- Card is now pinned at the top (stays visible when scrolling)
-- Pulsing glow animation when no enhancement is selected (draws attention)
-- Subtle static glow when enhancement is selected
-- Larger icon (40px vs 30px) and text (titleLarge vs bodyMedium) for prominence
-
----
-
 ## Font Consolidation - Investigate
 
 Consider changing fonts to use **Tinos** for body text and **Germania One** for subtitles (keeping Pirata One for select large titles). This would mean we could potentially remove some of the font assets and use Google Fonts or built-in alternatives.
@@ -262,96 +251,12 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 
 ---
 
-## Code Audit Refactors - Remaining Issues
+## Code Audit Refactors - Remaining Issue
 
 **Added:** 2026-02-04
 **Status:** Pending
 
-Issues #1-5, #15-19 completed and pushed to dev. The following larger refactors remain.
-
-### Issue #8: Long Method - database_helpers.dart _onCreate
-
-**File:** `lib/data/database_helpers.dart` (lines ~76-166)
-**Problem:** `_onCreate` method is ~90 lines with nested `Future.forEach` and 3-level deep nesting
-
-**Suggested Refactor:**
-1. Extract table creation to `_createTables(Database db)`
-2. Extract perk seeding to `_seedPerks(Database db)`
-3. Extract mastery seeding to `_seedMasteries(Database db)`
-4. Keep `_onCreate` as a coordinator calling these methods
-
----
-
-### Issue #9: Long Method - database_helpers.dart _onUpgrade
-
-**File:** `lib/data/database_helpers.dart` (lines ~168-247)
-**Problem:** ~80 lines with 40+ sequential `if (oldVersion < X)` blocks
-
-**Suggested Refactor:**
-1. Create a `_migrations` map: `Map<int, Future<void> Function(Database)>`
-2. Iterate through migrations where version > oldVersion
-3. Each migration becomes a focused, testable function
-
----
-
-### Issue #10: Long Method - getCalculationBreakdown
-
-**File:** `lib/viewmodels/enhancement_calculator_model.dart`
-**Problem:** `getCalculationBreakdown()` is ~200 lines building calculation steps
-
-**Suggested Refactor:**
-1. `_buildBaseCostStep()` - Enhancement type base cost
-2. `_buildCardLevelStep()` - Card level penalty
-3. `_buildPreviousEnhancementsStep()` - Previous enhancements penalty
-4. `_buildModifierSteps()` - Multi-target, loss, persistent modifiers
-5. `_buildDiscountSteps()` - Temp enhancement, Hail's, Party Boon, Enhancer
-6. Main method becomes a coordinator assembling steps
-
----
-
-### Issue #11: Deep Database Nesting (4 levels)
-
-**File:** `lib/data/database_helpers.dart` (lines ~110-129)
-**Problem:** 4 levels of nested loops in perk/mastery seeding
-
-**Fix:** Address together with Issue #8 by extracting to helper methods
-
----
-
-### Issue #12: Deep UI Nesting (7+ levels)
-
-**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~445-514)
-**Problem:** `_buildToggleRow` has 7+ levels: `Padding > Row > [IconButton, Expanded > GestureDetector > Padding > Column, GestureDetector > Switch]`
-
-**Fix:** Extract `_ToggleRow` as a separate widget class, or simplify layout
-
----
-
-### Issue #13: God Widget - _CardDetailsGroupCard
-
-**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~183-516)
-**Problem:** 330 lines handling card level, previous enhancements, and all modifier toggles
-
-**Suggested Refactor:**
-1. `_CardLevelSection` - Slider and cost display
-2. `_PreviousEnhancementsSection` - Segmented button and cost
-3. `_ModifierTogglesSection` - All toggle rows
-4. Or extract helper methods within the existing widget
-
----
-
-### Issue #14: God Widget - _DiscountsGroupCard
-
-**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~576-834)
-**Problem:** 250 lines with toggle group config + enhancer dialog (~100 lines)
-
-**Suggested Refactor:**
-1. Extract `EnhancerDialog` to `lib/ui/dialogs/enhancer_dialog.dart`
-2. Keep `_DiscountsGroupCard` focused on toggle group configuration
-
----
-
-### Issue #15: Convert `_build*` Methods to Proper Widgets
+### Convert `_build*` Methods to Proper Widgets
 
 **Problem:** Throughout the codebase, there are methods like `Widget _buildMyWidget()` that return widgets. This pattern:
 - Doesn't benefit from Flutter's widget lifecycle optimizations
@@ -370,27 +275,69 @@ Issues #1-5, #15-19 completed and pushed to dev. The following larger refactors 
 
 ---
 
-### Refactoring Guidelines
+## Enhanced Backup System
 
-Follow `/refactor` skill principles:
-- **Small steps** - Make one change, verify, commit
-- **Behavior preserved** - No functional changes
-- **One thing at a time** - Don't mix refactoring with features
+**Added:** 2026-02-04
+**Status:** Pending
 
-### Testing Checklist:
-- [ ] Enhancement calculator displays correctly
-- [ ] All toggles work (multiple targets, loss, persistent)
-- [ ] Cost calculations are correct for all editions
-- [ ] Info dialogs open properly
-- [ ] Database operations succeed (character CRUD, perks, masteries)
-- [ ] Backup/restore works
+Currently, backup only exports SQLite database (characters, perks, masteries). SharedPreferences (39 keys including theme, calculator state, unlocked classes, element tracker) are NOT backed up.
 
-### Completion Checklist:
-- [x] #8: Extract `_onCreate` helper methods
-- [x] #9: Refactor `_onUpgrade` migrations
-- [x] #10: Split `getCalculationBreakdown` into sections
-- [x] #11: Flatten database nesting (with #8)
-- [x] #12: Reduce UI nesting in toggle rows
-- [x] #13: Extract `_CardDetailsGroupCard` sections
-- [x] #14: Extract `EnhancerDialog` from `_DiscountsGroupCard`
-- [ ] #15: Convert `_build*` methods to proper widgets
+### Improvements
+
+#### 1. Include SharedPreferences in Backup (High Priority)
+
+**Files to modify:**
+- `lib/shared_prefs.dart` - Add `toJson()` and `fromJson()` methods
+- `lib/data/database_helpers.dart` - Include SharedPrefs in `generateBackup()` output
+- `lib/ui/dialogs/restore_dialog.dart` - Restore SharedPrefs from backup
+
+**Backup JSON structure:**
+```json
+{
+  "version": 2,
+  "database": [...current backup format...],
+  "settings": {
+    "darkTheme": true,
+    "gameEdition": 0,
+    "primaryClassColor": 0xff4e7ec1,
+    ...
+  }
+}
+```
+
+**Exclude from backup:** Transient keys like `showUpdate4Dialog`, `clearOldPrefs`
+
+#### 2. One-Tap Backup Sharing
+
+Currently: Backup → Save to Downloads → User must find file to share
+Improved: Backup → Immediate share sheet option (keep save option too)
+
+**File:** `lib/ui/dialogs/backup_dialog.dart`
+
+#### 3. Auto-Backup to App Documents
+
+- Write backup to app documents directory after each character save
+- Keep last 5 auto-backups, rotate oldest
+- No user action required
+
+**Files to modify:**
+- `lib/viewmodels/characters_model.dart` - Trigger auto-backup on character save
+- New file: `lib/data/auto_backup_service.dart` - Handle rotation logic
+
+#### 4. Backup Age Reminder
+
+- Track last manual backup date in SharedPrefs
+- Show subtle indicator in Settings if >30 days since last backup
+- "Last backed up: 45 days ago" with warning color
+
+**Files to modify:**
+- `lib/shared_prefs.dart` - Add `lastManualBackupDate` key
+- `lib/ui/widgets/settings/backup_settings_section.dart` - Show last backup indicator
+- `lib/ui/dialogs/backup_dialog.dart` - Update timestamp on successful backup
+
+### Implementation Order
+
+1. SharedPrefs in backup (most value, lowest effort)
+2. Backup age reminder (quick win)
+3. One-tap sharing (UX improvement)
+4. Auto-backup (nice-to-have)

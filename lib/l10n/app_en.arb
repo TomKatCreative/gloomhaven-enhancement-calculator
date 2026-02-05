@@ -63,9 +63,9 @@
   "reduceLevelPenalties": "and reduce level penalties by 10 gold per level",
   "reduceRepeatPenalties": "and reduce repeat penalties by 25 gold per enhancement",
   "hailsDiscount": "Hail's discount",
-  "lossNonPersistent": "Loss non-persistent",
+  "lossNonPersistent": "Lost & non-persistent",
   "persistent": "Persistent",
-  "eligibleFor": "Eligible For",
+  "eligibleFor": "Eligible for",
   "gameplay": "GAMEPLAY",
   "display": "DISPLAY",
   "backupAndRestore": "LOCAL BACKUP & RESTORE",
@@ -146,5 +146,8 @@
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
   "selectClass": "Select class...",
-  "addNotes": "Add notes..."
+  "addNotes": "Add notes...",
+  "folderAccessTitle": "Choose backup folder",
+  "folderAccessExplanation": "On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.",
+  "folderAccessTip": "Tip: Create a new folder called 'Backups' to keep your backup files organized."
 }
