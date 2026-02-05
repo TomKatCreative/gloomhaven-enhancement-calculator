@@ -2,6 +2,7 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/character_consta
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
 /// Test data fixtures for unit and widget tests.
@@ -24,6 +25,11 @@ class TestData {
     (c) => c.classCode == ClassCodes.drifter,
   );
 
+  /// Returns the Hail player class (Mercenary Packs).
+  static PlayerClass get hail => PlayerClasses.playerClasses.firstWhere(
+    (c) => c.classCode == ClassCodes.hail,
+  );
+
   /// Creates a test character with sensible defaults.
   ///
   /// Parameters:
@@ -35,6 +41,7 @@ class TestData {
   /// - [xp]: Experience points (defaults to 0)
   /// - [gold]: Gold amount (defaults to 0)
   /// - [checkMarks]: Battle goal checkmarks (defaults to 0)
+  /// - [variant]: Class variant (defaults to Variant.base)
   /// - [characterMasteries]: List of mastery achievements (defaults to empty)
   static Character createCharacter({
     String uuid = 'test-1',
@@ -45,7 +52,9 @@ class TestData {
     int xp = 0,
     int gold = 0,
     int checkMarks = 0,
+    Variant variant = Variant.base,
     List<CharacterMastery>? characterMasteries,
+    List<CharacterPerk>? characterPerks,
   }) {
     final character = Character(
       uuid: uuid,
@@ -56,9 +65,13 @@ class TestData {
       xp: xp,
       gold: gold,
       checkMarks: checkMarks,
+      variant: variant,
     );
     if (characterMasteries != null) {
       character.characterMasteries = characterMasteries;
+    }
+    if (characterPerks != null) {
+      character.characterPerks = characterPerks;
     }
     return character;
   }
@@ -75,6 +88,26 @@ class TestData {
       playerClass: playerClass,
       isRetired: true,
     );
+  }
+
+  /// Creates a test CharacterPerk.
+  static CharacterPerk createCharacterPerk({
+    String associatedCharacterUuid = 'test-1',
+    String associatedPerkId = 'perk-1',
+    bool isSelected = false,
+  }) {
+    return CharacterPerk(associatedCharacterUuid, associatedPerkId, isSelected);
+  }
+
+  /// Creates a list of CharacterPerks for testing.
+  static List<CharacterPerk> createCharacterPerkList({
+    String characterUuid = 'test-1',
+    int count = 3,
+    int selectedCount = 0,
+  }) {
+    return List.generate(count, (i) {
+      return CharacterPerk(characterUuid, 'perk-$i', i < selectedCount);
+    });
   }
 
   /// Creates a list of test characters with mixed retirement status.

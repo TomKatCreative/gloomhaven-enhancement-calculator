@@ -427,3 +427,4 @@ gh workflow run deploy-internal.yml -f version_name=4.3.3
 11. **Responsive design** - UI must adapt to smaller screens (minimum ~5" phones). Avoid hardcoding pixel values for layout sizing. Use `MediaQuery`, `LayoutBuilder`, or relative sizing (percentages with minimum constraints) to ensure UI elements remain visible and usable on all screen sizes.
 12. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
 13. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).
+14. **Run tests after changes** - After modifying code in `lib/`, always run relevant tests with `flutter test` (or a specific test file if the scope is narrow). Ensure all tests pass before considering the work complete. If a change touches models or viewmodels, run the corresponding tests in `test/models/` or `test/viewmodels/`.

@@ -3,25 +3,74 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
 import '../helpers/test_data.dart';
 
 void main() {
-  group('Character Model - Retirement', () {
-    group('Constructor defaults', () {
-      test('isRetired defaults to false', () {
-        final character = TestData.createCharacter();
+  group('Character Model - Constructor & Defaults', () {
+    test('gold defaults to 0', () {
+      final character = TestData.createCharacter();
 
-        expect(character.isRetired, isFalse);
-      });
-
-      test('isRetired can be set to true in constructor', () {
-        final character = TestData.createCharacter(isRetired: true);
-
-        expect(character.isRetired, isTrue);
-      });
+      expect(character.gold, equals(0));
     });
 
+    test('xp defaults to 0', () {
+      final character = TestData.createCharacter();
+
+      expect(character.xp, equals(0));
+    });
+
+    test('checkMarks defaults to 0', () {
+      final character = TestData.createCharacter();
+
+      expect(character.checkMarks, equals(0));
+    });
+
+    test('notes defaults to placeholder text', () {
+      final character = Character(
+        uuid: 'test',
+        name: 'Test',
+        playerClass: TestData.brute,
+      );
+
+      expect(character.notes, equals('Items, reminders, wishlist...'));
+    });
+
+    test('variant defaults to Variant.base', () {
+      final character = TestData.createCharacter();
+
+      expect(character.variant, equals(Variant.base));
+    });
+
+    test('all Frosthaven resources default to 0', () {
+      final character = TestData.createCharacter();
+
+      expect(character.resourceHide, equals(0));
+      expect(character.resourceMetal, equals(0));
+      expect(character.resourceLumber, equals(0));
+      expect(character.resourceArrowvine, equals(0));
+      expect(character.resourceAxenut, equals(0));
+      expect(character.resourceRockroot, equals(0));
+      expect(character.resourceFlamefruit, equals(0));
+      expect(character.resourceCorpsecap, equals(0));
+      expect(character.resourceSnowthistle, equals(0));
+    });
+
+    test('isRetired defaults to false', () {
+      final character = TestData.createCharacter();
+
+      expect(character.isRetired, isFalse);
+    });
+
+    test('isRetired can be set to true in constructor', () {
+      final character = TestData.createCharacter(isRetired: true);
+
+      expect(character.isRetired, isTrue);
+    });
+  });
+
+  group('Character Model - Database Serialization', () {
     group('fromMap', () {
       test('parses IsRetired=1 as true', () {
         final map = _createCharacterMap(isRetired: 1);
@@ -37,6 +86,61 @@ void main() {
         final character = Character.fromMap(map);
 
         expect(character.isRetired, isFalse);
+      });
+
+      test('deserializes all core fields correctly', () {
+        final map = _createCharacterMap(
+          id: 42,
+          uuid: 'test-uuid-42',
+          name: 'My Brute',
+          classCode: ClassCodes.brute,
+          previousRetirements: 3,
+          xp: 150,
+          gold: 75,
+          notes: 'Some notes',
+          checkMarks: 6,
+          isRetired: 1,
+          variant: 'base',
+        );
+
+        final character = Character.fromMap(map);
+
+        expect(character.id, equals(42));
+        expect(character.uuid, equals('test-uuid-42'));
+        expect(character.name, equals('My Brute'));
+        expect(character.playerClass.classCode, equals(ClassCodes.brute));
+        expect(character.previousRetirements, equals(3));
+        expect(character.xp, equals(150));
+        expect(character.gold, equals(75));
+        expect(character.notes, equals('Some notes'));
+        expect(character.checkMarks, equals(6));
+        expect(character.isRetired, isTrue);
+        expect(character.variant, equals(Variant.base));
+      });
+
+      test('handles variant serialization for frosthavenCrossover', () {
+        final map = _createCharacterMap(variant: 'frosthavenCrossover');
+
+        final character = Character.fromMap(map);
+
+        expect(character.variant, equals(Variant.frosthavenCrossover));
+      });
+
+      test('handles variant serialization for gloomhaven2E', () {
+        final map = _createCharacterMap(variant: 'gloomhaven2E');
+
+        final character = Character.fromMap(map);
+
+        expect(character.variant, equals(Variant.gloomhaven2E));
+      });
+
+      test('handles legacy characters without UUID (falls back to ID)', () {
+        final map = _createCharacterMap(id: 99);
+        map.remove(columnCharacterUuid);
+
+        final character = Character.fromMap(map);
+
+        expect(character.uuid, equals('99'));
       });
     });
 
@@ -56,8 +160,73 @@ void main() {
 
         expect(map[columnIsRetired], equals(0));
       });
+
+      test('serializes all core fields correctly', () {
+        final character = TestData.createCharacter(
+          uuid: 'serial-test',
+          name: 'Serial Tester',
+          xp: 200,
+          gold: 50,
+          checkMarks: 9,
+          previousRetirements: 2,
+        );
+        character.id = 10;
+        character.notes = 'Test notes';
+
+        final map = character.toMap();
+
+        expect(map[columnCharacterId], equals(10));
+        expect(map[columnCharacterUuid], equals('serial-test'));
+        expect(map[columnCharacterName], equals('Serial Tester'));
+        expect(map[columnCharacterClassCode], equals(ClassCodes.brute));
+        expect(map[columnPreviousRetirements], equals(2));
+        expect(map[columnCharacterXp], equals(200));
+        expect(map[columnCharacterGold], equals(50));
+        expect(map[columnCharacterNotes], equals('Test notes'));
+        expect(map[columnCharacterCheckMarks], equals(9));
+        expect(map[columnVariant], equals('base'));
+      });
     });
 
+    test('toMap/fromMap round-trip preserves all data', () {
+      final original = TestData.createCharacter(
+        uuid: 'round-trip',
+        name: 'Round Trip',
+        xp: 275,
+        gold: 100,
+        checkMarks: 12,
+        previousRetirements: 1,
+        isRetired: true,
+      );
+      original.id = 5;
+      original.notes = 'Round trip notes';
+      original.resourceHide = 3;
+      original.resourceMetal = 2;
+
+      final map = original.toMap();
+      final restored = Character.fromMap(map);
+
+      expect(restored.uuid, equals(original.uuid));
+      expect(restored.name, equals(original.name));
+      expect(restored.xp, equals(original.xp));
+      expect(restored.gold, equals(original.gold));
+      expect(restored.checkMarks, equals(original.checkMarks));
+      expect(
+        restored.previousRetirements,
+        equals(original.previousRetirements),
+      );
+      expect(restored.isRetired, equals(original.isRetired));
+      expect(restored.variant, equals(original.variant));
+      expect(
+        restored.playerClass.classCode,
+        equals(original.playerClass.classCode),
+      );
+      expect(restored.resourceHide, equals(original.resourceHide));
+      expect(restored.resourceMetal, equals(original.resourceMetal));
+    });
+  });
+
+  group('Character Model - Retirement', () {
     group('getEffectiveColor', () {
       test('returns white for retired character in dark mode', () {
         final character = TestData.createCharacter(isRetired: true);
@@ -175,7 +344,11 @@ void main() {
       expect(Character.level(0), equals(1));
     });
 
-    test('level 2 at 45 XP', () {
+    test('level 1 at 44 XP (boundary)', () {
+      expect(Character.level(44), equals(1));
+    });
+
+    test('level 2 at 45 XP (boundary)', () {
       expect(Character.level(45), equals(2));
     });
 
@@ -185,6 +358,137 @@ void main() {
 
     test('level 9 at XP above 500', () {
       expect(Character.level(999), equals(9));
+    });
+
+    test('xpForNextLevel returns correct thresholds', () {
+      expect(Character.xpForNextLevel(1), equals(45));
+      expect(Character.xpForNextLevel(2), equals(95));
+      expect(Character.xpForNextLevel(3), equals(150));
+      expect(Character.xpForNextLevel(4), equals(210));
+      expect(Character.xpForNextLevel(5), equals(275));
+      expect(Character.xpForNextLevel(6), equals(345));
+      expect(Character.xpForNextLevel(7), equals(420));
+      expect(Character.xpForNextLevel(8), equals(500));
+    });
+
+    test('xpForNextLevel at max level returns max XP', () {
+      // At level 9, there's no next level - should return the last entry (500)
+      expect(Character.xpForNextLevel(9), equals(500));
+    });
+  });
+
+  group('Character Model - Perk Calculations', () {
+    test('numOfSelectedPerks counts selected perks correctly', () {
+      final character = TestData.createCharacter(
+        characterPerks: TestData.createCharacterPerkList(
+          count: 5,
+          selectedCount: 3,
+        ),
+      );
+
+      expect(character.numOfSelectedPerks, equals(3));
+    });
+
+    test('numOfSelectedPerks returns 0 when no perks selected', () {
+      final character = TestData.createCharacter(
+        characterPerks: TestData.createCharacterPerkList(
+          count: 5,
+          selectedCount: 0,
+        ),
+      );
+
+      expect(character.numOfSelectedPerks, equals(0));
+    });
+
+    test('numOfSelectedPerks ignores unselected perks', () {
+      final character = TestData.createCharacter(
+        characterPerks: TestData.createCharacterPerkList(
+          count: 10,
+          selectedCount: 2,
+        ),
+      );
+
+      expect(character.numOfSelectedPerks, equals(2));
+    });
+
+    test('checkMarkProgress returns 0 for 0 checkmarks', () {
+      final character = TestData.createCharacter(checkMarks: 0);
+
+      expect(character.checkMarkProgress, equals(0));
+    });
+
+    test('checkMarkProgress returns 1 for 1 checkmark', () {
+      final character = TestData.createCharacter(checkMarks: 1);
+
+      expect(character.checkMarkProgress, equals(1));
+    });
+
+    test('checkMarkProgress returns 2 for 2 checkmarks', () {
+      final character = TestData.createCharacter(checkMarks: 2);
+
+      expect(character.checkMarkProgress, equals(2));
+    });
+
+    test('checkMarkProgress returns 3 for 3 checkmarks (full cycle)', () {
+      final character = TestData.createCharacter(checkMarks: 3);
+
+      expect(character.checkMarkProgress, equals(3));
+    });
+
+    test('checkMarkProgress returns 1 for 4 checkmarks (new cycle)', () {
+      final character = TestData.createCharacter(checkMarks: 4);
+
+      expect(character.checkMarkProgress, equals(1));
+    });
+
+    test('pocketItemsAllowed calculation at various levels', () {
+      // Level 1 (0 XP) → 1/2 rounded = 1
+      expect(TestData.createCharacter(xp: 0).pocketItemsAllowed, equals(1));
+      // Level 2 (45 XP) → 2/2 = 1
+      expect(TestData.createCharacter(xp: 45).pocketItemsAllowed, equals(1));
+      // Level 3 (95 XP) → 3/2 rounded = 2
+      expect(TestData.createCharacter(xp: 95).pocketItemsAllowed, equals(2));
+      // Level 5 (210 XP) → 5/2 rounded = 3
+      expect(TestData.createCharacter(xp: 210).pocketItemsAllowed, equals(3));
+      // Level 9 (500 XP) → 9/2 rounded = 5
+      expect(TestData.createCharacter(xp: 500).pocketItemsAllowed, equals(5));
+    });
+  });
+
+  group('Character Model - shouldShowMasteries', () {
+    test('returns true for Frosthaven classes', () {
+      final character = TestData.createCharacter(playerClass: TestData.drifter);
+
+      expect(character.shouldShowMasteries, isTrue);
+    });
+
+    test('returns true for frosthavenCrossover variant', () {
+      final character = TestData.createCharacter(
+        variant: Variant.frosthavenCrossover,
+      );
+
+      expect(character.shouldShowMasteries, isTrue);
+    });
+
+    test('returns true for gloomhaven2E variant', () {
+      final character = TestData.createCharacter(variant: Variant.gloomhaven2E);
+
+      expect(character.shouldShowMasteries, isTrue);
+    });
+
+    test('returns true for mercenaryPacks category', () {
+      final character = TestData.createCharacter(playerClass: TestData.hail);
+
+      expect(character.shouldShowMasteries, isTrue);
+    });
+
+    test('returns false for base Gloomhaven class with base variant', () {
+      final character = TestData.createCharacter(
+        playerClass: TestData.brute,
+        variant: Variant.base,
+      );
+
+      expect(character.shouldShowMasteries, isFalse);
     });
   });
 }

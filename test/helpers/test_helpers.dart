@@ -118,4 +118,7 @@ extension CharactersModelTestExtensions on CharactersModel {
 
   /// Returns whether the current character is the one with the given UUID.
   bool isCurrentCharacter(String uuid) => currentCharacter?.uuid == uuid;
+
+  /// Returns the count of selected perks for the current character.
+  int get selectedPerkCount => currentCharacter?.numOfSelectedPerks ?? 0;
 }
