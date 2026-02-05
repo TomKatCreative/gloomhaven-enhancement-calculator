@@ -131,15 +131,15 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                   segments: const [
                     ButtonSegment<GameEdition>(
                       value: GameEdition.gloomhaven,
-                      label: Text('Gloomhaven'),
+                      label: Text('GH'),
                     ),
                     ButtonSegment<GameEdition>(
                       value: GameEdition.gloomhaven2e,
-                      label: Text('Gloomhaven 2E'),
+                      label: Text('GH2e'),
                     ),
                     ButtonSegment<GameEdition>(
                       value: GameEdition.frosthaven,
-                      label: Text('Frosthaven'),
+                      label: Text('FH'),
                     ),
                   ],
                   selected: {SharedPrefs().gameEdition},

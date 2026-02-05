@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/check_row_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/conditional_checkbox.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +25,14 @@ class PerkRowState extends State<PerkRow> {
   final List<String?> perkIds = [];
   double height = 0;
 
+  /// Safely finds the CharacterPerk for a given perk ID.
+  /// Returns null if not found (defensive against data inconsistency).
+  CharacterPerk? _findCharacterPerk(String perkId) {
+    return widget.character.characterPerks.firstWhereOrNull(
+      (element) => element.associatedPerkId == perkId,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     CharactersModel charactersModel = context.watch<CharactersModel>();
@@ -41,29 +51,22 @@ class PerkRowState extends State<PerkRow> {
           widget.perks[0].grouped
               ? _buildGroupedCheckboxes(context, charactersModel)
               : Row(
-                  children: List.generate(
-                    widget.perks.length,
-                    (index) => ConditionalCheckbox(
-                      value: widget.character.characterPerks
-                          .firstWhere(
-                            (element) =>
-                                element.associatedPerkId ==
-                                widget.perks[index].perkId,
-                          )
-                          .characterPerkIsSelected,
+                  children: List.generate(widget.perks.length, (index) {
+                    final characterPerk = _findCharacterPerk(
+                      widget.perks[index].perkId,
+                    );
+                    if (characterPerk == null) return const SizedBox.shrink();
+                    return ConditionalCheckbox(
+                      value: characterPerk.characterPerkIsSelected,
                       isEditMode: charactersModel.isEditMode,
                       isRetired: widget.character.isRetired,
                       onChanged: (bool value) => charactersModel.togglePerk(
                         characterPerks: widget.character.characterPerks,
-                        perk: widget.character.characterPerks.firstWhere(
-                          (element) =>
-                              element.associatedPerkId ==
-                              widget.perks[index].perkId,
-                        ),
+                        perk: characterPerk,
                         value: value,
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 ),
           widget.perks[0].grouped
               ? const SizedBox(width: smallPadding)
@@ -82,9 +85,7 @@ class PerkRowState extends State<PerkRow> {
             child: Expanded(
               child: RichText(
                 text: TextSpan(
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(letterSpacing: 0.7),
+                  style: Theme.of(context).textTheme.bodyLarge,
                   children: Utils.generateCheckRowDetails(
                     context,
                     widget.perks.first.perkDetails,
@@ -119,24 +120,17 @@ class PerkRowState extends State<PerkRow> {
       ),
       child: Column(
         children: List.generate(widget.perks.length, (index) {
+          final characterPerk = _findCharacterPerk(widget.perks[index].perkId);
+          if (characterPerk == null) return const SizedBox.shrink();
           return Checkbox(
             visualDensity: VisualDensity.compact,
-            value: widget.character.characterPerks
-                .firstWhere(
-                  (element) =>
-                      element.associatedPerkId == widget.perks[index].perkId,
-                )
-                .characterPerkIsSelected,
+            value: characterPerk.characterPerkIsSelected,
             onChanged: charactersModel.isEditMode && !widget.character.isRetired
                 ? (bool? value) {
                     if (value != null) {
                       charactersModel.togglePerk(
                         characterPerks: widget.character.characterPerks,
-                        perk: widget.character.characterPerks.firstWhere(
-                          (element) =>
-                              element.associatedPerkId ==
-                              widget.perks[index].perkId,
-                        ),
+                        perk: characterPerk,
                         value: value,
                       );
                     }

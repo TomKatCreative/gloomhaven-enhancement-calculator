@@ -66,7 +66,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get license => 'License';
 
   @override
-  String get supportAndFeedback => 'Support & Feedback';
+  String get supportAndFeedback => 'Support & feedback';
 
   @override
   String get name => 'Name';
@@ -87,7 +87,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retired => '(retired)';
 
   @override
-  String get previousRetirements => 'Previous Retirements';
+  String get previousRetirements => 'Previous retirements';
 
   @override
   String pocketItemsAllowed(int count) {
@@ -101,49 +101,49 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get battleGoals => 'Battle Goals';
+  String get battleGoals => 'Battle goals';
 
   @override
-  String get cardLevel => 'Card Level';
+  String get cardLevel => 'Card level';
 
   @override
-  String get previousEnhancements => 'Previous Enhancements';
+  String get previousEnhancements => 'Previous enhancements';
 
   @override
-  String get enhancementType => 'Enhancement Type';
+  String get enhancementType => 'Enhancement type';
 
   @override
   String get actionDetails => 'Enhancement';
 
   @override
-  String get cardDetails => 'Card Details';
+  String get cardDetails => 'Card details';
 
   @override
   String get discounts => 'Discounts';
 
   @override
-  String get enhancementCalculator => 'Enhancement Calculator';
+  String get enhancementCalculator => 'Enhancement calculator';
 
   @override
-  String get enhancementGuidelines => 'Enhancement Guidelines';
+  String get enhancementGuidelines => 'Enhancement guidelines';
 
   @override
   String get type => 'Select type...';
 
   @override
-  String get multipleTargets => 'Multiple Targets';
+  String get multipleTargets => 'Multiple targets';
 
   @override
-  String get generalGuidelines => 'General Guidelines';
+  String get generalGuidelines => 'General guidelines';
 
   @override
-  String get scenario114Reward => 'Scenario 114 Reward';
+  String get scenario114Reward => 'Scenario 114 reward';
 
   @override
   String get forgottenCirclesSpoilers => 'Forgotten Circles spoilers';
 
   @override
-  String get temporaryEnhancement => 'Temporary Enhancement';
+  String get temporaryEnhancement => 'Temporary enhancements';
 
   @override
   String get variant => 'Variant';
@@ -185,7 +185,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'and reduce repeat penalties by 25 gold per enhancement';
 
   @override
-  String get hailsDiscount => 'Hail\'s Discount';
+  String get hailsDiscount => 'Hail\'s discount';
 
   @override
   String get lossNonPersistent => 'Loss non-persistent';
@@ -209,7 +209,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get testing => 'TESTING';
 
   @override
-  String get customClasses => 'Custom Classes';
+  String get customClasses => 'Custom classes';
 
   @override
   String get customClassesDescription =>
@@ -256,14 +256,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get light => 'Light';
 
   @override
-  String get useInterFont => 'Use Inter Font';
+  String get useInterFont => 'Use Inter font';
 
   @override
   String get useInterFontDescription =>
       'Replace stylized fonts with Inter to improve readability';
 
   @override
-  String get showRetiredCharacters => 'Show Retired Characters';
+  String get showRetiredCharacters => 'Show retired characters';
 
   @override
   String get showRetiredCharactersDescription =>
@@ -273,13 +273,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backup => 'Backup';
 
   @override
-  String get backupDescription => 'Backup your current characters';
+  String get backupDescription =>
+      'Backup your current characters to your device';
 
   @override
   String get restore => 'Restore';
 
   @override
-  String get restoreDescription => 'Restore your characters from a backup file';
+  String get restoreDescription =>
+      'Restore your characters from a backup file on your device';
 
   @override
   String get backupFileWarning =>
@@ -312,7 +314,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get createAll => 'Create All';
+  String get createAll => 'Create all';
 
   @override
   String get gloomhaven => 'Gloomhaven';
@@ -358,10 +360,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelectClass => 'Please select a Class';
 
   @override
-  String get createCharacter => 'Create Character';
+  String get createCharacter => 'Create character';
 
   @override
-  String get gameEdition => 'Game Edition';
+  String get gameEdition => 'Game edition';
 
   @override
   String get selectClass => 'Select class...';

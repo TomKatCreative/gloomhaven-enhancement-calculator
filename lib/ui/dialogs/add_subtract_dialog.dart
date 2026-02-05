@@ -23,7 +23,9 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
   }
 
   void _handleOperation(bool isAddition) {
-    final inputValue = int.parse(_controller.text);
+    final inputValue = int.tryParse(_controller.text);
+    if (inputValue == null) return; // Guard against invalid input
+
     final newValue = isAddition
         ? widget.currentValue + inputValue
         : widget.currentValue - inputValue;

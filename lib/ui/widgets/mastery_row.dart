@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/check_row_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/conditional_checkbox.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -51,9 +53,14 @@ class MasteryRowState extends State<MasteryRow>
     super.dispose();
   }
 
-  bool get _isAchieved => widget.character.characterMasteries
-      .firstWhere((mastery) => mastery.associatedMasteryId == widget.mastery.id)
-      .characterMasteryAchieved;
+  /// Safely finds the CharacterMastery for this row's mastery.
+  /// Returns null if not found (defensive against data inconsistency).
+  CharacterMastery? get _characterMastery =>
+      widget.character.characterMasteries.firstWhereOrNull(
+        (mastery) => mastery.associatedMasteryId == widget.mastery.id,
+      );
+
+  bool get _isAchieved => _characterMastery?.characterMasteryAchieved ?? false;
 
   @override
   Widget build(BuildContext context) {
@@ -94,36 +101,27 @@ class MasteryRowState extends State<MasteryRow>
           );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: tinyPadding),
+          padding: const EdgeInsets.only(
+            top: tinyPadding,
+            bottom: tinyPadding,
+            right: smallPadding,
+          ),
           child: Row(
             children: <Widget>[
-              ConditionalCheckbox(
-                value: widget.character.characterMasteries
-                    .firstWhere(
-                      (mastery) =>
-                          mastery.associatedMasteryId == widget.mastery.id,
-                    )
-                    .characterMasteryAchieved,
-                isEditMode: charactersModel.isEditMode,
-                isRetired: widget.character.isRetired,
-                onChanged: (bool value) => charactersModel.toggleMastery(
-                  characterMasteries: widget.character.characterMasteries,
-                  mastery: widget.character.characterMasteries.firstWhere(
-                    (mastery) =>
-                        mastery.associatedMasteryId == widget.mastery.id,
+              if (_characterMastery != null)
+                ConditionalCheckbox(
+                  value: _characterMastery!.characterMasteryAchieved,
+                  isEditMode: charactersModel.isEditMode,
+                  isRetired: widget.character.isRetired,
+                  onChanged: (bool value) => charactersModel.toggleMastery(
+                    characterMasteries: widget.character.characterMasteries,
+                    mastery: _characterMastery!,
+                    value: value,
                   ),
-                  value: value,
                 ),
-              ),
               CheckRowDivider(
                 height: height,
-                color:
-                    widget.character.characterMasteries
-                        .firstWhere(
-                          (mastery) =>
-                              mastery.associatedMasteryId == widget.mastery.id,
-                        )
-                        .characterMasteryAchieved
+                color: (_characterMastery?.characterMasteryAchieved ?? false)
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).dividerTheme.color,
               ),
@@ -136,18 +134,13 @@ class MasteryRowState extends State<MasteryRow>
                   }
                 },
                 child: Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: smallPadding),
-                    child: RichText(
-                      text: TextSpan(
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyLarge?.copyWith(letterSpacing: 0.7),
-                        children: Utils.generateCheckRowDetails(
-                          context,
-                          widget.mastery.masteryDetails,
-                          Theme.of(context).brightness == Brightness.dark,
-                        ),
+                  child: RichText(
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      children: Utils.generateCheckRowDetails(
+                        context,
+                        widget.mastery.masteryDetails,
+                        Theme.of(context).brightness == Brightness.dark,
                       ),
                     ),
                   ),

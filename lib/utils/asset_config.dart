@@ -872,6 +872,7 @@ const Map<String, AssetConfig> assets = {
   // ui/
   // ===========================================================================
   'CLASS': AssetConfig('ui/class.svg', themeMode: CurrentColorTheme()),
+  'NOT': AssetConfig('ui/not.svg', themeMode: CurrentColorTheme()),
   'GOAL': AssetConfig('ui/goal.svg', themeMode: CurrentColorTheme()),
   'TRAIT': AssetConfig('ui/trait.svg', themeMode: CurrentColorTheme()),
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),

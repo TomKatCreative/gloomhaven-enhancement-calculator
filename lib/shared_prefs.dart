@@ -30,7 +30,7 @@ class SharedPrefs {
   set showRetiredCharacters(bool value) =>
       _sharedPrefs.setBool('showRetiredCharacters', value);
 
-  bool get enhancerLvl1 => _sharedPrefs.getBool('enhancerLvl1') ?? enhancerLvl2;
+  bool get enhancerLvl1 => _sharedPrefs.getBool('enhancerLvl1') ?? false;
 
   set enhancerLvl1(bool value) {
     if (!value) {
@@ -41,7 +41,7 @@ class SharedPrefs {
     _sharedPrefs.setBool('enhancerLvl1', value);
   }
 
-  bool get enhancerLvl2 => _sharedPrefs.getBool('enhancerLvl2') ?? enhancerLvl3;
+  bool get enhancerLvl2 => _sharedPrefs.getBool('enhancerLvl2') ?? false;
 
   set enhancerLvl2(bool value) {
     if (value) {
@@ -53,7 +53,7 @@ class SharedPrefs {
     _sharedPrefs.setBool('enhancerLvl2', value);
   }
 
-  bool get enhancerLvl3 => _sharedPrefs.getBool('enhancerLvl3') ?? enhancerLvl4;
+  bool get enhancerLvl3 => _sharedPrefs.getBool('enhancerLvl3') ?? false;
 
   set enhancerLvl3(bool value) {
     if (value) {

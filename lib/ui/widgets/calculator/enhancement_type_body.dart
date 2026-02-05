@@ -48,7 +48,7 @@ class EnhancementTypeBody extends StatelessWidget {
             : Text(
                 AppLocalizations.of(context).type,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: theme.disabledColor,
                 ),
               ),
       ),

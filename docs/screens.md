@@ -178,3 +178,245 @@ The settings screen includes a persistent bottom sheet with:
 - Buy Me a Coffee button (Android US region only)
 - Version number and changelog link
 - License link
+
+---
+
+## Home Screen
+
+> **File**: `lib/ui/screens/home.dart`
+
+The main container/shell for the app, managing navigation between Characters and Enhancement Calculator pages.
+
+### Structure
+
+```
+┌─────────────────────────────────────┐
+│ [≡] Title            [⚙] Settings  │  ← GHCAnimatedAppBar
+├─────────────────────────────────────┤
+│                                     │
+│       PageView (swipe disabled)     │
+│                                     │
+│   Page 0: CharactersScreen          │
+│   Page 1: EnhancementCalculatorScreen│
+│                                     │
+├─────────────────────────────────────┤
+│      [Characters]  [Calculator]     │  ← GHCBottomNavigationBar
+└─────────────────────────────────────┘
+                              [FAB] ←── Dynamic action button
+```
+
+### Initialization
+
+- Loads characters on init via `CharactersModel.loadCharacters()`
+- Shows update dialogs (v4.3.0) if flag set in SharedPrefs
+- Uses `FutureBuilder` with loading spinner while characters load
+
+### FAB Logic
+
+The FAB visibility and action changes based on context:
+
+| Page | Condition | Visible? | Action |
+|------|-----------|----------|--------|
+| Calculator (1) | Cost sheet expanded OR no cost | Hidden | - |
+| Calculator (1) | Has cost to clear | Visible | Reset cost |
+| Characters (0) | Element sheet fully expanded | Hidden | - |
+| Characters (0) | No characters exist | Visible | Create character |
+| Characters (0) | Characters exist | Visible | Toggle edit mode |
+
+### State Reset on Navigation
+
+When switching pages:
+- Edit mode is disabled
+- Element sheet expansion states are reset
+- Prevents stale UI state between pages
+
+### Key Features
+
+- `NeverScrollableScrollPhysics` on PageView (manual nav only via bottom bar)
+- `ScaffoldMessengerKey` for snackbars
+- Watches all three main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`
+- `AnimatedSwitcher` for smooth FAB icon transitions
+
+---
+
+## Character Screen
+
+> **File**: `lib/ui/screens/character_screen.dart`
+
+Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child.
+
+### Layout
+
+```
+┌─────────────────────────────────────┐
+│ Character Name          [Lvl Badge] │
+│ Class Name • Subtitle               │
+│ Traits: Tank, Healer, ...           │
+├─────────────────────────────────────┤
+│ XP: 45/95    Gold: 120              │  ← Stats Section
+│ Battle Goals: ○○● (1/3)             │
+│ Pocket Items: 3                     │
+├─────────────────────────────────────┤
+│ ▶ Resources (expandable)            │  ← Frosthaven only
+│   Hide: 5  Metal: 3  Lumber: 8      │
+├─────────────────────────────────────┤
+│ Notes                               │  ← Optional section
+│ "Remember to buy boots..."          │
+├─────────────────────────────────────┤
+│ Perks                               │
+│ [✓] Remove two -1 cards             │
+│ [✓] Add one +2 card                 │
+│ [ ] Add one rolling PUSH 2          │
+├─────────────────────────────────────┤
+│ Masteries (Frosthaven only)         │
+│ [✓] Complete 3 scenarios without... │
+└─────────────────────────────────────┘
+```
+
+### Edit Mode vs View Mode
+
+Controlled by `charactersModel.isEditMode`:
+
+| Section | View Mode | Edit Mode |
+|---------|-----------|-----------|
+| Name | Display only | Editable text field |
+| Traits | Visible | Hidden |
+| XP/Gold | Inline display | Text fields + add/subtract buttons |
+| Checkmarks/Retirements | Hidden | Visible with +/- controls |
+| Resources | Read-only cards | Cards with +/- callbacks |
+| Notes | Plain text | Multiline text field |
+| Retired badge | Shows if retired | Hidden |
+
+### Sections (Private Widgets)
+
+- `_NameAndClassSection` - Name, level badge, class info, traits
+- `_StatsSection` - XP, gold, battle goals, pocket items
+- `_ResourcesSection` - Expandable Frosthaven resources (hide, metal, lumber, etc.)
+- `PerksSection` - Perk checkboxes with parsed game text
+- `MasteriesSection` - Mastery checkboxes (conditional display)
+
+### Key Features
+
+- Uses `context.watch<CharactersModel>()` for reactive rebuilds
+- Retired characters have disabled edit controls
+- Bottom padding adjusts for element sheet expansion state
+- `ValueKey` on form fields keyed to character UUID
+- Max-width constraints (400-468px) for responsive design
+- Scroll controller from `CharactersModel` for app bar animations
+
+---
+
+## Enhancement Calculator Screen
+
+> **File**: `lib/ui/screens/enhancement_calculator_screen.dart`
+
+Full-page calculator for computing Gloomhaven/Frosthaven enhancement costs.
+
+### Layout
+
+```
+┌─────────────────────────────────────┐
+│ Enhancement Type                [i] │
+│ [MOVE +1]            30g → 25g  ‡*  │  ← Type card with markers
+├─────────────────────────────────────┤
+│ Card Details                        │
+│ ├─ Card Level            [i]        │
+│ │  [========○=] 5     +100g  (§*)   │
+│ ├─ Previous Enhancements [i]        │
+│ │  [0][1][2●][3][4]   +150g  (†*)   │
+│ ├─ Multiple Targets      [i]  [OFF] │
+│ ├─ Lost Action (GH2E)    [i]  [ON]  │
+│ └─ Persistent (FH)       [i]  [OFF] │
+├─────────────────────────────────────┤
+│ Discounts                           │
+│ ├─ Temporary Enhancement  †   [OFF] │
+│ ├─ Hail's Discount        ‡   [ON]  │
+│ ├─ Party Boon (GH/GH2E)   §   [OFF] │
+│ └─ Building 44 (FH)       * → [⚙]   │
+└─────────────────────────────────────┘
+              [Cost Chip: 275g] ←── Expandable with breakdown
+```
+
+### Discount Markers System
+
+Markers indicate which discounts apply to each cost component:
+
+| Marker | Name | Edition | Effect |
+|--------|------|---------|--------|
+| `†` | Temporary Enhancement | All | -20g flat + ×0.8 |
+| `‡` | Hail's Discount | All | -5g flat |
+| `§` | Party Boon / Scenario 114 | GH/GH2E | Reduces card level penalty |
+| `*` | Building 44 (Enhancer) | FH | Reduces costs at Lvl 2/3/4 |
+
+Multiple markers can combine (e.g., `‡*` = Hail's + Building 44).
+
+### Card Sections
+
+**Enhancement Type Card** (`_EnhancementTypeCard`):
+- Info button for category details
+- Enhancement selection opens `EnhancementTypeSelectorScreen`
+- Shows base cost, discounted cost, and applicable markers
+
+**Card Details Group Card** (`_CardDetailsGroupCard`):
+- Card Level slider (1-9) with base penalty (25×level)
+- Previous Enhancements segmented buttons (0-9) with penalty (75×count)
+- Multiple Targets toggle (×2 for eligible enhancements)
+- Lost/Non-Persistent toggle (GH2E/FH: ×0.5)
+- Persistent toggle (FH only: ×3)
+
+**Discounts Group Card** (`_DiscountsGroupCard`):
+- Toggle items for each discount type
+- Building 44 toggle opens `EnhancerDialog` for level configuration
+
+### Edition-Specific Features
+
+| Feature | GH | GH2E | FH |
+|---------|----|----|-----|
+| Lost modifier | No | Yes (×0.5) | Yes (×0.5) |
+| Persistent modifier | No | No | Yes (×3) |
+| Party Boon / Scenario 114 | Yes | Yes | No |
+| Building 44 (Enhancer) | No | No | Yes |
+| Multi-target on Target/Elements | Yes | No | No |
+
+### Cost Chip Overlay
+
+The `ExpandableCostChip` widget shows:
+- Final calculated cost
+- Expandable breakdown with each calculation step
+- Step-by-step formula explanation
+
+### Key Features
+
+- Watches both `EnhancementCalculatorModel` and `ThemeProvider`
+- Dynamic calculation via `model.calculateCost(notify: false)`
+- All toggles trigger cost recalculation
+- Info buttons use `InfoDialog` with rich text from `Strings`
+- Bottom padding adjusts for cost chip visibility
+
+---
+
+## Characters Screen
+
+> **File**: `lib/ui/screens/characters_screen.dart`
+
+Horizontal PageView container for browsing all characters.
+
+### Structure
+
+```
+┌─────────────────────────────────────┐
+│ ← CharacterScreen 1 →               │
+│ ← CharacterScreen 2 →               │  ← Swipeable pages
+│ ← CharacterScreen 3 →               │
+├─────────────────────────────────────┤
+│ [● ○ ○]                             │  ← Page indicator dots
+└─────────────────────────────────────┘
+```
+
+### Features
+
+- `PageView` with horizontal swipe navigation
+- Page indicator dots showing current position
+- Filters retired characters based on `showRetired` toggle
+- Empty state prompts character creation
+- Element tracker sheet overlay (slides up from bottom)

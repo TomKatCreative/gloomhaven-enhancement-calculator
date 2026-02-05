@@ -316,12 +316,12 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.enhancement != null) ...[
-                      _buildEnhancementIcon(widget.enhancement!, 40),
-                      const SizedBox(width: 12),
+                      _buildEnhancementIcon(widget.enhancement!, iconSizeLarge),
+                      const SizedBox(width: mediumPadding),
                     ],
                     Text(
                       '${widget.totalCost}g',
-                      style: theme.textTheme.headlineMedium?.copyWith(
+                      style: theme.textTheme.headlineLarge?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -394,14 +394,14 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                 if (step.modifier != null)
                   Text(
                     step.modifier!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 if (step.formula != null)
                   Text(
                     step.formula!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    style: theme.textTheme.labelLarge?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),

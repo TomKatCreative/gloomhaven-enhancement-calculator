@@ -259,3 +259,138 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 - Which current font assets could be removed (HighTower, Nyala, OpenSans, Roboto)?
 - How would this affect app bundle size?
 - Visual comparison of current fonts vs proposed alternatives
+
+---
+
+## Code Audit Refactors - Remaining Issues
+
+**Added:** 2026-02-04
+**Status:** Pending
+
+Issues #1-5, #15-19 completed and pushed to dev. The following larger refactors remain.
+
+### Issue #8: Long Method - database_helpers.dart _onCreate
+
+**File:** `lib/data/database_helpers.dart` (lines ~76-166)
+**Problem:** `_onCreate` method is ~90 lines with nested `Future.forEach` and 3-level deep nesting
+
+**Suggested Refactor:**
+1. Extract table creation to `_createTables(Database db)`
+2. Extract perk seeding to `_seedPerks(Database db)`
+3. Extract mastery seeding to `_seedMasteries(Database db)`
+4. Keep `_onCreate` as a coordinator calling these methods
+
+---
+
+### Issue #9: Long Method - database_helpers.dart _onUpgrade
+
+**File:** `lib/data/database_helpers.dart` (lines ~168-247)
+**Problem:** ~80 lines with 40+ sequential `if (oldVersion < X)` blocks
+
+**Suggested Refactor:**
+1. Create a `_migrations` map: `Map<int, Future<void> Function(Database)>`
+2. Iterate through migrations where version > oldVersion
+3. Each migration becomes a focused, testable function
+
+---
+
+### Issue #10: Long Method - getCalculationBreakdown
+
+**File:** `lib/viewmodels/enhancement_calculator_model.dart`
+**Problem:** `getCalculationBreakdown()` is ~200 lines building calculation steps
+
+**Suggested Refactor:**
+1. `_buildBaseCostStep()` - Enhancement type base cost
+2. `_buildCardLevelStep()` - Card level penalty
+3. `_buildPreviousEnhancementsStep()` - Previous enhancements penalty
+4. `_buildModifierSteps()` - Multi-target, loss, persistent modifiers
+5. `_buildDiscountSteps()` - Temp enhancement, Hail's, Party Boon, Enhancer
+6. Main method becomes a coordinator assembling steps
+
+---
+
+### Issue #11: Deep Database Nesting (4 levels)
+
+**File:** `lib/data/database_helpers.dart` (lines ~110-129)
+**Problem:** 4 levels of nested loops in perk/mastery seeding
+
+**Fix:** Address together with Issue #8 by extracting to helper methods
+
+---
+
+### Issue #12: Deep UI Nesting (7+ levels)
+
+**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~445-514)
+**Problem:** `_buildToggleRow` has 7+ levels: `Padding > Row > [IconButton, Expanded > GestureDetector > Padding > Column, GestureDetector > Switch]`
+
+**Fix:** Extract `_ToggleRow` as a separate widget class, or simplify layout
+
+---
+
+### Issue #13: God Widget - _CardDetailsGroupCard
+
+**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~183-516)
+**Problem:** 330 lines handling card level, previous enhancements, and all modifier toggles
+
+**Suggested Refactor:**
+1. `_CardLevelSection` - Slider and cost display
+2. `_PreviousEnhancementsSection` - Segmented button and cost
+3. `_ModifierTogglesSection` - All toggle rows
+4. Or extract helper methods within the existing widget
+
+---
+
+### Issue #14: God Widget - _DiscountsGroupCard
+
+**File:** `lib/ui/screens/enhancement_calculator_screen.dart` (lines ~576-834)
+**Problem:** 250 lines with toggle group config + enhancer dialog (~100 lines)
+
+**Suggested Refactor:**
+1. Extract `EnhancerDialog` to `lib/ui/dialogs/enhancer_dialog.dart`
+2. Keep `_DiscountsGroupCard` focused on toggle group configuration
+
+---
+
+### Issue #15: Convert `_build*` Methods to Proper Widgets
+
+**Problem:** Throughout the codebase, there are methods like `Widget _buildMyWidget()` that return widgets. This pattern:
+- Doesn't benefit from Flutter's widget lifecycle optimizations
+- Makes the code harder to test in isolation
+- Mixes widget building logic with parent widget state
+
+**Goal:** Scan the app for `Widget _build` method patterns and convert them to proper StatelessWidget or StatefulWidget classes.
+
+**Files to scan:**
+- `lib/ui/screens/*.dart`
+- `lib/ui/widgets/**/*.dart`
+
+**Exceptions (acceptable patterns):**
+- Methods that need direct access to parent state/controllers that would be awkward to pass as props
+- Very simple one-liner builders
+
+---
+
+### Refactoring Guidelines
+
+Follow `/refactor` skill principles:
+- **Small steps** - Make one change, verify, commit
+- **Behavior preserved** - No functional changes
+- **One thing at a time** - Don't mix refactoring with features
+
+### Testing Checklist:
+- [ ] Enhancement calculator displays correctly
+- [ ] All toggles work (multiple targets, loss, persistent)
+- [ ] Cost calculations are correct for all editions
+- [ ] Info dialogs open properly
+- [ ] Database operations succeed (character CRUD, perks, masteries)
+- [ ] Backup/restore works
+
+### Completion Checklist:
+- [x] #8: Extract `_onCreate` helper methods
+- [x] #9: Refactor `_onUpgrade` migrations
+- [x] #10: Split `getCalculationBreakdown` into sections
+- [x] #11: Flatten database nesting (with #8)
+- [x] #12: Reduce UI nesting in toggle rows
+- [x] #13: Extract `_CardDetailsGroupCard` sections
+- [x] #14: Extract `EnhancerDialog` from `_DiscountsGroupCard`
+- [ ] #15: Convert `_build*` methods to proper widgets

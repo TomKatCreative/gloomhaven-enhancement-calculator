@@ -1,3 +1,43 @@
+/// Enhancement calculator state management and cost calculation logic.
+///
+/// [EnhancementCalculatorModel] manages all state for the enhancement
+/// calculator screen and performs edition-specific cost calculations.
+///
+/// ## Responsibilities
+///
+/// - Enhancement selection and validation
+/// - Cost calculation with edition-specific rules
+/// - Modifier and discount tracking (multi-target, lost, persistent)
+/// - Enhancer building levels (Frosthaven)
+/// - Calculation breakdown generation for UI display
+///
+/// ## Cost Calculation Flow
+///
+/// 1. **Base Enhancement Cost** - From [Enhancement.cost]
+///    - Apply Enhancer L2 discount (FH)
+///    - Apply Hail's discount (-5g)
+/// 2. **Multipliers** - Applied to base cost
+///    - Multiple Targets (×2)
+///    - Lost/Non-Persistent (×0.5) - GH2E/FH
+///    - Persistent (×3) - FH only
+/// 3. **Card Level Penalty** - 25g × level
+///    - Apply Party Boon discount (GH/GH2E)
+///    - Apply Enhancer L3 discount (FH)
+/// 4. **Previous Enhancements Penalty** - 75g × count
+///    - Apply Enhancer L4 discount (FH)
+/// 5. **Temporary Enhancement Mode** - -20g + ×0.8
+/// 6. **Final** - max(0, total)
+///
+/// ## State Persistence
+///
+/// All calculator state is persisted via [SharedPrefs] for session continuity.
+///
+/// See also:
+/// - [Enhancement] for enhancement definitions
+/// - [GameEdition] for edition-specific rules
+/// - `docs/viewmodels_reference.md` for full documentation
+library;
+
 import 'package:flutter/material.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
@@ -6,6 +46,14 @@ import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
+/// Manages enhancement calculator state and performs cost calculations.
+///
+/// This model tracks all calculator inputs (enhancement type, card level,
+/// previous enhancements, modifiers, discounts) and computes the total
+/// cost with edition-specific rules.
+///
+/// Use [calculateCost] to recalculate after state changes.
+/// Use [getCalculationBreakdown] to get step-by-step cost breakdown for UI.
 class EnhancementCalculatorModel with ChangeNotifier {
   EnhancementCalculatorModel() {
     // Calculate initial cost based on saved state so showCost is correct
@@ -271,7 +319,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
   /// The breakdown follows this order:
   /// 1. Base cost (from enhancement type)
   /// 2. Multipliers (multi-target ×2, lost ÷2, persistent ×3)
-  /// 3. Discounts (Enhancer L 2 -10g, Hail's -5g)
+  /// 3. Discounts (Enhancer L2 -10g, Hail's -5g)
   /// 4. Penalties (card level, previous enhancements)
   /// 5. Temporary enhancement mode (×0.8 rounded up)
   List<CalculationStep> getCalculationBreakdown() {
@@ -284,198 +332,271 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
     int runningTotal = 0;
 
-    // === SECTION 1: BASE COST ===
-    if (enhancement != null) {
-      final baseCost = enhancement!.cost(edition: edition);
-      runningTotal = baseCost;
-      final isPlusOne =
-          enhancement!.category == EnhancementCategory.charPlusOne ||
-          enhancement!.category == EnhancementCategory.summonPlusOne ||
-          enhancement!.category == EnhancementCategory.target;
-      final enhancementName = isPlusOne
-          ? '+1 ${enhancement!.name}'
-          : enhancement!.name;
-      steps.add(
-        CalculationStep(
-          description: 'Base cost ($enhancementName)',
-          value: baseCost,
-          formula: '${baseCost}g',
-        ),
-      );
+    // Section 1: Base cost (from enhancement type)
+    runningTotal = _addBaseCostStep(steps, edition);
 
-      // === SECTION 2: MULTIPLIERS ===
+    // Section 2: Multipliers (multi-target, lost, persistent)
+    runningTotal = _addMultiplierSteps(steps, runningTotal, edition);
 
-      // Multi-target multiplier (×2)
-      if (multipleTargets &&
-          eligibleForMultipleTargets(enhancement!, edition: edition)) {
-        runningTotal *= 2;
-        steps.add(
-          CalculationStep(
-            description: 'Multiple targets',
-            value: runningTotal,
-            formula: '×2',
-          ),
-        );
-      }
+    // Section 3: Discounts (Enhancer L2, Hail's)
+    runningTotal = _addDiscountSteps(steps, runningTotal, edition);
 
-      // Lost action modifier (÷2, rounded) - GH2E and FH only
-      if (edition.hasLostModifier && lostNonPersistent) {
-        runningTotal = (runningTotal / 2).round();
-        // In FH, clarify "non-persistent" since persistent modifier exists
-        // In GH2E, just say "Lost action" since there's no persistent concept
-        final lostDescription = edition.hasPersistentModifier
-            ? 'Lost action (non-persistent)'
-            : 'Lost action';
-        steps.add(
-          CalculationStep(
-            description: lostDescription,
-            value: runningTotal,
-            formula: '÷2',
-          ),
-        );
-      }
-
-      // Persistent modifier (×3) - FH only
-      if (edition.hasPersistentModifier && persistent) {
-        runningTotal *= 3;
-        steps.add(
-          CalculationStep(
-            description: 'Persistent action',
-            value: runningTotal,
-            formula: '×3',
-          ),
-        );
-      }
-
-      // === SECTION 3: DISCOUNTS ===
-
-      // Enhancer Level 2 discount (-10g) - FH only
-      if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2) {
-        runningTotal -= 10;
-        steps.add(
-          CalculationStep(
-            description: 'Enhancer Level 2',
-            value: runningTotal,
-            formula: '−10g',
-          ),
-        );
-      }
-
-      // Hail's Discount (-5g)
-      if (hailsDiscount) {
-        runningTotal -= 5;
-        steps.add(
-          CalculationStep(
-            description: "Hail's Discount",
-            value: runningTotal,
-            formula: '−5g',
-          ),
-        );
-      }
-
-      // Ensure enhancement cost doesn't go negative
-      if (runningTotal < 0) {
-        runningTotal = 0;
-      }
+    // Ensure enhancement cost doesn't go negative before penalties
+    if (runningTotal < 0) {
+      runningTotal = 0;
     }
 
-    // === SECTION 4: PENALTIES ===
+    // Section 4: Penalties (card level, previous enhancements)
+    runningTotal = _addCardLevelStep(steps, runningTotal, edition);
+    runningTotal = _addPreviousEnhancementsStep(steps, runningTotal, edition);
 
-    // Card level penalty
-    if (cardLevel > 0) {
-      const int basePerLevel = 25;
-      int discountPerLevel = 0;
-      String? modifier;
-
-      // Apply party boon discount (GH/GH2E)
-      if (edition.supportsPartyBoon && SharedPrefs().partyBoon) {
-        discountPerLevel = 5;
-        modifier = 'Party Boon: −${discountPerLevel}g/level';
-      }
-      // Apply Enhancer L 3 discount (FH)
-      else if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3) {
-        discountPerLevel = 10;
-        modifier = 'Enhancer L3: −${discountPerLevel}g/level';
-      }
-
-      final effectivePerLevel = basePerLevel - discountPerLevel;
-      final levelPenalty = effectivePerLevel * cardLevel;
-
-      String formula;
-      if (discountPerLevel > 0) {
-        formula = '(${basePerLevel}g − ${discountPerLevel}g) × $cardLevel';
-      } else {
-        formula = '${basePerLevel}g × $cardLevel';
-      }
-      runningTotal += levelPenalty;
-
-      steps.add(
-        CalculationStep(
-          description: 'Card level ${cardLevel + 1}',
-          value: runningTotal,
-          formula: formula,
-          modifier: modifier,
-        ),
-      );
-    }
-
-    // Previous enhancements penalty
-    if (previousEnhancements > 0) {
-      const int basePerEnhancement = 75;
-      int discountPerEnhancement = 0;
-      final modifiers = <String>[];
-
-      // Apply Enhancer L 4 discount (FH)
-      if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl4) {
-        discountPerEnhancement = 25;
-        modifiers.add('Enhancer L4: −${discountPerEnhancement}g/enh.');
-      }
-
-      final effectivePerEnhancement =
-          basePerEnhancement - discountPerEnhancement;
-      int enhancementPenalty = effectivePerEnhancement * previousEnhancements;
-
-      // Apply temporary enhancement discount (-20g if at least 1 previous enhancement)
-      if (temporaryEnhancementMode) {
-        enhancementPenalty -= 20;
-        modifiers.add('Temp. Enh.: −20g');
-      }
-
-      String formula;
-      if (discountPerEnhancement > 0) {
-        formula =
-            '(${basePerEnhancement}g − ${discountPerEnhancement}g) × $previousEnhancements${temporaryEnhancementMode ? ' − 20g' : ''}';
-      } else {
-        formula =
-            '${basePerEnhancement}g × $previousEnhancements${temporaryEnhancementMode ? ' − 20g' : ''}';
-      }
-      runningTotal += enhancementPenalty;
-
-      steps.add(
-        CalculationStep(
-          description:
-              '$previousEnhancements previous enhancement${previousEnhancements > 1 ? 's' : ''}',
-          value: runningTotal,
-          formula: formula,
-          modifier: modifiers.isNotEmpty ? modifiers.join('\n') : null,
-        ),
-      );
-    }
-
-    // === SECTION 5: TEMPORARY ENHANCEMENT MODE ===
-    if (temporaryEnhancementMode) {
-      final preTempTotal = runningTotal;
-      runningTotal = (runningTotal * 0.8).ceil();
-      steps.add(
-        CalculationStep(
-          description: 'Temporary Enhancement (×0.8↑)',
-          value: runningTotal,
-          formula: '${preTempTotal}g × 0.8 = ${runningTotal}g',
-        ),
-      );
-    }
+    // Section 5: Temporary enhancement mode (×0.8 rounded up)
+    runningTotal = _addTempEnhancementStep(steps, runningTotal);
 
     return steps;
+  }
+
+  /// Adds the base cost step for the selected enhancement.
+  /// Returns the base cost, or 0 if no enhancement is selected.
+  int _addBaseCostStep(List<CalculationStep> steps, GameEdition edition) {
+    if (enhancement == null) {
+      return 0;
+    }
+
+    final baseCost = enhancement!.cost(edition: edition);
+    final isPlusOne =
+        enhancement!.category == EnhancementCategory.charPlusOne ||
+        enhancement!.category == EnhancementCategory.summonPlusOne ||
+        enhancement!.category == EnhancementCategory.target;
+    final enhancementName = isPlusOne
+        ? '+1 ${enhancement!.name}'
+        : enhancement!.name;
+
+    steps.add(
+      CalculationStep(
+        description: 'Base cost ($enhancementName)',
+        value: baseCost,
+        formula: '${baseCost}g',
+      ),
+    );
+
+    return baseCost;
+  }
+
+  /// Adds multiplier steps: multi-target (×2), lost (÷2), persistent (×3).
+  /// Returns the modified running total.
+  int _addMultiplierSteps(
+    List<CalculationStep> steps,
+    int runningTotal,
+    GameEdition edition,
+  ) {
+    if (enhancement == null) {
+      return runningTotal;
+    }
+
+    // Multi-target multiplier (×2)
+    if (multipleTargets &&
+        eligibleForMultipleTargets(enhancement!, edition: edition)) {
+      runningTotal *= 2;
+      steps.add(
+        CalculationStep(
+          description: 'Multiple targets',
+          value: runningTotal,
+          formula: '×2',
+        ),
+      );
+    }
+
+    // Lost action modifier (÷2, rounded) - GH2E and FH only
+    if (edition.hasLostModifier && lostNonPersistent) {
+      runningTotal = (runningTotal / 2).round();
+      // In FH, clarify "non-persistent" since persistent modifier exists
+      // In GH2E, just say "Lost action" since there's no persistent concept
+      final lostDescription = edition.hasPersistentModifier
+          ? 'Lost action (non-persistent)'
+          : 'Lost action';
+      steps.add(
+        CalculationStep(
+          description: lostDescription,
+          value: runningTotal,
+          formula: '÷2',
+        ),
+      );
+    }
+
+    // Persistent modifier (×3) - FH only
+    if (edition.hasPersistentModifier && persistent) {
+      runningTotal *= 3;
+      steps.add(
+        CalculationStep(
+          description: 'Persistent action',
+          value: runningTotal,
+          formula: '×3',
+        ),
+      );
+    }
+
+    return runningTotal;
+  }
+
+  /// Adds discount steps: Enhancer Level 2 (-10g), Hail's (-5g).
+  /// Returns the modified running total.
+  int _addDiscountSteps(
+    List<CalculationStep> steps,
+    int runningTotal,
+    GameEdition edition,
+  ) {
+    if (enhancement == null) {
+      return runningTotal;
+    }
+
+    // Enhancer Level 2 discount (-10g) - FH only
+    if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2) {
+      runningTotal -= 10;
+      steps.add(
+        CalculationStep(
+          description: 'Enhancer Level 2',
+          value: runningTotal,
+          formula: '−10g',
+        ),
+      );
+    }
+
+    // Hail's Discount (-5g)
+    if (hailsDiscount) {
+      runningTotal -= 5;
+      steps.add(
+        CalculationStep(
+          description: "Hail's Discount",
+          value: runningTotal,
+          formula: '−5g',
+        ),
+      );
+    }
+
+    return runningTotal;
+  }
+
+  /// Adds the card level penalty step.
+  /// Returns the modified running total.
+  int _addCardLevelStep(
+    List<CalculationStep> steps,
+    int runningTotal,
+    GameEdition edition,
+  ) {
+    if (cardLevel <= 0) {
+      return runningTotal;
+    }
+
+    const int basePerLevel = 25;
+    int discountPerLevel = 0;
+    String? modifier;
+
+    // Apply party boon discount (GH/GH2E)
+    if (edition.supportsPartyBoon && SharedPrefs().partyBoon) {
+      discountPerLevel = 5;
+      modifier = 'Party Boon: −${discountPerLevel}g/level';
+    }
+    // Apply Enhancer L3 discount (FH)
+    else if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3) {
+      discountPerLevel = 10;
+      modifier = 'Enhancer L3: −${discountPerLevel}g/level';
+    }
+
+    final effectivePerLevel = basePerLevel - discountPerLevel;
+    final levelPenalty = effectivePerLevel * cardLevel;
+
+    String formula;
+    if (discountPerLevel > 0) {
+      formula = '(${basePerLevel}g − ${discountPerLevel}g) × $cardLevel';
+    } else {
+      formula = '${basePerLevel}g × $cardLevel';
+    }
+    runningTotal += levelPenalty;
+
+    steps.add(
+      CalculationStep(
+        description: 'Card level ${cardLevel + 1}',
+        value: runningTotal,
+        formula: formula,
+        modifier: modifier,
+      ),
+    );
+
+    return runningTotal;
+  }
+
+  /// Adds the previous enhancements penalty step.
+  /// Returns the modified running total.
+  int _addPreviousEnhancementsStep(
+    List<CalculationStep> steps,
+    int runningTotal,
+    GameEdition edition,
+  ) {
+    if (previousEnhancements <= 0) {
+      return runningTotal;
+    }
+
+    const int basePerEnhancement = 75;
+    int discountPerEnhancement = 0;
+    final modifiers = <String>[];
+
+    // Apply Enhancer L4 discount (FH)
+    if (edition.hasEnhancerLevels && SharedPrefs().enhancerLvl4) {
+      discountPerEnhancement = 25;
+      modifiers.add('Enhancer L4: −${discountPerEnhancement}g/enh.');
+    }
+
+    final effectivePerEnhancement = basePerEnhancement - discountPerEnhancement;
+    int enhancementPenalty = effectivePerEnhancement * previousEnhancements;
+
+    // Apply temporary enhancement discount (-20g if at least 1 prev enhancement)
+    if (temporaryEnhancementMode) {
+      enhancementPenalty -= 20;
+      modifiers.add('Temp. Enh.: −20g');
+    }
+
+    String formula;
+    if (discountPerEnhancement > 0) {
+      formula =
+          '(${basePerEnhancement}g − ${discountPerEnhancement}g) × $previousEnhancements${temporaryEnhancementMode ? ' − 20g' : ''}';
+    } else {
+      formula =
+          '${basePerEnhancement}g × $previousEnhancements${temporaryEnhancementMode ? ' − 20g' : ''}';
+    }
+    runningTotal += enhancementPenalty;
+
+    steps.add(
+      CalculationStep(
+        description:
+            '$previousEnhancements previous enhancement${previousEnhancements > 1 ? 's' : ''}',
+        value: runningTotal,
+        formula: formula,
+        modifier: modifiers.isNotEmpty ? modifiers.join('\n') : null,
+      ),
+    );
+
+    return runningTotal;
+  }
+
+  /// Adds the temporary enhancement mode step (×0.8 rounded up).
+  /// Returns the final total.
+  int _addTempEnhancementStep(List<CalculationStep> steps, int runningTotal) {
+    if (!temporaryEnhancementMode) {
+      return runningTotal;
+    }
+
+    final preTempTotal = runningTotal;
+    runningTotal = (runningTotal * 0.8).ceil();
+    steps.add(
+      CalculationStep(
+        description: 'Temporary Enhancement (×0.8↑)',
+        value: runningTotal,
+        formula: '${preTempTotal}g × 0.8 = ${runningTotal}g',
+      ),
+    );
+
+    return runningTotal;
   }
 
   void gameVersionToggled() {

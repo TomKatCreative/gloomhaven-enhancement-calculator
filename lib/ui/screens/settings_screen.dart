@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/backup_settings_
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/debug_settings_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/display_settings_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/gameplay_settings_section.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/settings_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -28,24 +29,6 @@ class SettingsScreen extends StatefulWidget {
 
 class SettingsScreenState extends State<SettingsScreen> {
   final ScrollController scrollController = ScrollController();
-  bool isBottom = false;
-
-  @override
-  void initState() {
-    super.initState();
-    scrollController.addListener(() {
-      if ((scrollController.offset >=
-          scrollController.position.maxScrollExtent)) {
-        setState(() {
-          isBottom = true;
-        });
-      } else {
-        setState(() {
-          isBottom = false;
-        });
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -217,7 +200,7 @@ Platform: ${Platform.isIOS ? 'iOS' : 'Android'}
       color: theme.colorScheme.onSurfaceVariant,
     );
     final linkStyle = theme.textTheme.labelMedium?.copyWith(
-      color: theme.colorScheme.primary,
+      color: theme.contrastedPrimary,
     );
 
     return Padding(
