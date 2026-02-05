@@ -103,7 +103,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // SCENARIO 114 REWARD (PARTY BOON)
   // ============================================================================
 
-  static const String scenario114RewardTitle = "Scenario 114 reward";
+  static const String scenario114RewardTitle = "Party Boon";
 
   static const String _scenario114RewardContent =
       "After completing Scenario 114 (from the Forgotten Circles expansion), your party "
@@ -122,7 +122,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // BUILDING 44 (ENHANCER)
   // ============================================================================
 
-  static const String building44Title = "Building 44";
+  static const String building44Title = "The Enhancer";
 
   static const String _building44Content =
       "Building 44 is **The Enhancer** in Frosthaven. Once built, it allows your party "
