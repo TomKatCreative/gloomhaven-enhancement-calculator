@@ -39,6 +39,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   late AnimationController _controller;
   late Animation<double> _expandAnimation;
   bool _isExpanded = false;
+  double _blurOpacity = 0.0;
 
   // Chip dimensions
   static const double _chipHeight = 56.0;
@@ -54,6 +55,9 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   static const double _bottomOffset = 16.0;
   static const double _horizontalPadding = 16.0;
 
+  // Blur fade threshold (pixels scrolled before blur is fully visible)
+  static const double _blurFadeThreshold = 100.0;
+
   @override
   void initState() {
     super.initState();
@@ -66,12 +70,43 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
+    widget.scrollController?.addListener(_onScroll);
+    // Initialize blur opacity based on current scroll position
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onScroll());
+  }
+
+  @override
+  void didUpdateWidget(ExpandableCostChip oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.scrollController != widget.scrollController) {
+      oldWidget.scrollController?.removeListener(_onScroll);
+      widget.scrollController?.addListener(_onScroll);
+    }
   }
 
   @override
   void dispose() {
+    widget.scrollController?.removeListener(_onScroll);
     _controller.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final controller = widget.scrollController;
+    if (controller == null || !controller.hasClients) return;
+
+    // Show blur when there's content that could scroll behind the chip
+    // (i.e., when we're NOT at the bottom of the scroll view)
+    final maxExtent = controller.position.maxScrollExtent;
+    final distanceFromBottom = maxExtent - controller.offset;
+    final newOpacity = (distanceFromBottom / _blurFadeThreshold).clamp(
+      0.0,
+      1.0,
+    );
+
+    if (newOpacity != _blurOpacity) {
+      setState(() => _blurOpacity = newOpacity);
+    }
   }
 
   void _toggleExpanded() {
@@ -115,55 +150,57 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           // Blur bar at bottom - provides frosted glass effect behind chip/FAB
           // Uses ShaderMask to fade the blur at the top edge for a soft transition
           // Wrapped in GestureDetector to allow vertical drag scrolling but block taps
+          // Fades in as content scrolls behind it
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             height: 100,
-            child: GestureDetector(
-              onTap: () {}, // Absorb taps (do nothing)
-              onVerticalDragUpdate: (details) {
-                final controller = widget.scrollController;
-                if (controller != null && controller.hasClients) {
-                  controller.jumpTo(
-                    (controller.offset - details.delta.dy).clamp(
-                      0.0,
-                      controller.position.maxScrollExtent,
-                    ),
-                  );
-                }
-              },
-              behavior: HitTestBehavior.translucent,
-              child: ShaderMask(
-                shaderCallback: (Rect bounds) {
-                  return const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: [0.0, 0.4, 1.0],
-                    colors: [Colors.transparent, Colors.white, Colors.white],
-                  ).createShader(bounds);
+            child: Opacity(
+              opacity: _blurOpacity,
+              child: GestureDetector(
+                onTap: () {}, // Absorb taps (do nothing)
+                onVerticalDragUpdate: (details) {
+                  final controller = widget.scrollController;
+                  if (controller != null && controller.hasClients) {
+                    controller.jumpTo(
+                      (controller.offset - details.delta.dy).clamp(
+                        0.0,
+                        controller.position.maxScrollExtent,
+                      ),
+                    );
+                  }
                 },
-                blendMode: BlendMode.dstIn,
-                child: ClipRect(
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: const [0.0, 0.5, 1.0],
-                          colors: [
-                            Theme.of(
-                              context,
-                            ).colorScheme.surface.withValues(alpha: 0.6),
-                            Theme.of(
-                              context,
-                            ).colorScheme.surface.withValues(alpha: 0.8),
-                            Theme.of(
-                              context,
-                            ).colorScheme.surface.withValues(alpha: 1.0),
-                          ],
+                behavior: HitTestBehavior.translucent,
+                child: ShaderMask(
+                  shaderCallback: (Rect bounds) {
+                    return const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: [0.0, 0.4, 1.0],
+                      colors: [Colors.transparent, Colors.white, Colors.white],
+                    ).createShader(bounds);
+                  },
+                  blendMode: BlendMode.dstIn,
+                  child: ClipRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            stops: const [0.0, 0.5, 1.0],
+                            colors: [
+                              colorScheme.surfaceContainer.withValues(
+                                alpha: 0.6,
+                              ),
+                              colorScheme.surfaceContainer.withValues(
+                                alpha: 0.8,
+                              ),
+                              colorScheme.surfaceContainer,
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -221,9 +258,15 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                     ),
                   );
 
-                  final chipColor =
+                  final baseChipColor =
                       theme.bottomNavigationBarTheme.backgroundColor ??
                       colorScheme.surface;
+                  // Lighten chip when blur/shadow is present for better visibility
+                  final chipColor = Color.lerp(
+                    baseChipColor,
+                    colorScheme.surfaceContainerHighest,
+                    _blurOpacity,
+                  )!;
 
                   return DecoratedBox(
                     decoration: BoxDecoration(
