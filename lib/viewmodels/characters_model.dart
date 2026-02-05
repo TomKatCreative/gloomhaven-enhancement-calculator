@@ -40,7 +40,7 @@ library;
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -73,7 +73,7 @@ class CharactersModel with ChangeNotifier {
 
   List<Character> _characters = [];
   Character? currentCharacter;
-  DatabaseHelper databaseHelper;
+  IDatabaseHelper databaseHelper;
   ThemeProvider themeProvider;
   PageController pageController = PageController(
     initialPage: SharedPrefs().initialPage,

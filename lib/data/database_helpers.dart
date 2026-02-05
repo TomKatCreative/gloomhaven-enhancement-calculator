@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:path/path.dart';
@@ -17,7 +18,7 @@ import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'database_migrations.dart';
 
 // singleton class to manage the database
-class DatabaseHelper {
+class DatabaseHelper implements IDatabaseHelper {
   // This is the actual database filename that is saved in the docs directory.
   static const _databaseName = 'GloomhavenCompanion.db';
 
@@ -341,6 +342,7 @@ class DatabaseHelper {
     }
   }
 
+  @override
   Future<int> insertCharacter(Character character) async {
     Database db = await database;
     int id = await db.insert(tableCharacters, character.toMap());
@@ -365,6 +367,7 @@ class DatabaseHelper {
     return id;
   }
 
+  @override
   Future<void> updateCharacter(Character updatedCharacter) async {
     Database db = await database;
     await db.update(
@@ -375,6 +378,7 @@ class DatabaseHelper {
     );
   }
 
+  @override
   Future<void> updateCharacterPerk(CharacterPerk perk, bool value) async {
     Database db = await database;
     Map<String, dynamic> map = {
@@ -391,6 +395,7 @@ class DatabaseHelper {
     );
   }
 
+  @override
   Future<void> updateCharacterMastery(
     CharacterMastery mastery,
     bool value,
@@ -410,6 +415,7 @@ class DatabaseHelper {
     );
   }
 
+  @override
   Future<List<CharacterPerk>> queryCharacterPerks(String characterUuid) async {
     Database db = await database;
     List<CharacterPerk> list = [];
@@ -424,6 +430,7 @@ class DatabaseHelper {
     return list;
   }
 
+  @override
   Future<List<CharacterMastery>> queryCharacterMasteries(
     String characterUuid,
   ) async {
@@ -440,6 +447,7 @@ class DatabaseHelper {
     return list;
   }
 
+  @override
   Future<List<Map<String, Object?>>> queryPerks(Character character) async {
     Database db = await database;
     List<Map<String, Object?>> result = await db.query(
@@ -450,6 +458,7 @@ class DatabaseHelper {
     return result.toList();
   }
 
+  @override
   Future<List<Map<String, Object?>>> queryMasteries(Character character) async {
     Database db = await database;
     List<Map<String, Object?>> result = await db.query(
@@ -460,6 +469,7 @@ class DatabaseHelper {
     return result.toList();
   }
 
+  @override
   Future<List<Character>> queryAllCharacters() async {
     Database db = await database;
     List<Character> list = [];
@@ -471,6 +481,7 @@ class DatabaseHelper {
     return list;
   }
 
+  @override
   Future<void> deleteCharacter(Character character) async {
     Database db = await database;
     return await db.transaction((txn) async {
