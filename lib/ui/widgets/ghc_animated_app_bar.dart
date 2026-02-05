@@ -89,7 +89,24 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final enhancementCalculatorModel = context
         .read<EnhancementCalculatorModel>();
     final appModel = context.read<AppModel>();
-    final charactersModel = context.watch<CharactersModel>();
+    // Use targeted selects to only rebuild when specific properties change,
+    // not during PageView transitions which would cause jank
+    final isEditMode = context.select<CharactersModel, bool>(
+      (m) => m.isEditMode,
+    );
+    final isScrolledToTop = context.select<CharactersModel, bool>(
+      (m) => m.isScrolledToTop,
+    );
+    final showRetired = context.select<CharactersModel, bool>(
+      (m) => m.showRetired,
+    );
+    final characterCount = context.select<CharactersModel, int>(
+      (m) => m.characters.length,
+    );
+    final currentCharacter = context.select<CharactersModel, Character?>(
+      (m) => m.currentCharacter,
+    );
+    final charactersModel = context.read<CharactersModel>();
     final colorScheme = Theme.of(context).colorScheme;
 
     // Base and scrolled colors for tint effect
@@ -97,7 +114,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final scrolledColor = AppBarUtils.getTintedBackground(colorScheme);
 
     return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: charactersModel.isScrolledToTop ? 0.0 : 1.0),
+      tween: Tween<double>(end: isScrolledToTop ? 0.0 : 1.0),
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
       builder: (context, progress, child) {
@@ -107,16 +124,18 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
           scrolledUnderElevation: 0,
           backgroundColor: Color.lerp(baseColor, scrolledColor, progress),
           centerTitle: true,
-          title:
-              context.watch<AppModel>().page == 0 &&
-                  charactersModel.characters.length > 1
-              ? SmoothPageIndicator(
-                  controller: charactersModel.pageController,
-                  count: charactersModel.characters.length,
-                  effect: ScrollingDotsEffect(
-                    dotHeight: 10,
-                    dotWidth: 10,
-                    activeDotColor: colorScheme.onSurface,
+          title: context.watch<AppModel>().page == 0 && characterCount > 1
+              // RepaintBoundary isolates the page indicator's frame-by-frame
+              // repaints during swipe transitions from the rest of the AppBar
+              ? RepaintBoundary(
+                  child: SmoothPageIndicator(
+                    controller: charactersModel.pageController,
+                    count: characterCount,
+                    effect: ScrollingDotsEffect(
+                      dotHeight: 10,
+                      dotWidth: 10,
+                      activeDotColor: colorScheme.onSurface,
+                    ),
                   ),
                 )
               : context.watch<AppModel>().page == 1
@@ -154,21 +173,19 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 )
               : Container(),
           actions: <Widget>[
-            if (charactersModel.isEditMode)
+            if (isEditMode && currentCharacter != null)
               Tooltip(
-                message: charactersModel.currentCharacter!.isRetired
-                    ? 'Unretire'
-                    : 'Retire',
+                message: currentCharacter.isRetired ? 'Unretire' : 'Retire',
                 child: IconButton(
                   icon: Icon(
-                    charactersModel.currentCharacter!.isRetired
+                    currentCharacter.isRetired
                         ? Icons.directions_walk
                         : Icons.assist_walker,
                   ),
                   onPressed: () async {
                     final String message =
-                        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? 'unretired' : 'retired'}';
-                    Character? character = charactersModel.currentCharacter;
+                        '${currentCharacter.name} ${currentCharacter.isRetired ? 'unretired' : 'retired'}';
+                    Character? character = currentCharacter;
                     await charactersModel.retireCurrentCharacter();
                     appModel.updateTheme();
                     if (!context.mounted) return;
@@ -178,7 +195,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                         SnackBar(
                           content: Text(message),
                           persist: false,
-                          action: charactersModel.showRetired
+                          action: showRetired
                               ? null
                               : SnackBarAction(
                                   label: 'Show',
@@ -195,17 +212,15 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               ),
             if (appModel.page == 0)
               Tooltip(
-                message: charactersModel.isEditMode
-                    ? 'Delete'
-                    : 'New Character',
+                message: isEditMode ? 'Delete' : 'New Character',
                 child: IconButton(
                   icon: Icon(
-                    charactersModel.isEditMode
+                    isEditMode
                         ? Icons.delete_rounded
                         : Icons.person_add_rounded,
-                    color: charactersModel.isEditMode ? Colors.red[400] : null,
+                    color: isEditMode ? Colors.red[400] : null,
                   ),
-                  onPressed: charactersModel.isEditMode
+                  onPressed: isEditMode
                       ? () async {
                           final bool? result = await ConfirmationDialog.show(
                             context: context,
@@ -217,8 +232,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                           );
 
                           if (result == true && context.mounted) {
-                            final String characterName =
-                                charactersModel.currentCharacter!.name;
+                            final String characterName = currentCharacter!.name;
                             await charactersModel.deleteCurrentCharacter();
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context)

@@ -35,7 +35,12 @@ class PerkRowState extends State<PerkRow> {
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.watch<CharactersModel>();
+    // Use targeted select to only rebuild when isEditMode changes,
+    // not during PageView transitions or other model updates
+    final isEditMode = context.select<CharactersModel, bool>(
+      (m) => m.isEditMode,
+    );
+    final charactersModel = context.read<CharactersModel>();
 
     // Build perkIds if not already done
     if (perkIds.isEmpty) {
@@ -49,7 +54,7 @@ class PerkRowState extends State<PerkRow> {
       child: Row(
         children: <Widget>[
           widget.perks[0].grouped
-              ? _buildGroupedCheckboxes(context, charactersModel)
+              ? _buildGroupedCheckboxes(context, charactersModel, isEditMode)
               : Row(
                   children: List.generate(widget.perks.length, (index) {
                     final characterPerk = _findCharacterPerk(
@@ -58,7 +63,7 @@ class PerkRowState extends State<PerkRow> {
                     if (characterPerk == null) return const SizedBox.shrink();
                     return ConditionalCheckbox(
                       value: characterPerk.characterPerkIsSelected,
-                      isEditMode: charactersModel.isEditMode,
+                      isEditMode: isEditMode,
                       isRetired: widget.character.isRetired,
                       onChanged: (bool value) => charactersModel.togglePerk(
                         characterPerks: widget.character.characterPerks,
@@ -103,6 +108,7 @@ class PerkRowState extends State<PerkRow> {
   Widget _buildGroupedCheckboxes(
     BuildContext context,
     CharactersModel charactersModel,
+    bool isEditMode,
   ) {
     final allSelected = _allPerksSelected();
     final borderColor = allSelected
@@ -125,7 +131,7 @@ class PerkRowState extends State<PerkRow> {
           return Checkbox(
             visualDensity: VisualDensity.compact,
             value: characterPerk.characterPerkIsSelected,
-            onChanged: charactersModel.isEditMode && !widget.character.isRetired
+            onChanged: isEditMode && !widget.character.isRetired
                 ? (bool? value) {
                     if (value != null) {
                       charactersModel.togglePerk(

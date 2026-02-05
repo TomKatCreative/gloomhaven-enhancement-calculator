@@ -124,6 +124,21 @@ class CharactersModel with ChangeNotifier {
     super.dispose();
   }
 
+  /// Toggles visibility of retired characters and navigates appropriately.
+  ///
+  /// This is the main entry point for the "show/hide retired" toggle. It handles
+  /// several scenarios:
+  ///
+  /// 1. **Empty list**: Just toggles the setting without navigation.
+  /// 2. **Specific character provided**: Navigates to that character (used by
+  ///    snackbar "Show" action after retiring a character).
+  /// 3. **Currently viewing a retired character while hiding retired**: Finds
+  ///    the next non-retired character to navigate to.
+  /// 4. **Currently viewing an active character**: Maintains position in the
+  ///    filtered list.
+  ///
+  /// The [character] parameter is optional and used when we want to navigate
+  /// to a specific character after toggling (e.g., snackbar "Show" action).
   void toggleShowRetired({Character? character}) {
     if (_characters.isEmpty) {
       _toggleSettingOnly();
@@ -134,11 +149,25 @@ class CharactersModel with ChangeNotifier {
     _applyToggleAndNavigate(targetIndex);
   }
 
+  /// Toggles the retired visibility setting without any navigation.
+  /// Used when the character list is empty.
   void _toggleSettingOnly() {
     showRetired = !showRetired;
     notifyListeners();
   }
 
+  /// Determines which page index to navigate to after toggling retired visibility.
+  ///
+  /// Returns the index in the POST-toggle list (i.e., the list that will be
+  /// displayed after the toggle is applied).
+  ///
+  /// Scenarios:
+  /// - If [providedCharacter] is given, returns its index in the full list
+  ///   (used when navigating to a specific retired character via snackbar).
+  /// - If viewing a retired character while about to hide retired, finds the
+  ///   next non-retired character.
+  /// - If viewing an active character while about to show retired, finds its
+  ///   position in the combined list.
   int _calculateTargetIndex(Character? providedCharacter) {
     // If specific character provided, use it
     if (providedCharacter != null) {
@@ -158,6 +187,10 @@ class CharactersModel with ChangeNotifier {
     return 0; // Fallback
   }
 
+  /// Determines the target index based on current character's retired status.
+  ///
+  /// Called when [currentCharacter] is not null. Routes to appropriate handler
+  /// based on whether the current character is retired and current visibility.
   int _getIndexForCurrentCharacter() {
     if (currentCharacter!.isRetired) {
       return _findIndexWhenCurrentIsRetired();
@@ -168,31 +201,59 @@ class CharactersModel with ChangeNotifier {
     }
   }
 
+  /// Finds the target index when the current character is retired.
+  ///
+  /// When toggling to hide retired characters while viewing a retired character,
+  /// we need to find a non-retired character to display. This method:
+  ///
+  /// 1. Looks for the first non-retired character AFTER the current position
+  ///    in the full list (to maintain a sense of "next" in the original order).
+  /// 2. If none found after, falls back to the last non-retired character.
+  /// 3. Returns 0 if no non-retired characters exist (empty state).
+  ///
+  /// Note: Uses [_characters] (unfiltered list) to find the current position
+  /// and iterate, since the filtered [characters] list may not contain the
+  /// current retired character when [showRetired] is false.
   int _findIndexWhenCurrentIsRetired() {
-    // Find next non-retired character after current
-    final currentIndex = characters.indexOf(currentCharacter!);
+    // Find position in the FULL list (unfiltered) to iterate from
+    final currentIndex = _characters.indexOf(currentCharacter!);
 
-    for (int i = currentIndex + 1; i < characters.length; i++) {
-      if (!characters[i].isRetired) {
-        // Convert to non-retired list index
-        return _getNonRetiredCharacters().indexOf(characters[i]);
+    // Look for next non-retired character after current position
+    for (int i = currentIndex + 1; i < _characters.length; i++) {
+      if (!_characters[i].isRetired) {
+        // Found one - return its position in the non-retired list
+        return _getNonRetiredCharacters().indexOf(_characters[i]);
       }
     }
 
-    // No non-retired character found after current, go to last non-retired
+    // No non-retired character found after current position
+    // Fall back to the last non-retired character (or 0 if none exist)
     final nonRetiredList = _getNonRetiredCharacters();
     return nonRetiredList.isNotEmpty ? nonRetiredList.length - 1 : 0;
   }
 
+  /// Finds the target index when the current character is active (non-retired).
+  ///
+  /// When toggling to hide retired characters while viewing an active character,
+  /// we need to find where that character will appear in the filtered list.
+  /// Simply returns the character's position in the non-retired list.
   int _findIndexWhenCurrentIsActive() {
-    // Current character is active, find its position in non-retired list
     return _getNonRetiredCharacters().indexOf(currentCharacter!);
   }
 
+  /// Returns a list of only non-retired characters.
+  /// Helper method used by retired character navigation logic.
   List<Character> _getNonRetiredCharacters() {
     return _characters.where((character) => !character.isRetired).toList();
   }
 
+  /// Applies the toggle and navigates to the target index.
+  ///
+  /// This is the final step after calculating the target index. It:
+  /// 1. Flips the [showRetired] flag
+  /// 2. Persists the setting to SharedPreferences
+  /// 3. Navigates to the target page (if valid)
+  /// 4. Notifies listeners to rebuild the UI
   void _applyToggleAndNavigate(int targetIndex) {
     showRetired = !showRetired;
     SharedPrefs().showRetiredCharacters = showRetired;
@@ -423,6 +484,28 @@ class CharactersModel with ChangeNotifier {
     }
   }
 
+  /// Toggles the retired status of the current character.
+  ///
+  /// This method handles both retiring and unretiring a character. Key behavior:
+  ///
+  /// 1. **Captures index BEFORE toggle**: We get the character's index in the
+  ///    current (pre-toggle) filtered list. This is important because after
+  ///    toggling retired status, the character may no longer be in the filtered
+  ///    list (if retired and showRetired=false).
+  ///
+  /// 2. **Persists to database**: The retired status is saved immediately.
+  ///
+  /// 3. **Updates current character**: [_setCurrentCharacter] handles the edge
+  ///    case where the index becomes invalid (e.g., character disappears from
+  ///    filtered list). If the index is out of bounds, it falls back to the
+  ///    last character in the list.
+  ///
+  /// After this method completes, if [showRetired] is false and the character
+  /// was just retired, the UI will navigate away from the retired character
+  /// (handled by [_setCurrentCharacter]'s bounds checking).
+  ///
+  /// The caller (AppBar) shows a snackbar with a "Show" action that calls
+  /// [toggleShowRetired] with the retired character to navigate back to it.
   Future<void> retireCurrentCharacter() async {
     if (currentCharacter != null) {
       _isEditMode = false;

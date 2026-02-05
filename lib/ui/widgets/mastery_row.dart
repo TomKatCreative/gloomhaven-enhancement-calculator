@@ -64,7 +64,12 @@ class MasteryRowState extends State<MasteryRow>
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.watch<CharactersModel>();
+    // Use targeted select to only rebuild when isEditMode changes,
+    // not during PageView transitions or other model updates
+    final isEditMode = context.select<CharactersModel, bool>(
+      (m) => m.isEditMode,
+    );
+    final charactersModel = context.read<CharactersModel>();
 
     // Check for state change and trigger animation
     final isNowAchieved = _isAchieved;
@@ -111,7 +116,7 @@ class MasteryRowState extends State<MasteryRow>
               if (_characterMastery != null)
                 ConditionalCheckbox(
                   value: _characterMastery!.characterMasteryAchieved,
-                  isEditMode: charactersModel.isEditMode,
+                  isEditMode: isEditMode,
                   isRetired: widget.character.isRetired,
                   onChanged: (bool value) => charactersModel.toggleMastery(
                     characterMasteries: widget.character.characterMasteries,
