@@ -11,6 +11,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/enhancer_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_cost_chip.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -215,20 +216,20 @@ class _CardDetailsGroupCard extends StatelessWidget {
               model: model,
               darkTheme: darkTheme,
             ),
-            _buildDivider(context),
+            const GHCDivider(indent: true),
             _PreviousEnhancementsSection(
               edition: edition,
               model: model,
               darkTheme: darkTheme,
             ),
-            _buildDivider(context),
+            const GHCDivider(indent: true),
             _MultipleTargetsToggle(
               edition: edition,
               model: model,
               darkTheme: darkTheme,
             ),
             if (edition.hasLostModifier) ...[
-              _buildDivider(context),
+              const GHCDivider(indent: true),
               _LossNonPersistentToggle(
                 edition: edition,
                 model: model,
@@ -236,19 +237,12 @@ class _CardDetailsGroupCard extends StatelessWidget {
               ),
             ],
             if (edition.hasPersistentModifier) ...[
-              _buildDivider(context),
+              const GHCDivider(indent: true),
               _PersistentToggle(model: model, darkTheme: darkTheme),
             ],
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildDivider(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: largePadding),
-      child: Divider(height: 1, color: Theme.of(context).dividerTheme.color),
     );
   }
 }

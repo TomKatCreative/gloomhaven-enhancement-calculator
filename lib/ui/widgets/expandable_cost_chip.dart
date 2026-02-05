@@ -8,6 +8,7 @@ import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/calculation_step.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
@@ -384,7 +385,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           ),
         ),
 
-        Divider(height: 1, color: Theme.of(context).dividerTheme.color),
+        const GHCDivider(),
 
         // Breakdown content
         Expanded(
@@ -415,8 +416,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       itemCount: widget.steps.length,
-      separatorBuilder: (context, index) =>
-          Divider(height: 1, color: Theme.of(context).dividerTheme.color),
+      separatorBuilder: (context, index) => const GHCDivider(),
       itemBuilder: (context, index) =>
           _buildStepRow(theme, widget.steps[index]),
     );

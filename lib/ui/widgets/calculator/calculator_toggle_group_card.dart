@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/info_button_config.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 
 /// Configuration for a single toggle item in a [CalculatorToggleGroupCard].
 class ToggleGroupItem {
@@ -79,15 +80,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
 
       // Add thin divider between items (not after the last one)
       if (i < items.length - 1) {
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: largePadding),
-            child: Divider(
-              height: 1,
-              color: Theme.of(context).dividerTheme.color,
-            ),
-          ),
-        );
+        widgets.add(const GHCDivider(indent: true));
       }
     }
 
