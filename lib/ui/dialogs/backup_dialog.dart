@@ -11,7 +11,6 @@ import 'package:gloomhaven_enhancement_calc/utils/settings_helpers.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
 
 /// Result returned from the backup dialog.
 class BackupResult {
@@ -34,15 +33,12 @@ enum BackupAction {
 
   /// User saved the backup to a custom location.
   custom,
-
-  /// User shared the backup file.
-  shared,
 }
 
 /// A dialog for creating and exporting database backups.
 ///
-/// On Android, offers both "Save to Downloads" and "Share" options.
-/// On iOS, only offers "Continue" to share the file.
+/// On Android, offers "Save" (to Downloads or custom path) and "Choose location".
+/// On iOS, offers "Choose location" to select where to save.
 ///
 /// ## Example Usage
 ///
@@ -151,10 +147,50 @@ class _BackupDialogState extends State<BackupDialog> {
     }
   }
 
+  Future<bool> _showFolderAccessExplanation() async {
+    if (!Platform.isAndroid) return true;
+
+    final l10n = AppLocalizations.of(context);
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.folderAccessTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.folderAccessExplanation),
+            const SizedBox(height: mediumPadding),
+            Text(
+              l10n.folderAccessTip,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.continue_),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+
   Future<void> _handleChooseLocation() async {
     if (!_validateFilename()) return;
 
     if (!await getStoragePermission()) {
+      return;
+    }
+
+    // Show explanation dialog before SAF picker
+    if (!await _showFolderAccessExplanation()) {
       return;
     }
 
@@ -169,51 +205,18 @@ class _BackupDialogState extends State<BackupDialog> {
 
       // Save the backup to the selected location
       String value = await DatabaseHelper.instance.generateBackup();
-      File backupFile = File('$selectedDirectory/${_fileNameController.text}.txt');
+      File backupFile = File(
+        '$selectedDirectory/${_fileNameController.text}.txt',
+      );
       await backupFile.writeAsString(value);
 
       // Save this path as the new default for future backups
       SharedPrefs().customBackupPath = selectedDirectory;
 
       if (!mounted) return;
-      Navigator.of(
-        context,
-      ).pop(BackupResult(action: BackupAction.custom, savedPath: selectedDirectory));
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).backupError)),
-        );
-    }
-  }
-
-  Future<void> _handleShare() async {
-    if (!_validateFilename()) return;
-
-    try {
-      Directory directory = await getTemporaryDirectory();
-      String downloadPath = directory.path;
-      String backupValue = await DatabaseHelper.instance.generateBackup();
-      File backupFile = File('$downloadPath/${_fileNameController.text}.txt');
-      await backupFile.writeAsString(backupValue);
-      if (!mounted) return;
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile('$downloadPath/${_fileNameController.text}.txt')],
-          sharePositionOrigin:
-              Offset(
-                MediaQuery.of(context).size.height / 2,
-                MediaQuery.of(context).size.width / 2,
-              ) &
-              const Size(3.0, 4.0),
-        ),
+      Navigator.of(context).pop(
+        BackupResult(action: BackupAction.custom, savedPath: selectedDirectory),
       );
-      if (!mounted) return;
-      Navigator.of(
-        context,
-      ).pop(const BackupResult(action: BackupAction.shared));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -269,24 +272,16 @@ class _BackupDialogState extends State<BackupDialog> {
             context,
           ).pop(const BackupResult(action: BackupAction.cancelled)),
         ),
-        if (Platform.isAndroid) ...[
+        if (Platform.isAndroid)
           TextButton.icon(
             icon: Icon(MdiIcons.contentSave, color: theme.colorScheme.primary),
             label: Text(l10n.save),
             onPressed: _handleSave,
           ),
-          TextButton.icon(
-            icon: Icon(MdiIcons.folderOpen, color: theme.colorScheme.primary),
-            label: const Text('Choose location...'),
-            onPressed: _handleChooseLocation,
-          ),
-        ],
         TextButton.icon(
-          onPressed: _handleShare,
-          icon: Platform.isAndroid
-              ? Icon(Icons.share, color: theme.colorScheme.primary)
-              : Container(),
-          label: Text(Platform.isAndroid ? l10n.share : l10n.continue_),
+          icon: Icon(MdiIcons.folderOpen, color: theme.colorScheme.primary),
+          label: const Text('Choose location...'),
+          onPressed: _handleChooseLocation,
         ),
       ],
     );

@@ -146,5 +146,8 @@
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
   "selectClass": "Select class...",
-  "addNotes": "Add notes..."
+  "addNotes": "Add notes...",
+  "folderAccessTitle": "Choose backup folder",
+  "folderAccessExplanation": "On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.",
+  "folderAccessTip": "Tip: Create a new folder called 'Backups' to keep your backup files organized."
 }
