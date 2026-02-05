@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @lossNonPersistent.
   ///
   /// In en, this message translates to:
-  /// **'Loss non-persistent'**
+  /// **'Lost & non-persistent'**
   String get lossNonPersistent;
 
   /// No description provided for @persistent.
@@ -449,7 +449,7 @@ abstract class AppLocalizations {
   /// No description provided for @eligibleFor.
   ///
   /// In en, this message translates to:
-  /// **'Eligible For'**
+  /// **'Eligible for'**
   String get eligibleFor;
 
   /// No description provided for @gameplay.

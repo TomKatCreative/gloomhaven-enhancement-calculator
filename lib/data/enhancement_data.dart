@@ -28,7 +28,7 @@ enum EnhancementCategory {
       case EnhancementCategory.anyElem:
         return 'Effect';
       case EnhancementCategory.hex:
-        return 'Current Hexes';
+        return 'Existing hexes';
     }
   }
 
@@ -237,7 +237,7 @@ class EnhancementData {
       ghCost: 150,
       assetKey: 'Wild_Element',
     ),
-    // Current Hexes
+    // Existing hexes
     Enhancement(
       EnhancementCategory.hex,
       '2 hexes',

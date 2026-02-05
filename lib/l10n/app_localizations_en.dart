@@ -188,13 +188,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get hailsDiscount => 'Hail\'s discount';
 
   @override
-  String get lossNonPersistent => 'Loss non-persistent';
+  String get lossNonPersistent => 'Lost & non-persistent';
 
   @override
   String get persistent => 'Persistent';
 
   @override
-  String get eligibleFor => 'Eligible For';
+  String get eligibleFor => 'Eligible for';
 
   @override
   String get gameplay => 'GAMEPLAY';
