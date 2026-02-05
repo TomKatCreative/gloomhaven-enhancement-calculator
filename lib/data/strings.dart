@@ -208,6 +208,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   static String _previousEnhancementsContent({
     required GameEdition edition,
     required bool enhancerLvl4,
+    required bool temporaryEnhancementMode,
   }) {
     String baseContent =
         "75 gold is added to the cost of an enhancement for each previous enhancement on the "
@@ -221,9 +222,11 @@ A **main** ability is an ability that is written in larger font, whereas a **non
           "\n\nWith **Enhancer level 4** unlocked, this fee is reduced by 25 gold per previous enhancement.";
     }
 
-    // Add Temporary Enhancement discount info (always shown - not a spoiler)
-    baseContent +=
-        "\n\nWith the **Temporary Enhancement** variant, if the action has at least one previous enhancement, the cost is reduced by an additional 20 gold.";
+    // Add Temporary Enhancement discount info only when enabled
+    if (temporaryEnhancementMode) {
+      baseContent +=
+          "\n\nWith the **Temporary Enhancement** variant, if the action has at least one previous enhancement, the cost is reduced by an additional 20 gold.";
+    }
 
     return baseContent;
   }
@@ -233,12 +236,14 @@ A **main** ability is an ability that is written in larger font, whereas a **non
     bool darkMode, {
     required GameEdition edition,
     required bool enhancerLvl4,
+    required bool temporaryEnhancementMode,
   }) {
     return RichTextBuilder.build(
       context,
       _previousEnhancementsContent(
         edition: edition,
         enhancerLvl4: enhancerLvl4,
+        temporaryEnhancementMode: temporaryEnhancementMode,
       ),
       darkMode,
     );
