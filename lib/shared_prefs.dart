@@ -249,4 +249,15 @@ class SharedPrefs {
 
   int get airState => _sharedPrefs.getInt('elementAirState') ?? 0;
   set airState(int value) => _sharedPrefs.setInt('elementAirState', value);
+
+  /// Custom backup directory path (null means use default Downloads folder)
+  String? get customBackupPath => _sharedPrefs.getString('customBackupPath');
+
+  set customBackupPath(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('customBackupPath');
+    } else {
+      _sharedPrefs.setString('customBackupPath', value);
+    }
+  }
 }
