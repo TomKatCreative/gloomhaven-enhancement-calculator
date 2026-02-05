@@ -101,7 +101,11 @@ class MasteryRowState extends State<MasteryRow>
           );
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: tinyPadding),
+          padding: const EdgeInsets.only(
+            top: tinyPadding,
+            bottom: tinyPadding,
+            right: smallPadding,
+          ),
           child: Row(
             children: <Widget>[
               if (_characterMastery != null)

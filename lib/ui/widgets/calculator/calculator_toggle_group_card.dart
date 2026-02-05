@@ -136,7 +136,7 @@ class CalculatorToggleGroupCard extends StatelessWidget {
                     item.titleWidget ??
                         AutoSizeText(
                           item.title!,
-                          maxLines: 2,
+                          maxLines: 1,
                           style: theme.textTheme.bodyLarge,
                         ),
                     if (item.subtitle != null)

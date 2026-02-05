@@ -739,10 +739,15 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
           title: '${AppLocalizations.of(context).building44} \u002A',
           subtitle: AppLocalizations.of(context).frosthavenSpoilers,
           value: _hasAnyEnhancerUpgrades(),
-          trailingWidget: Icon(
-            Icons.open_in_new,
-            size: 30,
-            color: colorScheme.onSurface.withValues(alpha: 0.75),
+          trailingWidget: SizedBox(
+            width: 60, // Match Switch width for alignment
+            child: Center(
+              child: Icon(
+                Icons.open_in_new,
+                size: iconSizeMedium,
+                color: colorScheme.onSurface.withValues(alpha: 0.5),
+              ),
+            ),
           ),
           onTap: () => _showEnhancerDialog(context),
         ),

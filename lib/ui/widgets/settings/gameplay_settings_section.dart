@@ -202,9 +202,15 @@ class GameplaySettingsSection extends StatelessWidget {
     return ListTile(
       leading: const Icon(Icons.auto_awesome_rounded),
       title: Text(l10n.enhancementGuidelines),
-      trailing: Icon(
-        Icons.open_in_new,
-        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+      trailing: SizedBox(
+        width: 60, // Match Switch width for alignment
+        child: Center(
+          child: Icon(
+            Icons.open_in_new,
+            size: iconSizeMedium,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
+        ),
       ),
       onTap: () => showDialog<void>(
         context: context,
