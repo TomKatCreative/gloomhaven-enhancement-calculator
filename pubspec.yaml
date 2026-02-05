@@ -19,7 +19,7 @@ dependencies:
   flutter_svg: ^2.2.3
   share_plus: ^12.0.0
   # Temporarily pinned to avoid breaking change
-  file_picker: 10.3.8
+  file_picker: 10.3.10
   intl: any
   smooth_page_indicator: ^2.0.1
   permission_handler: ^12.0.0
