@@ -16,20 +16,48 @@ class PerksSection extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('Perks:', style: Theme.of(context).textTheme.headlineMedium),
-            const SizedBox(width: smallPadding),
-            Text(
-              '${character.numOfSelectedPerks}',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color:
-                    Character.maximumPerks(character) >=
-                        character.numOfSelectedPerks
-                    ? null
-                    : Colors.red,
+            IntrinsicWidth(
+              child: Stack(
+                alignment: Alignment.centerRight,
+                children: [
+                  Opacity(
+                    opacity: 0,
+                    child: Text(
+                      '99',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                  Text(
+                    '${character.numOfSelectedPerks}',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color:
+                          Character.maximumPerks(character) >=
+                              character.numOfSelectedPerks
+                          ? null
+                          : Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
-            Text(
-              ' / ${Character.maximumPerks(character)}',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Text('/', style: Theme.of(context).textTheme.headlineMedium),
+            IntrinsicWidth(
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  Opacity(
+                    opacity: 0,
+                    child: Text(
+                      '99',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+                  Text(
+                    '${Character.maximumPerks(character)}',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
             ),
           ],
         ),
