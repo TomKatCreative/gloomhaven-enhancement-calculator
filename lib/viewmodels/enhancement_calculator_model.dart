@@ -599,6 +599,32 @@ class EnhancementCalculatorModel with ChangeNotifier {
     return runningTotal;
   }
 
+  /// Re-reads all fields from SharedPrefs and recalculates.
+  ///
+  /// Call this after a backup restore to sync the model with the
+  /// newly imported SharedPreferences values.
+  void reloadFromPrefs() {
+    _cardLevel = SharedPrefs().targetCardLvl;
+    _previousEnhancements = SharedPrefs().previousEnhancements;
+
+    final enhancementIndex = SharedPrefs().enhancementTypeIndex;
+    if (enhancementIndex > 0 &&
+        enhancementIndex < EnhancementData.enhancements.length) {
+      _enhancement = EnhancementData.enhancements[enhancementIndex];
+    } else {
+      _enhancement = null;
+    }
+
+    _multipleTargets = SharedPrefs().multipleTargetsSwitch;
+    _lostNonPersistent = SharedPrefs().lostNonPersistent;
+    _persistent = SharedPrefs().persistent;
+    _disableMultiTargetsSwitch = SharedPrefs().disableMultiTargetSwitch;
+    _temporaryEnhancementMode = SharedPrefs().temporaryEnhancementMode;
+    _hailsDiscount = SharedPrefs().hailsDiscount;
+
+    calculateCost();
+  }
+
   void gameVersionToggled() {
     final edition = SharedPrefs().gameEdition;
 

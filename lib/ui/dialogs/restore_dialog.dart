@@ -7,8 +7,11 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_config.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/utils/settings_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:provider/provider.dart';
 
 /// Handles the database restore flow including confirmation, file picking,
@@ -104,7 +107,27 @@ class RestoreDialog {
       await DatabaseHelper.instance.restoreBackup(contents);
       SharedPrefs().initialPage = 0;
       if (!context.mounted) return;
-      await context.read<CharactersModel>().loadCharacters();
+
+      // Refresh theme from restored SharedPrefs
+      final prefs = SharedPrefs();
+      context.read<ThemeProvider>().updateThemeConfig(
+        ThemeConfig(
+          seedColor: Color(prefs.primaryClassColor),
+          useDarkMode: prefs.darkTheme,
+          useDefaultFonts: prefs.useDefaultFonts,
+        ),
+      );
+
+      // Refresh calculator model from restored SharedPrefs
+      context.read<EnhancementCalculatorModel>().reloadFromPrefs();
+
+      // Sync showRetired with restored value
+      final charactersModel = context.read<CharactersModel>();
+      if (charactersModel.showRetired != prefs.showRetiredCharacters) {
+        charactersModel.showRetired = prefs.showRetiredCharacters;
+      }
+
+      await charactersModel.loadCharacters();
       if (!context.mounted) return;
       context.read<CharactersModel>().jumpToPage(0);
     } catch (e) {
