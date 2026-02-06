@@ -36,17 +36,17 @@ class _Update440DialogState extends State<Update440Dialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'The backup system now includes all app data. Creating a new backup now is strongly recommended. Note that backups created before version 4.2.0 can no longer be restored.',
+              '• The backup system now includes all app data. Creating a new backup now is strongly recommended. Note that backups created before version 4.2.0 can no longer be restored.',
             ),
             const SizedBox(height: 12),
             const Text(
-              'Many UI, quality of life, and performance improvements.',
+              '• Many UI, quality of life, and performance improvements.',
             ),
             const SizedBox(height: 12),
             Text(
               showBuyMeACoffee
-                  ? "If you enjoy using this app, please consider supporting it through the 'Buy Me a Coffee' link in the Settings screen or by leaving a review!"
-                  : 'If you enjoy using this app, please consider leaving a review!',
+                  ? "• If you enjoy using this app, please consider supporting its development through the 'Buy Me a Coffee' link in the Settings screen, or by leaving a review! ✨"
+                  : '• If you enjoy using this app, please consider leaving a review! ✨',
             ),
           ],
         ),

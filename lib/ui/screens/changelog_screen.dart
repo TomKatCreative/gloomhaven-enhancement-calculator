@@ -40,15 +40,21 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
                         : 'v${snapshot.data!.version}')
                   : null;
               return GHCAppBar(
-                title: AppLocalizations.of(context).changelog,
-                centerTitle: true,
+                titleWidget: Text.rich(
+                  TextSpan(
+                    text: AppLocalizations.of(context).changelog,
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    children: versionText != null
+                        ? [
+                            TextSpan(
+                              text: '  $versionText',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ]
+                        : null,
+                  ),
+                ),
                 scrollController: _scrollController,
-                subtitle: versionText != null
-                    ? Text(
-                        versionText,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      )
-                    : null,
               );
             },
           ),
@@ -61,13 +67,13 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
               version: '4.4.0',
               date: '2026-02-06',
               changes: [
-                'UI overhaul of Enhancement Calculator and Character screen.',
-                'Added cost breakdown to Enhancement cost chip.',
+                'UI overhaul of Enhancement Calculator and Character screens.',
+                'Added cost breakdown dialog to Enhancement cost chip.',
                 'Added all data (theme, unlocked characters, enhancement calculator) to backup.',
+                'Backup now generates a .json file (to better reflect the actual JSON content).',
                 'Replaced variant selector dialog with inline popup menu.',
                 'Improved app performance.',
-                'Fixed numeric display shifting on character screen.',
-                'Various UI polish and fixes.',
+                'Various UI polishes and behind-the-scenes fixes and improvements.',
               ],
             ),
             SizedBox(height: extraLargePadding),

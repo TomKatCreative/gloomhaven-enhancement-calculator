@@ -31,14 +31,14 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 /// ```
 class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
   /// The primary title text displayed in the AppBar.
-  /// If null, no title is displayed.
+  /// If null, no title is displayed. Ignored when [titleWidget] is provided.
   final String? title;
+
+  /// Optional custom title widget. Takes precedence over [title].
+  final Widget? titleWidget;
 
   /// Optional widget displayed below the title.
   final Widget? subtitle;
-
-  /// Whether to center the title. Defaults to false.
-  final bool centerTitle;
 
   /// Optional action buttons displayed on the right side.
   final List<Widget>? actions;
@@ -55,8 +55,8 @@ class GHCAppBar extends StatefulWidget implements PreferredSizeWidget {
   const GHCAppBar({
     super.key,
     this.title,
+    this.titleWidget,
     this.subtitle,
-    this.centerTitle = false,
     this.actions,
     this.titleStyle,
     this.scrollController,
@@ -118,7 +118,7 @@ class _GHCAppBarState extends State<GHCAppBar> {
       builder: (context, progress, child) {
         return AppBar(
           automaticallyImplyLeading: false,
-          centerTitle: widget.centerTitle,
+          centerTitle: false,
           elevation: progress * 4.0,
           scrolledUnderElevation: 0,
           backgroundColor: Color.lerp(baseColor, scrolledColor, progress),
@@ -128,26 +128,29 @@ class _GHCAppBarState extends State<GHCAppBar> {
               Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
             ),
           ),
-          title: widget.title != null
-              ? (widget.subtitle != null
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
+          title:
+              widget.titleWidget ??
+              (widget.title != null
+                  ? (widget.subtitle != null
+                        ? Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.title!,
+                                style:
+                                    widget.titleStyle ??
+                                    theme.textTheme.headlineLarge,
+                              ),
+                              widget.subtitle!,
+                            ],
+                          )
+                        : Text(
                             widget.title!,
                             style:
                                 widget.titleStyle ??
                                 theme.textTheme.headlineLarge,
-                          ),
-                          widget.subtitle!,
-                        ],
-                      )
-                    : Text(
-                        widget.title!,
-                        style:
-                            widget.titleStyle ?? theme.textTheme.headlineLarge,
-                      ))
-              : null,
+                          ))
+                  : null),
           actions: widget.actions,
         );
       },
