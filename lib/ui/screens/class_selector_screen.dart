@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/custom_class_warning_dialog.dart';
@@ -441,47 +442,12 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
               curve: Curves.easeOutBack,
             ),
             child: Material(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
               elevation: 8,
               borderRadius: BorderRadius.circular(borderRadiusCard),
               clipBehavior: Clip.antiAlias,
               child: IntrinsicWidth(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        extraLargePadding,
-                        mediumPadding,
-                        extraLargePadding,
-                        0,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).variant,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    ...perkLists.map(
-                      (perkList) => InkWell(
-                        onTap: () =>
-                            Navigator.of(context).pop(perkList.variant),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: extraLargePadding,
-                            vertical: mediumPadding,
-                          ),
-                          child: Text(
-                            ClassVariants.classVariants[perkList.variant]!,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                child: _VariantMenuContent(perkLists: perkLists),
               ),
             ),
           );
@@ -542,5 +508,54 @@ class _PopupPositionDelegate extends SingleChildLayoutDelegate {
     return tapPosition != oldDelegate.tapPosition ||
         screenSize != oldDelegate.screenSize ||
         bottomPadding != oldDelegate.bottomPadding;
+  }
+}
+
+/// The content of the variant selection popup menu.
+class _VariantMenuContent extends StatelessWidget {
+  final List<Perks> perkLists;
+
+  const _VariantMenuContent({required this.perkLists});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            extraLargePadding,
+            mediumPadding,
+            extraLargePadding,
+            0,
+          ),
+          child: Text(
+            AppLocalizations.of(context).variant,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        ...perkLists.map(
+          (perkList) => InkWell(
+            onTap: () => Navigator.of(context).pop(perkList.variant),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: extraLargePadding,
+                vertical: mediumPadding,
+              ),
+              child: Text(
+                ClassVariants.classVariants[perkList.variant]!,
+                style: theme.textTheme.bodyLarge,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
