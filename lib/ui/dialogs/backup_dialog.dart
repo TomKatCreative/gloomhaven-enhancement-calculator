@@ -124,7 +124,7 @@ class _BackupDialogState extends State<BackupDialog> {
       if (savedPath == null || !mounted) return;
       Navigator.of(
         context,
-      ).pop(BackupResult(action: BackupAction.saved, savedPath: _fileName));
+      ).pop(BackupResult(action: BackupAction.saved, savedPath: savedPath));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)

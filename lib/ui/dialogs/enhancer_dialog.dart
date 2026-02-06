@@ -123,10 +123,16 @@ class _EnhancerLevelTile extends StatelessWidget {
       ),
     );
 
-    // Blur the subtitle for levels 2-4 when not checked (to avoid spoilers)
-    final subtitleWidget = (level > 1 && !isActive)
-        ? ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+    // Animate blur for levels 2-4 (spoiler protection)
+    final subtitleWidget = level > 1
+        ? TweenAnimationBuilder<double>(
+            tween: Tween(end: isActive ? 0 : 6),
+            duration: animationDuration,
+            curve: Curves.easeOut,
+            builder: (context, sigma, child) => ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+              child: child,
+            ),
             child: subtitleText,
           )
         : subtitleText;

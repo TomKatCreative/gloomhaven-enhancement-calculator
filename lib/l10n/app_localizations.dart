@@ -620,11 +620,11 @@ abstract class AppLocalizations {
   /// **'Filename'**
   String get filename;
 
-  /// No description provided for @savedTo.
+  /// No description provided for @saved.
   ///
   /// In en, this message translates to:
-  /// **'Saved to {path}'**
-  String savedTo(String path);
+  /// **'Saved {filename} to {path}'**
+  String saved(String filename, String path);
 
   /// No description provided for @filenameRequired.
   ///

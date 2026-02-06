@@ -3,6 +3,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/backup_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/restore_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/settings_section_header.dart';
+import 'package:path/path.dart' as p;
 
 /// Settings section for backup and restore functionality.
 ///
@@ -49,7 +50,14 @@ class BackupSettingsSection extends StatelessWidget {
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
-          SnackBar(content: Text(l10n.savedTo(result.savedPath!))),
+          SnackBar(
+            content: Text(
+              l10n.saved(
+                p.basename(result.savedPath!),
+                p.dirname(result.savedPath!),
+              ),
+            ),
+          ),
         );
     }
   }
