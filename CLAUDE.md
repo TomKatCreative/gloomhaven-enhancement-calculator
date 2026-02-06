@@ -132,7 +132,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 16)
+- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 17)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ## Key Domain Concepts
@@ -213,7 +213,7 @@ Where L = starting level, P = prosperity level.
 |----------|------|-------|
 | `iconSizeTiny` | 14 | Decorative overlays (+1 badge) |
 | `iconSizeSmall` | 20 | Form inputs, element tracker collapsed, stacked elements |
-| `iconSizeMedium` | 28 | Inline text icons (perks, masteries), section headers |
+| `iconSizeMedium` | 26 | Inline text icons (perks, masteries), section headers |
 | `iconSizeLarge` | 32 | Primary navigation, calculator, dialog buttons |
 | `iconSizeXL` | 36 | Class icons in lists/dialogs |
 | `iconSizeHero` | 48 | Hero elements (level badge) |
@@ -293,6 +293,10 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 - `docs/game_text_parser.md` - Game text parser syntax and usage
 - `docs/perk_format_reference.md` - Perk definition format for perks_repository.dart
 - `docs/svg_asset_config_refactor.md` - SVG asset centralization patterns and rationale
+- `docs/database_schema.md` - Database schema and migration reference
+- `docs/models_reference.md` - Data model class reference
+- `docs/viewmodels_reference.md` - ViewModel/ChangeNotifier reference
+- `docs/shared_prefs_keys.md` - SharedPreferences keys reference
 
 **Widget/Feature documentation** (read when working on specific features):
 - `docs/element_tracker.md` - Element tracker sheet and animation system

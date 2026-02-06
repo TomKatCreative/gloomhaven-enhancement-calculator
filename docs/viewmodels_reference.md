@@ -17,7 +17,7 @@ The app uses Provider with four main models set up in `main.dart`:
 │  └────────┬────────┘                                        │
 │           │                                                 │
 │  ┌────────▼────────┐                                        │
-│  │    AppModel     │  ← Uses ThemeProvider                  │
+│  │    AppModel     │  ← No dependencies                     │
 │  └────────┬────────┘                                        │
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
@@ -91,14 +91,14 @@ Handles app-level navigation state and page management.
 |----------|------|---------|-------------|
 | `pageController` | `PageController` | created | Controls PageView navigation |
 | `page` | `int` | 0 | Current page index (0=Characters, 1=Calculator) |
-| `themeMode` | `ThemeMode` | system | Theme mode (delegated to ThemeProvider) |
+| `themeMode` | `ThemeMode` | from SharedPrefs (light/dark) | Theme mode (delegated to ThemeProvider) |
 | `useDefaultFonts` | `bool` | false | Font preference (delegated to ThemeProvider) |
 
 ### Methods
 
 | Method | Description |
 |--------|-------------|
-| `updateTheme({ThemeMode?, bool?})` | Update theme with optional notification |
+| `updateTheme({ThemeMode? themeMode})` | Update theme with optional notification |
 
 ### State Persistence
 

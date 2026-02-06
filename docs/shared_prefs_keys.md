@@ -186,9 +186,7 @@ One-time flags to show update dialogs on first launch after update.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `showUpdate4Dialog` | bool | true | Show v4.0 update dialog |
-| `showUpdate420Dialog` | bool | true | Show v4.2.0 update dialog |
-| `showUpdate430Dialog` | bool | true | Show v4.3.0 update dialog |
+| `showUpdate440Dialog` | bool | true | Show v4.4.0 update dialog |
 
 ---
 
