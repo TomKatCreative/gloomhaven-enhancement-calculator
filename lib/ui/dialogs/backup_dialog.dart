@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helpers.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 /// Result returned from the backup dialog.
 class BackupResult {
@@ -24,15 +26,21 @@ enum BackupAction {
   /// User cancelled the dialog.
   cancelled,
 
-  /// User saved the backup.
+  /// User saved the backup to device storage.
   saved,
+
+  /// User shared the backup via the share sheet.
+  shared,
 }
 
 /// A dialog for creating and exporting database backups.
 ///
-/// Uses the platform-native save dialog (SAF on Android, file saver on iOS)
-/// to let the user choose where to save the backup file. Supports saving to
-/// cloud storage providers (Google Drive, Dropbox, OneDrive) if installed.
+/// Offers two export options:
+/// - **Save**: Opens the platform-native save picker (SAF on Android, file
+///   saver on iOS) to let the user choose where to save. Supports cloud
+///   storage providers if installed.
+/// - **Share**: Opens the platform share sheet to send the file via email,
+///   cloud storage, messaging, etc.
 ///
 /// ## Example Usage
 ///
@@ -70,9 +78,7 @@ class _BackupDialogState extends State<BackupDialog> {
   @override
   void initState() {
     super.initState();
-    final defaultName =
-        'ghc_backup_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}';
-    _fileNameController = TextEditingController(text: defaultName);
+    _fileNameController = TextEditingController(text: 'ghc_backup');
   }
 
   @override
@@ -91,16 +97,27 @@ class _BackupDialogState extends State<BackupDialog> {
     return true;
   }
 
+  String get _fileName => '${_fileNameController.text}.txt';
+
+  Future<String> _generateBackupFile() async {
+    final value = await DatabaseHelper.instance.generateBackup();
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/$_fileName');
+    await file.writeAsString(value);
+    return file.path;
+  }
+
   Future<void> _handleSave() async {
     if (!_validateFilename()) return;
 
     try {
       final value = await DatabaseHelper.instance.generateBackup();
       final bytes = Uint8List.fromList(utf8.encode(value));
-      final fileName = '${_fileNameController.text}.txt';
 
       final savedPath = await FilePicker.platform.saveFile(
-        fileName: fileName,
+        fileName: _fileName,
+        type: FileType.custom,
+        allowedExtensions: ['txt'],
         bytes: bytes,
       );
 
@@ -108,6 +125,28 @@ class _BackupDialogState extends State<BackupDialog> {
       Navigator.of(
         context,
       ).pop(BackupResult(action: BackupAction.saved, savedPath: savedPath));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context).backupError)),
+        );
+    }
+  }
+
+  Future<void> _handleShare() async {
+    if (!_validateFilename()) return;
+
+    try {
+      final filePath = await _generateBackupFile();
+
+      if (!mounted) return;
+      Navigator.of(
+        context,
+      ).pop(const BackupResult(action: BackupAction.shared));
+
+      await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
@@ -129,7 +168,9 @@ class _BackupDialogState extends State<BackupDialog> {
           decoration: InputDecoration(
             labelText: l10n.filename,
             errorText: _filenameError,
+            suffixText: '.txt',
           ),
+          textAlign: TextAlign.end,
           controller: _fileNameController,
           onChanged: (_) {
             if (_filenameError != null) {
@@ -152,6 +193,7 @@ class _BackupDialogState extends State<BackupDialog> {
             context,
           ).pop(const BackupResult(action: BackupAction.cancelled)),
         ),
+        TextButton(onPressed: _handleShare, child: Text(l10n.share)),
         TextButton(onPressed: _handleSave, child: Text(l10n.save)),
       ],
     );

@@ -29,36 +29,28 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('renders filename field, Cancel and Save buttons', (
+    testWidgets('renders filename field, Cancel, Share, and Save buttons', (
       tester,
     ) async {
       await openDialog(tester);
 
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Share'), findsOneWidget);
       expect(find.text('Save'), findsOneWidget);
     });
 
-    testWidgets('default filename contains ghc_backup_ prefix', (tester) async {
+    testWidgets('default filename is ghc_backup', (tester) async {
       await openDialog(tester);
 
       final textField = tester.widget<TextField>(find.byType(TextField));
-      final text = textField.controller!.text;
-      expect(text, startsWith('ghc_backup_'));
+      expect(textField.controller!.text, 'ghc_backup');
     });
 
-    testWidgets('default filename contains date in expected format', (
-      tester,
-    ) async {
+    testWidgets('shows .txt suffix on filename field', (tester) async {
       await openDialog(tester);
 
-      final textField = tester.widget<TextField>(find.byType(TextField));
-      final text = textField.controller!.text;
-      // Format: ghc_backup_YYYY-MM-DD_HH-mm
-      expect(
-        text,
-        matches(RegExp(r'^ghc_backup_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}$')),
-      );
+      expect(find.text('.txt'), findsOneWidget);
     });
 
     testWidgets('empty filename shows validation error', (tester) async {
@@ -134,20 +126,6 @@ void main() {
       expect(result, isNotNull);
       expect(result!.action, BackupAction.cancelled);
       expect(result!.savedPath, isNull);
-    });
-
-    testWidgets('no warning icon or Choose location button', (tester) async {
-      await openDialog(tester);
-
-      expect(find.byIcon(Icons.warning_rounded), findsNothing);
-      expect(find.text('Choose location...'), findsNothing);
-    });
-
-    testWidgets('no backup file warning text', (tester) async {
-      await openDialog(tester);
-
-      // The old Android-only warning about overwriting files should not exist
-      expect(find.textContaining('overwritten'), findsNothing);
     });
   });
 }
