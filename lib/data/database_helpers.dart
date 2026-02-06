@@ -9,6 +9,8 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
@@ -280,7 +282,7 @@ class DatabaseHelper implements IDatabaseHelper {
       data.add(listMaps);
     }
 
-    List backups = [tables, data];
+    List backups = [tables, data, SharedPrefs().exportForBackup()];
 
     return convert.jsonEncode(backups);
   }
@@ -328,6 +330,11 @@ class DatabaseHelper implements IDatabaseHelper {
       await restoreBackup(fallBack);
       throw error ?? 'Error restoring backup';
     });
+
+    // Restore SharedPreferences if present (new format backups)
+    if (json.length > 2 && json[2] is Map) {
+      SharedPrefs().importFromBackup(Map<String, dynamic>.from(json[2]));
+    }
   }
 
   Future _clearAllTables() async {
