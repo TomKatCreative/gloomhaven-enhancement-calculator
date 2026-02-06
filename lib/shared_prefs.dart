@@ -1,3 +1,4 @@
+import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -245,4 +246,152 @@ class SharedPrefs {
 
   int get airState => _sharedPrefs.getInt('elementAirState') ?? 0;
   set airState(int value) => _sharedPrefs.setInt('elementAirState', value);
+
+  // ===========================================================================
+  // Backup Export / Import
+  // ===========================================================================
+
+  /// Exports a categorized map of SharedPreferences for inclusion in backups.
+  ///
+  /// Excluded: clearOldPrefs, initialPage, resourcesExpanded,
+  /// showUpdate*Dialog, isUSRegion, gloomhavenMode (legacy), element tracker.
+  Map<String, dynamic> exportForBackup() {
+    final classUnlocks = <String, dynamic>{};
+    for (final pc in PlayerClasses.playerClasses) {
+      if (pc.locked) {
+        classUnlocks[pc.classCode] = getPlayerClassIsUnlocked(pc.classCode);
+      }
+    }
+
+    return {
+      'settings': {
+        'darkTheme': darkTheme,
+        'useDefaultFonts': useDefaultFonts,
+        'primaryClassColor': primaryClassColor,
+        'showRetiredCharacters': showRetiredCharacters,
+        'customClasses': customClasses,
+        'hideCustomClassesWarningMessage': hideCustomClassesWarningMessage,
+        'envelopeX': envelopeX,
+        'envelopeV': envelopeV,
+      },
+      'calculator': {
+        'gameEdition': gameEdition.index,
+        'enhancementType': enhancementTypeIndex,
+        'enhancementsOnTargetAction': previousEnhancements,
+        'targetCardLvl': targetCardLvl,
+        'disableMultiTargetsSwitch': disableMultiTargetSwitch,
+        'multipleTargetsSelected': multipleTargetsSwitch,
+        'temporaryEnhancementMode': temporaryEnhancementMode,
+        'partyBoon': partyBoon,
+        'lostNonPersistent': lostNonPersistent,
+        'persistent': persistent,
+        'hailsDiscount': hailsDiscount,
+      },
+      'enhancerLevels': {
+        'enhancerLvl1': enhancerLvl1,
+        'enhancerLvl2': enhancerLvl2,
+        'enhancerLvl3': enhancerLvl3,
+        'enhancerLvl4': enhancerLvl4,
+      },
+      'classUnlocks': classUnlocks,
+    };
+  }
+
+  /// Imports SharedPreferences data from a backup map.
+  ///
+  /// Each category is optional — missing categories are skipped.
+  /// Enhancer levels are written directly to bypass cascade logic,
+  /// since backup data is already self-consistent.
+  void importFromBackup(Map<String, dynamic> data) {
+    // Settings
+    if (data['settings'] is Map) {
+      final s = Map<String, dynamic>.from(data['settings'] as Map);
+      if (s.containsKey('darkTheme')) darkTheme = s['darkTheme'] as bool;
+      if (s.containsKey('useDefaultFonts')) {
+        useDefaultFonts = s['useDefaultFonts'] as bool;
+      }
+      if (s.containsKey('primaryClassColor')) {
+        primaryClassColor = s['primaryClassColor'] as int;
+      }
+      if (s.containsKey('showRetiredCharacters')) {
+        showRetiredCharacters = s['showRetiredCharacters'] as bool;
+      }
+      if (s.containsKey('customClasses')) {
+        customClasses = s['customClasses'] as bool;
+      }
+      if (s.containsKey('hideCustomClassesWarningMessage')) {
+        hideCustomClassesWarningMessage =
+            s['hideCustomClassesWarningMessage'] as bool;
+      }
+      if (s.containsKey('envelopeX')) envelopeX = s['envelopeX'] as bool;
+      if (s.containsKey('envelopeV')) envelopeV = s['envelopeV'] as bool;
+    }
+
+    // Calculator
+    if (data['calculator'] is Map) {
+      final c = Map<String, dynamic>.from(data['calculator'] as Map);
+      if (c.containsKey('gameEdition')) {
+        final idx = c['gameEdition'] as int;
+        if (idx >= 0 && idx < GameEdition.values.length) {
+          gameEdition = GameEdition.values[idx];
+        }
+      }
+      if (c.containsKey('enhancementType')) {
+        enhancementTypeIndex = c['enhancementType'] as int;
+      }
+      if (c.containsKey('enhancementsOnTargetAction')) {
+        previousEnhancements = c['enhancementsOnTargetAction'] as int;
+      }
+      if (c.containsKey('targetCardLvl')) {
+        targetCardLvl = c['targetCardLvl'] as int;
+      }
+      if (c.containsKey('disableMultiTargetsSwitch')) {
+        disableMultiTargetSwitch = c['disableMultiTargetsSwitch'] as bool;
+      }
+      if (c.containsKey('multipleTargetsSelected')) {
+        multipleTargetsSwitch = c['multipleTargetsSelected'] as bool;
+      }
+      if (c.containsKey('temporaryEnhancementMode')) {
+        temporaryEnhancementMode = c['temporaryEnhancementMode'] as bool;
+      }
+      if (c.containsKey('partyBoon')) partyBoon = c['partyBoon'] as bool;
+      if (c.containsKey('lostNonPersistent')) {
+        lostNonPersistent = c['lostNonPersistent'] as bool;
+      }
+      if (c.containsKey('persistent')) persistent = c['persistent'] as bool;
+      if (c.containsKey('hailsDiscount')) {
+        hailsDiscount = c['hailsDiscount'] as bool;
+      }
+    }
+
+    // Enhancer levels — bypass cascade logic with direct writes
+    if (data['enhancerLevels'] is Map) {
+      final e = Map<String, dynamic>.from(data['enhancerLevels'] as Map);
+      if (e.containsKey('enhancerLvl1')) {
+        _sharedPrefs.setBool('enhancerLvl1', e['enhancerLvl1'] as bool);
+      }
+      if (e.containsKey('enhancerLvl2')) {
+        _sharedPrefs.setBool('enhancerLvl2', e['enhancerLvl2'] as bool);
+      }
+      if (e.containsKey('enhancerLvl3')) {
+        _sharedPrefs.setBool('enhancerLvl3', e['enhancerLvl3'] as bool);
+      }
+      if (e.containsKey('enhancerLvl4')) {
+        _sharedPrefs.setBool('enhancerLvl4', e['enhancerLvl4'] as bool);
+      }
+    }
+
+    // Class unlocks — reset all locked classes first, then apply backup
+    if (data['classUnlocks'] is Map) {
+      final u = Map<String, dynamic>.from(data['classUnlocks'] as Map);
+      for (final pc in PlayerClasses.playerClasses) {
+        if (pc.locked) {
+          setPlayerClassIsUnlocked(pc.classCode, false);
+        }
+      }
+      for (final entry in u.entries) {
+        setPlayerClassIsUnlocked(entry.key, entry.value as bool);
+      }
+    }
+  }
 }
