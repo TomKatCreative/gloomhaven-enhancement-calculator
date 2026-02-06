@@ -51,11 +51,28 @@ class BackupSettingsSection extends StatelessWidget {
         ..clearSnackBars()
         ..showSnackBar(
           SnackBar(
-            content: Text(
-              l10n.saved(
-                p.basename(result.savedPath!),
-                p.dirname(result.savedPath!),
-              ),
+            content: Builder(
+              builder: (context) {
+                final filename = p.basename(result.savedPath!);
+                final message = l10n.saved(
+                  filename,
+                  p.dirname(result.savedPath!),
+                );
+                final parts = message.split(filename);
+                return Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(text: parts.first),
+                      TextSpan(
+                        text: filename,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      if (parts.length > 1)
+                        TextSpan(text: parts.skip(1).join(filename)),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         );
