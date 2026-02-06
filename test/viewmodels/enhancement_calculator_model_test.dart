@@ -1316,5 +1316,74 @@ void main() {
         expect(model.enhancerLvl4Applies, isFalse);
       });
     });
+
+    group('reloadFromPrefs', () {
+      test('picks up new SharedPrefs values', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+
+        expect(model.cardLevel, 0);
+        expect(model.enhancement, isNull);
+        expect(model.hailsDiscount, isFalse);
+
+        // Change SharedPrefs externally (simulating a backup restore)
+        SharedPrefs().targetCardLvl = 3;
+        SharedPrefs().enhancementTypeIndex = 1;
+        SharedPrefs().hailsDiscount = true;
+        SharedPrefs().multipleTargetsSwitch = true;
+        SharedPrefs().lostNonPersistent = false;
+        SharedPrefs().persistent = false;
+
+        model.reloadFromPrefs();
+
+        expect(model.cardLevel, 3);
+        expect(model.enhancement, EnhancementData.enhancements[1]);
+        expect(model.hailsDiscount, isTrue);
+        expect(model.multipleTargets, isTrue);
+      });
+
+      test('triggers notifyListeners', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+
+        int notifyCount = 0;
+        model.addListener(() => notifyCount++);
+
+        model.reloadFromPrefs();
+
+        expect(notifyCount, 1);
+      });
+
+      test('handles out-of-range enhancementTypeIndex', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+
+        // Set an index beyond the list
+        SharedPrefs().enhancementTypeIndex = 9999;
+
+        model.reloadFromPrefs();
+
+        expect(model.enhancement, isNull);
+        // Should still calculate without error
+        expect(model.totalCost, 0);
+      });
+
+      test('handles enhancementTypeIndex of 0 (no selection)', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+
+        // Select an enhancement first
+        model.enhancementSelected(
+          _findEnhancementByCategory('Move', EnhancementCategory.charPlusOne),
+        );
+        expect(model.enhancement, isNotNull);
+
+        // Reset via prefs
+        SharedPrefs().enhancementTypeIndex = 0;
+        model.reloadFromPrefs();
+
+        expect(model.enhancement, isNull);
+      });
+    });
   });
 }

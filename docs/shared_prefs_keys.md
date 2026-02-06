@@ -292,6 +292,52 @@ if (prefs.getPlayerClassIsUnlocked(ClassCodes.sunkeeper)) {
 
 ---
 
+## Backup Integration
+
+SharedPreferences data is included as an optional third element in the JSON backup file, alongside the SQLite database tables and data.
+
+### Backup Format
+
+```json
+[tableNames, tableData, { "settings": {...}, "calculator": {...}, "enhancerLevels": {...}, "classUnlocks": {...} }]
+```
+
+Old backups (2 elements) are fully supported — the third element is simply absent and SharedPrefs are left unchanged on restore.
+
+### Included Keys (by category)
+
+| Category | Keys |
+|----------|------|
+| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
+| `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
+| `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
+| `classUnlocks` | Dynamic keys (class codes) for locked classes only |
+
+### Excluded Keys
+
+| Key | Reason |
+|-----|--------|
+| `clearOldPrefs` | Legacy cleanup flag, not user state |
+| `initialPage` | Transient navigation state |
+| `resourcesExpanded` | Transient UI state |
+| `showUpdate*Dialog` | One-time dialog flags |
+| `isUSRegion` | Device-specific locale detection |
+| `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |
+| `element*State` | Transient game session state |
+
+### Enhancer Level Cascade Bypass
+
+During import, enhancer levels are written directly via `_sharedPrefs.setBool()` instead of using the property setters. This bypasses the cascading logic (where setting lvl3=true auto-enables lvl1 and lvl2) because the backup data is already self-consistent.
+
+### Methods
+
+| Method | Description |
+|--------|-------------|
+| `exportForBackup()` | Returns categorized `Map<String, dynamic>` of all backed-up prefs |
+| `importFromBackup(Map<String, dynamic>)` | Applies backup data; missing categories are skipped |
+
+---
+
 ## Key Naming Conventions
 
 - **Booleans**: Descriptive name (e.g., `darkTheme`, `showRetiredCharacters`)
