@@ -82,7 +82,7 @@ class RestoreDialog {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowMultiple: false,
-      allowedExtensions: ['txt'],
+      allowedExtensions: ['json', 'txt'],
     );
 
     if (result == null) return;

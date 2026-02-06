@@ -47,10 +47,10 @@ void main() {
       expect(textField.controller!.text, 'ghc_backup');
     });
 
-    testWidgets('shows .txt suffix on filename field', (tester) async {
+    testWidgets('shows .json suffix on filename field', (tester) async {
       await openDialog(tester);
 
-      expect(find.text('.txt'), findsOneWidget);
+      expect(find.text('.json'), findsOneWidget);
     });
 
     testWidgets('empty filename shows validation error', (tester) async {

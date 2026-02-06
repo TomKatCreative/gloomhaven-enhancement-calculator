@@ -97,7 +97,7 @@ class _BackupDialogState extends State<BackupDialog> {
     return true;
   }
 
-  String get _fileName => '${_fileNameController.text}.txt';
+  String get _fileName => '${_fileNameController.text}.json';
 
   Future<String> _generateBackupFile() async {
     final value = await DatabaseHelper.instance.generateBackup();
@@ -117,7 +117,7 @@ class _BackupDialogState extends State<BackupDialog> {
       final savedPath = await FilePicker.platform.saveFile(
         fileName: _fileName,
         type: FileType.custom,
-        allowedExtensions: ['txt'],
+        allowedExtensions: ['json'],
         bytes: bytes,
       );
 
@@ -177,7 +177,7 @@ class _BackupDialogState extends State<BackupDialog> {
               decoration: InputDecoration(
                 labelText: l10n.filename,
                 errorText: _filenameError,
-                suffixText: '.txt',
+                suffixText: '.json',
               ),
               textAlign: TextAlign.end,
               controller: _fileNameController,
