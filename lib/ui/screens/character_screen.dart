@@ -161,7 +161,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
                     icon: const Icon(Icons.indeterminate_check_box_rounded),
                     onPressed: character.previousRetirements > 0 && !isRetired
@@ -182,7 +181,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
                     icon: const Icon(Icons.add_box_rounded),
                     onPressed: !isRetired
@@ -240,7 +238,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
                     icon: const Icon(Icons.indeterminate_check_box_rounded),
                     onPressed: character.checkMarks > 0 && !isRetired
@@ -260,7 +257,6 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   ),
                   const Text('/18'),
                   IconButton(
-                    padding: EdgeInsets.zero,
                     iconSize: iconSizeMedium,
                     icon: const Icon(Icons.add_box_rounded),
                     onPressed: character.checkMarks < 18 && !isRetired
@@ -316,10 +312,17 @@ class _NameAndClassSection extends StatelessWidget {
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
                 ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL),
-                Text(
-                  '${Character.level(character.xp)}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.surface,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: [1, 2, 6, 8].contains(Character.level(character.xp))
+                        ? tinyPadding
+                        : 0.0,
+                  ),
+                  child: Text(
+                    '${Character.level(character.xp)}',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
                   ),
                 ),
               ],
@@ -417,7 +420,7 @@ class _StatsSectionState extends State<_StatsSection> {
                           ..xp = value == '' ? 0 : int.parse(value),
                       );
                     },
-                    textAlign: TextAlign.start,
+                    textAlign: TextAlign.end,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
                         RegExp('[\\.|\\,|\\ |\\-]'),
@@ -440,6 +443,12 @@ class _StatsSectionState extends State<_StatsSection> {
                           ),
                         ],
                       ),
+                      contentPadding: const EdgeInsets.fromLTRB(
+                        mediumPadding,
+                        mediumPadding,
+                        tinyPadding,
+                        mediumPadding,
+                      ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       border: const OutlineInputBorder(),
                     ),
@@ -447,9 +456,15 @@ class _StatsSectionState extends State<_StatsSection> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: tinyPadding),
-                  child: Text(
-                    '/ ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  child: SizedBox(
+                    width: 42,
+                    child: Text(
+                      '/${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                      textAlign: TextAlign.start,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ),
                 ),
                 IconButton(
@@ -557,7 +572,9 @@ class _StatsSectionState extends State<_StatsSection> {
               Consumer<CharactersModel>(
                 builder: (_, charactersModel, _) => Text(
                   ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                  style: Theme.of(context).textTheme.labelMedium,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
             ],

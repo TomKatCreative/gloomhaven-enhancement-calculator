@@ -403,7 +403,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('/ 45'), findsOneWidget);
+      expect(find.text('/45'), findsOneWidget);
     });
 
     testWidgets('edit mode shows exposure (add/subtract) buttons', (
