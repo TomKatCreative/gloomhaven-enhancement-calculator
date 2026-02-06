@@ -74,6 +74,10 @@ class BackupDialog extends StatefulWidget {
 class _BackupDialogState extends State<BackupDialog> {
   late final TextEditingController _fileNameController;
   String? _filenameError;
+  bool _isSaving = false;
+  bool _isSharing = false;
+
+  bool get _isBusy => _isSaving || _isSharing;
 
   @override
   void initState() {
@@ -110,6 +114,7 @@ class _BackupDialogState extends State<BackupDialog> {
   Future<void> _handleSave() async {
     if (!_validateFilename()) return;
 
+    setState(() => _isSaving = true);
     try {
       final value = await DatabaseHelper.instance.generateBackup();
       final bytes = Uint8List.fromList(utf8.encode(value));
@@ -121,12 +126,16 @@ class _BackupDialogState extends State<BackupDialog> {
         bytes: bytes,
       );
 
-      if (savedPath == null || !mounted) return;
+      if (savedPath == null || !mounted) {
+        if (mounted) setState(() => _isSaving = false);
+        return;
+      }
       Navigator.of(
         context,
       ).pop(BackupResult(action: BackupAction.saved, savedFilename: _fileName));
     } catch (e) {
       if (!mounted) return;
+      setState(() => _isSaving = false);
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
@@ -138,6 +147,7 @@ class _BackupDialogState extends State<BackupDialog> {
   Future<void> _handleShare() async {
     if (!_validateFilename()) return;
 
+    setState(() => _isSharing = true);
     try {
       final filePath = await _generateBackupFile();
 
@@ -149,6 +159,7 @@ class _BackupDialogState extends State<BackupDialog> {
       await SharePlus.instance.share(ShareParams(files: [XFile(filePath)]));
     } catch (e) {
       if (!mounted) return;
+      setState(() => _isSharing = false);
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
@@ -199,13 +210,31 @@ class _BackupDialogState extends State<BackupDialog> {
       ),
       actions: <Widget>[
         TextButton(
+          onPressed: _isBusy
+              ? null
+              : () => Navigator.of(
+                  context,
+                ).pop(const BackupResult(action: BackupAction.cancelled)),
           child: Text(l10n.cancel),
-          onPressed: () => Navigator.of(
-            context,
-          ).pop(const BackupResult(action: BackupAction.cancelled)),
         ),
-        TextButton(onPressed: _handleShare, child: Text(l10n.share)),
-        TextButton(onPressed: _handleSave, child: Text(l10n.save)),
+        TextButton(
+          onPressed: _isBusy ? null : _handleShare,
+          child: _isSharing
+              ? const SizedBox.square(
+                  dimension: iconSizeSmall,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.share),
+        ),
+        TextButton(
+          onPressed: _isBusy ? null : _handleSave,
+          child: _isSaving
+              ? const SizedBox.square(
+                  dimension: iconSizeSmall,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Text(l10n.save),
+        ),
       ],
     );
   }
