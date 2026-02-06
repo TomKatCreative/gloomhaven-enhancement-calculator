@@ -4,7 +4,7 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_con
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/custom_class_warning_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/variant_selector_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
@@ -188,7 +188,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
       ClassCategory.frosthaven => 'Frosthaven',
       ClassCategory.mercenaryPacks => 'Mercenary Packs',
       ClassCategory.crimsonScales => 'Crimson Scales',
-      ClassCategory.custom => 'Custom Classes',
+      ClassCategory.custom => 'Custom classes',
     };
   }
 
@@ -252,7 +252,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                           ),
                           _buildCategoryFilterChip(
                             category: ClassCategory.custom,
-                            label: 'Custom Classes',
+                            label: 'Custom classes',
                           ),
                         ],
                       ],
@@ -344,56 +344,66 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
       playerClass.classCode,
     );
 
-    return ListTile(
-      leading: ClassIconSvg(
-        playerClass: playerClass,
-        width: iconSizeXL,
-        height: iconSizeXL,
-      ),
-      title: Text(
-        isUnlocked || !playerClass.locked
-            ? playerClass.getCombinedDisplayNames()
-            : '???',
-        style: theme.textTheme.bodyLarge?.copyWith(
-          color: isUnlocked || !playerClass.locked ? null : theme.disabledColor,
+    Offset? tapPosition;
+    return Listener(
+      onPointerDown: (event) => tapPosition = event.position,
+      child: ListTile(
+        leading: ClassIconSvg(
+          playerClass: playerClass,
+          width: iconSizeXL,
+          height: iconSizeXL,
         ),
+        title: Text(
+          isUnlocked || !playerClass.locked
+              ? playerClass.getCombinedDisplayNames()
+              : '???',
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: isUnlocked || !playerClass.locked
+                ? null
+                : theme.disabledColor,
+          ),
+        ),
+        subtitleTextStyle: theme.textTheme.titleMedium?.copyWith(
+          color: theme.disabledColor,
+        ),
+        subtitle: playerClass.title != null ? Text(playerClass.title!) : null,
+        trailing: playerClass.locked
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    SharedPrefs().setPlayerClassIsUnlocked(
+                      playerClass.classCode,
+                      !isUnlocked,
+                    );
+                  });
+                },
+                icon: Icon(
+                  isUnlocked
+                      ? Icons.visibility_rounded
+                      : Icons.visibility_off_rounded,
+                ),
+              )
+            : null,
+        onTap: () async {
+          SelectedPlayerClass? choice = await _onClassSelected(
+            playerClass,
+            tapPosition!,
+          );
+          if (choice != null && mounted) {
+            Navigator.pop<SelectedPlayerClass>(context, choice);
+          }
+        },
       ),
-      subtitleTextStyle: theme.textTheme.titleMedium?.copyWith(
-        color: theme.disabledColor,
-      ),
-      subtitle: playerClass.title != null ? Text(playerClass.title!) : null,
-      trailing: playerClass.locked
-          ? IconButton(
-              onPressed: () {
-                setState(() {
-                  SharedPrefs().setPlayerClassIsUnlocked(
-                    playerClass.classCode,
-                    !isUnlocked,
-                  );
-                });
-              },
-              icon: Icon(
-                isUnlocked
-                    ? Icons.visibility_rounded
-                    : Icons.visibility_off_rounded,
-              ),
-            )
-          : null,
-      onTap: () async {
-        SelectedPlayerClass? choice = await _onClassSelected(playerClass);
-        if (choice != null && mounted) {
-          Navigator.pop<SelectedPlayerClass>(context, choice);
-        }
-      },
     );
   }
 
   /// Handles class selection, showing dialogs as needed.
   ///
   /// For custom classes: Shows a warning dialog about community content.
-  /// For multi-variant classes: Shows a variant selection dialog.
+  /// For multi-variant classes: Shows a popup menu at the tap position.
   Future<SelectedPlayerClass?> _onClassSelected(
     PlayerClass selectedPlayerClass,
+    Offset tapPosition,
   ) async {
     bool hideMessage = SharedPrefs().hideCustomClassesWarningMessage;
     bool? proceed = true;
@@ -409,11 +419,63 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     }
 
     // Show variant selection if class has multiple versions
-    if (PlayerClass.perkListByClassCode(selectedPlayerClass.classCode)!.length >
-        1) {
-      Variant? variant = await VariantSelectorDialog.show(
+    final perkLists = PlayerClass.perkListByClassCode(
+      selectedPlayerClass.classCode,
+    )!;
+    if (perkLists.length > 1) {
+      final variant = await showGeneralDialog<Variant>(
         context: context,
-        playerClass: selectedPlayerClass,
+        barrierDismissible: true,
+        barrierLabel: MaterialLocalizations.of(
+          context,
+        ).modalBarrierDismissLabel,
+        barrierColor: Colors.transparent,
+        transitionDuration: animationDuration,
+        pageBuilder: (context, animation, _) {
+          final screen = MediaQuery.of(context).size;
+          final menuContent = ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutBack,
+            ),
+            child: Material(
+              elevation: 8,
+              borderRadius: BorderRadius.circular(borderRadiusCard),
+              clipBehavior: Clip.antiAlias,
+              child: IntrinsicWidth(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: perkLists
+                      .map(
+                        (perkList) => InkWell(
+                          onTap: () =>
+                              Navigator.of(context).pop(perkList.variant),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: extraLargePadding,
+                              vertical: mediumPadding,
+                            ),
+                            child: Text(
+                              ClassVariants.classVariants[perkList.variant]!,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          );
+          return CustomSingleChildLayout(
+            delegate: _PopupPositionDelegate(
+              tapPosition: tapPosition,
+              screenSize: screen,
+            ),
+            child: menuContent,
+          );
+        },
       );
       proceed = variant != null;
       userChoice = SelectedPlayerClass(
@@ -423,5 +485,38 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     }
 
     return proceed == true ? userChoice : null;
+  }
+}
+
+/// Positions the variant popup at the tap point, clamping so it stays
+/// fully within the screen viewport.
+class _PopupPositionDelegate extends SingleChildLayoutDelegate {
+  final Offset tapPosition;
+  final Size screenSize;
+
+  _PopupPositionDelegate({required this.tapPosition, required this.screenSize});
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    return BoxConstraints.loose(screenSize);
+  }
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final left = (tapPosition.dx).clamp(
+      0.0,
+      screenSize.width - childSize.width,
+    );
+    final top = (tapPosition.dy).clamp(
+      0.0,
+      screenSize.height - childSize.height,
+    );
+    return Offset(left, top);
+  }
+
+  @override
+  bool shouldRelayout(_PopupPositionDelegate oldDelegate) {
+    return tapPosition != oldDelegate.tapPosition ||
+        screenSize != oldDelegate.screenSize;
   }
 }
