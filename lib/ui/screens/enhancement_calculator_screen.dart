@@ -294,7 +294,7 @@ class _CardLevelSection extends StatelessWidget {
               ),
               const SizedBox(width: largePadding),
               Text(
-                '${AppLocalizations.of(context).cardLevel}: ${level + 1}',
+                '${AppLocalizations.of(context).cardLevel}: ${level == 0 ? '1/X' : level + 1}',
                 style: theme.textTheme.bodyLarge,
               ),
             ],

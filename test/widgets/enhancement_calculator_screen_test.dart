@@ -134,13 +134,13 @@ void main() {
     });
 
     group('Card Level Section', () {
-      testWidgets('card level label shows "Card level: 1" initially', (
+      testWidgets('card level label shows "Card level: 1/X" initially', (
         tester,
       ) async {
         await tester.pumpWidget(await buildCalculatorScreen());
         await tester.pumpAndSettle();
 
-        expect(find.text('Card level: 1'), findsOneWidget);
+        expect(find.text('Card level: 1/X'), findsOneWidget);
       });
 
       testWidgets('cost displays present', (tester) async {

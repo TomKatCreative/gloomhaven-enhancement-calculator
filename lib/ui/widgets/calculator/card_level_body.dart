@@ -23,7 +23,12 @@ class CardLevelBody extends StatelessWidget {
       interval: 1,
       stepSize: 1,
       showLabels: true,
-
+      labelFormatterCallback: (dynamic actualValue, String formattedText) {
+        if ((actualValue as double).round() == 1) {
+          return '1/X';
+        }
+        return formattedText;
+      },
       activeColor: colorScheme.primary,
       inactiveColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
       onChanged: (dynamic value) {

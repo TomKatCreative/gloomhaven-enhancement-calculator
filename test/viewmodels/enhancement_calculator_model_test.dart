@@ -319,18 +319,16 @@ void main() {
     group('enhancementCost() - Lost Modifier', () {
       test('GH: lost toggle has no effect', () async {
         await _setupPrefs(edition: GameEdition.gloomhaven);
-        final model = EnhancementCalculatorModel();
-        // Manually set _lostNonPersistent via private backing
         // Since GH has no lost modifier, the code path won't trigger
         SharedPrefs().lostNonPersistent = true;
-        final model2 = EnhancementCalculatorModel();
+        final model = EnhancementCalculatorModel();
 
         final move = _findEnhancementByCategory(
           'Move',
           EnhancementCategory.charPlusOne,
         );
         // GH doesn't have lost modifier, so cost stays at 30
-        expect(model2.enhancementCost(move), 30);
+        expect(model.enhancementCost(move), 30);
       });
 
       test('GH2E: halves cost when lostNonPersistent is true', () async {
