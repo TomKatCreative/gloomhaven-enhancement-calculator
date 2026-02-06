@@ -141,10 +141,6 @@ class SharedPrefs {
   set multipleTargetsSwitch(bool value) =>
       _sharedPrefs.setBool('multipleTargetsSelected', value);
 
-  String get backup => _sharedPrefs.getString('backup') ?? '';
-
-  set backup(String value) => _sharedPrefs.setString('backup', value);
-
   /// Game edition for enhancement calculator
   /// Migrates from legacy gloomhavenMode boolean if present
   GameEdition get gameEdition {
@@ -249,15 +245,4 @@ class SharedPrefs {
 
   int get airState => _sharedPrefs.getInt('elementAirState') ?? 0;
   set airState(int value) => _sharedPrefs.setInt('elementAirState', value);
-
-  /// Custom backup directory path (null means use default Downloads folder)
-  String? get customBackupPath => _sharedPrefs.getString('customBackupPath');
-
-  set customBackupPath(String? value) {
-    if (value == null) {
-      _sharedPrefs.remove('customBackupPath');
-    } else {
-      _sharedPrefs.setString('customBackupPath', value);
-    }
-  }
 }

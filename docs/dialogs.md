@@ -109,11 +109,11 @@ if (result?.action == BackupAction.saved) {
 
 **Features:**
 - Filename input with validation (filters special characters)
-- Default filename with timestamp
-- Platform-specific options:
-  - Android: Save to Downloads OR Share
-  - iOS: Share only
-- Returns `BackupResult` with action type and saved path
+- Default filename with timestamp (`ghc_backup_YYYY-MM-DD_HH-mm`)
+- Uses platform-native save dialog (SAF on Android, file saver on iOS)
+- Supports saving to cloud storage providers (Google Drive, Dropbox, OneDrive)
+  if the user has those apps installed — no OAuth needed
+- Returns `BackupResult` with action type and saved file path
 
 ## RestoreDialog
 

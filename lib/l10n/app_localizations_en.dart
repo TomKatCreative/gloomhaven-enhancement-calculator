@@ -284,10 +284,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'Restore your characters from a backup file on your device';
 
   @override
-  String get backupFileWarning =>
-      'If another backup file already exists in the Downloads folder with the same name, it will be overwritten';
-
-  @override
   String get filename => 'Filename';
 
   @override
@@ -370,15 +366,4 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNotes => 'Add notes...';
-
-  @override
-  String get folderAccessTitle => 'Choose backup folder';
-
-  @override
-  String get folderAccessExplanation =>
-      'On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.';
-
-  @override
-  String get folderAccessTip =>
-      'Tip: Create a new folder called \'Backups\' to keep your backup files organized.';
 }

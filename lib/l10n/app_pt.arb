@@ -86,7 +86,6 @@
   "backupDescription": "Fazer backup dos seus personagens atuais para o seu dispositivo",
   "restore": "Restaurar",
   "restoreDescription": "Restaurar seus personagens de um arquivo de backup no seu dispositivo",
-  "backupFileWarning": "Se já existir outro arquivo de backup na pasta Downloads com o mesmo nome, ele será substituído",
   "filename": "Nome do arquivo",
   "savedTo": "Salvo em {path}",
   "filenameRequired": "Por favor, insira um nome de arquivo",
@@ -111,8 +110,5 @@
   "createCharacter": "Criar personagem",
   "gameEdition": "Edição do jogo",
   "selectClass": "Selecionar classe...",
-  "addNotes": "Adicionar notas...",
-  "folderAccessTitle": "Escolher pasta de backup",
-  "folderAccessExplanation": "Na próxima tela, o Android pedirá que você escolha uma pasta para salvar backups. Isso concede ao aplicativo permissão para salvar arquivos apenas nessa pasta específica.",
-  "folderAccessTip": "Dica: Crie uma nova pasta chamada 'Backups' para manter seus arquivos de backup organizados."
+  "addNotes": "Adicionar notas..."
 }

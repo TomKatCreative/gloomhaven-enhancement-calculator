@@ -93,7 +93,6 @@
   "backupDescription": "Backup your current characters to your device",
   "restore": "Restore",
   "restoreDescription": "Restore your characters from a backup file on your device",
-  "backupFileWarning": "If another backup file already exists in the Downloads folder with the same name, it will be overwritten",
   "filename": "Filename",
   "savedTo": "Saved to {path}",
   "@savedTo": {
@@ -146,8 +145,5 @@
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
   "selectClass": "Select class...",
-  "addNotes": "Add notes...",
-  "folderAccessTitle": "Choose backup folder",
-  "folderAccessExplanation": "On the next screen, Android will ask you to choose a folder for saving backups. This grants the app permission to save files to that specific folder only.",
-  "folderAccessTip": "Tip: Create a new folder called 'Backups' to keep your backup files organized."
+  "addNotes": "Add notes..."
 }

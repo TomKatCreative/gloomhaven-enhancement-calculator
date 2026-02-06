@@ -283,10 +283,6 @@ class AppLocalizationsPt extends AppLocalizations {
       'Restaurar seus personagens de um arquivo de backup no seu dispositivo';
 
   @override
-  String get backupFileWarning =>
-      'Se já existir outro arquivo de backup na pasta Downloads com o mesmo nome, ele será substituído';
-
-  @override
   String get filename => 'Nome do arquivo';
 
   @override
@@ -370,15 +366,4 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get addNotes => 'Adicionar notas...';
-
-  @override
-  String get folderAccessTitle => 'Escolher pasta de backup';
-
-  @override
-  String get folderAccessExplanation =>
-      'Na próxima tela, o Android pedirá que você escolha uma pasta para salvar backups. Isso concede ao aplicativo permissão para salvar arquivos apenas nessa pasta específica.';
-
-  @override
-  String get folderAccessTip =>
-      'Dica: Crie uma nova pasta chamada \'Backups\' para manter seus arquivos de backup organizados.';
 }
