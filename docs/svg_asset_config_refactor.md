@@ -85,7 +85,6 @@ Resource('Lumber', 'lumber'),
 | `characters_screen.dart` | 1 background icon → `ClassIconSvg` |
 | `class_selector_screen.dart` | 1 → `ClassIconSvg` |
 | `create_character_screen.dart` | 1 → `ClassIconSvg` |
-| `variant_selector_dialog.dart` | 1 → `ClassIconSvg` |
 | `settings_screen.dart` | 1 BMC button → `ThemedSvg` |
 | `resource_card.dart` | 1 → `ThemedSvg` |
 

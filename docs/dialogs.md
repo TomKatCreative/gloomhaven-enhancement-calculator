@@ -47,28 +47,6 @@ if (proceed == true) {
 - "Don't show again" checkbox (persisted to SharedPreferences)
 - Custom stateful behavior for checkbox management
 
-## VariantSelectorDialog
-
-Dialog for selecting between class variants/editions.
-
-**Usage:**
-```dart
-final variant = await VariantSelectorDialog.show(
-  context: context,
-  playerClass: selectedClass,
-);
-
-if (variant != null) {
-  // Use selected variant (Variant.base, Variant.gloomhaven2E, etc.)
-}
-```
-
-**Features:**
-- Class icon and name in title
-- Dynamic button generation for all available variants
-- Supports unlimited variants (future-proof)
-- Cancel option with contrast-adjusted styling
-
 ## EnvelopePuzzleDialog
 
 Dialog for solving envelope puzzles (Envelope X and Envelope V) that require entering a secret answer.

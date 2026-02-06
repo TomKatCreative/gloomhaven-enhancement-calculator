@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/custom_class_warning_dialog.dart';
@@ -446,24 +447,38 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: perkLists
-                      .map(
-                        (perkList) => InkWell(
-                          onTap: () =>
-                              Navigator.of(context).pop(perkList.variant),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: extraLargePadding,
-                              vertical: mediumPadding,
-                            ),
-                            child: Text(
-                              ClassVariants.classVariants[perkList.variant]!,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        extraLargePadding,
+                        mediumPadding,
+                        extraLargePadding,
+                        0,
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).variant,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    ...perkLists.map(
+                      (perkList) => InkWell(
+                        onTap: () =>
+                            Navigator.of(context).pop(perkList.variant),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: extraLargePadding,
+                            vertical: mediumPadding,
+                          ),
+                          child: Text(
+                            ClassVariants.classVariants[perkList.variant]!,
+                            style: Theme.of(context).textTheme.bodyLarge,
                           ),
                         ),
-                      )
-                      .toList(),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
