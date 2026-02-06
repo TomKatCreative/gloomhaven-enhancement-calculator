@@ -58,14 +58,14 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
-              version: '4.3.3',
+              version: '4.4.0',
               date: '2026-02-06',
               changes: [
-                'UI overhaul of Enhancement Calculator and create character dialog.',
-                'Added Save and Share options to backup dialog.',
+                'UI overhaul of Enhancement Calculator and Character screen.',
+                'Added cost breakdown to Enhancement cost chip.',
+                'Added all data (theme, unlocked characters, enhancement calculator) to backup.',
                 'Replaced variant selector dialog with inline popup menu.',
-                'Show base card level as "1/X" in enhancement calculator.',
-                'Improved character page swiping performance.',
+                'Improved app performance.',
                 'Fixed numeric display shifting on character screen.',
                 'Various UI polish and fixes.',
               ],

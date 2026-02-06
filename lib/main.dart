@@ -22,8 +22,6 @@ Future<void> main() async {
     SharedPrefs().removeAll();
     SharedPrefs().clearSharedPrefs = false;
   }
-  SharedPrefs().showUpdate4Dialog = false;
-
   if (Platform.isAndroid) {
     try {
       // device_region: tries SIM first, falls back to network on Android

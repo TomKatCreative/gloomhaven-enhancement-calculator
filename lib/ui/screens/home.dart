@@ -7,7 +7,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_430_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_440_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
@@ -31,11 +31,11 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     future = context.read<CharactersModel>().loadCharacters();
-    if (SharedPrefs().showUpdate430Dialog) {
+    if (SharedPrefs().showUpdate440Dialog) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         showDialog<void>(
           context: context,
-          builder: (context) => const Update430Dialog(),
+          builder: (context) => const Update440Dialog(),
         );
       });
     }
