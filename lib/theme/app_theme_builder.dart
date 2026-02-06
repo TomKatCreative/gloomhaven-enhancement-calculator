@@ -189,14 +189,6 @@ class AppThemeBuilder {
         }),
       ),
 
-      snackBarTheme: SnackBarThemeData(
-        backgroundColor: colorScheme.inverseSurface,
-        actionTextColor: colorScheme.inversePrimary,
-        contentTextStyle: textTheme.bodyMedium?.copyWith(
-          color: colorScheme.onInverseSurface,
-        ),
-      ),
-
       listTileTheme: ListTileThemeData(
         titleTextStyle: textTheme.titleLarge?.copyWith(
           color: colorScheme.onSurface,
