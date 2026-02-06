@@ -417,7 +417,7 @@ class _StatsSectionState extends State<_StatsSection> {
                           ..xp = value == '' ? 0 : int.parse(value),
                       );
                     },
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
                         RegExp('[\\.|\\,|\\ |\\-]'),
@@ -427,19 +427,29 @@ class _StatsSectionState extends State<_StatsSection> {
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       hintText: '0',
-                      suffixText:
-                          '/ ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
                       label: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ThemedSvg(assetKey: 'XP', width: iconSizeSmall),
                           const SizedBox(width: tinyPadding),
-                          Text(AppLocalizations.of(context).xp),
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context).xp,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ],
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
                       border: const OutlineInputBorder(),
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: tinyPadding),
+                  child: Text(
+                    '/ ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
                 IconButton(
@@ -482,7 +492,7 @@ class _StatsSectionState extends State<_StatsSection> {
                           widget.character
                             ..gold = value == '' ? 0 : int.parse(value),
                         ),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                     inputFormatters: [
                       FilteringTextInputFormatter.deny(
                         RegExp('[\\.|\\,|\\ |\\-]'),

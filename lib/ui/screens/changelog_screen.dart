@@ -59,10 +59,15 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           children: [
             const _VersionSection(
               version: '4.3.3',
-              date: '2026-02-01',
+              date: '2026-02-06',
               changes: [
-                'UI overhaul of entire Enhancement Calculator.',
-                'UI overhaul of create character dialog.',
+                'UI overhaul of Enhancement Calculator and create character dialog.',
+                'Added Save and Share options to backup dialog.',
+                'Replaced variant selector dialog with inline popup menu.',
+                'Show base card level as "1/X" in enhancement calculator.',
+                'Improved character page swiping performance.',
+                'Fixed numeric display shifting on character screen.',
+                'Various UI polish and fixes.',
               ],
             ),
             SizedBox(height: extraLargePadding),

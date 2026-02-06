@@ -26,7 +26,7 @@ class Strings {
         ? '**The Power of Enhancement global achievement**'
         : edition == GameEdition.gloomhaven2e
         ? '**The Power of Enhancement**'
-        : '**The Enhancer (Building 44)**';
+        : '**Enhancer (Building 44)**';
 
     final earnedOrBuilt = edition == GameEdition.frosthaven
         ? 'built'
@@ -122,10 +122,10 @@ A **main** ability is an ability that is written in larger font, whereas a **non
   // BUILDING 44 (ENHANCER)
   // ============================================================================
 
-  static const String building44Title = "The Enhancer";
+  static const String building44Title = "Enhancer";
 
   static const String _building44Content =
-      "Building 44 is **The Enhancer** in Frosthaven. Once built, it allows your party "
+      "Building 44 is the **Enhancer** in Frosthaven. Once built, it allows your party "
       "to purchase enhancements. The building can be upgraded to provide additional "
       "discounts:\n\n"
       "**Level 1:** Buy enhancements\n"
