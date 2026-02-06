@@ -311,17 +311,21 @@ class _NameAndClassSection extends StatelessWidget {
             Stack(
               alignment: const Alignment(0, 0.3),
               children: <Widget>[
-                ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL),
+                ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL + tinyPadding),
                 Padding(
                   padding: EdgeInsets.only(
-                    top: [1, 2, 6, 8].contains(Character.level(character.xp))
-                        ? tinyPadding
-                        : 0.0,
+                    top: switch (Character.level(character.xp)) {
+                      1 || 2 || 8 => tinyPadding,
+                      5 => 3,
+                      6 => 4,
+                      _ => 0.0,
+                    },
                   ),
                   child: Text(
                     '${Character.level(character.xp)}',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Theme.of(context).colorScheme.surface,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
@@ -446,7 +450,7 @@ class _StatsSectionState extends State<_StatsSection> {
                       contentPadding: const EdgeInsets.fromLTRB(
                         mediumPadding,
                         mediumPadding,
-                        tinyPadding,
+                        0,
                         mediumPadding,
                       ),
                       floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -455,15 +459,22 @@ class _StatsSectionState extends State<_StatsSection> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: tinyPadding),
-                  child: SizedBox(
-                    width: 42,
-                    child: Text(
-                      '/${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                      textAlign: TextAlign.start,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                  padding: const EdgeInsets.symmetric(horizontal: tinyPadding),
+                  child: Text(
+                    '/',
+                    textAlign: TextAlign.start,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 40,
+                  child: Text(
+                    '${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                    textAlign: TextAlign.start,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ),
@@ -616,14 +627,20 @@ class _StatsSectionState extends State<_StatsSection> {
           child: Stack(
             alignment: AlignmentDirectional.bottomCenter,
             children: <Widget>[
-              ThemedSvg(assetKey: 'Pocket', width: iconSizeMedium),
+              ThemedSvg(assetKey: 'Pocket', width: iconSizeLarge),
               Transform.translate(
-                offset: const Offset(0, 1),
+                offset: Offset(
+                  0,
+                  switch (widget.character.pocketItemsAllowed) {
+                    1 || 2 => 3,
+                    _ => 2,
+                  }.toDouble(),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 3.5),
                   child: Text(
                     '${widget.character.pocketItemsAllowed}',
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).colorScheme.surface,
                     ),

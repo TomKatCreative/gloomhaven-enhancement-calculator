@@ -113,7 +113,7 @@ class CalculatorSectionCard extends StatelessWidget {
           // Header row with info button and title
           _buildHeader(context),
           // Body content
-          if (body != null) body!,
+          ?body,
           // Cost display
           if (costConfig != null) ...[
             const SizedBox(height: smallPadding),
