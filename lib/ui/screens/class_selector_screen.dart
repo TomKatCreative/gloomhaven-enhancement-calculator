@@ -457,6 +457,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                       ),
                       child: Text(
                         AppLocalizations.of(context).variant,
+                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
