@@ -294,12 +294,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get filenameRequired => 'Por favor, insira um nome de arquivo';
 
   @override
+  String get backupIncludes =>
+      'Seu backup incluirá todos os personagens, vantagens, maestrias e configurações do aplicativo (tema, estado da calculadora, classes desbloqueadas).';
+
+  @override
   String get backupError =>
       'Falha ao criar backup. Por favor, tente novamente.';
 
   @override
   String get restoreWarning =>
-      'Restaurar um arquivo de backup substituirá todos os personagens atuais. Deseja continuar?';
+      'Restaurar um arquivo de backup substituirá todos os personagens atuais e configurações do aplicativo (tema, estado da calculadora, classes desbloqueadas). Deseja continuar?';
 
   @override
   String get errorDuringRestore => 'Erro durante a operação de restauração';

@@ -64,7 +64,7 @@ void main() {
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Filename cannot be empty'), findsOneWidget);
+      expect(find.text('Cannot be empty'), findsOneWidget);
     });
 
     testWidgets('typing after validation error clears it', (tester) async {
@@ -75,12 +75,12 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Save'));
       await tester.pumpAndSettle();
-      expect(find.text('Filename cannot be empty'), findsOneWidget);
+      expect(find.text('Cannot be empty'), findsOneWidget);
 
       // Type something - error should clear
       await tester.enterText(find.byType(TextField), 'my_backup');
       await tester.pumpAndSettle();
-      expect(find.text('Filename cannot be empty'), findsNothing);
+      expect(find.text('Cannot be empty'), findsNothing);
     });
 
     testWidgets('special characters are filtered from filename input', (

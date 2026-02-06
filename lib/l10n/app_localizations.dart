@@ -632,6 +632,12 @@ abstract class AppLocalizations {
   /// **'Please enter a filename'**
   String get filenameRequired;
 
+  /// No description provided for @backupIncludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Your backup will include all characters, perks, masteries, and app settings (theme, calculator state, class unlocks).'**
+  String get backupIncludes;
+
   /// No description provided for @backupError.
   ///
   /// In en, this message translates to:
@@ -641,7 +647,7 @@ abstract class AppLocalizations {
   /// No description provided for @restoreWarning.
   ///
   /// In en, this message translates to:
-  /// **'Restoring a backup file will overwrite any current characters. Do you wish to continue?'**
+  /// **'Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?'**
   String get restoreWarning;
 
   /// No description provided for @errorDuringRestore.

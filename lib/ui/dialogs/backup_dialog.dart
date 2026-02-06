@@ -90,7 +90,7 @@ class _BackupDialogState extends State<BackupDialog> {
   bool _validateFilename() {
     if (_fileNameController.text.trim().isEmpty) {
       setState(() {
-        _filenameError = 'Filename cannot be empty';
+        _filenameError = 'Cannot be empty';
       });
       return false;
     }
@@ -164,24 +164,35 @@ class _BackupDialogState extends State<BackupDialog> {
     return AlertDialog(
       content: Container(
         constraints: const BoxConstraints(maxWidth: maxDialogWidth),
-        child: TextField(
-          decoration: InputDecoration(
-            labelText: l10n.filename,
-            errorText: _filenameError,
-            suffixText: '.txt',
-          ),
-          textAlign: TextAlign.end,
-          controller: _fileNameController,
-          onChanged: (_) {
-            if (_filenameError != null) {
-              setState(() => _filenameError = null);
-            }
-          },
-          inputFormatters: [
-            FilteringTextInputFormatter.deny(
-              RegExp(
-                '[\\#|\\<|\\>|\\+|\\\$|\\%|\\!|\\`|\\&|\\*|\\\'|\\||\\}|\\{|\\?|\\"|\\=|\\/|\\:|\\\\|\\ |\\@]',
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.backupIncludes,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: largePadding),
+            TextField(
+              decoration: InputDecoration(
+                labelText: l10n.filename,
+                errorText: _filenameError,
+                suffixText: '.txt',
               ),
+              textAlign: TextAlign.end,
+              controller: _fileNameController,
+              onChanged: (_) {
+                if (_filenameError != null) {
+                  setState(() => _filenameError = null);
+                }
+              },
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(
+                  RegExp(
+                    '[\\#|\\<|\\>|\\+|\\\$|\\%|\\!|\\`|\\&|\\*|\\\'|\\||\\}|\\{|\\?|\\"|\\=|\\/|\\:|\\\\|\\ |\\@]',
+                  ),
+                ),
+              ],
             ),
           ],
         ),
