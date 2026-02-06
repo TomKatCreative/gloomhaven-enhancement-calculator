@@ -94,13 +94,10 @@
   "restore": "Restore",
   "restoreDescription": "Restore your characters from a backup file on your device",
   "filename": "Filename",
-  "saved": "Saved {filename} to {path}",
+  "saved": "Saved {filename}",
   "@saved": {
     "placeholders": {
       "filename": {
-        "type": "String"
-      },
-      "path": {
         "type": "String"
       }
     }

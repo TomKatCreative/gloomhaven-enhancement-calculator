@@ -87,7 +87,7 @@
   "restore": "Restaurar",
   "restoreDescription": "Restaurar seus personagens de um arquivo de backup no seu dispositivo",
   "filename": "Nome do arquivo",
-  "saved": "{filename} salvo em {path}",
+  "saved": "{filename} salvo",
   "filenameRequired": "Por favor, insira um nome de arquivo",
   "backupIncludes": "Seu backup incluirá todos os personagens, vantagens, maestrias e configurações do aplicativo (tema, estado da calculadora, classes desbloqueadas).",
   "backupError": "Falha ao criar backup. Por favor, tente novamente.",

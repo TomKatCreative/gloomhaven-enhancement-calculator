@@ -286,8 +286,8 @@ class AppLocalizationsPt extends AppLocalizations {
   String get filename => 'Nome do arquivo';
 
   @override
-  String saved(String filename, String path) {
-    return '$filename salvo em $path';
+  String saved(String filename) {
+    return '$filename salvo';
   }
 
   @override

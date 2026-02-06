@@ -81,12 +81,12 @@ Dialog for creating and exporting database backups.
 final result = await BackupDialog.show(context: context);
 
 if (result?.action == BackupAction.saved) {
-  // Show success message with result.savedPath
+  // Show success message with result.savedFilename
 }
 ```
 
 **Features:**
-- Filename input with validation (filters special characters, shows `.txt` suffix)
+- Filename input with validation (filters special characters, shows `.json` suffix)
 - Default filename: `ghc_backup`
 - Two export options:
   - **Save**: Opens the platform-native save picker (SAF on Android, file saver

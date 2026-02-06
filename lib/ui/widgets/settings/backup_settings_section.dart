@@ -3,7 +3,6 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/backup_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/restore_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/settings_section_header.dart';
-import 'package:path/path.dart' as p;
 
 /// Settings section for backup and restore functionality.
 ///
@@ -45,36 +44,12 @@ class BackupSettingsSection extends StatelessWidget {
 
     if (result == null) return;
 
-    if (result.action == BackupAction.saved && result.savedPath != null) {
+    if (result.action == BackupAction.saved && result.savedFilename != null) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
         ..showSnackBar(
-          SnackBar(
-            content: Builder(
-              builder: (context) {
-                final filename = p.basename(result.savedPath!);
-                final message = l10n.saved(
-                  filename,
-                  p.dirname(result.savedPath!),
-                );
-                final parts = message.split(filename);
-                return Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(text: parts.first),
-                      TextSpan(
-                        text: filename,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      if (parts.length > 1)
-                        TextSpan(text: parts.skip(1).join(filename)),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
+          SnackBar(content: Text(l10n.saved(result.savedFilename!))),
         );
     }
   }

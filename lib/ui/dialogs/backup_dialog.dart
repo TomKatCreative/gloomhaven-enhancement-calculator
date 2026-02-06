@@ -15,10 +15,10 @@ class BackupResult {
   /// The type of backup action performed.
   final BackupAction action;
 
-  /// The path where the backup was saved (only for [BackupAction.saved]).
-  final String? savedPath;
+  /// The user-entered filename (only for [BackupAction.saved]).
+  final String? savedFilename;
 
-  const BackupResult({required this.action, this.savedPath});
+  const BackupResult({required this.action, this.savedFilename});
 }
 
 /// The type of backup action the user chose.
@@ -49,7 +49,7 @@ enum BackupAction {
 ///
 /// if (result?.action == BackupAction.saved) {
 ///   ScaffoldMessenger.of(context).showSnackBar(
-///     SnackBar(content: Text('Saved to ${result.savedPath}')),
+///     SnackBar(content: Text('Saved ${result.savedFilename}')),
 ///   );
 /// }
 /// ```
@@ -124,7 +124,7 @@ class _BackupDialogState extends State<BackupDialog> {
       if (savedPath == null || !mounted) return;
       Navigator.of(
         context,
-      ).pop(BackupResult(action: BackupAction.saved, savedPath: savedPath));
+      ).pop(BackupResult(action: BackupAction.saved, savedFilename: _fileName));
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context)

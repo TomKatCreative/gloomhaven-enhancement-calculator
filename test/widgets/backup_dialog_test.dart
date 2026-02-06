@@ -125,7 +125,7 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.action, BackupAction.cancelled);
-      expect(result!.savedPath, isNull);
+      expect(result!.savedFilename, isNull);
     });
   });
 }

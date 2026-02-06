@@ -287,8 +287,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filename => 'Filename';
 
   @override
-  String saved(String filename, String path) {
-    return 'Saved $filename to $path';
+  String saved(String filename) {
+    return 'Saved $filename';
   }
 
   @override
