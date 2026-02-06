@@ -434,6 +434,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
         transitionDuration: animationDuration,
         pageBuilder: (context, animation, _) {
           final screen = MediaQuery.of(context).size;
+          final bottomPadding = MediaQuery.of(context).padding.bottom;
           final menuContent = ScaleTransition(
             scale: CurvedAnimation(
               parent: animation,
@@ -488,6 +489,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
             delegate: _PopupPositionDelegate(
               tapPosition: tapPosition,
               screenSize: screen,
+              bottomPadding: bottomPadding,
             ),
             child: menuContent,
           );
@@ -505,12 +507,17 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
 }
 
 /// Positions the variant popup at the tap point, clamping so it stays
-/// fully within the screen viewport.
+/// fully within the screen viewport and above the system navigation bar.
 class _PopupPositionDelegate extends SingleChildLayoutDelegate {
   final Offset tapPosition;
   final Size screenSize;
+  final double bottomPadding;
 
-  _PopupPositionDelegate({required this.tapPosition, required this.screenSize});
+  _PopupPositionDelegate({
+    required this.tapPosition,
+    required this.screenSize,
+    this.bottomPadding = 0,
+  });
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
@@ -525,7 +532,7 @@ class _PopupPositionDelegate extends SingleChildLayoutDelegate {
     );
     final top = (tapPosition.dy).clamp(
       0.0,
-      screenSize.height - childSize.height,
+      screenSize.height - childSize.height - bottomPadding,
     );
     return Offset(left, top);
   }
@@ -533,6 +540,7 @@ class _PopupPositionDelegate extends SingleChildLayoutDelegate {
   @override
   bool shouldRelayout(_PopupPositionDelegate oldDelegate) {
     return tapPosition != oldDelegate.tapPosition ||
-        screenSize != oldDelegate.screenSize;
+        screenSize != oldDelegate.screenSize ||
+        bottomPadding != oldDelegate.bottomPadding;
   }
 }
