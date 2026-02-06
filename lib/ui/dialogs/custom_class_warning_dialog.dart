@@ -49,7 +49,7 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
 
     return AlertDialog(
       title: Center(
-        child: Text('Custom Classes', style: theme.textTheme.headlineLarge),
+        child: Text('Custom classes', style: theme.textTheme.headlineLarge),
       ),
       content: Container(
         constraints: const BoxConstraints(

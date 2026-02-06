@@ -8,7 +8,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 /// A dialog for selecting between different variants/editions of a player class.
 ///
 /// Some classes have multiple versions across game editions (e.g., Brute in base
-/// game vs Bruiser in Gloomhaven 2E). This dialog shows all available variants
+/// game vs Bruiser in Gloomhaven 2e). This dialog shows all available variants
 /// as action buttons.
 ///
 /// ## Example Usage

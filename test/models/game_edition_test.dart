@@ -8,7 +8,7 @@ void main() {
         expect(GameEdition.gloomhaven.supportsPartyBoon, isTrue);
       });
 
-      test('true for Gloomhaven 2E', () {
+      test('true for Gloomhaven 2e', () {
         expect(GameEdition.gloomhaven2e.supportsPartyBoon, isTrue);
       });
 
@@ -22,7 +22,7 @@ void main() {
         expect(GameEdition.gloomhaven.hasLostModifier, isFalse);
       });
 
-      test('true for Gloomhaven 2E', () {
+      test('true for Gloomhaven 2e', () {
         expect(GameEdition.gloomhaven2e.hasLostModifier, isTrue);
       });
 
@@ -36,7 +36,7 @@ void main() {
         expect(GameEdition.gloomhaven.hasPersistentModifier, isFalse);
       });
 
-      test('false for Gloomhaven 2E', () {
+      test('false for Gloomhaven 2e', () {
         expect(GameEdition.gloomhaven2e.hasPersistentModifier, isFalse);
       });
 
@@ -50,7 +50,7 @@ void main() {
         expect(GameEdition.gloomhaven.hasEnhancerLevels, isFalse);
       });
 
-      test('false for Gloomhaven 2E', () {
+      test('false for Gloomhaven 2e', () {
         expect(GameEdition.gloomhaven2e.hasEnhancerLevels, isFalse);
       });
 
@@ -64,7 +64,7 @@ void main() {
         expect(GameEdition.gloomhaven.multiTargetAppliesToAll, isTrue);
       });
 
-      test('false for Gloomhaven 2E', () {
+      test('false for Gloomhaven 2e', () {
         expect(GameEdition.gloomhaven2e.multiTargetAppliesToAll, isFalse);
       });
 
@@ -78,8 +78,8 @@ void main() {
         expect(GameEdition.gloomhaven.displayName, 'Gloomhaven');
       });
 
-      test('Gloomhaven 2E', () {
-        expect(GameEdition.gloomhaven2e.displayName, 'Gloomhaven 2E');
+      test('Gloomhaven 2e', () {
+        expect(GameEdition.gloomhaven2e.displayName, 'Gloomhaven 2e');
       });
 
       test('Frosthaven', () {

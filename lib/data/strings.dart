@@ -517,7 +517,7 @@ A **main** ability is an ability that is written in larger font, whereas a **non
             "For example, if the city is at Prosperity Level 3, you could start a character at "
             "level 1, 2, or 3, and would be alloted 30, 45, or 60 gold, respectively.";
       case GameEdition.gloomhaven2e:
-        return "When starting a new character in Gloomhaven 2E, they always start "
+        return "When starting a new character in Gloomhaven 2e, they always start "
             "at level 1. They may immediately level up (even multiple times) as long as their "
             "level does not exceed half the current Prosperity Level (rounded up).\n\n"
             "You are alloted an amount of gold equal to **10xP+15**, where 'P' is the current "

@@ -26,7 +26,7 @@ enum GameEdition {
       case GameEdition.gloomhaven:
         return 'Gloomhaven';
       case GameEdition.gloomhaven2e:
-        return 'Gloomhaven 2E';
+        return 'Gloomhaven 2e';
       case GameEdition.frosthaven:
         return 'Frosthaven';
     }

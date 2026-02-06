@@ -236,7 +236,7 @@ class Character {
   /// Traits are hidden when:
   /// - The class has no traits defined
   /// - Base variant of non-Frosthaven classes
-  /// - Gloomhaven 2E variant (different trait system)
+  /// - Gloomhaven 2e variant (different trait system)
   bool get shouldShowTraits =>
       !(playerClass.traits.isEmpty ||
           (playerClass.category != ClassCategory.frosthaven &&

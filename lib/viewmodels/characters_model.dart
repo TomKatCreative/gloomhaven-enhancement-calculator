@@ -346,7 +346,7 @@ class CharactersModel with ChangeNotifier {
   /// Calculate starting gold based on game edition rules.
   ///
   /// - Gloomhaven: 15 × (L + 1), where L is starting level
-  /// - Gloomhaven 2E: 10 × P + 15, where P is prosperity level
+  /// - Gloomhaven 2e: 10 × P + 15, where P is prosperity level
   /// - Frosthaven: 10 × P + 20, where P is prosperity level
   int _calculateStartingGold(
     GameEdition edition,
