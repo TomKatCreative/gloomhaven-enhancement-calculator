@@ -397,4 +397,18 @@ class AppLocalizationsPt extends AppLocalizations {
   String progressOf(int current, int target) {
     return '$current/$target';
   }
+
+  @override
+  String get personalQuestComplete => 'Missão pessoal completa!';
+
+  @override
+  String personalQuestCompleteBody(String name) {
+    return '$name cumpriu sua missão pessoal e deve se aposentar. Antes de se aposentar, considere gastar ouro em melhorias ou doações — todo ouro e itens são perdidos na aposentadoria. A cidade ganha 1 de prosperidade.';
+  }
+
+  @override
+  String get retire => 'Aposentar';
+
+  @override
+  String get notYet => 'Ainda Não';
 }

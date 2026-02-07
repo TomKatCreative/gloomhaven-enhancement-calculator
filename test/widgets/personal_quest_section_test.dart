@@ -173,7 +173,9 @@ void main() {
         expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(3));
       });
 
-      testWidgets('shows envelope icon for envelope quests', (tester) async {
+      testWidgets('shows envelope icon in header for envelope quests', (
+        tester,
+      ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-6');
         // Quest 513 unlocks Envelope X
         character.personalQuestId = 'gh_513';
@@ -185,12 +187,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // Icon should be in the header row
         expect(find.byIcon(Icons.mail_outline), findsOneWidget);
       });
     });
 
-    group('view mode (no quest)', () {
-      testWidgets('shows no personal quest message', (tester) async {
+    group('no quest assigned', () {
+      testWidgets('renders nothing in view mode', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-7');
         // No quest assigned (personalQuestId defaults to '')
 
@@ -200,12 +203,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('No personal quest selected'), findsOneWidget);
+        // Should show nothing - no header, no prompt
+        expect(find.text('Personal Quest'), findsNothing);
+        expect(find.text('No personal quest selected'), findsNothing);
+        expect(find.byType(SizedBox), findsWidgets);
       });
-    });
 
-    group('edit mode', () {
-      testWidgets('shows select prompt when no quest assigned', (tester) async {
+      testWidgets('shows selector field in edit mode', (tester) async {
         tester.view.physicalSize = const Size(800, 600);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -219,10 +223,32 @@ void main() {
         );
         await tester.pumpAndSettle();
 
+        // Should show TextFormField with hint text
         expect(find.text('Select personal quest...'), findsOneWidget);
-        expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+        expect(find.text('Personal Quest'), findsOneWidget);
+        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
       });
 
+      testWidgets('renders nothing for retired character in edit mode', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(
+          uuid: 'test-pq-retired-no-quest',
+          isRetired: true,
+        );
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.text('Personal Quest'), findsNothing);
+        expect(find.text('Select personal quest...'), findsNothing);
+      });
+    });
+
+    group('edit mode', () {
       testWidgets('shows +/- buttons for requirements', (tester) async {
         tester.view.physicalSize = const Size(800, 600);
         tester.view.devicePixelRatio = 1.0;
@@ -255,7 +281,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.edit), findsOneWidget);
+        expect(find.byIcon(Icons.swap_horiz_rounded), findsOneWidget);
       });
 
       testWidgets('+ button increments progress', (tester) async {
@@ -351,7 +377,7 @@ void main() {
 
         // Should show quest content but NOT edit controls
         expect(find.text('515 - Lawbringer'), findsOneWidget);
-        expect(find.byIcon(Icons.edit), findsNothing);
+        expect(find.byIcon(Icons.swap_horiz_rounded), findsNothing);
         expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
       });
 
@@ -406,6 +432,170 @@ void main() {
         // Quest should still be displayed
         expect(find.text('515 - Lawbringer'), findsOneWidget);
         expect(find.text('5/20'), findsOneWidget);
+      });
+    });
+
+    group('retirement prompt', () {
+      testWidgets(
+        'shows retirement snackbar when quest transitions to complete',
+        (tester) async {
+          final character = TestData.createCharacter(uuid: 'test-pq-retire-1');
+          character.personalQuestId = 'gh_515'; // 1 req: kill 20
+          character.personalQuestProgress = [19]; // one away
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Tap the + button to go from 19 to 20 (completing the quest)
+          await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+          await tester.pumpAndSettle();
+
+          // Snackbar with short message and Retire action
+          expect(find.byType(SnackBar), findsOneWidget);
+          expect(find.text('Personal quest complete!'), findsOneWidget);
+          expect(find.text('Retire'), findsOneWidget);
+        },
+      );
+
+      testWidgets('tapping Retire in snackbar opens confirmation dialog', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(uuid: 'test-pq-retire-2');
+        character.personalQuestId = 'gh_515';
+        character.personalQuestProgress = [19];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Complete the quest
+        await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+        await tester.pumpAndSettle();
+
+        // Tap Retire in snackbar to open dialog
+        await tester.tap(find.text('Retire'));
+        await tester.pumpAndSettle();
+
+        // Confirmation dialog should appear with full message
+        expect(find.text('Not Yet'), findsOneWidget);
+        expect(find.textContaining('must retire'), findsOneWidget);
+      });
+
+      testWidgets('Not Yet in dialog keeps character active', (tester) async {
+        final character = TestData.createCharacter(uuid: 'test-pq-retire-3');
+        character.personalQuestId = 'gh_515';
+        character.personalQuestProgress = [19];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Complete the quest → snackbar → Retire → dialog
+        await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Retire'));
+        await tester.pumpAndSettle();
+
+        // Tap Not Yet
+        await tester.tap(find.text('Not Yet'));
+        await tester.pumpAndSettle();
+
+        expect(model.currentCharacter!.isRetired, isFalse);
+      });
+
+      testWidgets('confirming Retire in dialog retires the character', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(uuid: 'test-pq-retire-4');
+        character.personalQuestId = 'gh_515';
+        character.personalQuestProgress = [19];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Complete the quest → snackbar → Retire → dialog → Retire
+        await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Retire'));
+        await tester.pumpAndSettle();
+
+        // Dialog has two Retire texts (title area + confirm button); tap the button
+        await tester.tap(find.text('Retire').last);
+        await tester.pumpAndSettle();
+
+        expect(model.currentCharacter!.isRetired, isTrue);
+      });
+
+      testWidgets(
+        'does not show snackbar when progress changes on already-complete quest',
+        (tester) async {
+          final character = TestData.createCharacter(uuid: 'test-pq-retire-5');
+          // Quest 523 has 6 binary requirements
+          character.personalQuestId = 'gh_523';
+          // All complete
+          character.personalQuestProgress = [1, 1, 1, 1, 1, 1];
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Decrement requirement 0 from 1 to 0 (quest becomes incomplete)
+          await tester.tap(find.byIcon(Icons.remove_circle_outline).first);
+          await tester.pumpAndSettle();
+
+          // No snackbar should appear
+          expect(find.byType(SnackBar), findsNothing);
+
+          // Now increment it back to 1 (quest becomes complete again)
+          await tester.tap(find.byIcon(Icons.add_circle_outline).first);
+          await tester.pumpAndSettle();
+
+          // Snackbar SHOULD appear because it transitioned from incomplete to complete
+          expect(find.byType(SnackBar), findsOneWidget);
+        },
+      );
+
+      testWidgets('retirement dialog includes character name in body', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(
+          uuid: 'test-pq-retire-6',
+          name: 'TestHero',
+        );
+        character.personalQuestId = 'gh_515';
+        character.personalQuestProgress = [19];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Complete quest → snackbar → Retire → dialog
+        await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Retire'));
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('TestHero'), findsOneWidget);
       });
     });
 

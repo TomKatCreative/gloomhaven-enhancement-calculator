@@ -538,13 +538,34 @@ class CharactersModel with ChangeNotifier {
   }
 
   /// Updates progress for a single requirement of the personal quest.
-  Future<void> updatePersonalQuestProgress(
+  ///
+  /// Returns `true` if this update caused the quest to become fully complete
+  /// (i.e., it was not complete before but is now). Returns `false` otherwise.
+  Future<bool> updatePersonalQuestProgress(
     Character character,
     int requirementIndex,
     int value,
   ) async {
+    final wasComplete = isPersonalQuestComplete(character);
     character.personalQuestProgress[requirementIndex] = value;
     await databaseHelper.updateCharacter(character);
     notifyListeners();
+    final isNowComplete = isPersonalQuestComplete(character);
+    return !wasComplete && isNowComplete;
+  }
+
+  /// Whether all personal quest requirements are met for the given character.
+  bool isPersonalQuestComplete(Character character) {
+    final quest = character.personalQuest;
+    if (quest == null) return false;
+    if (character.personalQuestProgress.length != quest.requirements.length) {
+      return false;
+    }
+    for (int i = 0; i < quest.requirements.length; i++) {
+      if (character.personalQuestProgress[i] < quest.requirements[i].target) {
+        return false;
+      }
+    }
+    return true;
   }
 }

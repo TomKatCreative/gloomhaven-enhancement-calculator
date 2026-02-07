@@ -164,5 +164,16 @@
         "type": "int"
       }
     }
-  }
+  },
+  "personalQuestComplete": "Personal quest complete!",
+  "personalQuestCompleteBody": "{name} has fulfilled their personal quest and must retire. Before retiring, consider spending gold on enhancements or donations — all gold and items are lost upon retirement. The city gains 1 prosperity.",
+  "@personalQuestCompleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "retire": "Retire",
+  "notYet": "Not Yet"
 }

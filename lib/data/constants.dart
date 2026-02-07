@@ -46,6 +46,9 @@ const double dividerThickness = 1.0; // Standard divider line
 // Animation Duration - standard duration for all animations
 const Duration animationDuration = Duration(milliseconds: 250);
 
+// Blur - backdrop blur sigma for expanded sections over the class icon
+const double expansionBlurSigma = 12.0;
+
 // Layout Constraints
 const double maxWidth = 500;
 const double maxDialogWidth = 400;

@@ -10,9 +10,11 @@ import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
@@ -108,11 +110,10 @@ class CharacterScreen extends StatelessWidget {
               ),
             ),
             // PERSONAL QUEST
-            if (character.personalQuestId.isNotEmpty || model.isEditMode)
-              Padding(
-                padding: const EdgeInsets.all(smallPadding),
-                child: PersonalQuestSection(character: character),
-              ),
+            Padding(
+              padding: const EdgeInsets.all(smallPadding),
+              child: PersonalQuestSection(character: character),
+            ),
             // PERKS
             Padding(
               padding: const EdgeInsets.all(smallPadding),
@@ -604,10 +605,18 @@ class _StatsSectionState extends State<_StatsSection> {
             children: <Widget>[
               ThemedSvg(assetKey: 'GOLD', width: iconSizeMedium),
               const SizedBox(width: smallPadding),
-              Text(
-                '${widget.character.gold}',
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
+              if (widget.character.isRetired && widget.character.gold > 0)
+                StrikethroughText(
+                  '${widget.character.gold}',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                )
+              else
+                Text(
+                  '${widget.character.gold}',
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
             ],
           ),
         ),
@@ -662,51 +671,29 @@ class _StatsSectionState extends State<_StatsSection> {
   }
 }
 
-class _ResourcesSection extends StatefulWidget {
+class _ResourcesSection extends StatelessWidget {
   const _ResourcesSection({required this.character});
   final Character character;
-  @override
-  State<_ResourcesSection> createState() => _ResourcesSectionState();
-}
 
-class _ResourcesSectionState extends State<_ResourcesSection> {
   @override
   Widget build(BuildContext context) {
     CharactersModel charactersModel = context.read<CharactersModel>();
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(
-          width: 1,
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    return BlurredExpansionContainer(
       constraints: const BoxConstraints(maxWidth: 400),
-      child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          iconColor: Theme.of(context).colorScheme.primary,
-          onExpansionChanged: (value) =>
-              SharedPrefs().resourcesExpanded = value,
-          initiallyExpanded: SharedPrefs().resourcesExpanded,
-          title: Text(AppLocalizations.of(context).resources),
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(bottom: smallPadding),
-              child: Wrap(
-                runSpacing: smallPadding,
-                spacing: smallPadding,
-                alignment: WrapAlignment.spaceEvenly,
-                children: _buildResourceCards(
-                  context,
-                  widget.character,
-                  charactersModel,
-                ),
-              ),
-            ),
-          ],
+      initiallyExpanded: SharedPrefs().resourcesExpanded,
+      onExpansionChanged: (value) => SharedPrefs().resourcesExpanded = value,
+      title: Text(AppLocalizations.of(context).resources),
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(bottom: smallPadding),
+          child: Wrap(
+            runSpacing: smallPadding,
+            spacing: smallPadding,
+            alignment: WrapAlignment.spaceEvenly,
+            children: _buildResourceCards(context, character, charactersModel),
+          ),
         ),
-      ),
+      ],
     );
   }
 

@@ -4,15 +4,22 @@
 /// mode, allows changing the quest and adjusting progress via +/- buttons.
 ///
 /// ## View Mode
-/// - Quest title with unlock class icon
+/// - Quest title with unlock class icon in header
 /// - Requirements list with progress text (e.g., "12/20")
 ///
 /// ## Edit Mode
 /// - Tappable quest title to change PQ
 /// - +/- buttons for each requirement's progress
-/// - Prompt to select a quest if none assigned
+/// - TextFormField selector when no quest assigned
+///
+/// ## Retirement Prompt
+/// When the last requirement is completed, a dialog prompts the player
+/// to retire (per official Gloomhaven rules).
 library;
 
+import 'dart:math';
+
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
@@ -23,8 +30,10 @@ import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -38,85 +47,80 @@ class PersonalQuestSection extends StatelessWidget {
     final model = context.watch<CharactersModel>();
     final quest = character.personalQuest;
 
+    // No quest assigned and not in edit mode: show nothing
+    if (quest == null && !model.isEditMode) {
+      return const SizedBox.shrink();
+    }
+
+    // No quest assigned but in edit mode: show selector field
+    if (quest == null && model.isEditMode && !character.isRetired) {
+      return Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: _QuestSelectorField(character: character, model: model),
+      );
+    }
+
+    // No quest assigned, edit mode, but retired: show nothing
+    if (quest == null) {
+      return const SizedBox.shrink();
+    }
+
+    // Quest assigned: show ExpansionTile with blur
     return Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 1, color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(borderRadiusMedium),
-      ),
       constraints: const BoxConstraints(maxWidth: 400),
-      child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          iconColor: theme.colorScheme.primary,
-          onExpansionChanged: (value) =>
-              SharedPrefs().personalQuestExpanded = value,
-          initiallyExpanded: SharedPrefs().personalQuestExpanded,
-          title: Text(AppLocalizations.of(context).personalQuest),
+      child: BlurredExpansionContainer(
+        initiallyExpanded: SharedPrefs().personalQuestExpanded,
+        onExpansionChanged: (value) =>
+            SharedPrefs().personalQuestExpanded = value,
+        title: Row(
           children: [
-            if (quest != null)
-              _QuestContent(character: character, quest: quest, model: model)
-            else if (model.isEditMode && !character.isRetired)
-              _NoQuestPrompt(character: character, model: model)
-            else
-              Padding(
-                padding: const EdgeInsets.all(largePadding),
-                child: Text(
-                  AppLocalizations.of(context).noPersonalQuest,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
+            Text(AppLocalizations.of(context).personalQuest),
+            if (quest.unlockClassCode != null) ...[
+              const SizedBox(width: smallPadding),
+              SizedBox(
+                width: iconSizeMedium,
+                height: iconSizeMedium,
+                child: ClassIconSvg(
+                  playerClass: PlayerClasses.playerClasses.firstWhere(
+                    (c) => c.classCode == quest.unlockClassCode,
                   ),
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
+            ] else if (quest.unlockEnvelope != null) ...[
+              const SizedBox(width: smallPadding),
+              Icon(
+                Icons.mail_outline,
+                size: iconSizeMedium,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
           ],
         ),
+        children: [
+          _QuestContent(character: character, quest: quest, model: model),
+        ],
       ),
     );
   }
 }
 
-class _NoQuestPrompt extends StatelessWidget {
-  const _NoQuestPrompt({required this.character, required this.model});
+class _QuestSelectorField extends StatelessWidget {
+  const _QuestSelectorField({required this.character, required this.model});
   final Character character;
   final CharactersModel model;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.all(largePadding),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(borderRadiusMedium),
-        onTap: () => _selectQuest(context),
-        child: Container(
-          padding: const EdgeInsets.all(mediumPadding),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: theme.colorScheme.outlineVariant,
-              width: dividerThickness,
-            ),
-            borderRadius: BorderRadius.circular(borderRadiusMedium),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.add_circle_outline,
-                size: iconSizeSmall,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: smallPadding),
-              Flexible(
-                child: Text(
-                  AppLocalizations.of(context).selectPersonalQuest,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+    return TextFormField(
+      readOnly: true,
+      onTap: () => _selectQuest(context),
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context).personalQuest,
+        hintText: AppLocalizations.of(context).selectPersonalQuest,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        border: const OutlineInputBorder(),
+        suffixIcon: const Icon(Icons.chevron_right),
       ),
     );
   }
@@ -163,41 +167,15 @@ class _QuestContent extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(
-                          quest.displayName,
-                          style: theme.textTheme.titleMedium,
-                        ),
-                      ),
-                      if (quest.unlockClassCode != null) ...[
-                        const SizedBox(width: smallPadding),
-                        SizedBox(
-                          width: iconSizeMedium,
-                          height: iconSizeMedium,
-                          child: ClassIconSvg(
-                            playerClass: PlayerClasses.playerClasses.firstWhere(
-                              (c) => c.classCode == quest.unlockClassCode,
-                            ),
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ] else if (quest.unlockEnvelope != null) ...[
-                        const SizedBox(width: smallPadding),
-                        Icon(
-                          Icons.mail_outline,
-                          size: iconSizeMedium,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ],
-                    ],
+                  child: Text(
+                    quest.displayName,
+                    style: theme.textTheme.titleMedium,
                   ),
                 ),
                 if (isEditMode) ...[
                   const SizedBox(width: smallPadding),
                   Icon(
-                    Icons.edit,
+                    Icons.swap_horiz_rounded,
                     size: iconSizeSmall,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -306,11 +284,7 @@ class _RequirementRow extends StatelessWidget {
               padding: const EdgeInsets.all(tinyPadding),
               icon: const Icon(Icons.remove_circle_outline),
               onPressed: progress > 0
-                  ? () => model.updatePersonalQuestProgress(
-                      character,
-                      index,
-                      progress - 1,
-                    )
+                  ? () => _updateProgress(context, progress - 1)
                   : null,
             ),
             SizedBox(
@@ -329,11 +303,7 @@ class _RequirementRow extends StatelessWidget {
               padding: const EdgeInsets.all(tinyPadding),
               icon: const Icon(Icons.add_circle_outline),
               onPressed: progress < requirement.target
-                  ? () => model.updatePersonalQuestProgress(
-                      character,
-                      index,
-                      progress + 1,
-                    )
+                  ? () => _updateProgress(context, progress + 1)
                   : null,
             ),
           ] else
@@ -350,5 +320,73 @@ class _RequirementRow extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _updateProgress(BuildContext context, int newValue) async {
+    final justCompleted = await model.updatePersonalQuestProgress(
+      character,
+      index,
+      newValue,
+    );
+    if (justCompleted && context.mounted) {
+      _showRetirementSnackBar(context);
+    }
+  }
+
+  void _showRetirementSnackBar(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    _showConfetti(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.personalQuestComplete),
+        action: SnackBarAction(
+          label: l10n.retire,
+          onPressed: () => _showRetirementDialog(context),
+        ),
+      ),
+    );
+  }
+
+  void _showConfetti(BuildContext context) {
+    final overlay = Overlay.of(context);
+    final controller = ConfettiController(duration: const Duration(seconds: 1));
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (_) => Align(
+        alignment: Alignment.bottomCenter,
+        child: ConfettiWidget(
+          confettiController: controller,
+          blastDirection: -pi / 2,
+          emissionFrequency: 0.8,
+          maxBlastForce: 60,
+          minBlastForce: 30,
+          blastDirectionality: BlastDirectionality.explosive,
+        ),
+      ),
+    );
+    overlay.insert(entry);
+    controller.play();
+    // Remove overlay after particles settle
+    Future.delayed(const Duration(seconds: 6), () {
+      entry.remove();
+      controller.dispose();
+    });
+  }
+
+  Future<void> _showRetirementDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await ConfirmationDialog.show(
+      context: context,
+      title: l10n.personalQuestComplete,
+      content: Text(l10n.personalQuestCompleteBody(character.name)),
+      confirmLabel: l10n.retire,
+      cancelLabel: l10n.notYet,
+    );
+    if (confirmed == true && context.mounted) {
+      await model.retireCurrentCharacter();
+      if (context.mounted) {
+        context.read<AppModel>().updateTheme();
+      }
+    }
   }
 }

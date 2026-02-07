@@ -817,6 +817,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{current}/{target}'**
   String progressOf(int current, int target);
+
+  /// No description provided for @personalQuestComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal quest complete!'**
+  String get personalQuestComplete;
+
+  /// No description provided for @personalQuestCompleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has fulfilled their personal quest and must retire. Before retiring, consider spending gold on enhancements or donations — all gold and items are lost upon retirement. The city gains 1 prosperity.'**
+  String personalQuestCompleteBody(String name);
+
+  /// No description provided for @retire.
+  ///
+  /// In en, this message translates to:
+  /// **'Retire'**
+  String get retire;
+
+  /// No description provided for @notYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Yet'**
+  String get notYet;
 }
 
 class _AppLocalizationsDelegate
