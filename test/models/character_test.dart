@@ -491,6 +491,76 @@ void main() {
       expect(character.shouldShowMasteries, isFalse);
     });
   });
+
+  group('Character Model - Personal Quest', () {
+    test('personalQuestId defaults to empty string', () {
+      final character = TestData.createCharacter();
+      expect(character.personalQuestId, '');
+    });
+
+    test('personalQuestProgress defaults to empty list', () {
+      final character = TestData.createCharacter();
+      expect(character.personalQuestProgress, isEmpty);
+    });
+
+    test('personalQuest getter returns null when no quest assigned', () {
+      final character = TestData.createCharacter();
+      expect(character.personalQuest, isNull);
+    });
+
+    test('personalQuest getter resolves quest from repository', () {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_510';
+
+      final quest = character.personalQuest;
+      expect(quest, isNotNull);
+      expect(quest!.title, 'Seeker of Xorn');
+    });
+
+    test('toMap includes personalQuestId and progress', () {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_515';
+      character.personalQuestProgress = [5];
+
+      final map = character.toMap();
+      expect(map[columnCharacterPersonalQuestId], 'gh_515');
+      expect(map[columnCharacterPersonalQuestProgress], '[5]');
+    });
+
+    test('fromMap parses personalQuestId and progress', () {
+      final map = _createCharacterMap(
+        personalQuestId: 'gh_512',
+        personalQuestProgress: '[100]',
+      );
+
+      final character = Character.fromMap(map);
+      expect(character.personalQuestId, 'gh_512');
+      expect(character.personalQuestProgress, [100]);
+    });
+
+    test('fromMap handles missing PQ fields gracefully', () {
+      // Simulate a DB row from before v18 migration
+      final map = _createCharacterMap();
+
+      final character = Character.fromMap(map);
+      expect(character.personalQuestId, '');
+      expect(character.personalQuestProgress, isEmpty);
+    });
+
+    test('toMap/fromMap round-trip preserves PQ data', () {
+      final original = TestData.createCharacter();
+      original.id = 1; // id is required for round-trip (DB provides it)
+      original.personalQuestId = 'gh_523';
+      original.personalQuestProgress = [1, 0, 1, 0, 1, 0];
+
+      final roundTripped = Character.fromMap(original.toMap());
+      expect(roundTripped.personalQuestId, original.personalQuestId);
+      expect(
+        roundTripped.personalQuestProgress,
+        original.personalQuestProgress,
+      );
+    });
+  });
 }
 
 /// Creates a map representing a character row from the database.
@@ -506,6 +576,8 @@ Map<String, dynamic> _createCharacterMap({
   int checkMarks = 0,
   int isRetired = 0,
   String variant = 'base',
+  String personalQuestId = '',
+  String personalQuestProgress = '[]',
 }) {
   return {
     columnCharacterId: id,
@@ -528,5 +600,7 @@ Map<String, dynamic> _createCharacterMap({
     columnResourceFlamefruit: 0,
     columnResourceCorpsecap: 0,
     columnResourceSnowthistle: 0,
+    columnCharacterPersonalQuestId: personalQuestId,
+    columnCharacterPersonalQuestProgress: personalQuestProgress,
   };
 }

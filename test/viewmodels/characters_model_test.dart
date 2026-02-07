@@ -1084,4 +1084,107 @@ void main() {
       expect(notified, isTrue);
     });
   });
+
+  group('Personal Quest', () {
+    test('createCharacter with personalQuestId stores it', () async {
+      final model = createModel();
+
+      await model.createCharacter(
+        'Test',
+        TestData.brute,
+        personalQuestId: 'gh_510',
+      );
+
+      expect(model.characters.length, 1);
+      expect(model.characters.first.personalQuestId, 'gh_510');
+      expect(model.characters.first.personalQuestProgress, [0, 0]);
+    });
+
+    test('createCharacter without personalQuestId defaults to empty', () async {
+      final model = createModel();
+
+      await model.createCharacter('Test', TestData.brute);
+
+      expect(model.characters.first.personalQuestId, '');
+      expect(model.characters.first.personalQuestProgress, isEmpty);
+    });
+
+    test('updatePersonalQuest changes quest and resets progress', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_510';
+      character.personalQuestProgress = [2, 1];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      await model.updatePersonalQuest(character, 'gh_515');
+
+      expect(character.personalQuestId, 'gh_515');
+      // gh_515 has 1 requirement
+      expect(character.personalQuestProgress, [0]);
+      expect(fakeDb.updateCalls, contains(character.uuid));
+    });
+
+    test('updatePersonalQuest to null clears quest', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_510';
+      character.personalQuestProgress = [2, 1];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      await model.updatePersonalQuest(character, null);
+
+      expect(character.personalQuestId, '');
+      expect(character.personalQuestProgress, isEmpty);
+    });
+
+    test(
+      'updatePersonalQuestProgress updates individual requirement',
+      () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'gh_510';
+        character.personalQuestProgress = [0, 0];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        await model.updatePersonalQuestProgress(character, 0, 3);
+
+        expect(character.personalQuestProgress, [3, 0]);
+        expect(fakeDb.updateCalls, contains(character.uuid));
+      },
+    );
+
+    test('updatePersonalQuest notifies listeners', () async {
+      final character = TestData.createCharacter();
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      bool notified = false;
+      model.addListener(() => notified = true);
+
+      await model.updatePersonalQuest(character, 'gh_510');
+
+      expect(notified, isTrue);
+    });
+
+    test('updatePersonalQuestProgress notifies listeners', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_523';
+      character.personalQuestProgress = [0, 0, 0, 0, 0, 0];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      bool notified = false;
+      model.addListener(() => notified = true);
+
+      await model.updatePersonalQuestProgress(character, 2, 1);
+
+      expect(notified, isTrue);
+      expect(character.personalQuestProgress[2], 1);
+    });
+  });
 }

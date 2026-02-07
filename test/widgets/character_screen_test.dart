@@ -28,6 +28,7 @@ void main() {
       'primaryClassColor': 0xff4e7ec1,
       'gameEdition': 0,
       'resourcesExpanded': false,
+      'personalQuestExpanded': false,
     });
     await SharedPrefs().init();
 
@@ -403,7 +404,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('/45'), findsOneWidget);
+      // The "/" and "45" are in separate Text widgets for spacing control
+      expect(find.text('45'), findsOneWidget);
     });
 
     testWidgets('edit mode shows exposure (add/subtract) buttons', (
