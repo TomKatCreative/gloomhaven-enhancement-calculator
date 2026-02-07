@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -12,10 +13,12 @@ import 'package:sqflite/sqflite.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 import 'database_migrations.dart';
 
@@ -25,7 +28,7 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 17;
+  static const _databaseVersion = 18;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -82,6 +85,7 @@ class DatabaseHelper implements IDatabaseHelper {
       await _createTables(txn);
       await _seedPerks(txn);
       await _seedMasteries(txn);
+      await _seedPersonalQuests(txn);
     });
   }
 
@@ -109,7 +113,9 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnResourceFlamefruit $integerType,
         $columnResourceCorpsecap $integerType,
         $columnResourceSnowthistle $integerType,
-        $columnVariant $textType
+        $columnVariant $textType,
+        $columnCharacterPersonalQuestId $textType DEFAULT '',
+        $columnCharacterPersonalQuestProgress $textType DEFAULT '[]'
       )''');
 
     await txn.execute('''
@@ -141,6 +147,14 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnAssociatedCharacterUuid $textType,
         $columnAssociatedMasteryId $textType,
         $columnCharacterMasteryAchieved $boolType
+      )''');
+
+    await txn.execute('''
+      $createTable $tablePersonalQuests (
+        $columnPersonalQuestId $idTextPrimaryType,
+        $columnPersonalQuestNumber $textType,
+        $columnPersonalQuestTitle $textType,
+        $columnPersonalQuestEdition $textType
       )''');
   }
 
@@ -183,6 +197,13 @@ class DatabaseHelper implements IDatabaseHelper {
           await txn.insert(tableMasteries, mastery.toMap('$i'));
         }
       }
+    }
+  }
+
+  /// Seeds the PersonalQuests table from PersonalQuestsRepository.
+  Future<void> _seedPersonalQuests(Transaction txn) async {
+    for (final quest in PersonalQuestsRepository.quests) {
+      await txn.insert(tablePersonalQuests, quest.toMap());
     }
   }
 
@@ -261,6 +282,11 @@ class DatabaseHelper implements IDatabaseHelper {
       15: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
       // v17: Rename item_minus_one to ITEM_MINUS_ONE
       16: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v18: Add Personal Quests
+      17: () async {
+        await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
+        await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
+      },
     };
 
     // Run migrations in order for versions > oldVersion
@@ -306,7 +332,7 @@ class DatabaseHelper implements IDatabaseHelper {
     for (var i = 0; i < json[0].length; i++) {
       for (var k = 0; k < json[1][i].length; k++) {
         // This handles the case where a user tries to restore a backup
-        // from a database version before 7 (Resources)
+        // from a database version before 7 (Resources) or 18 (Personal Quests)
         if (i < 1) {
           json[1][i][k][columnResourceHide] ??= 0;
           json[1][i][k][columnResourceMetal] ??= 0;
@@ -317,6 +343,8 @@ class DatabaseHelper implements IDatabaseHelper {
           json[1][i][k][columnResourceFlamefruit] ??= 0;
           json[1][i][k][columnResourceCorpsecap] ??= 0;
           json[1][i][k][columnResourceSnowthistle] ??= 0;
+          json[1][i][k][columnCharacterPersonalQuestId] ??= '';
+          json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
         }
 
         batch.insert(json[0][i], json[1][i][k]);
@@ -474,6 +502,21 @@ class DatabaseHelper implements IDatabaseHelper {
       whereArgs: [character.playerClass.classCode, character.variant.name],
     );
     return result.toList();
+  }
+
+  @override
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  }) async {
+    Database db = await database;
+    if (edition != null) {
+      return await db.query(
+        tablePersonalQuests,
+        where: '$columnPersonalQuestEdition = ?',
+        whereArgs: [edition.name],
+      );
+    }
+    return await db.query(tablePersonalQuests);
   }
 
   @override

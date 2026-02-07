@@ -1,7 +1,9 @@
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 
@@ -119,6 +121,16 @@ class FakeDatabaseHelper implements IDatabaseHelper {
 
     // Auto-generate from MasteriesRepository
     return _generateMasteryMaps(character);
+  }
+
+  @override
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  }) async {
+    final quests = edition != null
+        ? PersonalQuestsRepository.getByEdition(edition)
+        : PersonalQuestsRepository.quests;
+    return quests.map((q) => q.toMap()).toList();
   }
 
   @override

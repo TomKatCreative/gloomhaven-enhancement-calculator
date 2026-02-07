@@ -1,4 +1,5 @@
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 
@@ -48,4 +49,9 @@ abstract class IDatabaseHelper {
 
   /// Updates a character's mastery achievement status.
   Future<void> updateCharacterMastery(CharacterMastery mastery, bool value);
+
+  /// Queries available personal quests, optionally filtered by edition.
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  });
 }
