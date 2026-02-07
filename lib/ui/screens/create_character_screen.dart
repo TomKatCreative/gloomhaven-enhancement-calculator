@@ -9,6 +9,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
@@ -46,6 +47,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       TextEditingController();
   final TextEditingController _prosperityLevelTextFieldController =
       TextEditingController();
+  final TextEditingController _personalQuestTextFieldController =
+      TextEditingController();
 
   GameEdition _selectedEdition = GameEdition.gloomhaven;
   PlayerClass? _selectedClass;
@@ -55,6 +58,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   final ScrollController _scrollController = ScrollController();
   Variant _variant = Variant.base;
   int _selectedLevel = 1;
+  String? _selectedPersonalQuestId;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -71,6 +75,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     _classTextFieldController.dispose();
     _previousRetirementsTextFieldController.dispose();
     _prosperityLevelTextFieldController.dispose();
+    _personalQuestTextFieldController.dispose();
     _nameFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -108,7 +113,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             _buildNameField(context, theme),
             const SizedBox(height: 28),
             _buildClassSelector(context, theme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
+            _buildPersonalQuestSelector(context, theme),
+            const SizedBox(height: formFieldSpacing),
             _buildLevelSelector(context, theme, colorScheme),
             const SizedBox(height: 28),
             _buildRetirementsAndProsperityRow(context, theme),
@@ -225,6 +232,51 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPersonalQuestSelector(BuildContext context, ThemeData theme) {
+    final isEnabled = _selectedEdition == GameEdition.gloomhaven;
+    return Opacity(
+      opacity: isEnabled ? 1.0 : 0.4,
+      child: TextFormField(
+        readOnly: true,
+        enabled: isEnabled,
+        controller: _personalQuestTextFieldController,
+        decoration: InputDecoration(
+          labelText: AppLocalizations.of(context).personalQuest,
+          hintText: isEnabled
+              ? AppLocalizations.of(context).selectPersonalQuest
+              : AppLocalizations.of(context).comingSoon,
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          border: const OutlineInputBorder(),
+          suffixIcon: _selectedPersonalQuestId != null
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _selectedPersonalQuestId = null;
+                      _personalQuestTextFieldController.clear();
+                    });
+                  },
+                )
+              : const Icon(Icons.chevron_right),
+        ),
+        onTap: isEnabled
+            ? () async {
+                final quest = await showPersonalQuestSelectorDialog(
+                  context: context,
+                  edition: GameEdition.gloomhaven,
+                );
+                if (quest != null) {
+                  setState(() {
+                    _selectedPersonalQuestId = quest.id;
+                    _personalQuestTextFieldController.text = quest.displayName;
+                  });
+                }
+              }
+            : null,
+      ),
     );
   }
 
@@ -374,6 +426,11 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 if (newEdition == GameEdition.gloomhaven) {
                   _prosperityLevelTextFieldController.clear();
                 }
+                // Clear PQ when switching away from GH
+                if (newEdition != GameEdition.gloomhaven) {
+                  _selectedPersonalQuestId = null;
+                  _personalQuestTextFieldController.clear();
+                }
                 _selectedEdition = newEdition;
               });
             },
@@ -400,6 +457,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             ? int.parse(_prosperityLevelTextFieldController.text)
             : 0,
         variant: _variant,
+        personalQuestId: _selectedPersonalQuestId,
       );
       if (!mounted) return;
       Navigator.pop(context, true);

@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
@@ -106,6 +107,12 @@ class CharacterScreen extends StatelessWidget {
                     : const SizedBox(),
               ),
             ),
+            // PERSONAL QUEST
+            if (character.personalQuestId.isNotEmpty || model.isEditMode)
+              Padding(
+                padding: const EdgeInsets.all(smallPadding),
+                child: PersonalQuestSection(character: character),
+              ),
             // PERKS
             Padding(
               padding: const EdgeInsets.all(smallPadding),

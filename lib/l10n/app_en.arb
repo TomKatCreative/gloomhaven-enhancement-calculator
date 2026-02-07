@@ -146,5 +146,23 @@
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
   "selectClass": "Select class...",
-  "addNotes": "Add notes..."
+  "addNotes": "Add notes...",
+  "personalQuest": "Personal Quest",
+  "selectPersonalQuest": "Select personal quest...",
+  "changePersonalQuest": "Change Personal Quest?",
+  "changePersonalQuestBody": "This will replace your current quest and reset all progress.",
+  "comingSoon": "Coming soon",
+  "noPersonalQuest": "No personal quest selected",
+  "change": "Change",
+  "progressOf": "{current}/{target}",
+  "@progressOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  }
 }

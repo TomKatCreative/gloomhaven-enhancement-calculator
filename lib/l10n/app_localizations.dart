@@ -769,6 +769,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add notes...'**
   String get addNotes;
+
+  /// No description provided for @personalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Quest'**
+  String get personalQuest;
+
+  /// No description provided for @selectPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Select personal quest...'**
+  String get selectPersonalQuest;
+
+  /// No description provided for @changePersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Personal Quest?'**
+  String get changePersonalQuest;
+
+  /// No description provided for @changePersonalQuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace your current quest and reset all progress.'**
+  String get changePersonalQuestBody;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon'**
+  String get comingSoon;
+
+  /// No description provided for @noPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'No personal quest selected'**
+  String get noPersonalQuest;
+
+  /// No description provided for @change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// No description provided for @progressOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{current}/{target}'**
+  String progressOf(int current, int target);
 }
 
 class _AppLocalizationsDelegate

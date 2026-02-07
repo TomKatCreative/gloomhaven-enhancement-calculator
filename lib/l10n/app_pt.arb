@@ -111,5 +111,13 @@
   "createCharacter": "Criar personagem",
   "gameEdition": "Edição do jogo",
   "selectClass": "Selecionar classe...",
-  "addNotes": "Adicionar notas..."
+  "addNotes": "Adicionar notas...",
+  "personalQuest": "Missão Pessoal",
+  "selectPersonalQuest": "Selecionar missão pessoal...",
+  "changePersonalQuest": "Alterar Missão Pessoal?",
+  "changePersonalQuestBody": "Isso substituirá sua missão atual e redefinirá todo o progresso.",
+  "comingSoon": "Em breve",
+  "noPersonalQuest": "Nenhuma missão pessoal selecionada",
+  "change": "Alterar",
+  "progressOf": "{current}/{target}"
 }

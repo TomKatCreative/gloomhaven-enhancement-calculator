@@ -42,6 +42,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -320,7 +321,18 @@ class CharactersModel with ChangeNotifier {
     GameEdition edition = GameEdition.gloomhaven,
     int prosperityLevel = 0,
     Variant variant = Variant.base,
+    String? personalQuestId,
   }) async {
+    final pqId = personalQuestId ?? '';
+    final pqProgress = personalQuestId != null
+        ? List.filled(
+            PersonalQuestsRepository.getById(
+                  personalQuestId,
+                )?.requirements.length ??
+                0,
+            0,
+          )
+        : <int>[];
     Character character = Character(
       uuid: const Uuid().v1(),
       name: name,
@@ -329,6 +341,8 @@ class CharactersModel with ChangeNotifier {
       xp: PlayerClasses.xpByLevel(initialLevel),
       gold: _calculateStartingGold(edition, initialLevel, prosperityLevel),
       variant: variant,
+      personalQuestId: pqId,
+      personalQuestProgress: pqProgress,
     );
     character.id = await databaseHelper.insertCharacter(character);
     character.characterPerks = await _loadPerks(character);
@@ -507,6 +521,30 @@ class CharactersModel with ChangeNotifier {
       }
     }
     await databaseHelper.updateCharacterMastery(mastery, value);
+    notifyListeners();
+  }
+
+  /// Updates the personal quest for a character, resetting progress.
+  Future<void> updatePersonalQuest(Character character, String? questId) async {
+    character.personalQuestId = questId ?? '';
+    character.personalQuestProgress = questId != null
+        ? List.filled(
+            PersonalQuestsRepository.getById(questId)?.requirements.length ?? 0,
+            0,
+          )
+        : [];
+    await databaseHelper.updateCharacter(character);
+    notifyListeners();
+  }
+
+  /// Updates progress for a single requirement of the personal quest.
+  Future<void> updatePersonalQuestProgress(
+    Character character,
+    int requirementIndex,
+    int value,
+  ) async {
+    character.personalQuestProgress[requirementIndex] = value;
+    await databaseHelper.updateCharacter(character);
     notifyListeners();
   }
 }

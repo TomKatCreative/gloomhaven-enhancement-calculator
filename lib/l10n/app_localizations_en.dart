@@ -370,4 +370,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNotes => 'Add notes...';
+
+  @override
+  String get personalQuest => 'Personal Quest';
+
+  @override
+  String get selectPersonalQuest => 'Select personal quest...';
+
+  @override
+  String get changePersonalQuest => 'Change Personal Quest?';
+
+  @override
+  String get changePersonalQuestBody =>
+      'This will replace your current quest and reset all progress.';
+
+  @override
+  String get comingSoon => 'Coming soon';
+
+  @override
+  String get noPersonalQuest => 'No personal quest selected';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String progressOf(int current, int target) {
+    return '$current/$target';
+  }
 }
