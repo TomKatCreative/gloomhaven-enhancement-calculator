@@ -158,6 +158,7 @@ This ensures users can only have contiguous levels (can't have L3 without L1-L2)
 |-----|------|---------|-------------|
 | `initialPage` | int | 0 | Home screen tab on app launch |
 | `resourcesExpanded` | bool | false | Resources section expansion |
+| `personalQuestExpanded` | bool | true | Personal Quest section expansion |
 
 ---
 
@@ -318,6 +319,7 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `clearOldPrefs` | Legacy cleanup flag, not user state |
 | `initialPage` | Transient navigation state |
 | `resourcesExpanded` | Transient UI state |
+| `personalQuestExpanded` | Transient UI state |
 | `showUpdate*Dialog` | One-time dialog flags |
 | `isUSRegion` | Device-specific locale detection |
 | `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |

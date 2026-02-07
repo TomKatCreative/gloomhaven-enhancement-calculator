@@ -293,6 +293,14 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `jumpToPage(int)` | Instant page jump |
 | `toggleShowRetired()` | Toggle retired visibility with smart navigation |
 
+### Personal Quest Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `updatePersonalQuest(Character, String questId)` | `Future<void>` | Change quest and reset progress to zeros |
+| `updatePersonalQuestProgress(Character, int index, int value)` | `Future<bool>` | Update a single requirement's progress. Returns `true` if quest just transitioned from incomplete → complete |
+| `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets |
+
 ### Perk/Mastery Methods
 
 | Method | Description |

@@ -8,7 +8,12 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - PQ selection on character creation screen (GH only; GH2E/FH show "Coming soon")
 - PQ section on character screen with progress tracking (+/- buttons in edit mode)
 - Change quest flow with confirmation dialog
-- Full test coverage (model, repository, viewmodel, widget tests)
+- Retirement prompt: snackbar with confetti pop on PQ completion → confirmation dialog → retire
+- Animated backdrop blur (`BlurredExpansionContainer`) on PQ and Resources sections
+- Class unlock icon / envelope icon in ExpansionTile header row
+- `TextFormField` selector when no quest assigned (edit mode)
+- Strikethrough gold display for retired characters (gold forfeited on retirement)
+- Full test coverage (model, repository, viewmodel, widget tests — 25 PQ widget tests)
 
 ### Architecture & File Locations
 
@@ -16,11 +21,12 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 |------|---------|
 | `lib/models/personal_quest/personal_quest.dart` | `PersonalQuest` model, `PersonalQuestRequirement`, progress encode/decode, DB column constants |
 | `lib/data/personal_quests/personal_quests_repository.dart` | Static list of all 24 GH quests with `getById()` and `getByEdition()` |
-| `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection` (ExpansionTile), `_QuestContent`, `_NoQuestPrompt`, `_ProgressRow` |
+| `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection`, `_QuestSelectorField`, `_QuestContent`, `_RequirementRow` |
+| `lib/ui/widgets/blurred_expansion_container.dart` | Reusable animated backdrop blur + bordered `ExpansionTile` |
 | `lib/ui/dialogs/personal_quest_selector_dialog.dart` | Bottom sheet for PQ selection, `PersonalQuestSelectorDialog.show()` |
 | `lib/data/database_helpers.dart` | v18 migration, `_seedPersonalQuests()`, `queryPersonalQuests()` |
 | `lib/data/database_migrations.dart` | v18 migration entry in `runMigrations()` |
-| `test/widgets/personal_quest_section_test.dart` | 18 widget tests for the PQ section |
+| `test/widgets/personal_quest_section_test.dart` | 25 widget tests for the PQ section |
 | `test/models/personal_quest_test.dart` | Model unit tests (constructor, toMap/fromMap, progress encoding) |
 | `test/models/personal_quest_repository_test.dart` | Repository tests (quest data integrity, getById, getByEdition) |
 
@@ -31,7 +37,8 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 3. `Character.personalQuestProgress` (List<int>) stores progress per requirement as JSON in DB
 4. `Character.personalQuest` getter resolves the full `PersonalQuest` from the repository
 5. `CharactersModel.updatePersonalQuest()` changes quest and resets progress to zeros
-6. `CharactersModel.updatePersonalQuestProgress()` updates a single requirement's count
+6. `CharactersModel.updatePersonalQuestProgress()` updates a single requirement's count, returns `bool` (true if quest just transitioned to complete)
+7. `CharactersModel.isPersonalQuestComplete()` checks if all progress values meet their targets
 
 ### DB Schema (v18)
 
@@ -53,7 +60,10 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - **ExpansionTile state** persisted via `SharedPrefs().personalQuestExpanded`.
 - **"Coming soon"** shown for GH2E/FH editions - the selector dialog is disabled, not hidden.
 - **Confirmation dialog** appears when changing an existing quest (resets progress).
-- **`_NoQuestPrompt` Row overflow** - Fixed by adding `mainAxisSize: MainAxisSize.min` + `Flexible` on Text. Watch for this pattern in constrained layouts.
+- **Retirement flow** uses two-step UX: snackbar ("Personal quest complete!" with confetti pop) → tap "Retire" → confirmation dialog with full details → retire. `updatePersonalQuestProgress` returns `bool` to detect completion transitions.
+- **`BlurredExpansionContainer`** centralizes animated backdrop blur (`TweenAnimationBuilder<double>` from 0→`expansionBlurSigma`) used by both Resources and PQ sections. Blur fades in on expand, out on collapse.
+- **No-quest selector** shows a read-only `TextFormField` (matching create character screen pattern) instead of an `ExpansionTile` when no quest is assigned in edit mode.
+- **Gold strikethrough** for retired characters uses `StrikethroughText` widget with `onSurfaceVariant` color.
 
 ### Known Gotchas
 
@@ -68,8 +78,8 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Will need to add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
 - **Frosthaven quest data** - Same pattern as GH2E but with `edition: GameEdition.frosthaven`.
 - **Adaptive widgets** - Replace basic +/- counters with segmented buttons, sliders, etc. for specific requirement types (e.g., binary yes/no for scenario completion, counter for kill counts).
-- **Quest completion** - Visual indicator when all requirements are met (e.g., green checkmark, confetti).
-- **Retirement integration** - Link quest completion to retirement flow. When all requirements are met, prompt or enable retirement.
+- ~~**Quest completion** - Visual indicator when all requirements are met (e.g., green checkmark, confetti).~~ **Done** — confetti pop + snackbar on completion, strikethrough on completed requirements.
+- ~~**Retirement integration** - Link quest completion to retirement flow. When all requirements are met, prompt or enable retirement.~~ **Done** — snackbar → confirmation dialog → `retireCurrentCharacter()`.
 - **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---

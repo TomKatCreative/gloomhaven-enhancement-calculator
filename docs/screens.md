@@ -253,11 +253,15 @@ Displays and edits a single character's stats, perks, masteries, and resources. 
 │ Class Name • Subtitle               │
 │ Traits: Tank, Healer, ...           │
 ├─────────────────────────────────────┤
-│ XP: 45/95    Gold: 120              │  ← Stats Section
+│ XP: 45/95    Gold: ~~120~~           │  ← Stats (gold struck through if retired)
 │ Battle Goals: ○○● (1/3)             │
 │ Pocket Items: 3                     │
 ├─────────────────────────────────────┤
-│ ▶ Resources (expandable)            │  ← Frosthaven only
+│ ▶ Personal Quest [🔓]  (blur)       │  ← GH only, with unlock icon
+│   515 - Lawbringer         [swap]   │
+│   ● Kill 20 Bandits...    12/20    │
+├─────────────────────────────────────┤
+│ ▶ Resources (expandable)   (blur)   │  ← Frosthaven only
 │   Hide: 5  Metal: 3  Lumber: 8      │
 ├─────────────────────────────────────┤
 │ Notes                               │  ← Optional section
@@ -281,8 +285,9 @@ Controlled by `charactersModel.isEditMode`:
 |---------|-----------|-----------|
 | Name | Display only | Editable text field |
 | Traits | Visible | Hidden |
-| XP/Gold | Inline display | Text fields + add/subtract buttons |
+| XP/Gold | Inline display (gold struck through if retired) | Text fields + add/subtract buttons |
 | Checkmarks/Retirements | Hidden | Visible with +/- controls |
+| Personal Quest | Progress text (e.g., "12/20") | +/- buttons per requirement, swap quest |
 | Resources | Read-only cards | Cards with +/- callbacks |
 | Notes | Plain text | Multiline text field |
 | Retired badge | Shows if retired | Hidden |
@@ -290,15 +295,41 @@ Controlled by `charactersModel.isEditMode`:
 ### Sections (Private Widgets)
 
 - `_NameAndClassSection` - Name, level badge, class info, traits
-- `_StatsSection` - XP, gold, battle goals, pocket items
+- `_StatsSection` - XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- `PersonalQuestSection` - PQ progress with retirement prompt (see below)
 - `_ResourcesSection` - Expandable Frosthaven resources (hide, metal, lumber, etc.)
+- `_NotesSection` - User notes (hidden when empty and not editing)
 - `PerksSection` - Perk checkboxes with parsed game text
 - `MasteriesSection` - Mastery checkboxes (conditional display)
+
+### BlurredExpansionContainer
+
+Both `PersonalQuestSection` and `_ResourcesSection` use `BlurredExpansionContainer` (`lib/ui/widgets/blurred_expansion_container.dart`), which provides:
+- Bordered container with `ExpansionTile`
+- Animated backdrop blur (`TweenAnimationBuilder<double>`, 0 → `expansionBlurSigma`) that frosts the large class icon SVG behind the section when expanded
+- Blur fades in/out over `animationDuration` (250ms)
+- `ClipRRect` constrains the blur to the container's `borderRadiusMedium` corners
+
+### Personal Quest Section
+
+> **File**: `lib/ui/widgets/personal_quest_section.dart`
+
+Three display states:
+1. **Quest assigned** — `BlurredExpansionContainer` with quest title, unlock icon in header, requirements list with progress
+2. **No quest + edit mode** — `TextFormField` selector (read-only, `OutlineInputBorder`, hint "Select personal quest...", chevron suffix)
+3. **No quest + view mode** — `SizedBox.shrink()` (hidden)
+
+**Retirement flow** (on PQ completion):
+1. `updatePersonalQuestProgress` returns `true` when quest transitions from incomplete → complete
+2. Confetti pop via `ConfettiWidget` overlay from bottom-center
+3. SnackBar: "Personal quest complete!" with "Retire" action
+4. Tapping "Retire" opens `ConfirmationDialog` with full details (spend gold first, items lost, +1 prosperity)
+5. Confirming retires the character and updates the theme
 
 ### Key Features
 
 - Uses `context.watch<CharactersModel>()` for reactive rebuilds
-- Retired characters have disabled edit controls
+- Retired characters have disabled edit controls and strikethrough gold
 - Bottom padding adjusts for element sheet expansion state
 - `ValueKey` on form fields keyed to character UUID
 - Max-width constraints (400-468px) for responsive design
