@@ -163,31 +163,37 @@ class _QuestContent extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    quest.displayName,
-                    style: theme.textTheme.titleMedium,
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          quest.displayName,
+                          style: theme.textTheme.titleMedium,
+                        ),
+                      ),
+                      if (quest.unlockClassCode != null) ...[
+                        const SizedBox(width: smallPadding),
+                        SizedBox(
+                          width: iconSizeMedium,
+                          height: iconSizeMedium,
+                          child: ClassIconSvg(
+                            playerClass: PlayerClasses.playerClasses.firstWhere(
+                              (c) => c.classCode == quest.unlockClassCode,
+                            ),
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ] else if (quest.unlockEnvelope != null) ...[
+                        const SizedBox(width: smallPadding),
+                        Icon(
+                          Icons.mail_outline,
+                          size: iconSizeMedium,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (quest.unlockClassCode != null) ...[
-                  const SizedBox(width: smallPadding),
-                  SizedBox(
-                    width: iconSizeMedium,
-                    height: iconSizeMedium,
-                    child: ClassIconSvg(
-                      playerClass: PlayerClasses.playerClasses.firstWhere(
-                        (c) => c.classCode == quest.unlockClassCode,
-                      ),
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ] else if (quest.unlockEnvelope != null) ...[
-                  const SizedBox(width: smallPadding),
-                  Icon(
-                    Icons.mail_outline,
-                    size: iconSizeMedium,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ],
                 if (isEditMode) ...[
                   const SizedBox(width: smallPadding),
                   Icon(
@@ -277,17 +283,20 @@ class _RequirementRow extends StatelessWidget {
           ),
           const SizedBox(width: smallPadding),
           Expanded(
-            child: isComplete
-                ? StrikethroughText(
-                    requirement.description,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: isComplete
+                  ? StrikethroughText(
+                      requirement.description,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  : Text(
+                      requirement.description,
+                      style: theme.textTheme.bodyMedium,
                     ),
-                  )
-                : Text(
-                    requirement.description,
-                    style: theme.textTheme.bodyMedium,
-                  ),
+            ),
           ),
           const SizedBox(width: smallPadding),
           if (isEditMode) ...[
