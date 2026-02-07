@@ -26,12 +26,14 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 import 'player_class.dart';
 
@@ -58,6 +60,8 @@ const String columnResourceCorpsecap = 'ResourceCorpseCap';
 const String columnResourceSnowthistle = 'ResourceSnowThistle';
 const String columnIsRetired = 'IsRetired';
 const String columnVariant = 'Variant';
+const String columnCharacterPersonalQuestId = 'PersonalQuestId';
+const String columnCharacterPersonalQuestProgress = 'PersonalQuestProgress';
 
 /// A player character instance with stats, resources, and progression.
 ///
@@ -101,6 +105,8 @@ class Character {
   late int resourceSnowthistle;
   bool isRetired = false;
   Variant variant = Variant.base;
+  String personalQuestId = '';
+  List<int> personalQuestProgress = [];
   List<Perk> perks = [];
   List<CharacterPerk> characterPerks = [];
   List<Mastery> masteries = [];
@@ -126,6 +132,8 @@ class Character {
     this.resourceSnowthistle = 0,
     this.isRetired = false,
     this.variant = Variant.base,
+    this.personalQuestId = '',
+    this.personalQuestProgress = const [],
   });
 
   Character.fromMap(Map<String, dynamic> map) {
@@ -154,6 +162,10 @@ class Character {
     variant = Variant.values.firstWhere(
       (variant) => variant.name == map[columnVariant],
     );
+    personalQuestId = map[columnCharacterPersonalQuestId] ?? '';
+    personalQuestProgress = decodeProgress(
+      map[columnCharacterPersonalQuestProgress] ?? '[]',
+    );
   }
 
   Map<String, dynamic> toMap() => {
@@ -177,7 +189,16 @@ class Character {
     columnResourceSnowthistle: resourceSnowthistle,
     columnIsRetired: isRetired ? 1 : 0,
     columnVariant: variant.name,
+    columnCharacterPersonalQuestId: personalQuestId,
+    columnCharacterPersonalQuestProgress: encodeProgress(personalQuestProgress),
   };
+
+  /// Resolves the full [PersonalQuest] object from the repository.
+  ///
+  /// Returns null if no personal quest is assigned.
+  PersonalQuest? get personalQuest => personalQuestId.isNotEmpty
+      ? PersonalQuestsRepository.getById(personalQuestId)
+      : null;
 
   /// Returns the effective theme color for this character.
   ///
