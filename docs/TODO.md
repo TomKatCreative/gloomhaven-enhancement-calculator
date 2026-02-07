@@ -1,241 +1,76 @@
-# Personal Quests Implementation Plan
+# Personal Quests
 
-## Overview
+## Status: Phase 1 Implemented
 
-Add Personal Quests feature to track character retirement goals. Data sourced from [gloomhavensecretariat](https://github.com/Lurkars/gloomhavensecretariat) repository, bundled statically like perks/masteries.
+Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
+- `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
+- DB migration v18 (PersonalQuestsTable + PQ columns on Characters)
+- PQ selection on character creation screen (GH only; GH2E/FH show "Coming soon")
+- PQ section on character screen with progress tracking (+/- buttons in edit mode)
+- Change quest flow with confirmation dialog
+- Full test coverage (model, repository, viewmodel, widget tests)
 
-## Scope
+### Architecture & File Locations
 
-- **Editions**: Gloomhaven (24 quests), GH 2E, Frosthaven (Jaws of the Lion has no personal quests)
-- **Per Character**: Each character has ONE assigned quest
-- **Progress Tracking**: Counter-based requirements (e.g., "Kill 15 bandits: 7/15")
-- **Retirement**: Quest completion enables retirement
-
----
-
-## Data Models
-
-### PersonalQuest (static game data)
-**File**: `lib/models/personal_quest.dart`
-
-```dart
-class PersonalQuest {
-  String questId;           // "gh_510", "fh_581"
-  String edition;           // "gh", "gh2e", "fh"
-  String cardId;            // "510" (original card number)
-  String title;             // "Seeker of Xorn"
-  List<QuestRequirement> requirements;
-  QuestReward reward;       // unlockCharacter or openEnvelope
-}
-
-class QuestRequirement {
-  String description;       // "Crypt scenarios completed"
-  int targetCount;          // 3
-}
-
-class QuestReward {
-  QuestRewardType type;     // character | envelope
-  String value;             // "squidface" | "X"
-}
-```
-
-### CharacterPersonalQuest (character progress)
-**File**: `lib/models/character_personal_quest.dart`
-
-```dart
-class CharacterPersonalQuest {
-  String characterUuid;
-  String questId;
-  List<int> progress;       // [2, 0] for 2-requirement quest
-  bool isCompleted;
-}
-```
-
----
-
-## Repository
-
-**File**: `lib/data/personal_quests/personal_quests_repository.dart`
-
-Static data converted from gloomhavensecretariat JSON:
-
-```dart
-class PersonalQuestsRepository {
-  static final Map<String, List<PersonalQuest>> questsByEdition = {
-    'gh': [...],    // 24 quests (510-533)
-    'gh2e': [...],  // GH 2E quests
-    'fh': [...],    // Frosthaven quests (581+)
-  };
-
-  static List<PersonalQuest>? getQuestsForEdition(String edition) =>
-      questsByEdition[edition];
-}
-```
-
----
-
-## Database Changes
-
-### New Tables
-
-**PersonalQuestsTable** (regenerated from repository):
-```sql
-CREATE TABLE PersonalQuestsTable (
-  _id TEXT PRIMARY KEY,        -- "gh_510"
-  Edition TEXT NOT NULL,
-  Title TEXT NOT NULL,
-  Requirements TEXT NOT NULL,  -- JSON
-  RewardType TEXT NOT NULL,
-  RewardValue TEXT NOT NULL
-)
-```
-
-**CharacterPersonalQuests** (persisted):
-```sql
-CREATE TABLE CharacterPersonalQuests (
-  CharacterUuid TEXT NOT NULL,
-  QuestID TEXT NOT NULL,
-  Progress TEXT NOT NULL,      -- JSON array [2, 0]
-  IsCompleted BOOL NOT NULL,
-  PRIMARY KEY (CharacterUuid, QuestID)
-)
-```
-
-### Character Table Update
-```sql
-ALTER TABLE Characters ADD COLUMN PersonalQuestId TEXT
-```
-
-### Migration
-- Increment to version 17
-- Add migration in `database_migrations.dart`
-
----
-
-## Character Model Updates
-
-**File**: `lib/models/character.dart`
-
-Add fields:
-```dart
-String? personalQuestId;
-CharacterPersonalQuest? characterPersonalQuest;
-```
-
-Add helpers:
-```dart
-bool supportsPersonalQuests() => category != ClassCategory.jawsOfTheLion;
-bool isQuestComplete() => characterPersonalQuest?.isCompleted ?? false;
-```
-
----
-
-## State Management
-
-**File**: `lib/viewmodels/characters_model.dart`
-
-Add methods:
-- `assignPersonalQuest(character, questId)` - Assign quest, create progress record
-- `updateQuestProgress(character, requirementIndex, newValue)` - Update counter
-- `_loadPersonalQuest(character)` - Load quest progress on character load
-
----
-
-## UI Components
-
-### PersonalQuestSection
-**File**: `lib/ui/widgets/personal_quest_section.dart`
-
-Location: Character screen, after Stats row, before Resources
-
-```
-+------------------------------------------+
-| Personal Quest                      [v]  |
-|------------------------------------------|
-| #510 - Seeker of Xorn                    |
-|                                          |
-| [ ] Crypt scenarios          [2] / 3     |
-| [ ] Follow Noxious Cellar    [0] / 1     |
-|                                          |
-| Reward: [eye icon to reveal]             |
-+------------------------------------------+
-```
-
-- `ExpansionTile` like Resources section
-- Shows quest card ID + title
-- Requirement rows with counter widgets
-- Edit mode: +/- buttons on counters
-- Spoiler toggle for reward
-
-### SelectPersonalQuestDialog
-**File**: `lib/ui/dialogs/select_personal_quest_dialog.dart`
-
-- Lists quests for character's edition
-- Shows card ID + title (reward hidden)
-- "Random" selection option
-
----
-
-## Localization
-
-Add to ARB files:
-```json
-"personalQuest": "Personal Quest",
-"assignPersonalQuest": "Assign Personal Quest",
-"questComplete": "Quest Complete!",
-"readyToRetire": "Ready to Retire",
-"noQuestAssigned": "No quest assigned"
-```
-
----
-
-## Implementation Phases
-
-### Phase 1: Data Layer
-1. Create `PersonalQuest` and `CharacterPersonalQuest` models
-2. Create `PersonalQuestsRepository` with converted static data
-3. Add database tables and migration (v17)
-4. Update `Character` model
-5. Add `DatabaseHelper` query methods
-
-### Phase 2: State Management
-1. Add quest methods to `CharactersModel`
-2. Integrate quest loading into character load flow
-
-### Phase 3: UI
-1. Create `PersonalQuestSection` widget
-2. Add to `CharacterScreen`
-3. Create `SelectPersonalQuestDialog`
-
-### Phase 4: Polish
-1. Add spoiler handling for rewards
-2. Add localization strings
-3. Update backup/restore to include quest tables
-
----
-
-## Key Files to Modify
-
-| File | Changes |
+| File | Purpose |
 |------|---------|
-| `lib/models/character.dart` | Add `personalQuestId` field |
-| `lib/data/database_helpers.dart` | Add tables, queries |
-| `lib/data/database_migrations.dart` | Add v17 migration |
-| `lib/viewmodels/characters_model.dart` | Add quest methods |
-| `lib/ui/screens/character_screen.dart` | Add PersonalQuestSection |
-| `lib/l10n/app_en.arb` | Add localization strings |
-| `lib/l10n/app_pt.arb` | Add Portuguese translations |
+| `lib/models/personal_quest/personal_quest.dart` | `PersonalQuest` model, `PersonalQuestRequirement`, progress encode/decode, DB column constants |
+| `lib/data/personal_quests/personal_quests_repository.dart` | Static list of all 24 GH quests with `getById()` and `getByEdition()` |
+| `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection` (ExpansionTile), `_QuestContent`, `_NoQuestPrompt`, `_ProgressRow` |
+| `lib/ui/dialogs/personal_quest_selector_dialog.dart` | Bottom sheet for PQ selection, `PersonalQuestSelectorDialog.show()` |
+| `lib/data/database_helpers.dart` | v18 migration, `_seedPersonalQuests()`, `queryPersonalQuests()` |
+| `lib/data/database_migrations.dart` | v18 migration entry in `runMigrations()` |
+| `test/widgets/personal_quest_section_test.dart` | 18 widget tests for the PQ section |
+| `test/models/personal_quest_test.dart` | Model unit tests (constructor, toMap/fromMap, progress encoding) |
+| `test/models/personal_quest_repository_test.dart` | Repository tests (quest data integrity, getById, getByEdition) |
 
----
+### Data Flow
 
-## Verification
+1. `PersonalQuestsRepository` holds static quest definitions (requirements, unlock rewards)
+2. `Character.personalQuestId` (String, defaults to `''`) references a quest ID like `"gh_510"`
+3. `Character.personalQuestProgress` (List<int>) stores progress per requirement as JSON in DB
+4. `Character.personalQuest` getter resolves the full `PersonalQuest` from the repository
+5. `CharactersModel.updatePersonalQuest()` changes quest and resets progress to zeros
+6. `CharactersModel.updatePersonalQuestProgress()` updates a single requirement's count
 
-1. **Create character** - Verify quest can be assigned
-2. **Update progress** - Increment/decrement counters, verify persistence
-3. **Complete quest** - Mark all requirements complete, verify `isCompleted` flag
-4. **Reload app** - Verify quest data persists correctly
-5. **Backup/restore** - Verify quest progress included in backup
-6. **Edition switching** - Verify correct quests shown per edition
+### DB Schema (v18)
+
+**PersonalQuestsTable** - quest definitions (seeded from repository):
+- `_id` TEXT PRIMARY KEY (e.g., "gh_510")
+- `Number` TEXT NOT NULL (e.g., "510")
+- `Title` TEXT NOT NULL (e.g., "Seeker of Xorn")
+- `Edition` TEXT NOT NULL (e.g., "gloomhaven")
+
+**Characters table** - two new columns:
+- `PersonalQuestId` TEXT NOT NULL DEFAULT '' (references PersonalQuestsTable._id)
+- `PersonalQuestProgress` TEXT NOT NULL DEFAULT '[]' (JSON-encoded List<int>)
+
+### Design Decisions & Lessons Learned
+
+- **`edition` uses `GameEdition` enum**, not String. Initially implemented as String but refactored. The enum is serialized to/from DB via `.name` and `GameEdition.values.byName()`. Type safety prevents invalid editions at compile time.
+- **Second printing values** used for quest targets (e.g., quest 514 target is 12, not 15).
+- **Quests unlock either a class OR an envelope**, never both. Enforced in repository test.
+- **ExpansionTile state** persisted via `SharedPrefs().personalQuestExpanded`.
+- **"Coming soon"** shown for GH2E/FH editions - the selector dialog is disabled, not hidden.
+- **Confirmation dialog** appears when changing an existing quest (resets progress).
+- **`_NoQuestPrompt` Row overflow** - Fixed by adding `mainAxisSize: MainAxisSize.min` + `Flexible` on Text. Watch for this pattern in constrained layouts.
+
+### Known Gotchas
+
+- **`Character.fromMap` id bug**: `id = map[columnCharacterId] ?? ''` assigns String to int? when id is null. This is a pre-existing bug (not from PQ work). Tests that do toMap/fromMap round-trips must set `character.id = 1` first.
+- **PQ section visibility**: Shows when quest is assigned OR in edit mode. If neither, it's hidden entirely.
+- **ThemedSvg/ClassIconSvg in tests**: SVG widgets fail silently in tests (no real asset files). PQ section tests that render class icons can't verify them visually - use model-level assertions instead.
+- **Widget test viewport**: Some PQ tests need `tester.view.physicalSize = const Size(800, 600)` to avoid overflow in +/- button layouts. Remember to reset in `addTearDown`.
+- **Progress encoding**: `encodeProgress([1,0,3])` → `"[1,0,3]"`. `decodeProgress('')` → `[]`. The JSON format is simple but watch for empty-string edge cases.
+
+## Remaining Work
+
+- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Will need to add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
+- **Frosthaven quest data** - Same pattern as GH2E but with `edition: GameEdition.frosthaven`.
+- **Adaptive widgets** - Replace basic +/- counters with segmented buttons, sliders, etc. for specific requirement types (e.g., binary yes/no for scenario completion, counter for kill counts).
+- **Quest completion** - Visual indicator when all requirements are met (e.g., green checkmark, confetti).
+- **Retirement integration** - Link quest completion to retirement flow. When all requirements are met, prompt or enable retirement.
+- **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---
 

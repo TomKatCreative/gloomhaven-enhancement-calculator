@@ -7,7 +7,7 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 17
+- **Current Schema Version**: 18
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
@@ -59,6 +59,13 @@ Core character data storage.
 | `ResourceFlamefruit` | INTEGER | 0 | Flamefruit herb |
 | `ResourceCorpsecap` | INTEGER | 0 | Corpsecap herb |
 | `ResourceSnowthistle` | INTEGER | 0 | Snowthistle herb |
+
+**Personal Quest Fields** (added v18):
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "gh_510") |
+| `PersonalQuestProgress` | TEXT | `'[]'` | JSON array of ints (progress per requirement) |
 
 ---
 
@@ -129,6 +136,23 @@ Join table linking characters to their mastery achievements.
 
 ---
 
+### PersonalQuestsTable
+
+Personal quest definitions seeded from `PersonalQuestsRepository`.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | Quest ID (e.g., "gh_510") |
+| `Number` | TEXT | NOT NULL | Card number (e.g., "510") |
+| `Title` | TEXT | NOT NULL | Quest title (e.g., "Seeker of Xorn") |
+| `Edition` | TEXT | NOT NULL | Game edition (e.g., "gloomhaven") |
+
+**Note**: Requirements, unlock class, and unlock envelope are stored in `PersonalQuestsRepository` (not in DB), similar to how perk details are stored. The DB table holds the basic quest reference data only.
+
+**Added in**: v18
+
+---
+
 ## Key Operations
 
 ### Character Operations
@@ -155,6 +179,12 @@ Join table linking characters to their mastery achievements.
 | `queryMasteries(Character)` | Fetch masteries matching class + variant |
 | `queryCharacterMasteries(String uuid)` | Fetch mastery achievements |
 | `updateCharacterMastery(CharacterMastery, bool)` | Update achievement state |
+
+### Personal Quest Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryPersonalQuests({String? edition})` | Fetch quest definitions, optionally filtered by edition |
 
 ### Backup Operations
 
@@ -184,6 +214,7 @@ Join table linking characters to their mastery achievements.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
+| v18 | Personal Quests table, PQ columns on Characters |
 
 ### Critical Migrations
 
