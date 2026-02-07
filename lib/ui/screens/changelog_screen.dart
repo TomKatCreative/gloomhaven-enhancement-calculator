@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class ChangelogScreen extends StatefulWidget {
   const ChangelogScreen({super.key});
@@ -29,35 +27,9 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
       top: false,
       bottom: Platform.isAndroid,
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, snapshot) {
-              final versionText = snapshot.hasData
-                  ? (kDebugMode
-                        ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-                        : 'v${snapshot.data!.version}')
-                  : null;
-              return GHCAppBar(
-                titleWidget: Text.rich(
-                  TextSpan(
-                    text: AppLocalizations.of(context).changelog,
-                    style: Theme.of(context).textTheme.headlineLarge,
-                    children: versionText != null
-                        ? [
-                            TextSpan(
-                              text: '  $versionText',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ]
-                        : null,
-                  ),
-                ),
-                scrollController: _scrollController,
-              );
-            },
-          ),
+        appBar: GHCAppBar(
+          title: AppLocalizations.of(context).changelog,
+          scrollController: _scrollController,
         ),
         body: ListView(
           controller: _scrollController,
