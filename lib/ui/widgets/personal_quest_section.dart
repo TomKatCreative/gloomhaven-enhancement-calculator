@@ -24,6 +24,7 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -276,13 +277,17 @@ class _RequirementRow extends StatelessWidget {
           ),
           const SizedBox(width: smallPadding),
           Expanded(
-            child: Text(
-              requirement.description,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                decoration: isComplete ? TextDecoration.lineThrough : null,
-                color: isComplete ? theme.colorScheme.onSurfaceVariant : null,
-              ),
-            ),
+            child: isComplete
+                ? StrikethroughText(
+                    requirement.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  )
+                : Text(
+                    requirement.description,
+                    style: theme.textTheme.bodyMedium,
+                  ),
           ),
           const SizedBox(width: smallPadding),
           if (isEditMode) ...[
