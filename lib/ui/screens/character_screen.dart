@@ -108,18 +108,21 @@ class _CharacterScreenState extends State<CharacterScreen>
                   child: Text(
                     l10n.tabStatsAndResources,
                     textAlign: TextAlign.center,
+                    style: const TextStyle(height: 1.1),
                   ),
                 ),
                 Tab(
                   child: Text(
                     l10n.tabPerksAndMasteries,
                     textAlign: TextAlign.center,
+                    style: const TextStyle(height: 1.1),
                   ),
                 ),
                 Tab(
                   child: Text(
                     l10n.tabQuestAndNotes,
                     textAlign: TextAlign.center,
+                    style: const TextStyle(height: 1.1),
                   ),
                 ),
               ],
@@ -155,11 +158,13 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
 
   const _TabBarDelegate({required this.tabBar});
 
-  @override
-  double get minExtent => tabBar.preferredSize.height;
+  double get _totalHeight => tabBar.preferredSize.height + smallPadding * 2;
 
   @override
-  double get maxExtent => tabBar.preferredSize.height;
+  double get minExtent => _totalHeight;
+
+  @override
+  double get maxExtent => _totalHeight;
 
   @override
   Widget build(
@@ -168,11 +173,18 @@ class _TabBarDelegate extends SliverPersistentHeaderDelegate {
     bool overlapsContent,
   ) {
     final colorScheme = Theme.of(context).colorScheme;
-    final color = shrinkOffset > 0
-        ? AppBarUtils.getTintedBackground(colorScheme)
-        : Colors.transparent;
+    // Ease tint in over the first 20px of scroll, matching the app bar feel
+    final progress = (shrinkOffset / 20).clamp(0.0, 1.0);
+    final tinted = AppBarUtils.getTintedBackground(colorScheme);
+    final color = tinted.withValues(alpha: progress);
 
-    return ColoredBox(color: color, child: tabBar);
+    return ColoredBox(
+      color: color,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: smallPadding),
+        child: tabBar,
+      ),
+    );
   }
 
   @override
