@@ -47,9 +47,13 @@ class PersonalQuestSection extends StatelessWidget {
     final model = context.watch<CharactersModel>();
     final quest = character.personalQuest;
 
-    // No quest assigned and not in edit mode: show nothing
+    // No quest assigned and not in edit mode: show prompt
     if (quest == null && !model.isEditMode) {
-      return const SizedBox.shrink();
+      if (character.isRetired) return const SizedBox.shrink();
+      return Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: _NoQuestPrompt(character: character, model: model),
+      );
     }
 
     // No quest assigned but in edit mode: show selector field
@@ -102,6 +106,61 @@ class PersonalQuestSection extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _NoQuestPrompt extends StatelessWidget {
+  const _NoQuestPrompt({required this.character, required this.model});
+  final Character character;
+  final CharactersModel model;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    return InkWell(
+      borderRadius: BorderRadius.circular(borderRadiusMedium),
+      onTap: () => _selectQuest(context),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: largePadding,
+          vertical: mediumPadding,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.assignment_outlined,
+              size: iconSizeMedium,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: mediumPadding),
+            Expanded(
+              child: Text(
+                l10n.selectPersonalQuest,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.chevron_right,
+              size: iconSizeMedium,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectQuest(BuildContext context) async {
+    final quest = await showPersonalQuestSelectorDialog(
+      context: context,
+      edition: GameEdition.gloomhaven,
+    );
+    if (quest != null && context.mounted) {
+      await model.updatePersonalQuest(character, quest.id);
+    }
   }
 }
 
