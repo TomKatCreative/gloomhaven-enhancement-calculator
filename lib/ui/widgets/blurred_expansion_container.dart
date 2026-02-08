@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 
 /// A bordered container with an [ExpansionTile] that applies an animated
 /// backdrop blur when expanded. Used to frost the large class icon SVG
@@ -60,7 +61,8 @@ class _BlurredExpansionContainerState extends State<BlurredExpansionContainer> {
           child: Theme(
             data: theme.copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
-              iconColor: theme.colorScheme.primary,
+              iconColor: theme.contrastedPrimary,
+              collapsedIconColor: theme.contrastedPrimary,
               onExpansionChanged: (value) {
                 widget.onExpansionChanged(value);
                 setState(() => _isExpanded = value);
