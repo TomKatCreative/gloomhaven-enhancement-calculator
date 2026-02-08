@@ -307,6 +307,9 @@ class CharactersModel with ChangeNotifier {
 
   void onPageChanged(int index) {
     SharedPrefs().initialPage = index;
+    if (charScreenScrollController.hasClients) {
+      charScreenScrollController.jumpTo(0);
+    }
     isScrolledToTop = true;
     _setCurrentCharacter(index: index);
     _isEditMode = false;
