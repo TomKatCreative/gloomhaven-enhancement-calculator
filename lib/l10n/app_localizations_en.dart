@@ -411,4 +411,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notYet => 'Not Yet';
+
+  @override
+  String get tabStatsAndResources => 'Stats &\nResources';
+
+  @override
+  String get tabPerksAndMasteries => 'Perks &\nMasteries';
+
+  @override
+  String get tabQuestAndNotes => 'Quest &\nNotes';
 }

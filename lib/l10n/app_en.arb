@@ -175,5 +175,8 @@
     }
   },
   "retire": "Retire",
-  "notYet": "Not Yet"
+  "notYet": "Not Yet",
+  "tabStatsAndResources": "Stats &\nResources",
+  "tabPerksAndMasteries": "Perks &\nMasteries",
+  "tabQuestAndNotes": "Quest &\nNotes"
 }

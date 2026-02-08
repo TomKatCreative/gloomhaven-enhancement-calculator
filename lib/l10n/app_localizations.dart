@@ -841,6 +841,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not Yet'**
   String get notYet;
+
+  /// No description provided for @tabStatsAndResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats &\nResources'**
+  String get tabStatsAndResources;
+
+  /// No description provided for @tabPerksAndMasteries.
+  ///
+  /// In en, this message translates to:
+  /// **'Perks &\nMasteries'**
+  String get tabPerksAndMasteries;
+
+  /// No description provided for @tabQuestAndNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest &\nNotes'**
+  String get tabQuestAndNotes;
 }
 
 class _AppLocalizationsDelegate

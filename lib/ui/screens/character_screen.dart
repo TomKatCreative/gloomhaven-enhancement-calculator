@@ -9,6 +9,7 @@ import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
@@ -19,7 +20,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
-class CharacterScreen extends StatelessWidget {
+class CharacterScreen extends StatefulWidget {
   const CharacterScreen({required this.character, super.key});
   final Character character;
 
@@ -29,26 +30,46 @@ class CharacterScreen extends StatelessWidget {
   static const double _baseFabPadding = 82.0;
 
   @override
+  State<CharacterScreen> createState() => _CharacterScreenState();
+}
+
+class _CharacterScreenState extends State<CharacterScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final model = context.watch<CharactersModel>();
     final isSheetExpanded = model.isElementSheetExpanded;
     final screenHeight = MediaQuery.of(context).size.height;
 
     // Calculate bottom padding based on sheet state
-    // When collapsed: just enough for FAB
-    // When expanded: sheet covers most of the screen
     final double bottomPadding = isSheetExpanded
-        ? screenHeight * _sheetExpandedSize
-        : _baseFabPadding;
+        ? screenHeight * CharacterScreen._sheetExpandedSize
+        : CharacterScreen._baseFabPadding;
 
-    return SingleChildScrollView(
+    final l10n = AppLocalizations.of(context);
+
+    return NestedScrollView(
       controller: context.read<CharactersModel>().charScreenScrollController,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-        child: Column(
-          children: <Widget>[
-            // NAME and CLASS
-            Container(
+      headerSliverBuilder: (context, innerBoxIsScrolled) => [
+        // NAME and CLASS — scrolls away
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+            child: Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
                 padding: const EdgeInsets.only(
@@ -57,85 +78,286 @@ class CharacterScreen extends StatelessWidget {
                   bottom: mediumPadding,
                   top: extraLargePadding,
                 ),
-                child: _NameAndClassSection(character: character),
+                child: _NameAndClassSection(character: widget.character),
               ),
             ),
-            // STATS
-            Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: smallPadding,
-                  right: smallPadding,
-                  top: smallPadding,
-                  bottom: largePadding,
-                ),
-                child: _StatsSection(character: character),
-              ),
-            ),
-            // BATTLE GOAL CHECKMARKS & PREVIOUS RETIREMENTS (edit mode only)
-            if (model.isEditMode && !character.isRetired)
-              Container(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Padding(
-                  padding: const EdgeInsets.all(smallPadding),
-                  child: _CheckmarksAndRetirementsRow(character: character),
-                ),
-              ),
-            // RESOURCES
-            Padding(
-              padding: EdgeInsets.only(
-                left: smallPadding,
-                right: smallPadding,
-                top: smallPadding,
-                bottom: model.isEditMode ? largePadding : smallPadding,
-              ),
-              child: _ResourcesSection(character: character),
-            ),
-            // NOTES
-            Container(
-              constraints: const BoxConstraints(maxWidth: maxWidth),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  left: smallPadding,
-                  right: smallPadding,
-                  bottom: smallPadding,
-                  top: model.isEditMode ? largePadding : smallPadding,
-                ),
-                child:
-                    character.notes.isNotEmpty ||
-                        context.read<CharactersModel>().isEditMode
-                    ? _NotesSection(character: character)
-                    : const SizedBox(),
-              ),
-            ),
-            // PERSONAL QUEST
-            Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: PersonalQuestSection(character: character),
-            ),
-            // PERKS
-            Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: PerksSection(character: character),
-            ),
-            // MASTERIES
-            if (character.characterMasteries.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(smallPadding),
-                child: MasteriesSection(
-                  character: character,
-                  charactersModel: context.watch<CharactersModel>(),
-                ),
-              ),
-            // PADDING FOR FAB AND BOTTOM SHEET
-            SizedBox(height: bottomPadding),
-          ],
+          ),
         ),
+        // TAB BAR — pinned
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _TabBarDelegate(
+            tabBar: TabBar(
+              controller: _tabController,
+              dividerHeight: 0,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(borderRadiusPill),
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+              unselectedLabelColor: Theme.of(
+                context,
+              ).colorScheme.onSurfaceVariant,
+              indicatorPadding: const EdgeInsets.symmetric(
+                horizontal: smallPadding,
+              ),
+              splashBorderRadius: BorderRadius.circular(borderRadiusPill),
+              tabs: [
+                Tab(
+                  child: Text(
+                    l10n.tabStatsAndResources,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    l10n.tabPerksAndMasteries,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    l10n.tabQuestAndNotes,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+      body: TabBarView(
+        controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          _StatsAndResourcesTab(
+            character: widget.character,
+            bottomPadding: bottomPadding,
+          ),
+          _PerksAndMasteriesTab(
+            character: widget.character,
+            bottomPadding: bottomPadding,
+          ),
+          _QuestAndNotesTab(
+            character: widget.character,
+            bottomPadding: bottomPadding,
+          ),
+        ],
       ),
     );
   }
 }
+
+/// Delegate for the pinned tab bar in the sliver header.
+class _TabBarDelegate extends SliverPersistentHeaderDelegate {
+  final TabBar tabBar;
+
+  const _TabBarDelegate({required this.tabBar});
+
+  @override
+  double get minExtent => tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final color = shrinkOffset > 0
+        ? AppBarUtils.getTintedBackground(colorScheme)
+        : Colors.transparent;
+
+    return ColoredBox(color: color, child: tabBar);
+  }
+
+  @override
+  bool shouldRebuild(_TabBarDelegate oldDelegate) => true;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tab 0: Stats & Resources
+// ──────────────────────────────────────────────────────────────────────────
+
+class _StatsAndResourcesTab extends StatefulWidget {
+  const _StatsAndResourcesTab({
+    required this.character,
+    required this.bottomPadding,
+  });
+  final Character character;
+  final double bottomPadding;
+
+  @override
+  State<_StatsAndResourcesTab> createState() => _StatsAndResourcesTabState();
+}
+
+class _StatsAndResourcesTabState extends State<_StatsAndResourcesTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    final model = context.watch<CharactersModel>();
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+      children: [
+        // STATS
+        Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: smallPadding,
+              right: smallPadding,
+              top: smallPadding,
+              bottom: largePadding,
+            ),
+            child: _StatsSection(character: widget.character),
+          ),
+        ),
+        // BATTLE GOAL CHECKMARKS & PREVIOUS RETIREMENTS (edit mode only)
+        if (model.isEditMode && !widget.character.isRetired)
+          Container(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Padding(
+              padding: const EdgeInsets.all(smallPadding),
+              child: _CheckmarksAndRetirementsRow(character: widget.character),
+            ),
+          ),
+        // RESOURCES
+        Padding(
+          padding: EdgeInsets.only(
+            left: smallPadding,
+            right: smallPadding,
+            top: smallPadding,
+            bottom: model.isEditMode ? largePadding : smallPadding,
+          ),
+          child: _ResourcesSection(character: widget.character),
+        ),
+        // PADDING FOR FAB AND BOTTOM SHEET
+        SizedBox(height: widget.bottomPadding),
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tab 1: Perks & Masteries
+// ──────────────────────────────────────────────────────────────────────────
+
+class _PerksAndMasteriesTab extends StatefulWidget {
+  const _PerksAndMasteriesTab({
+    required this.character,
+    required this.bottomPadding,
+  });
+  final Character character;
+  final double bottomPadding;
+
+  @override
+  State<_PerksAndMasteriesTab> createState() => _PerksAndMasteriesTabState();
+}
+
+class _PerksAndMasteriesTabState extends State<_PerksAndMasteriesTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+      children: [
+        // PERKS
+        Padding(
+          padding: const EdgeInsets.all(smallPadding),
+          child: PerksSection(character: widget.character),
+        ),
+        // MASTERIES
+        if (widget.character.characterMasteries.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(smallPadding),
+            child: MasteriesSection(
+              character: widget.character,
+              charactersModel: context.watch<CharactersModel>(),
+            ),
+          ),
+        // PADDING FOR FAB AND BOTTOM SHEET
+        SizedBox(height: widget.bottomPadding),
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Tab 2: Quest & Notes
+// ──────────────────────────────────────────────────────────────────────────
+
+class _QuestAndNotesTab extends StatefulWidget {
+  const _QuestAndNotesTab({
+    required this.character,
+    required this.bottomPadding,
+  });
+  final Character character;
+  final double bottomPadding;
+
+  @override
+  State<_QuestAndNotesTab> createState() => _QuestAndNotesTabState();
+}
+
+class _QuestAndNotesTabState extends State<_QuestAndNotesTab>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+      children: [
+        // PERSONAL QUEST
+        Padding(
+          padding: const EdgeInsets.all(smallPadding),
+          child: PersonalQuestSection(character: widget.character),
+        ),
+        // NOTES
+        Container(
+          constraints: const BoxConstraints(maxWidth: maxWidth),
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: smallPadding,
+              right: smallPadding,
+              bottom: smallPadding,
+              top: context.read<CharactersModel>().isEditMode
+                  ? largePadding
+                  : smallPadding,
+            ),
+            child:
+                widget.character.notes.isNotEmpty ||
+                    context.read<CharactersModel>().isEditMode
+                ? _NotesSection(character: widget.character)
+                : const SizedBox(),
+          ),
+        ),
+        // PADDING FOR FAB AND BOTTOM SHEET
+        SizedBox(height: widget.bottomPadding),
+      ],
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Existing section widgets (unchanged)
+// ──────────────────────────────────────────────────────────────────────────
 
 /// Combined section showing Previous Retirements and Battle Goal Checkmarks.
 /// Layout: Row with two columns side by side.
@@ -232,7 +454,7 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        const Opacity(opacity: 0, child: Text('3')),
+                        const Opacity(opacity: 0, child: Text('0')),
                         Text('${character.checkMarkProgress}'),
                       ],
                     ),
