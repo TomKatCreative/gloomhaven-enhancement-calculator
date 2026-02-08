@@ -245,37 +245,45 @@ When switching pages:
 
 Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child.
 
+Uses a `NestedScrollView` with a collapsing name/class header and a pinned `TabBar.secondary` for 3-tab navigation.
+
 ### Layout
 
 ```
-┌─────────────────────────────────────┐
-│ Character Name          [Lvl Badge] │
-│ Class Name • Subtitle               │
-│ Traits: Tank, Healer, ...           │
-├─────────────────────────────────────┤
-│ XP: 45/95    Gold: ~~120~~           │  ← Stats (gold struck through if retired)
-│ Battle Goals: ○○● (1/3)             │
-│ Pocket Items: 3                     │
-├─────────────────────────────────────┤
-│ ▶ Personal Quest [🔓]  (blur)       │  ← GH only, with unlock icon
-│   515 - Lawbringer         [swap]   │
-│   ● Kill 20 Bandits...    12/20    │
-├─────────────────────────────────────┤
-│ ▶ Resources (expandable)   (blur)   │  ← Frosthaven only
-│   Hide: 5  Metal: 3  Lumber: 8      │
-├─────────────────────────────────────┤
-│ Notes                               │  ← Optional section
-│ "Remember to buy boots..."          │
-├─────────────────────────────────────┤
-│ Perks                               │
-│ [✓] Remove two -1 cards             │
-│ [✓] Add one +2 card                 │
-│ [ ] Add one rolling PUSH 2          │
-├─────────────────────────────────────┤
-│ Masteries (Frosthaven only)         │
-│ [✓] Complete 3 scenarios without... │
-└─────────────────────────────────────┘
+CharacterScreen (StatefulWidget + SingleTickerProviderStateMixin)
+└── NestedScrollView (controller: charScreenScrollController)
+    ├── headerSliverBuilder:
+    │   ├── SliverToBoxAdapter → _NameAndClassSection (scrolls away)
+    │   └── SliverPersistentHeader (pinned: true)
+    │       └── TabBar.secondary (3 tabs)
+    └── body: TabBarView (NeverScrollableScrollPhysics)
+        ├── _StatsAndResourcesTab (keepAlive)
+        │   ├── _StatsSection
+        │   ├── _CheckmarksAndRetirementsRow (edit mode only)
+        │   └── _ResourcesSection
+        ├── _PerksAndMasteriesTab (keepAlive)
+        │   ├── PerksSection
+        │   └── MasteriesSection (conditional)
+        └── _QuestAndNotesTab (keepAlive)
+            ├── PersonalQuestSection
+            └── _NotesSection
 ```
+
+### Tab Structure
+
+| Tab | Content |
+|-----|---------|
+| **Stats & Resources** | Stats (XP, Gold, Battle Goals, Pocket Items), Checkmarks & Retirements (edit only), Resources |
+| **Perks & Masteries** | Perks, Masteries (conditional) |
+| **Quest & Notes** | Personal Quest, Notes |
+
+### Scroll Behavior
+
+- **Name & class header**: Scrolls away on scroll-down via `SliverToBoxAdapter`, reappears at scroll-to-top
+- **Tab bar**: Stays pinned at all times via `SliverPersistentHeader(pinned: true)` with `_TabBarDelegate`
+- **Tab content**: Each tab uses `ListView` with `AutomaticKeepAliveClientMixin` to preserve scroll position
+- **No swipe**: `NeverScrollableScrollPhysics` on `TabBarView` avoids conflict with character-swiping `PageView`
+- **App bar tinting**: `charScreenScrollController` is the `NestedScrollView` outer controller — `GHCAnimatedAppBar` scroll tinting works unchanged
 
 ### Edit Mode vs View Mode
 
@@ -294,8 +302,13 @@ Controlled by `charactersModel.isEditMode`:
 
 ### Sections (Private Widgets)
 
-- `_NameAndClassSection` - Name, level badge, class info, traits
+- `_NameAndClassSection` - Name, level badge, class info, traits (in sliver header, not a tab)
+- `_TabBarDelegate` - `SliverPersistentHeaderDelegate` for the pinned tab bar
+- `_StatsAndResourcesTab` - Tab 0 wrapper with `AutomaticKeepAliveClientMixin`
+- `_PerksAndMasteriesTab` - Tab 1 wrapper with `AutomaticKeepAliveClientMixin`
+- `_QuestAndNotesTab` - Tab 2 wrapper with `AutomaticKeepAliveClientMixin`
 - `_StatsSection` - XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- `_CheckmarksAndRetirementsRow` - Previous retirements + battle goal checkmarks (edit mode only)
 - `PersonalQuestSection` - PQ progress with retirement prompt (see below)
 - `_ResourcesSection` - Expandable Frosthaven resources (hide, metal, lumber, etc.)
 - `_NotesSection` - User notes (hidden when empty and not editing)

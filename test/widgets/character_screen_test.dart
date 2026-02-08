@@ -92,6 +92,12 @@ void main() {
     );
   }
 
+  /// Taps a tab by its label text and waits for animations to settle.
+  Future<void> tapTab(WidgetTester tester, String label) async {
+    await tester.tap(find.text(label));
+    await tester.pumpAndSettle();
+  }
+
   // ────────────────────────────────────────────────────────────────────────
   // Group 1: _NameAndClassSection
   // ────────────────────────────────────────────────────────────────────────
@@ -252,7 +258,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 2: _StatsSection
+  // Group 2: _StatsSection (Tab 0 - default)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_StatsSection', () {
@@ -446,7 +452,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 3: _CheckmarksAndRetirementsRow
+  // Group 3: _CheckmarksAndRetirementsRow (Tab 0 - default)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_CheckmarksAndRetirementsRow', () {
@@ -687,7 +693,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 4: _ResourcesSection
+  // Group 4: _ResourcesSection (Tab 0 - default)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_ResourcesSection', () {
@@ -880,7 +886,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 5: _NotesSection
+  // Group 5: _NotesSection (Tab 2 - Quest & Notes)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_NotesSection', () {
@@ -894,6 +900,9 @@ void main() {
         buildTestWidget(model: model, character: character),
       );
       await tester.pumpAndSettle();
+
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
 
       // "Notes" heading should not appear
       expect(find.text('Notes'), findsNothing);
@@ -912,9 +921,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll down to find the notes section
-      await tester.ensureVisible(find.text('Remember to buy boots'));
-      await tester.pumpAndSettle();
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
 
       expect(find.text('Remember to buy boots'), findsOneWidget);
     });
@@ -928,9 +936,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll to find "Notes" header
-      await tester.ensureVisible(find.text('Notes'));
-      await tester.pumpAndSettle();
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
 
       expect(find.text('Notes'), findsOneWidget);
     });
@@ -946,12 +953,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
+
       final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-
-      // Scroll to make the field visible
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
-
       expect(notesField, findsOneWidget);
     });
 
@@ -964,9 +969,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
+
       final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
+      expect(notesField, findsOneWidget);
 
       final field = tester.widget<TextFormField>(notesField);
       expect(field.initialValue, 'My important notes');
@@ -981,9 +988,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
+
       final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
+      expect(notesField, findsOneWidget);
 
       await tester.enterText(notesField, 'New note');
       await tester.pumpAndSettle();
@@ -1002,9 +1011,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Navigate to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
+
       // Should show plain Text, not TextFormField
-      await tester.ensureVisible(find.text('Old notes'));
-      await tester.pumpAndSettle();
       expect(find.text('Old notes'), findsOneWidget);
 
       // Notes TextFormField should not be present
@@ -1013,7 +1023,91 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 6: Integration
+  // Group 6: Tab Navigation
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('Tab Navigation', () {
+    testWidgets('three tabs are displayed', (tester) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Stats &\nResources'), findsOneWidget);
+      expect(find.text('Perks &\nMasteries'), findsOneWidget);
+      expect(find.text('Quest &\nNotes'), findsOneWidget);
+    });
+
+    testWidgets('default tab is Stats & Resources', (tester) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Stats section (Tooltips) should be visible on default tab
+      expect(
+        find.byWidgetPredicate((w) => w is Tooltip && w.message == 'XP'),
+        findsOneWidget,
+      );
+      // Resources header should be visible
+      expect(find.text('Resources'), findsOneWidget);
+    });
+
+    testWidgets('switching to Quest & Notes tab shows notes section', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(notes: 'Tab test notes');
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Notes should not be visible on default tab
+      expect(find.text('Tab test notes'), findsNothing);
+
+      // Switch to Quest & Notes tab
+      await tapTab(tester, 'Quest &\nNotes');
+
+      // Notes should now be visible
+      expect(find.text('Tab test notes'), findsOneWidget);
+    });
+
+    testWidgets('switching back to Stats tab preserves content', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(xp: 42, notes: 'Test notes');
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify stats are visible
+      expect(find.text('42'), findsWidgets);
+
+      // Switch to Quest & Notes
+      await tapTab(tester, 'Quest &\nNotes');
+      expect(find.text('Test notes'), findsOneWidget);
+
+      // Switch back to Stats
+      await tapTab(tester, 'Stats &\nResources');
+
+      // Stats should still be visible
+      expect(find.text('42'), findsWidgets);
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Group 7: Integration
   // ────────────────────────────────────────────────────────────────────────
 
   group('Integration', () {
