@@ -1025,7 +1025,111 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 6: Integration
+  // Group 6: UI updates after mutation (Provider rebuild regression tests)
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('UI updates after mutation', () {
+    testWidgets('incrementing previous retirements updates displayed text', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(
+        uuid: 'ret-ui',
+        previousRetirements: 1,
+      );
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify initial value
+      expect(find.text('1'), findsWidgets);
+
+      // Tap the increment button for retirements (first add button)
+      final addButtons = find.byIcon(Icons.add_box_rounded);
+      await tester.tap(addButtons.first);
+      await tester.pumpAndSettle();
+
+      // Verify the displayed text updated to '2'
+      expect(find.text('2'), findsWidgets);
+    });
+
+    testWidgets('incrementing checkmarks updates displayed text', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(uuid: 'chk-ui', checkMarks: 5);
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Verify initial checkmark count
+      expect(find.text('5'), findsWidgets);
+
+      // Tap the increment button for checkmarks (last add button)
+      final addButtons = find.byIcon(Icons.add_box_rounded);
+      await tester.tap(addButtons.last);
+      await Future.microtask(() {});
+      await tester.pumpAndSettle();
+
+      // Verify the displayed text updated to '6'
+      expect(find.text('6'), findsWidgets);
+    });
+
+    testWidgets('resource increment updates displayed count', (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'showRetiredCharacters': true,
+        'darkTheme': false,
+        'initialPage': 0,
+        'primaryClassColor': 0xff4e7ec1,
+        'gameEdition': 0,
+        'resourcesExpanded': true,
+        'personalQuestExpanded': false,
+      });
+      await SharedPrefs().init();
+
+      final character = TestData.createCharacter(uuid: 'res-ui');
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Scroll to a resource card
+      await tester.ensureVisible(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
+      // Get initial count text from first resource card
+      final firstCard = find.byType(ResourceCard).first;
+      final initialCountText = find.descendant(
+        of: firstCard,
+        matching: find.text('0'),
+      );
+      expect(initialCountText, findsOneWidget);
+
+      // Tap increment button on first resource
+      final addIcons = find.descendant(
+        of: firstCard,
+        matching: find.byIcon(Icons.add_rounded),
+      );
+      await tester.tap(addIcons.first);
+      await tester.pumpAndSettle();
+
+      // Verify count updated to 1
+      final updatedCountText = find.descendant(
+        of: find.byType(ResourceCard).first,
+        matching: find.text('1'),
+      );
+      expect(updatedCountText, findsOneWidget);
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Group 7: Integration
   // ────────────────────────────────────────────────────────────────────────
 
   group('Integration', () {

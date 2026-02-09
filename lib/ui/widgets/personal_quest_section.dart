@@ -33,7 +33,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart'
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
+import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +44,6 @@ class PersonalQuestSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final model = context.watch<CharactersModel>();
     final quest = character.personalQuest;
 
@@ -64,31 +63,7 @@ class PersonalQuestSection extends StatelessWidget {
         initiallyExpanded: SharedPrefs().personalQuestExpanded,
         onExpansionChanged: (value) =>
             SharedPrefs().personalQuestExpanded = value,
-        title: Row(
-          children: [
-            Text(AppLocalizations.of(context).personalQuest),
-            if (quest.unlockClassCode != null) ...[
-              const SizedBox(width: smallPadding),
-              SizedBox(
-                width: iconSizeMedium,
-                height: iconSizeMedium,
-                child: ClassIconSvg(
-                  playerClass: PlayerClasses.playerClasses.firstWhere(
-                    (c) => c.classCode == quest.unlockClassCode,
-                  ),
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ] else if (quest.unlockEnvelope != null) ...[
-              const SizedBox(width: smallPadding),
-              Icon(
-                Icons.mail_outline,
-                size: iconSizeMedium,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ],
-        ),
+        title: Text(AppLocalizations.of(context).personalQuest),
         children: [
           _QuestContent(character: character, quest: quest, model: model),
         ],
@@ -155,27 +130,57 @@ class _QuestContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Quest title row
-          InkWell(
-            borderRadius: BorderRadius.circular(borderRadiusMedium),
-            onTap: isEditMode ? () => _changeQuest(context) : null,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    quest.displayName,
+          Row(
+            children: [
+              Expanded(
+                child: Text.rich(
+                  TextSpan(
                     style: theme.textTheme.titleMedium,
+                    children: [
+                      TextSpan(text: '${quest.number}: ${quest.title}'),
+                      if (quest.unlockClassCode != null) ...[
+                        const TextSpan(text: ' · '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: SizedBox(
+                            width: iconSizeMedium,
+                            height: iconSizeMedium,
+                            child: ClassIconSvg(
+                              playerClass: PlayerClasses.playerClasses
+                                  .firstWhere(
+                                    (c) => c.classCode == quest.unlockClassCode,
+                                  ),
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ] else if (quest.unlockEnvelope != null) ...[
+                        const TextSpan(text: ' · '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
+                          child: Icon(
+                            Icons.mail_outline,
+                            size: iconSizeMedium,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (isEditMode) ...[
-                  const SizedBox(width: smallPadding),
-                  Icon(
+              ),
+              if (isEditMode)
+                IconButton(
+                  iconSize: iconSizeSmall,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(tinyPadding),
+                  icon: Icon(
                     Icons.swap_horiz_rounded,
-                    size: iconSizeSmall,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                ],
-              ],
-            ),
+                  onPressed: () => _changeQuest(context),
+                ),
+            ],
           ),
           const SizedBox(height: mediumPadding),
           // Requirements list
@@ -257,17 +262,18 @@ class _RequirementRow extends StatelessWidget {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: isComplete
-                  ? StrikethroughText(
-                      requirement.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    )
-                  : Text(
-                      requirement.description,
-                      style: theme.textTheme.bodyMedium,
-                    ),
+              child: RichText(
+                text: TextSpan(
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isComplete ? theme.disabledColor : null,
+                  ),
+                  children: Utils.generateCheckRowDetails(
+                    context,
+                    requirement.description,
+                    theme.brightness == Brightness.dark,
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: smallPadding),

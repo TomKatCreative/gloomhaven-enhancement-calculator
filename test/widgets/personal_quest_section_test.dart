@@ -99,7 +99,7 @@ void main() {
         // Section header
         expect(find.text('Personal Quest'), findsOneWidget);
         // Quest display name
-        expect(find.text('515 - Lawbringer'), findsOneWidget);
+        expect(find.textContaining('515: Lawbringer'), findsOneWidget);
       });
 
       testWidgets('displays requirement description and progress', (
@@ -115,8 +115,15 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Requirement text
-        expect(find.text('Kill 20 Bandits or Cultists'), findsOneWidget);
+        // Requirement text (rendered as RichText via GameTextParser)
+        expect(
+          find.byWidgetPredicate(
+            (w) =>
+                w is RichText &&
+                w.text.toPlainText().contains('Kill 20 Bandits or Cultists'),
+          ),
+          findsOneWidget,
+        );
         // Progress text: 12/20
         expect(find.text('12/20'), findsOneWidget);
       });
@@ -167,7 +174,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('523 - Aberrant Slayer'), findsOneWidget);
+        expect(find.textContaining('523: Aberrant Slayer'), findsOneWidget);
         // Should show 3 complete (check_circle) and 3 incomplete
         expect(find.byIcon(Icons.check_circle), findsNWidgets(3));
         expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(3));
@@ -376,12 +383,12 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should show quest content but NOT edit controls
-        expect(find.text('515 - Lawbringer'), findsOneWidget);
+        expect(find.textContaining('515: Lawbringer'), findsOneWidget);
         expect(find.byIcon(Icons.swap_horiz_rounded), findsNothing);
         expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
       });
 
-      testWidgets('tapping quest title opens confirmation dialog', (
+      testWidgets('tapping swap button opens confirmation dialog', (
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-16');
@@ -394,8 +401,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Tap the quest title row (InkWell wrapping the Row)
-        await tester.tap(find.text('515 - Lawbringer'));
+        // Tap the swap IconButton
+        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
 
         // Should show confirmation dialog
@@ -421,8 +428,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Tap quest title to open dialog
-        await tester.tap(find.text('515 - Lawbringer'));
+        // Tap swap button to open dialog
+        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
 
         // Tap Cancel
@@ -430,7 +437,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Quest should still be displayed
-        expect(find.text('515 - Lawbringer'), findsOneWidget);
+        expect(find.textContaining('515: Lawbringer'), findsOneWidget);
         expect(find.text('5/20'), findsOneWidget);
       });
     });
@@ -625,7 +632,7 @@ void main() {
         // Header should be visible
         expect(find.text('Personal Quest'), findsOneWidget);
         // Content should be collapsed - quest name not visible
-        expect(find.text('515 - Lawbringer'), findsNothing);
+        expect(find.textContaining('515: Lawbringer'), findsNothing);
       });
     });
   });

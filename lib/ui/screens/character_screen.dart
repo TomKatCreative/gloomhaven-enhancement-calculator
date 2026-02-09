@@ -92,13 +92,18 @@ class CharacterScreen extends StatelessWidget {
               ),
               child: _ResourcesSection(character: character),
             ),
+            // PERSONAL QUEST
+            Padding(
+              padding: const EdgeInsets.all(smallPadding),
+              child: PersonalQuestSection(character: character),
+            ),
             // NOTES
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: smallPadding,
-                  vertical: model.isEditMode ? largePadding : smallPadding,
+                  vertical: model.isEditMode ? mediumPadding : smallPadding,
                 ),
                 child:
                     character.notes.isNotEmpty ||
@@ -106,11 +111,6 @@ class CharacterScreen extends StatelessWidget {
                     ? _NotesSection(character: character)
                     : const SizedBox(),
               ),
-            ),
-            // PERSONAL QUEST
-            Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: PersonalQuestSection(character: character),
             ),
             // PERKS
             Padding(

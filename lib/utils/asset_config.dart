@@ -809,6 +809,10 @@ const Map<String, AssetConfig> assets = {
     'equipment_slots/body.svg',
     themeMode: CurrentColorTheme(),
   ),
+  'Feet': AssetConfig(
+    'equipment_slots/feet.svg',
+    themeMode: CurrentColorTheme(),
+  ),
   'Head': AssetConfig(
     'equipment_slots/head.svg',
     themeMode: CurrentColorTheme(),
