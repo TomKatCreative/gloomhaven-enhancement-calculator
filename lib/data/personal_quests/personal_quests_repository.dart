@@ -63,7 +63,7 @@ class PersonalQuestsRepository {
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.quartermaster,
       requirements: const [
-        PersonalQuestRequirement(description: 'Have 200 gold', target: 200),
+        PersonalQuestRequirement(description: 'Have 200 gold in your possession', target: 200),
       ],
     ),
     PersonalQuest(
