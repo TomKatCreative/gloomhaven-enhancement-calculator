@@ -50,7 +50,7 @@ class PersonalQuestsRepository {
         PersonalQuestRequirement(description: 'Own 2 Body items', target: 2),
         PersonalQuestRequirement(description: 'Own 2 Feet items', target: 2),
         PersonalQuestRequirement(
-          description: 'Own 3 One_Hand items or Two_Hand items',
+          description: 'Own 3 One_Hand or Two_Hand items',
           target: 3,
         ),
         PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
