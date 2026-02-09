@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
@@ -154,88 +152,14 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 )
               : Container(),
           actions: <Widget>[
-            if (charactersModel.isEditMode)
+            if (!charactersModel.isEditMode && appModel.page == 0)
               Tooltip(
-                message: charactersModel.currentCharacter!.isRetired
-                    ? 'Unretire'
-                    : 'Retire',
+                message: 'New Character',
                 child: IconButton(
-                  icon: Icon(
-                    charactersModel.currentCharacter!.isRetired
-                        ? Icons.directions_walk
-                        : Icons.assist_walker,
-                  ),
+                  icon: const Icon(Icons.person_add_rounded),
                   onPressed: () async {
-                    final String message =
-                        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? 'unretired' : 'retired'}';
-                    Character? character = charactersModel.currentCharacter;
-                    await charactersModel.retireCurrentCharacter();
-                    appModel.updateTheme();
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context)
-                      ..clearSnackBars()
-                      ..showSnackBar(
-                        SnackBar(
-                          content: Text(message),
-                          persist: false,
-                          action: charactersModel.showRetired
-                              ? null
-                              : SnackBarAction(
-                                  label: 'Show',
-                                  onPressed: () {
-                                    charactersModel.toggleShowRetired(
-                                      character: character,
-                                    );
-                                  },
-                                ),
-                        ),
-                      );
+                    await CreateCharacterScreen.show(context, charactersModel);
                   },
-                ),
-              ),
-            if (appModel.page == 0)
-              Tooltip(
-                message: charactersModel.isEditMode
-                    ? 'Delete'
-                    : 'New Character',
-                child: IconButton(
-                  icon: Icon(
-                    charactersModel.isEditMode
-                        ? Icons.delete_rounded
-                        : Icons.person_add_rounded,
-                    color: charactersModel.isEditMode ? Colors.red[400] : null,
-                  ),
-                  onPressed: charactersModel.isEditMode
-                      ? () async {
-                          final bool? result = await ConfirmationDialog.show(
-                            context: context,
-                            content: const Text(
-                              'Are you sure? This cannot be undone',
-                            ),
-                            confirmLabel: 'Delete',
-                            cancelLabel: 'Cancel',
-                          );
-
-                          if (result == true && context.mounted) {
-                            final String characterName =
-                                charactersModel.currentCharacter!.name;
-                            await charactersModel.deleteCurrentCharacter();
-                            if (!context.mounted) return;
-                            ScaffoldMessenger.of(context)
-                              ..clearSnackBars()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: Text('$characterName deleted'),
-                                ),
-                              );
-                          }
-                        }
-                      : () async {
-                          await CreateCharacterScreen.show(
-                            context,
-                            charactersModel,
-                          );
-                        },
                 ),
               ),
             Tooltip(

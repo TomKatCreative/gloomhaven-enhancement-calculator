@@ -28,6 +28,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
@@ -47,22 +48,13 @@ class PersonalQuestSection extends StatelessWidget {
     final model = context.watch<CharactersModel>();
     final quest = character.personalQuest;
 
-    // No quest assigned and not in edit mode: show nothing
-    if (quest == null && !model.isEditMode) {
-      return const SizedBox.shrink();
-    }
-
-    // No quest assigned but in edit mode: show selector field
-    if (quest == null && model.isEditMode && !character.isRetired) {
+    // No quest assigned: show select button (hidden for retired characters)
+    if (quest == null) {
+      if (character.isRetired) return const SizedBox.shrink();
       return Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        child: _QuestSelectorField(character: character, model: model),
+        child: _SelectQuestButton(character: character, model: model),
       );
-    }
-
-    // No quest assigned, edit mode, but retired: show nothing
-    if (quest == null) {
-      return const SizedBox.shrink();
     }
 
     // Quest assigned: show ExpansionTile with blur
@@ -105,23 +97,25 @@ class PersonalQuestSection extends StatelessWidget {
   }
 }
 
-class _QuestSelectorField extends StatelessWidget {
-  const _QuestSelectorField({required this.character, required this.model});
+class _SelectQuestButton extends StatelessWidget {
+  const _SelectQuestButton({required this.character, required this.model});
   final Character character;
   final CharactersModel model;
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      readOnly: true,
-      onTap: () => _selectQuest(context),
-      decoration: InputDecoration(
-        labelText: AppLocalizations.of(context).personalQuest,
-        hintText: AppLocalizations.of(context).selectPersonalQuest,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        border: const OutlineInputBorder(),
-        suffixIcon: const Icon(Icons.chevron_right),
+    final l10n = AppLocalizations.of(context);
+    final primaryColor = Theme.of(
+      context,
+    ).extension<AppThemeExtension>()!.contrastedPrimary;
+    return OutlinedButton.icon(
+      onPressed: () => _selectQuest(context),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: primaryColor,
+        side: BorderSide(color: primaryColor),
       ),
+      icon: const Icon(Icons.add_rounded, size: iconSizeSmall),
+      label: Text(l10n.selectAPersonalQuest),
     );
   }
 

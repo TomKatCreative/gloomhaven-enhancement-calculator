@@ -6,10 +6,12 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_440_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_fab.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_bottom_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
@@ -38,6 +40,57 @@ class _HomeState extends State<Home> {
           builder: (context) => const Update440Dialog(),
         );
       });
+    }
+  }
+
+  Future<void> _handleRetire(
+    BuildContext context,
+    CharactersModel charactersModel,
+    AppModel appModel,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final String message =
+        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? l10n.unretire.toLowerCase() : l10n.retire.toLowerCase()}d';
+    Character? character = charactersModel.currentCharacter;
+    await charactersModel.retireCurrentCharacter();
+    appModel.updateTheme();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          persist: false,
+          action: charactersModel.showRetired
+              ? null
+              : SnackBarAction(
+                  label: 'Show',
+                  onPressed: () {
+                    charactersModel.toggleShowRetired(character: character);
+                  },
+                ),
+        ),
+      );
+  }
+
+  Future<void> _handleDelete(
+    BuildContext context,
+    CharactersModel charactersModel,
+  ) async {
+    final bool? result = await ConfirmationDialog.show(
+      context: context,
+      content: const Text('Are you sure? This cannot be undone'),
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+    );
+
+    if (result == true && context.mounted) {
+      final String characterName = charactersModel.currentCharacter!.name;
+      await charactersModel.deleteCurrentCharacter();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$characterName deleted')));
     }
   }
 
@@ -102,43 +155,63 @@ class _HomeState extends State<Home> {
       ),
       floatingActionButton: hideFab
           ? null
-          : FloatingActionButton(
-              heroTag: null,
-              onPressed: appModel.page == 1
-                  ? () => enhancementModel.resetCost()
-                  : charactersModel.characters.isEmpty
-                  ? () => CreateCharacterScreen.show(context, charactersModel)
-                  : () => charactersModel.isEditMode =
-                        !charactersModel.isEditMode,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: FadeTransition(opacity: animation, child: child),
-                  );
-                },
-                child: Icon(
-                  appModel.page == 1
-                      ? Icons.clear_rounded
-                      : charactersModel.characters.isEmpty
-                      ? Icons.add
-                      : charactersModel.isEditMode
-                      ? Icons.edit_off_rounded
-                      : Icons.edit_rounded,
-                  key: ValueKey<int>(
-                    appModel.page == 1
-                        ? 0
-                        : charactersModel.characters.isEmpty
-                        ? 1
-                        : charactersModel.isEditMode
-                        ? 2
-                        : 3,
-                  ),
-                ),
-              ),
-            ),
+          : _buildFab(appModel, charactersModel, enhancementModel),
       bottomNavigationBar: const GHCBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildFab(
+    AppModel appModel,
+    CharactersModel charactersModel,
+    EnhancementCalculatorModel enhancementModel,
+  ) {
+    // Calculator page: simple clear FAB
+    if (appModel.page == 1) {
+      return FloatingActionButton(
+        heroTag: null,
+        onPressed: () => enhancementModel.resetCost(),
+        child: const Icon(Icons.clear_rounded),
+      );
+    }
+
+    // Characters page with no characters: simple add FAB
+    if (charactersModel.characters.isEmpty) {
+      return FloatingActionButton(
+        heroTag: null,
+        onPressed: () => CreateCharacterScreen.show(context, charactersModel),
+        child: const Icon(Icons.add),
+      );
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+    final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
+
+    // Characters page with characters: expandable FAB
+    return ExpandableFab(
+      isOpen: charactersModel.isEditMode,
+      onToggle: (open) => charactersModel.isEditMode = open,
+      openIcon: const Icon(Icons.edit_rounded),
+      closeIcon: const Icon(Icons.edit_off_rounded),
+      children: [
+        ActionButton(
+          tooltip: isRetired ? l10n.unretire : l10n.retire,
+          icon: Icon(isRetired ? Icons.directions_walk : Icons.assist_walker),
+          color: brightness == Brightness.light ? Colors.grey : Colors.white,
+          iconColor: brightness == Brightness.light
+              ? Colors.white
+              : Colors.grey,
+          onPressed: () => _handleRetire(context, charactersModel, appModel),
+        ),
+        ActionButton(
+          tooltip: l10n.delete,
+          icon: const Icon(Icons.delete_rounded),
+          color: colorScheme.errorContainer,
+          iconColor: colorScheme.onErrorContainer,
+          onPressed: () => _handleDelete(context, charactersModel),
+        ),
+      ],
     );
   }
 }

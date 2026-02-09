@@ -378,6 +378,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get selectPersonalQuest => 'Selecionar missão pessoal...';
 
   @override
+  String get selectAPersonalQuest => 'Selecionar uma Missão Pessoal';
+
+  @override
   String get changePersonalQuest => 'Alterar Missão Pessoal?';
 
   @override
@@ -408,6 +411,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get retire => 'Aposentar';
+
+  @override
+  String get unretire => 'Desaposentar';
 
   @override
   String get notYet => 'Ainda Não';

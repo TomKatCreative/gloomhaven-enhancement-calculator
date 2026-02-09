@@ -782,6 +782,12 @@ abstract class AppLocalizations {
   /// **'Select personal quest...'**
   String get selectPersonalQuest;
 
+  /// No description provided for @selectAPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Personal Quest'**
+  String get selectAPersonalQuest;
+
   /// No description provided for @changePersonalQuest.
   ///
   /// In en, this message translates to:
@@ -835,6 +841,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retire'**
   String get retire;
+
+  /// No description provided for @unretire.
+  ///
+  /// In en, this message translates to:
+  /// **'Unretire'**
+  String get unretire;
 
   /// No description provided for @notYet.
   ///

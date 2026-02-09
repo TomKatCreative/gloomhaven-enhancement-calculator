@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_fab.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -56,6 +57,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       // Find the retire button by its icon
       expect(find.byIcon(Icons.assist_walker), findsOneWidget);
@@ -74,6 +76,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.directions_walk), findsOneWidget);
       expect(find.byIcon(Icons.assist_walker), findsNothing);
@@ -91,9 +94,19 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      // The action buttons are in the tree but not tappable (IgnorePointer)
+      // when the FAB is closed
+      final ignorePointers = find.ancestor(
+        of: find.byIcon(Icons.assist_walker),
+        matching: find.byType(IgnorePointer),
+      );
+      // Find the closest IgnorePointer (the one from _ExpandingActionButton)
+      final ignorePointerWidget = tester.widget<IgnorePointer>(
+        ignorePointers.first,
+      );
+      expect(ignorePointerWidget.ignoring, isTrue);
     });
 
     testWidgets('tapping retire button calls retireCurrentCharacter', (
@@ -111,6 +124,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       // Tap the retire button
       await tester.tap(find.byIcon(Icons.assist_walker));
@@ -131,6 +145,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       // Before retiring: shows assist_walker
       expect(find.byIcon(Icons.assist_walker), findsOneWidget);
@@ -139,10 +154,18 @@ void main() {
       await tester.tap(find.byIcon(Icons.assist_walker));
       await tester.pumpAndSettle();
 
-      // After retiring: edit mode is turned off, so button is hidden
-      // This is expected behavior - retiring turns off edit mode
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      // After retiring: edit mode is turned off, so action buttons are
+      // not tappable (IgnorePointer). The widget now shows directions_walk
+      // since the character is retired.
+      expect(find.byIcon(Icons.directions_walk), findsOneWidget);
+      final ignorePointers = find.ancestor(
+        of: find.byIcon(Icons.directions_walk),
+        matching: find.byType(IgnorePointer),
+      );
+      final ignorePointerWidget = tester.widget<IgnorePointer>(
+        ignorePointers.first,
+      );
+      expect(ignorePointerWidget.ignoring, isTrue);
     });
   });
 
@@ -157,6 +180,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       // Find the Tooltip with 'Retire' message
       final tooltip = find.byWidgetPredicate(
@@ -177,6 +201,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       final tooltip = find.byWidgetPredicate(
         (widget) => widget is Tooltip && widget.message == 'Unretire',
@@ -186,7 +211,7 @@ void main() {
   });
 }
 
-/// Builds a minimal test app with the AppBar containing retire button.
+/// Builds a minimal test app with an ExpandableFab containing retire button.
 Widget _buildTestApp({
   required CharactersModel model,
   required MockThemeProvider themeProvider,
@@ -198,42 +223,41 @@ Widget _buildTestApp({
       ChangeNotifierProvider(create: (_) => AppModel()),
       ChangeNotifierProvider(create: (_) => EnhancementCalculatorModel()),
     ],
-    child: MaterialApp(home: Scaffold(appBar: _TestAppBar())),
+    child: MaterialApp(home: _TestFabScaffold()),
   );
 }
 
-/// A simplified version of the AppBar that contains just the retire button.
+/// A simplified scaffold with the ExpandableFab containing retire/delete buttons.
 /// This isolates the retirement functionality for testing.
-class _TestAppBar extends StatelessWidget implements PreferredSizeWidget {
+class _TestFabScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isEditMode = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
-    final currentCharacter = context.watch<CharactersModel>().currentCharacter;
-    final charactersModel = context.read<CharactersModel>();
+    final charactersModel = context.watch<CharactersModel>();
+    final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
 
-    return AppBar(
-      title: const Text('Test'),
-      actions: [
-        if (isEditMode && currentCharacter != null)
-          Tooltip(
-            message: currentCharacter.isRetired ? 'Unretire' : 'Retire',
-            child: IconButton(
-              icon: Icon(
-                currentCharacter.isRetired
-                    ? Icons.directions_walk
-                    : Icons.assist_walker,
-              ),
-              onPressed: () async {
-                await charactersModel.retireCurrentCharacter();
-              },
-            ),
+    return Scaffold(
+      floatingActionButton: ExpandableFab(
+        isOpen: charactersModel.isEditMode,
+        onToggle: (open) => charactersModel.isEditMode = open,
+        openIcon: const Icon(Icons.edit_rounded),
+        closeIcon: const Icon(Icons.edit_off_rounded),
+        children: [
+          ActionButton(
+            tooltip: isRetired ? 'Unretire' : 'Retire',
+            icon: Icon(isRetired ? Icons.directions_walk : Icons.assist_walker),
+            onPressed: () async {
+              await charactersModel.retireCurrentCharacter();
+            },
           ),
-      ],
+          ActionButton(
+            tooltip: 'Delete',
+            icon: const Icon(Icons.delete_rounded),
+            color: Theme.of(context).colorScheme.errorContainer,
+            iconColor: Theme.of(context).colorScheme.onErrorContainer,
+            onPressed: () {},
+          ),
+        ],
+      ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

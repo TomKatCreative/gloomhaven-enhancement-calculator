@@ -55,7 +55,7 @@ class CharacterScreen extends StatelessWidget {
                   left: smallPadding,
                   right: smallPadding,
                   bottom: mediumPadding,
-                  top: extraLargePadding,
+                  top: largePadding,
                 ),
                 child: _NameAndClassSection(character: character),
               ),
@@ -96,11 +96,9 @@ class CharacterScreen extends StatelessWidget {
             Container(
               constraints: const BoxConstraints(maxWidth: maxWidth),
               child: Padding(
-                padding: EdgeInsets.only(
-                  left: smallPadding,
-                  right: smallPadding,
-                  bottom: smallPadding,
-                  top: model.isEditMode ? largePadding : smallPadding,
+                padding: EdgeInsets.symmetric(
+                  horizontal: smallPadding,
+                  vertical: model.isEditMode ? largePadding : smallPadding,
                 ),
                 child:
                     character.notes.isNotEmpty ||

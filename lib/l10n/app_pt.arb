@@ -114,6 +114,7 @@
   "addNotes": "Adicionar notas...",
   "personalQuest": "Missão Pessoal",
   "selectPersonalQuest": "Selecionar missão pessoal...",
+  "selectAPersonalQuest": "Selecionar uma Missão Pessoal",
   "changePersonalQuest": "Alterar Missão Pessoal?",
   "changePersonalQuestBody": "Isso substituirá sua missão atual e redefinirá todo o progresso.",
   "comingSoon": "Em breve",
@@ -123,5 +124,6 @@
   "personalQuestComplete": "Missão pessoal completa!",
   "personalQuestCompleteBody": "{name} cumpriu sua missão pessoal e deve se aposentar. Antes de se aposentar, considere gastar ouro em melhorias ou doações — todo ouro e itens são perdidos na aposentadoria. A cidade ganha 1 de prosperidade.",
   "retire": "Aposentar",
+  "unretire": "Desaposentar",
   "notYet": "Ainda Não"
 }

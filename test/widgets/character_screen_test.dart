@@ -812,8 +812,20 @@ void main() {
 
       // In view mode, ResourceCard should NOT have InkWell buttons (canEdit=false)
       // The remove_rounded / add_rounded icons are only in _ResourceButtonBar
-      expect(find.byIcon(Icons.remove_rounded), findsNothing);
-      expect(find.byIcon(Icons.add_rounded), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(ResourceCard),
+          matching: find.byIcon(Icons.remove_rounded),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(ResourceCard),
+          matching: find.byIcon(Icons.add_rounded),
+        ),
+        findsNothing,
+      );
     });
 
     testWidgets('resource buttons hidden for retired character', (

@@ -149,6 +149,7 @@
   "addNotes": "Add notes...",
   "personalQuest": "Personal Quest",
   "selectPersonalQuest": "Select personal quest...",
+  "selectAPersonalQuest": "Select a Personal Quest",
   "changePersonalQuest": "Change Personal Quest?",
   "changePersonalQuestBody": "This will replace your current quest and reset all progress.",
   "comingSoon": "Coming soon",
@@ -175,5 +176,6 @@
     }
   },
   "retire": "Retire",
+  "unretire": "Unretire",
   "notYet": "Not Yet"
 }

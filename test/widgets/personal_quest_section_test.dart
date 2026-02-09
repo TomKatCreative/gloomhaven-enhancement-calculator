@@ -193,7 +193,7 @@ void main() {
     });
 
     group('no quest assigned', () {
-      testWidgets('renders nothing in view mode', (tester) async {
+      testWidgets('shows select button in view mode', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-7');
         // No quest assigned (personalQuestId defaults to '')
 
@@ -203,13 +203,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Should show nothing - no header, no prompt
-        expect(find.text('Personal Quest'), findsNothing);
-        expect(find.text('No personal quest selected'), findsNothing);
-        expect(find.byType(SizedBox), findsWidgets);
+        // Should show OutlinedButton with select text
+        expect(find.text('Select a Personal Quest'), findsOneWidget);
+        expect(find.byIcon(Icons.add_rounded), findsOneWidget);
+        expect(find.byType(OutlinedButton), findsOneWidget);
       });
 
-      testWidgets('shows selector field in edit mode', (tester) async {
+      testWidgets('shows select button in edit mode', (tester) async {
         tester.view.physicalSize = const Size(800, 600);
         tester.view.devicePixelRatio = 1.0;
         addTearDown(tester.view.resetPhysicalSize);
@@ -223,10 +223,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Should show TextFormField with hint text
-        expect(find.text('Select personal quest...'), findsOneWidget);
-        expect(find.text('Personal Quest'), findsOneWidget);
-        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+        // Should show same OutlinedButton as view mode
+        expect(find.text('Select a Personal Quest'), findsOneWidget);
+        expect(find.byIcon(Icons.add_rounded), findsOneWidget);
+        expect(find.byType(OutlinedButton), findsOneWidget);
       });
 
       testWidgets('renders nothing for retired character in edit mode', (
@@ -243,8 +243,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Personal Quest'), findsNothing);
-        expect(find.text('Select personal quest...'), findsNothing);
+        expect(find.text('Select a Personal Quest'), findsNothing);
+        expect(find.byType(OutlinedButton), findsNothing);
       });
     });
 
