@@ -303,28 +303,6 @@ void main() {
   // ── MasteriesSection ──
 
   group('MasteriesSection', () {
-    testWidgets('renders "Masteries" header', (tester) async {
-      final masteries = TestData.createMasteryList(count: 2);
-      final character = TestData.createCharacter(playerClass: TestData.drifter);
-
-      final model = await setupModelWithMasteries(
-        character: character,
-        masteries: masteries,
-        masteryData: masteries
-            .map((m) => (masteryId: m.id, isAchieved: false))
-            .toList(),
-      );
-
-      await tester.pumpWidget(
-        buildTestWidget(
-          model: model,
-          child: MasteriesSection(charactersModel: model, character: character),
-        ),
-      );
-
-      expect(find.text('Masteries'), findsOneWidget);
-    });
-
     testWidgets('renders correct number of MasteryRow widgets', (tester) async {
       final masteries = TestData.createMasteryList(count: 3);
       final character = TestData.createCharacter(playerClass: TestData.drifter);

@@ -17,6 +17,7 @@ void main() {
   late MockThemeProvider mockTheme;
 
   setUp(() async {
+    isRetirementSnackBarVisible = false;
     SharedPreferences.setMockInitialValues({
       'showRetiredCharacters': true,
       'darkTheme': false,
@@ -658,6 +659,42 @@ void main() {
           await tester.pumpAndSettle();
 
           // Snackbar SHOULD appear because it transitioned from incomplete to complete
+          expect(find.byType(SnackBar), findsOneWidget);
+        },
+      );
+
+      testWidgets(
+        'does not show duplicate snackbar when isRetirementSnackBarVisible is true',
+        (tester) async {
+          final character = TestData.createCharacter(uuid: 'test-pq-dedup');
+          character.personalQuestId = 'gh_515';
+          character.personalQuestProgress = [19];
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Complete the quest (19 → 20)
+          await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+          await tester.pumpAndSettle();
+
+          // First snackbar should appear
+          expect(find.byType(SnackBar), findsOneWidget);
+          // The flag should now be true
+          expect(isRetirementSnackBarVisible, isTrue);
+
+          // Decrement back to 19 then increment again to 20
+          await tester.tap(find.byIcon(Icons.remove_circle_outline));
+          await tester.pumpAndSettle();
+          await tester.tap(find.byIcon(Icons.add_circle_outline).last);
+          await tester.pumpAndSettle();
+
+          // Should still only show one snackbar (guard prevents duplicate)
           expect(find.byType(SnackBar), findsOneWidget);
         },
       );
