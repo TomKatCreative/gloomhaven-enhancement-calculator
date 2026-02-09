@@ -208,7 +208,7 @@ The main container/shell for the app, managing navigation between Characters and
 ### Initialization
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
-- Shows update dialogs (v4.3.0) if flag set in SharedPrefs
+- Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
 
 ### FAB Logic
@@ -245,37 +245,62 @@ When switching pages:
 
 Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child.
 
-### Layout
+### Architecture
+
+Uses a `CustomScrollView` with slivers for efficient scrolling and pinned headers:
 
 ```
 ┌─────────────────────────────────────┐
-│ Character Name          [Lvl Badge] │
-│ Class Name • Subtitle               │
-│ Traits: Tank, Healer, ...           │
+│ Character Name          [Lvl Badge] │  ← SliverPersistentHeader (pinned)
+│ Class Name • (retired)              │     Collapses from 160px → 56px
 ├─────────────────────────────────────┤
-│ XP: 45/95    Gold: ~~120~~           │  ← Stats (gold struck through if retired)
-│ Battle Goals: ○○● (1/3)             │
-│ Pocket Items: 3                     │
+│ [General] [Quest] [Notes] [Perks]   │  ← SliverPersistentHeader (pinned)
+│                           [Master.] │     Chip nav bar with scroll-spy
 ├─────────────────────────────────────┤
-│ ▶ Personal Quest [🔓]  (blur)       │  ← GH only, with unlock icon
-│   515 - Lawbringer         [swap]   │
+│ ▼ General (collapsible)             │  ← CollapsibleSectionCard
+│   XP: 45/95    Gold: 120            │
+│   Resources: Hide 5, Metal 3, ...   │
+├─────────────────────────────────────┤
+│ ▼ Personal Quest (collapsible)      │  ← PersonalQuestSection
+│   515 - Lawbringer         [swap]   │     (CollapsibleSectionCard internally)
 │   ● Kill 20 Bandits...    12/20    │
 ├─────────────────────────────────────┤
-│ ▶ Resources (expandable)   (blur)   │  ← Frosthaven only
-│   Hide: 5  Metal: 3  Lumber: 8      │
+│ Notes                               │  ← CharacterSectionCard
+│ "Remember to buy boots..."          │     (hidden when empty + view mode)
 ├─────────────────────────────────────┤
-│ Notes                               │  ← Optional section
-│ "Remember to buy boots..."          │
-├─────────────────────────────────────┤
-│ Perks                               │
+│ Perks                     (3/9)     │  ← CharacterSectionCard + badge
 │ [✓] Remove two -1 cards             │
-│ [✓] Add one +2 card                 │
 │ [ ] Add one rolling PUSH 2          │
 ├─────────────────────────────────────┤
-│ Masteries (Frosthaven only)         │
-│ [✓] Complete 3 scenarios without... │
+│ Masteries                           │  ← CharacterSectionCard
+│ [✓] Complete 3 scenarios without... │     (conditional: FH/CS only)
 └─────────────────────────────────────┘
 ```
+
+### Pinned Header
+
+`_CharacterHeaderDelegate` — a `SliverPersistentHeaderDelegate` that:
+- Expands to 160px (name, class info, traits, level badge, faded class icon background)
+- Collapses to 56px (name only) on scroll
+- In edit mode with non-retired character: stays at max height (name `TextFormField`)
+- Elevation increases with scroll progress
+
+### Chip Nav Bar
+
+`_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets:
+- Labels: General, Quest, Notes, Perks, Masteries (Masteries hidden if class has none)
+- **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
+- **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
+- Pinned below the character header
+
+### Section Cards
+
+Two card widgets from `lib/ui/widgets/character_section_card.dart`:
+
+- **`CharacterSectionCard`** — static card with title row (icon + text) and child content. Used for Notes, Perks, Masteries.
+- **`CollapsibleSectionCard`** — card with `ExpansionTile` for collapsible sections. Used for General. Expansion state persisted via `SharedPrefs().generalExpanded`.
+
+Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and a default `maxWidth: 400`.
 
 ### Edit Mode vs View Mode
 
@@ -283,7 +308,7 @@ Controlled by `charactersModel.isEditMode`:
 
 | Section | View Mode | Edit Mode |
 |---------|-----------|-----------|
-| Name | Display only | Editable text field |
+| Name | AutoSizeText | Editable TextFormField |
 | Traits | Visible | Hidden |
 | XP/Gold | Inline display (gold struck through if retired) | Text fields + add/subtract buttons |
 | Checkmarks/Retirements | Hidden | Visible with +/- controls |
@@ -292,38 +317,31 @@ Controlled by `charactersModel.isEditMode`:
 | Notes | Plain text | Multiline text field |
 | Retired badge | Shows if retired | Hidden |
 
-### Sections (Private Widgets)
+### Content Widgets
 
-- `_NameAndClassSection` - Name, level badge, class info, traits
-- `_StatsSection` - XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
-- `PersonalQuestSection` - PQ progress with retirement prompt (see below)
-- `_ResourcesSection` - Expandable Frosthaven resources (hide, metal, lumber, etc.)
-- `_NotesSection` - User notes (hidden when empty and not editing)
-- `PerksSection` - Perk checkboxes with parsed game text
-- `MasteriesSection` - Mastery checkboxes (conditional display)
-
-### BlurredExpansionContainer
-
-Both `PersonalQuestSection` and `_ResourcesSection` use `BlurredExpansionContainer` (`lib/ui/widgets/blurred_expansion_container.dart`), which provides:
-- Bordered container with `ExpansionTile`
-- Animated backdrop blur (`TweenAnimationBuilder<double>`, 0 → `expansionBlurSigma`) that frosts the large class icon SVG behind the section when expanded
-- Blur fades in/out over `animationDuration` (250ms)
-- `ClipRRect` constrains the blur to the container's `borderRadiusMedium` corners
+- `_StatsSection` — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- `_CheckmarksAndRetirementsRow` — edit-mode only row with +/- controls
+- `_ResourcesContent` — 9 `ResourceCard` widgets for all resource types
+- `PersonalQuestSection` — PQ progress with retirement prompt (see below)
+- `_NotesSection` — User notes (hidden when empty and not editing)
+- `PerksSection` — Perk checkboxes with parsed game text
+- `MasteriesSection` — Mastery checkboxes (conditional display)
+- `_PerksCountBadge` — Shows checked/total perk count in Perks card title
 
 ### Personal Quest Section
 
 > **File**: `lib/ui/widgets/personal_quest_section.dart`
 
 Three display states:
-1. **Quest assigned** — `BlurredExpansionContainer` with quest title, unlock icon in header, requirements list with progress
-2. **No quest + edit mode** — `TextFormField` selector (read-only, `OutlineInputBorder`, hint "Select personal quest...", chevron suffix)
-3. **No quest + view mode** — `SizedBox.shrink()` (hidden)
+1. **Quest assigned** — `CollapsibleSectionCard` with quest title, unlock icon in header, requirements list with progress
+2. **No quest + not retired** — `OutlinedButton` "Select a Personal Quest" prompt
+3. **No quest + retired** — `SizedBox.shrink()` (hidden)
 
 **Retirement flow** (on PQ completion):
 1. `updatePersonalQuestProgress` returns `true` when quest transitions from incomplete → complete
 2. Confetti pop via `ConfettiWidget` overlay from bottom-center
-3. SnackBar: "Personal quest complete!" with "Retire" action
-4. Tapping "Retire" opens `ConfirmationDialog` with full details (spend gold first, items lost, +1 prosperity)
+3. SnackBar: "Personal quest complete!" with "Retire" action (deduplicated via `isRetirementSnackBarVisible` flag)
+4. Tapping "Retire" opens `ConfirmationDialog` with full details
 5. Confirming retires the character and updates the theme
 
 ### Key Features
@@ -332,7 +350,7 @@ Three display states:
 - Retired characters have disabled edit controls and strikethrough gold
 - Bottom padding adjusts for element sheet expansion state
 - `ValueKey` on form fields keyed to character UUID
-- Max-width constraints (400-468px) for responsive design
+- Max-width constraints (400px) on section cards for responsive design
 - Scroll controller from `CharactersModel` for app bar animations
 
 ---

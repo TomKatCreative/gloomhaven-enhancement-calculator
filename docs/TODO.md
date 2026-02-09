@@ -9,7 +9,7 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - PQ section on character screen with progress tracking (+/- buttons in edit mode)
 - Change quest flow with confirmation dialog
 - Retirement prompt: snackbar with confetti pop on PQ completion → confirmation dialog → retire
-- Animated backdrop blur (`BlurredExpansionContainer`) on PQ and Resources sections
+- `CollapsibleSectionCard` for PQ section; `CharacterSectionCard` for static sections
 - Class unlock icon / envelope icon in ExpansionTile header row
 - `TextFormField` selector when no quest assigned (edit mode)
 - Strikethrough gold display for retired characters (gold forfeited on retirement)
@@ -123,34 +123,13 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 ## Enhanced Backup System
 
 **Added:** 2026-02-04
-**Status:** Pending
-
-Currently, backup only exports SQLite database (characters, perks, masteries). SharedPreferences (39 keys including theme, calculator state, unlocked classes, element tracker) are NOT backed up.
+**Status:** Partially Done
 
 ### Improvements
 
-#### 1. Include SharedPreferences in Backup (High Priority)
+#### ~~1. Include SharedPreferences in Backup (High Priority)~~ — **Done**
 
-**Files to modify:**
-- `lib/shared_prefs.dart` - Add `toJson()` and `fromJson()` methods
-- `lib/data/database_helpers.dart` - Include SharedPrefs in `generateBackup()` output
-- `lib/ui/dialogs/restore_dialog.dart` - Restore SharedPrefs from backup
-
-**Backup JSON structure:**
-```json
-{
-  "version": 2,
-  "database": [...current backup format...],
-  "settings": {
-    "darkTheme": true,
-    "gameEdition": 0,
-    "primaryClassColor": 0xff4e7ec1,
-    ...
-  }
-}
-```
-
-**Exclude from backup:** Transient keys like `showUpdate4Dialog`, `clearOldPrefs`
+SharedPreferences are now included as an optional third element in the backup JSON array. See `docs/shared_prefs_keys.md` "Backup Integration" section for details.
 
 #### 2. One-Tap Backup Sharing
 

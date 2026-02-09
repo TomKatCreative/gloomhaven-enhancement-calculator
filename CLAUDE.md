@@ -132,7 +132,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 17)
+- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 18)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ## Key Domain Concepts
