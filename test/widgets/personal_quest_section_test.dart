@@ -302,13 +302,14 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('5/20'), findsOneWidget);
+        expect(find.text('5'), findsOneWidget);
+        expect(find.text('/20'), findsOneWidget);
 
         // Tap the + button
         await tester.tap(find.byIcon(Icons.add_circle_outline).last);
         await tester.pumpAndSettle();
 
-        expect(find.text('6/20'), findsOneWidget);
+        expect(find.text('6'), findsOneWidget);
       });
 
       testWidgets('- button decrements progress', (tester) async {
@@ -322,12 +323,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('5/20'), findsOneWidget);
+        expect(find.text('5'), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.remove_circle_outline));
         await tester.pumpAndSettle();
 
-        expect(find.text('4/20'), findsOneWidget);
+        expect(find.text('4'), findsOneWidget);
       });
 
       testWidgets('- button is disabled at 0 progress', (tester) async {
@@ -388,6 +389,86 @@ void main() {
         expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
       });
 
+      testWidgets(
+        'shows text field instead of +/- buttons for high-target requirements',
+        (tester) async {
+          tester.view.physicalSize = const Size(800, 600);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+
+          final character = TestData.createCharacter(uuid: 'test-pq-hi-1');
+          // Quest 512 (Greed is Good) - target 200
+          character.personalQuestId = 'gh_512';
+          character.personalQuestProgress = [50];
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Should show a TextField, not +/- buttons
+          expect(find.byType(TextField), findsOneWidget);
+          expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+          expect(find.byIcon(Icons.add_circle_outline), findsNothing);
+          // Should show "/" and target as separate text widgets
+          expect(find.text('/'), findsOneWidget);
+          expect(find.text('200'), findsOneWidget);
+        },
+      );
+
+      testWidgets('text field updates progress for high-target requirements', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final character = TestData.createCharacter(uuid: 'test-pq-hi-2');
+        character.personalQuestId = 'gh_512';
+        character.personalQuestProgress = [50];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Clear and type new value
+        await tester.enterText(find.byType(TextField), '120');
+        await tester.pumpAndSettle();
+
+        // Progress should be updated in the model
+        expect(model.characters.first.personalQuestProgress[0], 120);
+      });
+
+      testWidgets('text field shows check_circle when value meets target', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final character = TestData.createCharacter(uuid: 'test-pq-hi-3');
+        character.personalQuestId = 'gh_512';
+        character.personalQuestProgress = [200];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.check_circle), findsOneWidget);
+        expect(find.byIcon(Icons.radio_button_unchecked), findsNothing);
+      });
+
       testWidgets('tapping swap button opens confirmation dialog', (
         tester,
       ) async {
@@ -438,7 +519,8 @@ void main() {
 
         // Quest should still be displayed
         expect(find.textContaining('515: Lawbringer'), findsOneWidget);
-        expect(find.text('5/20'), findsOneWidget);
+        expect(find.text('5'), findsOneWidget);
+        expect(find.text('/20'), findsOneWidget);
       });
     });
 

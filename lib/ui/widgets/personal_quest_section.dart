@@ -21,6 +21,7 @@ import 'dart:math';
 
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -123,7 +124,7 @@ class _QuestContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(
         left: largePadding,
-        right: largePadding,
+        right: mediumPadding,
         bottom: largePadding,
       ),
       child: Column(
@@ -224,7 +225,7 @@ class _QuestContent extends StatelessWidget {
   }
 }
 
-class _RequirementRow extends StatelessWidget {
+class _RequirementRow extends StatefulWidget {
   const _RequirementRow({
     required this.requirement,
     required this.progress,
@@ -242,9 +243,40 @@ class _RequirementRow extends StatelessWidget {
   final bool isEditMode;
 
   @override
+  State<_RequirementRow> createState() => _RequirementRowState();
+}
+
+class _RequirementRowState extends State<_RequirementRow> {
+  late final TextEditingController _textController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(
+      text: widget.progress > 0 ? widget.progress.toString() : '',
+    );
+  }
+
+  @override
+  void didUpdateWidget(_RequirementRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.progress != widget.progress) {
+      _textController.text = widget.progress > 0
+          ? widget.progress.toString()
+          : '';
+    }
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isComplete = progress >= requirement.target;
+    final isComplete = widget.progress >= widget.requirement.target;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: tinyPadding),
@@ -269,7 +301,7 @@ class _RequirementRow extends StatelessWidget {
                   ),
                   children: Utils.generateCheckRowDetails(
                     context,
-                    requirement.description,
+                    widget.requirement.description,
                     theme.brightness == Brightness.dark,
                   ),
                 ),
@@ -277,40 +309,55 @@ class _RequirementRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: smallPadding),
-          if (isEditMode) ...[
-            IconButton(
-              iconSize: iconSizeSmall,
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(tinyPadding),
-              icon: const Icon(Icons.remove_circle_outline),
-              onPressed: progress > 0
-                  ? () => _updateProgress(context, progress - 1)
-                  : null,
-            ),
-            SizedBox(
-              width: 40,
-              child: Text(
-                AppLocalizations.of(
-                  context,
-                ).progressOf(progress, requirement.target),
-                style: theme.textTheme.bodySmall,
-                textAlign: TextAlign.center,
+          if (widget.isEditMode) ...[
+            if (widget.requirement.target > 20)
+              _buildTextField(theme)
+            else ...[
+              IconButton(
+                iconSize: iconSizeSmall,
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(tinyPadding),
+                icon: const Icon(Icons.remove_circle_outline),
+                onPressed: widget.progress > 0
+                    ? () => _updateProgress(context, widget.progress - 1)
+                    : null,
               ),
-            ),
-            IconButton(
-              iconSize: iconSizeSmall,
-              constraints: const BoxConstraints(),
-              padding: const EdgeInsets.all(tinyPadding),
-              icon: const Icon(Icons.add_circle_outline),
-              onPressed: progress < requirement.target
-                  ? () => _updateProgress(context, progress + 1)
-                  : null,
-            ),
+              IntrinsicWidth(
+                child: Stack(
+                  alignment: Alignment.centerRight,
+                  children: [
+                    // Invisible placeholder reserves width for widest value,
+                    // which is 14
+                    Opacity(
+                      opacity: 0,
+                      child: Text('14', style: theme.textTheme.bodySmall),
+                    ),
+                    Text(
+                      '${widget.progress}',
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                '/${widget.requirement.target}',
+                style: theme.textTheme.bodySmall,
+              ),
+              IconButton(
+                iconSize: iconSizeSmall,
+                constraints: const BoxConstraints(),
+                padding: const EdgeInsets.all(tinyPadding),
+                icon: const Icon(Icons.add_circle_outline),
+                onPressed: widget.progress < widget.requirement.target
+                    ? () => _updateProgress(context, widget.progress + 1)
+                    : null,
+              ),
+            ],
           ] else
             Text(
               AppLocalizations.of(
                 context,
-              ).progressOf(progress, requirement.target),
+              ).progressOf(widget.progress, widget.requirement.target),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: isComplete
                     ? theme.colorScheme.primary
@@ -322,10 +369,61 @@ class _RequirementRow extends StatelessWidget {
     );
   }
 
+  Widget _buildTextField(ThemeData theme) {
+    final isComplete = widget.progress >= widget.requirement.target;
+    final secondaryColor = theme.colorScheme.onSurfaceVariant;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 55,
+          child: TextField(
+            controller: _textController,
+            enableInteractiveSelection: false,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.end,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: isComplete ? theme.colorScheme.primary : null,
+            ),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(3),
+            ],
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.fromLTRB(
+                mediumPadding,
+                mediumPadding,
+                0,
+                mediumPadding,
+              ),
+              hintText: '0',
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (value) {
+              final parsed = int.tryParse(value) ?? 0;
+              _updateProgress(context, parsed);
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: tinyPadding),
+          child: Text(
+            '/',
+            style: theme.textTheme.bodySmall?.copyWith(color: secondaryColor),
+          ),
+        ),
+        Text(
+          '${widget.requirement.target}',
+          style: theme.textTheme.bodySmall?.copyWith(color: secondaryColor),
+        ),
+      ],
+    );
+  }
+
   Future<void> _updateProgress(BuildContext context, int newValue) async {
-    final justCompleted = await model.updatePersonalQuestProgress(
-      character,
-      index,
+    final justCompleted = await widget.model.updatePersonalQuestProgress(
+      widget.character,
+      widget.index,
       newValue,
     );
     if (justCompleted && context.mounted) {
@@ -378,12 +476,12 @@ class _RequirementRow extends StatelessWidget {
     final confirmed = await ConfirmationDialog.show(
       context: context,
       title: l10n.personalQuestComplete,
-      content: Text(l10n.personalQuestCompleteBody(character.name)),
+      content: Text(l10n.personalQuestCompleteBody(widget.character.name)),
       confirmLabel: l10n.retire,
       cancelLabel: l10n.notYet,
     );
     if (confirmed == true && context.mounted) {
-      await model.retireCurrentCharacter();
+      await widget.model.retireCurrentCharacter();
       if (context.mounted) {
         context.read<AppModel>().updateTheme();
       }
