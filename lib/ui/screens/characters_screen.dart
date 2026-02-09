@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -89,38 +88,15 @@ class _CharactersScreenState extends State<CharactersScreen>
         controller: charactersModel.pageController,
         onPageChanged: (index) {
           charactersModel.onPageChanged(index);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         },
         itemCount: charactersModel.characters.length,
         itemBuilder: (context, int index) {
           final character = charactersModel.characters[index];
 
-          return Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              // RepaintBoundary isolates repaints of the expensive background SVG
-              RepaintBoundary(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    child: Container(
-                      width: 500,
-                      height: 500,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ClassIconSvg(
-                        playerClass: character.playerClass,
-                        color: character
-                            .getEffectiveColor(Theme.of(context).brightness)
-                            .withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                constraints: const BoxConstraints(maxWidth: 700),
-                child: CharacterScreen(character: character),
-              ),
-            ],
+          return Container(
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: CharacterScreen(character: character),
           );
         },
       );

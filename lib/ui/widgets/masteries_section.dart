@@ -23,8 +23,6 @@ class MasteriesSectionState extends State<MasteriesSection> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Masteries', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: mediumPadding),
         ...widget.character.masteries.map(
           (mastery) => Padding(
             padding: const EdgeInsets.symmetric(vertical: tinyPadding),

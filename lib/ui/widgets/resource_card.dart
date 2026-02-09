@@ -24,49 +24,45 @@ class ResourceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: canEdit ? 100 : 75,
-      width: 100,
-      child: Card(
-        elevation: 4,
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          alignment: Alignment.topCenter,
-          children: [
-            // Background icon - fills the full card
-            Positioned.fill(
-              child: FittedBox(
-                fit: BoxFit.contain,
-                child: ThemedSvg(assetKey: resource.icon, color: color),
+    return Card(
+      elevation: 4,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        alignment: Alignment.topCenter,
+        children: [
+          // Background icon - fills the full card
+          Positioned.fill(
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: ThemedSvg(assetKey: resource.icon, color: color),
+            ),
+          ),
+          // Count positioning
+          if (canEdit)
+            // Edit mode: truly centered in full card
+            Center(child: Text('$count'))
+          else
+            // View mode: centered but offset upward
+            Align(
+              alignment: const Alignment(0, 0.6),
+              child: Text(
+                '$count',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            // Count positioning
-            if (canEdit)
-              // Edit mode: truly centered in full card
-              Center(child: Text('$count'))
-            else
-              // View mode: centered but offset upward
-              Align(
-                alignment: const Alignment(0, 0.6),
-                child: Text(
-                  '$count',
-                  style: Theme.of(context).textTheme.titleLarge,
+          // Foreground content layered on top
+          Column(
+            children: [
+              _ResourceHeader(resource: resource),
+              if (canEdit) const Spacer(),
+              if (canEdit)
+                _ResourceButtonBar(
+                  onDecrease: onDecrease,
+                  onIncrease: onIncrease,
                 ),
-              ),
-            // Foreground content layered on top
-            Column(
-              children: [
-                _ResourceHeader(resource: resource),
-                if (canEdit) const Spacer(),
-                if (canEdit)
-                  _ResourceButtonBar(
-                    onDecrease: onDecrease,
-                    onIncrease: onIncrease,
-                  ),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }

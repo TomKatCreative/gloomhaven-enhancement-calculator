@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perk_row.dart';
@@ -10,65 +9,11 @@ class PerksSection extends StatelessWidget {
   const PerksSection({super.key, required this.character});
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text('Perks:', style: Theme.of(context).textTheme.headlineMedium),
-            IntrinsicWidth(
-              child: Stack(
-                alignment: Alignment.centerRight,
-                children: [
-                  Opacity(
-                    opacity: 0,
-                    child: Text(
-                      '99',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ),
-                  Text(
-                    '${character.numOfSelectedPerks}',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color:
-                          Character.maximumPerks(character) >=
-                              character.numOfSelectedPerks
-                          ? null
-                          : Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text('/', style: Theme.of(context).textTheme.headlineMedium),
-            IntrinsicWidth(
-              child: Stack(
-                alignment: Alignment.centerLeft,
-                children: [
-                  Opacity(
-                    opacity: 0,
-                    child: Text(
-                      '99',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                  ),
-                  Text(
-                    '${Character.maximumPerks(character)}',
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: smallPadding),
-        ListView(
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          children: _generatePerkRows(),
-        ),
-      ],
+    return ListView(
+      padding: EdgeInsets.zero,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: _generatePerkRows(),
     );
   }
 

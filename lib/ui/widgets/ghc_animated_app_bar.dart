@@ -3,18 +3,13 @@ import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-/// The main AppBar for the Home screen with scroll-animated tinting.
-///
-/// This AppBar animates its background color based on scroll position:
-/// - At top: Uses surface color (no tint)
-/// - When scrolled: Applies 8% primary color tint
+/// The main AppBar for the Home screen.
 ///
 /// For pushed routes (Settings, CreateCharacter, etc.), use [GHCAppBar]
 /// or [GHCSearchAppBar] instead.
@@ -29,59 +24,6 @@ class GHCAnimatedAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
-  late VoidCallback _charScrollListener;
-  late VoidCallback _enhancementScrollListener;
-
-  @override
-  void initState() {
-    super.initState();
-    final charactersModel = context.read<CharactersModel>();
-
-    _charScrollListener = () =>
-        _scrollListener(charactersModel.charScreenScrollController);
-    _enhancementScrollListener = () =>
-        _scrollListener(charactersModel.enhancementCalcScrollController);
-
-    charactersModel.charScreenScrollController.addListener(_charScrollListener);
-    charactersModel.enhancementCalcScrollController.addListener(
-      _enhancementScrollListener,
-    );
-  }
-
-  @override
-  void dispose() {
-    final charactersModel = context.read<CharactersModel>();
-    charactersModel.charScreenScrollController.removeListener(
-      _charScrollListener,
-    );
-    charactersModel.enhancementCalcScrollController.removeListener(
-      _enhancementScrollListener,
-    );
-    super.dispose();
-  }
-
-  void _scrollListener(ScrollController scrollController) {
-    if (scrollController.hasClients &&
-        scrollController.positions.length == 1 &&
-        scrollController.offset <= scrollController.position.minScrollExtent) {
-      //call setState only when values are about to change
-      if (!context.read<CharactersModel>().isScrolledToTop) {
-        setState(() {
-          //reach the top
-          context.read<CharactersModel>().isScrolledToTop = true;
-        });
-      }
-    } else {
-      //call setState only when values are about to change
-      if (context.read<CharactersModel>().isScrolledToTop) {
-        setState(() {
-          //not the top
-          context.read<CharactersModel>().isScrolledToTop = false;
-        });
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
@@ -90,99 +32,88 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final charactersModel = context.watch<CharactersModel>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Base and scrolled colors for tint effect
-    final baseColor = colorScheme.surface;
-    final scrolledColor = AppBarUtils.getTintedBackground(colorScheme);
-
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: charactersModel.isScrolledToTop ? 0.0 : 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      builder: (context, progress, child) {
-        return AppBar(
-          automaticallyImplyLeading: false,
-          elevation: progress * 4.0,
-          scrolledUnderElevation: 0,
-          backgroundColor: Color.lerp(baseColor, scrolledColor, progress),
-          centerTitle: true,
-          title:
-              context.watch<AppModel>().page == 0 &&
-                  charactersModel.characters.length > 1
-              ? SmoothPageIndicator(
-                  controller: charactersModel.pageController,
-                  count: charactersModel.characters.length,
-                  effect: ScrollingDotsEffect(
-                    dotHeight: 10,
-                    dotWidth: 10,
-                    activeDotColor: colorScheme.onSurface,
-                  ),
-                )
-              : context.watch<AppModel>().page == 1
-              ? SegmentedButton<GameEdition>(
-                  style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: WidgetStatePropertyAll(
-                      EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                  ),
-                  showSelectedIcon: false,
-                  segments: const [
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.gloomhaven,
-                      label: Text('GH'),
-                    ),
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.gloomhaven2e,
-                      label: Text('GH2e'),
-                    ),
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.frosthaven,
-                      label: Text('FH'),
-                    ),
-                  ],
-                  selected: {SharedPrefs().gameEdition},
-                  onSelectionChanged: (Set<GameEdition> selection) {
-                    SharedPrefs().gameEdition = selection.first;
-                    Provider.of<EnhancementCalculatorModel>(
-                      context,
-                      listen: false,
-                    ).gameVersionToggled();
-                    setState(() {});
-                  },
-                )
-              : Container(),
-          actions: <Widget>[
-            if (!charactersModel.isEditMode && appModel.page == 0)
-              Tooltip(
-                message: 'New Character',
-                child: IconButton(
-                  icon: const Icon(Icons.person_add_rounded),
-                  onPressed: () async {
-                    await CreateCharacterScreen.show(context, charactersModel);
-                  },
+    return AppBar(
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: colorScheme.surface,
+      centerTitle: true,
+      title:
+          context.watch<AppModel>().page == 0 &&
+              charactersModel.characters.length > 1
+          ? SmoothPageIndicator(
+              controller: charactersModel.pageController,
+              count: charactersModel.characters.length,
+              effect: ScrollingDotsEffect(
+                dotHeight: 10,
+                dotWidth: 10,
+                activeDotColor: colorScheme.onSurface,
+              ),
+            )
+          : context.watch<AppModel>().page == 1
+          ? SegmentedButton<GameEdition>(
+              style: const ButtonStyle(
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                padding: WidgetStatePropertyAll(
+                  EdgeInsets.symmetric(horizontal: 8),
                 ),
               ),
-            Tooltip(
-              message: 'Settings',
-              child: IconButton(
-                icon: const Icon(Icons.settings_rounded),
-                onPressed: () async {
-                  charactersModel.isEditMode = false;
-
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SettingsScreen(
-                        enhancementCalculatorModel: enhancementCalculatorModel,
-                      ),
-                    ),
-                  );
-                },
-              ),
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment<GameEdition>(
+                  value: GameEdition.gloomhaven,
+                  label: Text('GH'),
+                ),
+                ButtonSegment<GameEdition>(
+                  value: GameEdition.gloomhaven2e,
+                  label: Text('GH2e'),
+                ),
+                ButtonSegment<GameEdition>(
+                  value: GameEdition.frosthaven,
+                  label: Text('FH'),
+                ),
+              ],
+              selected: {SharedPrefs().gameEdition},
+              onSelectionChanged: (Set<GameEdition> selection) {
+                SharedPrefs().gameEdition = selection.first;
+                Provider.of<EnhancementCalculatorModel>(
+                  context,
+                  listen: false,
+                ).gameVersionToggled();
+                setState(() {});
+              },
+            )
+          : Container(),
+      actions: <Widget>[
+        if (!charactersModel.isEditMode && appModel.page == 0)
+          Tooltip(
+            message: 'New Character',
+            child: IconButton(
+              icon: const Icon(Icons.person_add_rounded),
+              onPressed: () async {
+                await CreateCharacterScreen.show(context, charactersModel);
+              },
             ),
-          ],
-        );
-      },
+          ),
+        Tooltip(
+          message: 'Settings',
+          child: IconButton(
+            icon: const Icon(Icons.settings_rounded),
+            onPressed: () async {
+              charactersModel.isEditMode = false;
+
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(
+                    enhancementCalculatorModel: enhancementCalculatorModel,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
