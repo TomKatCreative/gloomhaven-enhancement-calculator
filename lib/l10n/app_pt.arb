@@ -125,5 +125,9 @@
   "personalQuestCompleteBody": "{name} cumpriu sua missão pessoal e deve se aposentar. Antes de se aposentar, considere gastar ouro em melhorias ou doações — todo ouro e itens são perdidos na aposentadoria. A cidade ganha 1 de prosperidade.",
   "retire": "Aposentar",
   "unretire": "Desaposentar",
-  "notYet": "Ainda Não"
+  "notYet": "Ainda Não",
+  "general": "Geral",
+  "quest": "Missão",
+  "perks": "Vantagens",
+  "masteries": "Maestrias"
 }

@@ -853,6 +853,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not Yet'**
   String get notYet;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
+  /// No description provided for @quest.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest'**
+  String get quest;
+
+  /// No description provided for @perks.
+  ///
+  /// In en, this message translates to:
+  /// **'Perks'**
+  String get perks;
+
+  /// No description provided for @masteries.
+  ///
+  /// In en, this message translates to:
+  /// **'Masteries'**
+  String get masteries;
 }
 
 class _AppLocalizationsDelegate

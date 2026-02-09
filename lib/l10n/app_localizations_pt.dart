@@ -417,4 +417,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get notYet => 'Ainda Não';
+
+  @override
+  String get general => 'Geral';
+
+  @override
+  String get quest => 'Missão';
+
+  @override
+  String get perks => 'Vantagens';
+
+  @override
+  String get masteries => 'Maestrias';
 }

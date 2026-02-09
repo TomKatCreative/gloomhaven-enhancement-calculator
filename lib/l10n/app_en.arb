@@ -177,5 +177,9 @@
   },
   "retire": "Retire",
   "unretire": "Unretire",
-  "notYet": "Not Yet"
+  "notYet": "Not Yet",
+  "general": "General",
+  "quest": "Quest",
+  "perks": "Perks",
+  "masteries": "Masteries"
 }

@@ -103,11 +103,10 @@ class SharedPrefs {
 
   set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
 
-  bool get resourcesExpanded =>
-      _sharedPrefs.getBool('resourcesExpanded') ?? false;
+  bool get generalExpanded => _sharedPrefs.getBool('generalExpanded') ?? true;
 
-  set resourcesExpanded(bool value) =>
-      _sharedPrefs.setBool('resourcesExpanded', value);
+  set generalExpanded(bool value) =>
+      _sharedPrefs.setBool('generalExpanded', value);
 
   bool get personalQuestExpanded =>
       _sharedPrefs.getBool('personalQuestExpanded') ?? false;
@@ -247,7 +246,7 @@ class SharedPrefs {
 
   /// Exports a categorized map of SharedPreferences for inclusion in backups.
   ///
-  /// Excluded: clearOldPrefs, initialPage, resourcesExpanded,
+  /// Excluded: clearOldPrefs, initialPage, generalExpanded,
   /// showUpdate*Dialog, isUSRegion, gloomhavenMode (legacy), element tracker.
   Map<String, dynamic> exportForBackup() {
     final classUnlocks = <String, dynamic>{};
