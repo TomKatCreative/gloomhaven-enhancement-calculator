@@ -75,7 +75,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 8 Forest Imps', target: 8),
         PersonalQuestRequirement(
-          description: 'Complete the Scenario 59 chain',
+          description: 'Unlock and complete Scenario 59',
           target: 1,
         ),
       ],
