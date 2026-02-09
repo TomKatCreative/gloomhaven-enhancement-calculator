@@ -32,7 +32,7 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/blurred_expansion_container.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character_section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
@@ -57,18 +57,16 @@ class PersonalQuestSection extends StatelessWidget {
       );
     }
 
-    // Quest assigned: show ExpansionTile with blur
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 400),
-      child: BlurredExpansionContainer(
-        initiallyExpanded: SharedPrefs().personalQuestExpanded,
-        onExpansionChanged: (value) =>
-            SharedPrefs().personalQuestExpanded = value,
-        title: Text(AppLocalizations.of(context).personalQuest),
-        children: [
-          _QuestContent(character: character, quest: quest, model: model),
-        ],
-      ),
+    // Quest assigned: show collapsible card
+    return CollapsibleSectionCard(
+      icon: Icons.map_rounded,
+      initiallyExpanded: SharedPrefs().personalQuestExpanded,
+      onExpansionChanged: (value) =>
+          SharedPrefs().personalQuestExpanded = value,
+      title: AppLocalizations.of(context).personalQuest,
+      children: [
+        _QuestContent(character: character, quest: quest, model: model),
+      ],
     );
   }
 }
@@ -246,6 +244,9 @@ class _RequirementRow extends StatefulWidget {
   State<_RequirementRow> createState() => _RequirementRowState();
 }
 
+@visibleForTesting
+bool isRetirementSnackBarVisible = false;
+
 class _RequirementRowState extends State<_RequirementRow> {
   late final TextEditingController _textController;
 
@@ -354,14 +355,17 @@ class _RequirementRowState extends State<_RequirementRow> {
               ),
             ],
           ] else
-            Text(
-              AppLocalizations.of(
-                context,
-              ).progressOf(widget.progress, widget.requirement.target),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isComplete
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
+            Padding(
+              padding: const EdgeInsets.only(right: mediumPadding),
+              child: Text(
+                AppLocalizations.of(
+                  context,
+                ).progressOf(widget.progress, widget.requirement.target),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isComplete
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
         ],
@@ -432,17 +436,22 @@ class _RequirementRowState extends State<_RequirementRow> {
   }
 
   void _showRetirementSnackBar(BuildContext context) {
+    if (isRetirementSnackBarVisible) return;
+    isRetirementSnackBarVisible = true;
     final l10n = AppLocalizations.of(context);
     _showConfetti(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.personalQuestComplete),
-        action: SnackBarAction(
-          label: l10n.retire,
-          onPressed: () => _showRetirementDialog(context),
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+          SnackBar(
+            content: Text(l10n.personalQuestComplete),
+            action: SnackBarAction(
+              label: l10n.retire,
+              onPressed: () => _showRetirementDialog(context),
+            ),
+          ),
+        )
+        .closed
+        .then((_) => isRetirementSnackBarVisible = false);
   }
 
   void _showConfetti(BuildContext context) {
