@@ -61,9 +61,8 @@ class CharacterSectionCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: theme.textTheme.titleLarge?.copyWith(
                       color: primaryColor,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -150,11 +149,12 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                 Icon(widget.icon, size: iconSizeSmall, color: primaryColor),
                 const SizedBox(width: smallPadding),
               ],
-              Text(
-                widget.title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: primaryColor,
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  widget.title,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: primaryColor,
+                  ),
                 ),
               ),
             ],
