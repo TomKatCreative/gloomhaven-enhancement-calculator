@@ -6,7 +6,7 @@ This document provides a comprehensive reference for the app's ChangeNotifier-ba
 
 ## Provider Dependency Tree
 
-The app uses Provider with four main models set up in `main.dart`:
+The app uses Provider with five main models set up in `main.dart`:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -22,6 +22,10 @@ The app uses Provider with four main models set up in `main.dart`:
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
 │  │ EnhancementCalculatorModel   │  ← Uses SharedPrefs       │
+│  └────────┬─────────────────────┘                           │
+│           │                                                 │
+│  ┌────────▼─────────────────────┐                           │
+│  │      TownModel               │  ← Uses DatabaseHelper    │
 │  └────────┬─────────────────────┘                           │
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
@@ -264,12 +268,14 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `_isElementSheetFullExpanded` | `bool` | false | Element tracker full expansion |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
 | `collapseElementSheetNotifier` | `ValueNotifier<int>` | 0 | Signal to collapse element sheet |
+| `_showAllCharacters` | `bool` | from prefs | Filter characters by active campaign |
 
 ### Getters
 
 | Getter | Returns | Description |
 |--------|---------|-------------|
-| `characters` | `List<Character>` | Filtered list (respects showRetired) |
+| `characters` | `List<Character>` | Filtered list (respects showRetired and campaign filter) |
+| `showAllCharacters` | `bool` | Whether to show all characters or filter by campaign |
 | `isEditMode` | `bool` | Current edit mode state |
 | `isElementSheetExpanded` | `bool` | Partial expansion state |
 | `isElementSheetFullExpanded` | `bool` | Full expansion state |
@@ -300,6 +306,12 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `updatePersonalQuest(Character, String questId)` | `Future<void>` | Change quest and reset progress to zeros |
 | `updatePersonalQuestProgress(Character, int index, int value)` | `Future<bool>` | Update a single requirement's progress. Returns `true` if quest just transitioned from incomplete → complete |
 | `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets |
+
+### Campaign Methods
+
+| Method | Description |
+|--------|-------------|
+| `assignCharacterToCampaign(Character, String? campaignId)` | Link or unlink a character to a campaign |
 
 ### Perk/Mastery Methods
 
@@ -353,6 +365,77 @@ When toggling `showRetired`, the model calculates the correct navigation target:
 ### State Persistence
 
 - `showRetiredCharacters` key in SharedPrefs
+- `showAllCharacters` key in SharedPrefs
+
+---
+
+## TownModel
+
+> **File**: `lib/viewmodels/town_model.dart`
+
+Manages world and campaign CRUD operations, prosperity/reputation state, and active selection persistence.
+
+### Responsibilities
+
+- World list management (load, create, rename, delete)
+- Campaign management within active world
+- Active world/campaign selection (persisted to SharedPrefs)
+- Prosperity checkmark increment/decrement
+- Reputation increment/decrement with bounds (-20 to +20)
+- Edit mode toggling
+
+### Dependencies
+
+- `DatabaseHelper` (injected) - for persistence
+- `SharedPrefs` - for active world/campaign ID persistence
+
+### Key Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `worlds` | `List<World>` | [] | All worlds loaded from database |
+| `campaigns` | `List<Campaign>` | [] | Campaigns for active world |
+| `activeWorld` | `World?` | null | Currently selected world |
+| `activeCampaign` | `Campaign?` | null | Currently selected campaign |
+| `isEditMode` | `bool` | false | Edit mode state |
+
+### World Methods
+
+| Method | Description |
+|--------|-------------|
+| `loadWorlds()` | Load all worlds from database, restore active selection from SharedPrefs |
+| `createWorld(name, edition, startingProsperity)` | Create world and set as active |
+| `setActiveWorld(World)` | Switch active world, load its campaigns |
+| `renameWorld(String name)` | Rename the active world |
+| `deleteActiveWorld()` | Delete active world and its campaigns |
+
+### Prosperity Methods
+
+| Method | Description |
+|--------|-------------|
+| `incrementProsperity()` | Add one checkmark (up to max threshold) |
+| `decrementProsperity()` | Remove one checkmark (min 0) |
+
+### Campaign Methods
+
+| Method | Description |
+|--------|-------------|
+| `createCampaign(name, startingReputation)` | Create campaign in active world, set as active |
+| `setActiveCampaign(Campaign)` | Switch active campaign |
+| `renameCampaign(String name)` | Rename the active campaign |
+| `deleteActiveCampaign()` | Delete active campaign and unlink characters |
+
+### Reputation Methods
+
+| Method | Description |
+|--------|-------------|
+| `incrementReputation()` | Increase reputation (max +20) |
+| `decrementReputation()` | Decrease reputation (min -20) |
+
+### State Persistence
+
+- `activeWorldId` key in SharedPrefs (nullable String)
+- `activeCampaignId` key in SharedPrefs (nullable String)
 
 ---
 

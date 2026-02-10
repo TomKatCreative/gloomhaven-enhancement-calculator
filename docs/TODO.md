@@ -78,9 +78,48 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Will need to add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
 - **Frosthaven quest data** - Same pattern as GH2E but with `edition: GameEdition.frosthaven`.
 - **Adaptive widgets** - Replace basic +/- counters with segmented buttons, sliders, etc. for specific requirement types (e.g., binary yes/no for scenario completion, counter for kill counts).
-- ~~**Quest completion** - Visual indicator when all requirements are met (e.g., green checkmark, confetti).~~ **Done** — confetti pop + snackbar on completion, strikethrough on completed requirements.
-- ~~**Retirement integration** - Link quest completion to retirement flow. When all requirements are met, prompt or enable retirement.~~ **Done** — snackbar → confirmation dialog → `retireCurrentCharacter()`.
 - **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
+
+---
+
+## Town Sheet — Foundation
+
+## Status: Implemented
+
+World/campaign management for tracking persistent game state across play groups.
+
+### What's Implemented
+
+- **World model** (`lib/models/world.dart`): Edition-specific prosperity tracking with level computation from checkmark thresholds
+- **Campaign model** (`lib/models/campaign.dart`): Party reputation tracking with bounds (-20 to +20)
+- **Character-Campaign linking**: Nullable `campaignId` FK on Characters (existing characters unassigned)
+- **TownModel** (`lib/viewmodels/town_model.dart`): ChangeNotifier for world/campaign CRUD, prosperity/reputation management, active selection persistence via SharedPrefs
+- **Campaign filtering** on CharactersModel: `showAllCharacters` toggle filters character list by active campaign
+- **DB migration v18**: Worlds/Campaigns tables + CampaignId column (bundled with Personal Quests migration)
+- **Town screen** (`lib/ui/screens/town_screen.dart`): Empty state → world selector → prosperity section → campaign section
+- **Create World/Campaign screens**: Pushed-route forms following CreateCharacterScreen pattern
+- **Section widgets**: `TownEmptyState`, `ProsperitySection`, `CampaignSection`, `WorldSelector`
+- **App bar integration**: World name title, create/delete actions in edit mode
+- **FAB edit mode**: Same toggle pattern as Characters page
+- **Localization**: EN + PT strings for all town UI
+- **Backup/restore**: Worlds and Campaigns tables included in backup, SharedPrefs town state included
+- **Full test coverage**: World model tests (36), Campaign model tests, TownModel tests (28), 649 total tests passing
+
+### Architecture
+
+| Level | What it tracks | Scope |
+|-------|---------------|-------|
+| **World** | Prosperity, donated gold | Persistent across all parties |
+| **Campaign** (Party) | Party name, reputation | Per party group |
+| **Character** | XP, gold, perks, etc. | Per character (optionally linked to campaign) |
+
+### Remaining Work
+
+- **Achievement/scenario tracking** — Complex, needs scenario data repository (deferred)
+- **Frosthaven extensions** — Buildings, morale, seasons (future sprint)
+- **GH2E prosperity thresholds** — May differ from GH, needs research
+- **Character assignment UI** — UI for assigning characters to campaigns from the Characters tab
+- **Campaign filter toggle** — UI toggle on Characters tab to filter by active campaign
 
 ---
 
@@ -131,12 +170,9 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 
 SharedPreferences are now included as an optional third element in the backup JSON array. See `docs/shared_prefs_keys.md` "Backup Integration" section for details.
 
-#### 2. One-Tap Backup Sharing
+#### ~~2. One-Tap Backup Sharing~~ — **Done**
 
-Currently: Backup → Save to Downloads → User must find file to share
-Improved: Backup → Immediate share sheet option (keep save option too)
-
-**File:** `lib/ui/dialogs/backup_dialog.dart`
+Share sheet implemented via `share_plus` in `backup_dialog.dart`. Both "Save" and "Share" buttons available.
 
 #### 3. Auto-Backup to App Documents
 
@@ -159,12 +195,10 @@ Improved: Backup → Immediate share sheet option (keep save option too)
 - `lib/ui/widgets/settings/backup_settings_section.dart` - Show last backup indicator
 - `lib/ui/dialogs/backup_dialog.dart` - Update timestamp on successful backup
 
-### Implementation Order
+### Remaining Implementation Order
 
-1. SharedPrefs in backup (most value, lowest effort)
-2. Backup age reminder (quick win)
-3. One-tap sharing (UX improvement)
-4. Auto-backup (nice-to-have)
+1. Backup age reminder (quick win)
+2. Auto-backup (nice-to-have)
 
 ---
 
@@ -209,11 +243,6 @@ Move the cascade validation logic (setting lvl4 triggers lvl3/2/1) out of proper
 **File:** `lib/data/database_helpers.dart`
 
 Extract backup/restore into `DatabaseBackupService`, separate from query logic.
-
-### PerkRow / MasteryRow Deduplication
-**Files:** `lib/ui/widgets/perk_row.dart`, `lib/ui/widgets/mastery_row.dart`
-
-Extract shared `CheckableRow` base component.
 
 ### SectionCard / CollapsibleSectionCard Deduplication
 **File:** `lib/ui/widgets/section_card.dart`

@@ -55,6 +55,16 @@ prefs.setPlayerClassIsUnlocked('br', true);
 
 ---
 
+## Town State
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `activeWorldId` | String? | null | UUID of the currently active world |
+| `activeCampaignId` | String? | null | UUID of the currently active campaign |
+| `showAllCharacters` | bool | true | Show all characters vs filter by active campaign |
+
+---
+
 ## Enhancement Calculator State
 
 ### Core State
@@ -298,7 +308,7 @@ SharedPreferences data is included as an optional third element in the JSON back
 ### Backup Format
 
 ```json
-[tableNames, tableData, { "settings": {...}, "calculator": {...}, "enhancerLevels": {...}, "classUnlocks": {...} }]
+[tableNames, tableData, { "settings": {...}, "calculator": {...}, "enhancerLevels": {...}, "classUnlocks": {...}, "town": {...} }]
 ```
 
 Old backups (2 elements) are fully supported — the third element is simply absent and SharedPrefs are left unchanged on restore.
@@ -307,10 +317,11 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 
 | Category | Keys |
 |----------|------|
-| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
+| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, showAllCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
 | `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
 | `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
 | `classUnlocks` | Dynamic keys (class codes) for locked classes only |
+| `town` | activeWorldId, activeCampaignId |
 
 ### Excluded Keys
 

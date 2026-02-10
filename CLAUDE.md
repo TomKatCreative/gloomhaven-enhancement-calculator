@@ -84,12 +84,13 @@ git log main..HEAD --oneline
 
 ### State Management: Provider + ChangeNotifier
 
-The app uses Provider with four main models set up in `main.dart`:
+The app uses Provider with five main models set up in `main.dart`:
 
 ```
 ThemeProvider          → Theme colors, dark mode, font preferences
 AppModel               → Page navigation, app-level UI state
 EnhancementCalculatorModel → Calculator page state
+TownModel              → World/campaign CRUD, prosperity, reputation
 CharactersModel        → Character CRUD, perk/mastery state (uses ProxyProvider)
 ```
 
@@ -115,7 +116,8 @@ lib/
 │   ├── screens/             # Full-page views
 │   ├── widgets/             # Reusable components
 │   │   ├── calculator/      # Enhancement calculator card components
-│   │   └── settings/        # Settings screen section widgets
+│   │   ├── settings/        # Settings screen section widgets
+│   │   └── town/            # Town screen section widgets
 │   └── dialogs/             # Modal dialogs
 ├── theme/                   # Theme system (ThemeProvider, extensions)
 ├── utils/                   # Helpers, text parsing
@@ -132,7 +134,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 18)
+- **SQLite** (`sqflite`) - Characters, perks, masteries, worlds, campaigns (schema version 18)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ## Key Domain Concepts

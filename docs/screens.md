@@ -209,6 +209,7 @@ The main container/shell for the app, managing navigation between Town, Characte
 ### Initialization
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
+- Loads worlds on init via `TownModel.loadWorlds()`
 - Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
 
@@ -218,7 +219,8 @@ The FAB visibility and action changes based on context:
 
 | Page | Condition | Visible? | Action |
 |------|-----------|----------|--------|
-| Town (0) | Always | Hidden | - |
+| Town (0) | No worlds exist | Hidden | - |
+| Town (0) | Worlds exist | Visible | Toggle edit mode |
 | Characters (1) | Element sheet fully expanded | Hidden | - |
 | Characters (1) | No characters exist | Visible | Create character |
 | Characters (1) | Characters exist | Visible | Toggle edit mode |
@@ -228,7 +230,7 @@ The FAB visibility and action changes based on context:
 ### State Reset on Navigation
 
 When switching pages:
-- Edit mode is disabled
+- Edit mode is disabled (both Characters and Town)
 - Element sheet expansion states are reset
 - Prevents stale UI state between pages
 
@@ -236,8 +238,104 @@ When switching pages:
 
 - `NeverScrollableScrollPhysics` on PageView (manual nav only via bottom bar)
 - `ScaffoldMessengerKey` for snackbars
-- Watches all three main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`
+- Watches all four main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`, `TownModel`
 - `AnimatedSwitcher` for smooth FAB icon transitions
+
+---
+
+## Town Screen
+
+> **File**: `lib/ui/screens/town_screen.dart`
+
+The Town tab for managing game worlds and campaigns.
+
+### Structure
+
+```
+┌─────────────────────────────────────┐
+│        [🌐] World Name (Edition)    │  ← ActionChip (tappable → selector)
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────┐    │
+│  │ Prosperity    Level 3       │    │
+│  │ ████████░░░░  10/16         │    │  ← ProsperitySection
+│  │         [-]          [+]    │    │     (+/- in edit mode)
+│  └─────────────────────────────┘    │
+│                                     │
+│  ┌─────────────────────────────┐    │
+│  │ Campaign: Adventure Party   │    │
+│  │ Reputation: +5              │    │  ← CampaignSection
+│  │         [-]          [+]    │    │     (+/- in edit mode)
+│  └─────────────────────────────┘    │
+│                                     │
+│  [Party A] [Party B●] [Party C]    │  ← Campaign selector chips
+└─────────────────────────────────────┘
+```
+
+### Display States
+
+| State | Display |
+|-------|---------|
+| No worlds | `TownEmptyState` — castle icon + "Create a world" prompt + button |
+| World, no campaigns | World selector + prosperity section + "Create a party" prompt |
+| World + campaign | World selector + prosperity + campaign section + campaign chips |
+
+### Edit Mode
+
+Controlled by `townModel.isEditMode` (toggled via FAB):
+
+| Feature | View Mode | Edit Mode |
+|---------|-----------|-----------|
+| Prosperity | Level + progress bar | + checkmark/- steppers |
+| Reputation | Numeric display | +/- steppers |
+| App bar actions | Create campaign button | Delete campaign, delete world buttons |
+
+### Section Widgets
+
+| Widget | File | Purpose |
+|--------|------|---------|
+| `TownEmptyState` | `lib/ui/widgets/town/town_empty_state.dart` | Empty state with create button |
+| `ProsperitySection` | `lib/ui/widgets/town/prosperity_section.dart` | Level display + progress bar + edit steppers |
+| `CampaignSection` | `lib/ui/widgets/town/campaign_section.dart` | Reputation display + edit steppers |
+| `WorldSelector` | `lib/ui/widgets/town/world_selector.dart` | Bottom sheet for switching/creating worlds |
+
+---
+
+## Create World Screen
+
+> **File**: `lib/ui/screens/create_world_screen.dart`
+
+Pushed route for creating a new game world.
+
+### Invocation
+
+```dart
+await CreateWorldScreen.show(context, townModel);
+```
+
+### Form Fields
+
+1. **Name** — Text field for world name
+2. **Edition** — SegmentedButton (GH / GH2E / FH)
+3. **Starting Prosperity** — Numeric input (0-65, defaults to 0)
+
+---
+
+## Create Campaign Screen
+
+> **File**: `lib/ui/screens/create_campaign_screen.dart`
+
+Pushed route for creating a new campaign/party within the active world.
+
+### Invocation
+
+```dart
+await CreateCampaignScreen.show(context, townModel);
+```
+
+### Form Fields
+
+1. **Party Name** — Text field for campaign/party name
+2. **Starting Reputation** — Numeric input (-20 to +20, defaults to 0)
 
 ---
 

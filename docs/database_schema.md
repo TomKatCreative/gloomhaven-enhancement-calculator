@@ -67,6 +67,12 @@ Core character data storage.
 | `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "gh_510") |
 | `PersonalQuestProgress` | TEXT | `'[]'` | JSON array of ints (progress per requirement) |
 
+**Campaign Fields** (added v18):
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `CampaignId` | TEXT | NULL | FK to Campaigns._id (nullable — unassigned characters have NULL) |
+
 ---
 
 ### Perks
@@ -153,6 +159,41 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 
 ---
 
+### Worlds
+
+Tracks game worlds with edition-specific prosperity.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | UUID |
+| `Name` | TEXT | NOT NULL | World name |
+| `Edition` | TEXT | NOT NULL | GameEdition.name (e.g., "gloomhaven") |
+| `ProsperityCheckmarks` | INTEGER | NOT NULL DEFAULT 0 | Raw checkmark count |
+| `DonatedGold` | INTEGER | NOT NULL DEFAULT 0 | Sanctuary donations |
+| `CreatedAt` | DATETIME | | Creation timestamp |
+
+**Added in**: v18
+
+---
+
+### Campaigns
+
+Tracks party campaigns within a world.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | UUID |
+| `WorldId` | TEXT | NOT NULL | FK to Worlds._id |
+| `Name` | TEXT | NOT NULL | Party/campaign name |
+| `Reputation` | INTEGER | NOT NULL DEFAULT 0 | Party reputation (-20 to +20) |
+| `CreatedAt` | DATETIME | | Creation timestamp |
+
+**Foreign Key**: `WorldId REFERENCES Worlds(_id) ON DELETE CASCADE`
+
+**Added in**: v18
+
+---
+
 ## Key Operations
 
 ### Character Operations
@@ -186,6 +227,31 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 |--------|-------------|
 | `queryPersonalQuests({String? edition})` | Fetch quest definitions, optionally filtered by edition |
 
+### World Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryAllWorlds()` | Fetch all worlds |
+| `insertWorld(World)` | Create a new world |
+| `updateWorld(World)` | Update world data (name, prosperity, etc.) |
+| `deleteWorld(String worldId)` | Cascading delete (world + campaigns + unlink characters) |
+
+### Campaign Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryCampaigns(String worldId)` | Fetch campaigns for a world |
+| `insertCampaign(Campaign)` | Create a new campaign |
+| `updateCampaign(Campaign)` | Update campaign data |
+| `deleteCampaign(String campaignId)` | Delete campaign and unlink characters |
+
+### Character-Campaign Linking
+
+| Method | Description |
+|--------|-------------|
+| `assignCharacterToCampaign(String uuid, String? campaignId)` | Link/unlink a character to a campaign |
+| `queryCharactersByCampaign(String campaignId)` | Fetch characters in a campaign |
+
 ### Backup Operations
 
 | Method | Description |
@@ -214,7 +280,7 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
-| v18 | Personal Quests table, PQ columns on Characters |
+| v18 | Personal Quests table, PQ columns on Characters, Worlds/Campaigns tables, CampaignId on Characters |
 
 ### Critical Migrations
 
@@ -356,11 +422,30 @@ The backup JSON structure:
       "AssociatedMasteryId": "bn_base_0",
       "CharacterMasteryAchieved": 0
     }
+  ],
+  "Worlds": [
+    {
+      "_id": "uuid-string",
+      "Name": "My World",
+      "Edition": "gloomhaven",
+      "ProsperityCheckmarks": 12,
+      "DonatedGold": 50,
+      "CreatedAt": "2025-01-15T10:30:00.000"
+    }
+  ],
+  "Campaigns": [
+    {
+      "_id": "uuid-string",
+      "WorldId": "uuid-string",
+      "Name": "Party One",
+      "Reputation": 3,
+      "CreatedAt": "2025-01-15T10:30:00.000"
+    }
   ]
 }
 ```
 
-**Note**: Perks and Masteries tables are NOT included in backup since they're seeded from repositories on database creation.
+**Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Worlds and Campaigns tables ARE included in backup since they contain user-created data.
 
 ---
 

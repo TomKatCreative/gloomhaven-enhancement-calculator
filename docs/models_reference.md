@@ -24,6 +24,16 @@ This document provides a comprehensive reference for the app's data models, thei
 │  (definition)   │
 └─────────────────┘
 
+┌─────────────────┐     ┌─────────────────┐
+│     World       │────▶│    Campaign     │
+│  (town state)   │     │ (party state)   │
+└─────────────────┘     └────────┬────────┘
+                                 │
+                                 ▼
+                        ┌─────────────────┐
+                        │    Character    │  (optional campaign link)
+                        └─────────────────┘
+
 ┌─────────────────┐
 │   Enhancement   │  (standalone - calculator only)
 │    (option)     │
@@ -53,6 +63,7 @@ Represents a player's character instance with stats, resources, and progression.
 | `checkMarks` | `int` | 0 | Check marks earned (0-18, every 3 = 1 perk) |
 | `isRetired` | `bool` | false | Retirement status |
 | `variant` | `Variant` | base | Class variant (affects perks/masteries) |
+| `campaignId` | `String?` | null | FK to Campaign (nullable — unassigned characters have null) |
 
 **Frosthaven Resources** (all default 0):
 | Field | Type | Description |
@@ -397,6 +408,74 @@ Enum representing game editions with edition-specific rules.
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
 
 Where L = starting level, P = prosperity level.
+
+---
+
+## World
+
+> **File**: `lib/models/world.dart`
+
+Represents a persistent game world with edition-specific prosperity tracking.
+
+### Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `String` | required | UUID identifier |
+| `name` | `String` | required | World name |
+| `edition` | `GameEdition` | required | Game edition (affects prosperity thresholds) |
+| `prosperityCheckmarks` | `int` | 0 | Raw checkmark count |
+| `donatedGold` | `int` | 0 | Sanctuary donations |
+| `createdAt` | `DateTime?` | null | Creation timestamp |
+
+### Computed Properties
+
+| Getter | Type | Description |
+|--------|------|-------------|
+| `prosperityLevel` | `int` | Current level (1-9) based on checkmark thresholds |
+| `maxProsperityLevel` | `int` | Maximum level (currently 9 for all editions) |
+| `checkmarksForNextLevel` | `int?` | Checkmarks needed for next level (null at max) |
+| `checkmarksForCurrentLevel` | `int` | Checkmarks threshold for current level |
+
+### Prosperity Thresholds
+
+| Level | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|-------|---|---|---|---|---|---|---|---|---|
+| Checkmarks | 0 | 5 | 10 | 16 | 23 | 31 | 40 | 51 | 65 |
+
+### Serialization
+
+- `toMap()` / `fromMap()` for SQLite persistence
+- `edition` stored as `GameEdition.name` string in DB
+
+---
+
+## Campaign
+
+> **File**: `lib/models/campaign.dart`
+
+Represents a party campaign within a world, tracking reputation.
+
+### Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `String` | required | UUID identifier |
+| `worldId` | `String` | required | FK to World |
+| `name` | `String` | required | Party/campaign name |
+| `reputation` | `int` | 0 | Party reputation (-20 to +20) |
+| `createdAt` | `DateTime?` | null | Creation timestamp |
+
+### Constants
+
+| Constant | Value | Description |
+|----------|-------|-------------|
+| `minReputation` | -20 | Minimum reputation bound |
+| `maxReputation` | 20 | Maximum reputation bound |
+
+### Serialization
+
+- `toMap()` / `fromMap()` for SQLite persistence
 
 ---
 
