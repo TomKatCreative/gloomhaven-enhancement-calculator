@@ -186,12 +186,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
         SliverToBoxAdapter(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                smallPadding,
-                mediumPadding,
-                smallPadding,
-                smallPadding,
-              ),
+              padding: const EdgeInsets.all(smallPadding),
               child: CollapsibleSectionCard(
                 sectionKey: _sectionKeys[_Section.general],
                 title: AppLocalizations.of(context).general,
