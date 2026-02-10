@@ -120,6 +120,12 @@ class SharedPrefs {
   set questAndNotesExpanded(bool value) =>
       _sharedPrefs.setBool('questAndNotesExpanded', value);
 
+  bool get perksAndMasteriesExpanded =>
+      _sharedPrefs.getBool('perksAndMasteriesExpanded') ?? true;
+
+  set perksAndMasteriesExpanded(bool value) =>
+      _sharedPrefs.setBool('perksAndMasteriesExpanded', value);
+
   int get targetCardLvl => _sharedPrefs.getInt('targetCardLvl') ?? 0;
 
   set targetCardLvl(int value) => _sharedPrefs.setInt('targetCardLvl', value);

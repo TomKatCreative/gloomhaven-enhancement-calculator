@@ -50,9 +50,6 @@ class _CharacterScreenState extends State<CharacterScreen> {
   late ScrollController _scrollController;
   bool _isScrollSpyEnabled = true;
 
-  /// How far the character header has collapsed: 0 = expanded, 1 = collapsed.
-  double _headerProgress = 0.0;
-
   @override
   void initState() {
     super.initState();
@@ -69,24 +66,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
   }
 
   void _onScroll() {
-    _updateHeaderProgress();
     if (!_isScrollSpyEnabled) return;
     _updateActiveSection();
-  }
-
-  void _updateHeaderProgress() {
-    if (!_scrollController.hasClients) return;
-    final isEditMode = context.read<CharactersModel>().isEditMode;
-    final range = (isEditMode && !widget.character.isRetired)
-        ? 0.0
-        : _CharacterHeaderDelegate._maxHeight -
-              _CharacterHeaderDelegate._minHeight;
-    final newProgress = range > 0
-        ? (_scrollController.offset / range).clamp(0.0, 1.0)
-        : 0.0;
-    if (newProgress != _headerProgress) {
-      setState(() => _headerProgress = newProgress);
-    }
   }
 
   void _updateActiveSection() {
@@ -104,7 +85,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
     };
 
     _Section? closest;
-    double closestDistance = double.infinity;
+    double closestY = double.negativeInfinity;
 
     for (final entry in allKeys.entries) {
       final key = entry.key;
@@ -119,15 +100,12 @@ class _CharacterScreenState extends State<CharacterScreen> {
       if (renderBox == null || !renderBox.hasSize) continue;
 
       final position = renderBox.localToGlobal(Offset.zero);
-      final distance = (position.dy - headerOffset).abs();
 
-      // Prefer the section whose top is closest to (but not far below) the
-      // threshold
-      if (position.dy <= headerOffset + 50 || closest == null) {
-        if (distance < closestDistance || position.dy <= headerOffset + 50) {
-          closest = entry.value;
-          closestDistance = distance;
-        }
+      // Among sections at or above the threshold, pick the one closest to it
+      // (largest Y). This is the most recently scrolled-to-top section.
+      if (position.dy <= headerOffset + 50 && position.dy > closestY) {
+        closest = entry.value;
+        closestY = position.dy;
       }
     }
 
@@ -183,126 +161,101 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
 
-    final theme = Theme.of(context);
-
-    return Stack(
-      children: [
-        // Background class icon — visible behind transparent headers
-        Positioned(
-          right: -30,
-          top: -30,
-          height: _CharacterHeaderDelegate._maxHeight + chipBarHeight + 30,
-          width: 250,
-          child: Opacity(
-            opacity: (0.12 * (1 - _headerProgress)).clamp(0.0, 0.12),
-            child: ClassIconSvg(
-              playerClass: widget.character.playerClass,
-              color: widget.character
-                  .getEffectiveColor(theme.brightness)
-                  .withValues(alpha: 1),
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // PINNED HEADER: Character name, level, class
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _CharacterHeaderDelegate(
+            character: widget.character,
+            isEditMode: model.isEditMode,
+          ),
+        ),
+        // CHIP NAV BAR
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _SectionNavBarDelegate(
+            character: widget.character,
+            activeSection: _activeSection,
+            onSectionTapped: _scrollToSection,
+            hasMasteries: hasMasteries,
+          ),
+        ),
+        // GENERAL CARD (stats + resources)
+        SliverToBoxAdapter(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                smallPadding,
+                mediumPadding,
+                smallPadding,
+                smallPadding,
+              ),
+              child: CollapsibleSectionCard(
+                sectionKey: _sectionKeys[_Section.general],
+                title: AppLocalizations.of(context).general,
+                icon: Icons.bar_chart_rounded,
+                initiallyExpanded: SharedPrefs().generalExpanded,
+                onExpansionChanged: (value) =>
+                    SharedPrefs().generalExpanded = value,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      largePadding,
+                      0,
+                      largePadding,
+                      largePadding,
+                    ),
+                    child: Column(
+                      children: [
+                        _StatsSection(character: widget.character),
+                        if (model.isEditMode &&
+                            !widget.character.isRetired) ...[
+                          SizedBox(height: largePadding),
+                          _CheckmarksAndRetirementsRow(
+                            character: widget.character,
+                          ),
+                        ],
+                        const Divider(height: largePadding * 2),
+                        _ResourcesContent(character: widget.character),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            // PINNED HEADER: Character name, level, class
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _CharacterHeaderDelegate(
+        // QUEST & NOTES CARD
+        SliverToBoxAdapter(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(smallPadding),
+              child: _QuestAndNotesCollapsibleCard(
+                sectionKey: _sectionKeys[_Section.questAndNotes],
+                notesKey: _notesKey,
                 character: widget.character,
-                isEditMode: model.isEditMode,
-                headerProgress: _headerProgress,
               ),
             ),
-            // CHIP NAV BAR
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SectionNavBarDelegate(
-                character: widget.character,
-                activeSection: _activeSection,
-                onSectionTapped: _scrollToSection,
-                hasMasteries: hasMasteries,
-                headerProgress: _headerProgress,
-              ),
-            ),
-            // GENERAL CARD (stats + resources)
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    smallPadding,
-                    mediumPadding,
-                    smallPadding,
-                    smallPadding,
-                  ),
-                  child: CollapsibleSectionCard(
-                    sectionKey: _sectionKeys[_Section.general],
-                    title: AppLocalizations.of(context).general,
-                    icon: Icons.bar_chart_rounded,
-                    initiallyExpanded: SharedPrefs().generalExpanded,
-                    onExpansionChanged: (value) =>
-                        SharedPrefs().generalExpanded = value,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          largePadding,
-                          0,
-                          largePadding,
-                          largePadding,
-                        ),
-                        child: Column(
-                          children: [
-                            _StatsSection(character: widget.character),
-                            if (model.isEditMode &&
-                                !widget.character.isRetired) ...[
-                              SizedBox(height: largePadding),
-                              // const Divider(height: largePadding * 2),
-                              _CheckmarksAndRetirementsRow(
-                                character: widget.character,
-                              ),
-                            ],
-                            const Divider(height: largePadding * 2),
-                            _ResourcesContent(character: widget.character),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // QUEST & NOTES CARD
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(smallPadding),
-                  child: _QuestAndNotesCollapsibleCard(
-                    sectionKey: _sectionKeys[_Section.questAndNotes],
-                    notesKey: _notesKey,
-                    character: widget.character,
-                  ),
-                ),
-              ),
-            ),
-            // PERKS & MASTERIES CARD
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(smallPadding),
-                  child: _PerksAndMasteriesCard(
-                    sectionKey: _sectionKeys[_Section.perksAndMasteries],
-                    masteriesKey: _masteriesKey,
-                    character: widget.character,
-                    hasMasteries: hasMasteries,
-                  ),
-                ),
-              ),
-            ),
-            // BOTTOM PADDING
-            SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
-          ],
+          ),
         ),
+        // PERKS & MASTERIES CARD
+        SliverToBoxAdapter(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(smallPadding),
+              child: _PerksAndMasteriesCard(
+                sectionKey: _sectionKeys[_Section.perksAndMasteries],
+                masteriesKey: _masteriesKey,
+                character: widget.character,
+                hasMasteries: hasMasteries,
+              ),
+            ),
+          ),
+        ),
+        // BOTTOM PADDING
+        SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
       ],
     );
   }
@@ -313,15 +266,10 @@ class _CharacterScreenState extends State<CharacterScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _CharacterHeaderDelegate({
-    required this.character,
-    required this.isEditMode,
-    required this.headerProgress,
-  });
+  _CharacterHeaderDelegate({required this.character, required this.isEditMode});
 
   final Character character;
   final bool isEditMode;
-  final double headerProgress;
 
   static const double _maxHeight = 180.0;
   static const double _minHeight = 56.0;
@@ -348,11 +296,34 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
     final progress = range > 0 ? (shrinkOffset / range).clamp(0.0, 1.0) : 0.0;
 
     return Material(
-      elevation: 0,
-      color: colorScheme.surface.withValues(alpha: headerProgress),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: largePadding),
-        child: _buildContent(context, progress),
+      color: colorScheme.surface,
+      child: ClipRect(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Faded class icon background
+            Positioned(
+              right: -25,
+              top: -25,
+              height: _maxHeight + 50,
+              width: 225,
+              child: Opacity(
+                opacity: (0.08 * (1 - progress)).clamp(0.0, 0.08),
+                child: ClassIconSvg(
+                  playerClass: character.playerClass,
+                  color: character
+                      .getEffectiveColor(theme.brightness)
+                      .withValues(alpha: 1),
+                ),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: largePadding),
+              child: _buildContent(context, progress),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -504,14 +475,12 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     required this.activeSection,
     required this.onSectionTapped,
     required this.hasMasteries,
-    required this.headerProgress,
   });
 
   final Character character;
   final _Section activeSection;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
-  final double headerProgress;
 
   @override
   double get maxExtent => chipBarHeight;
@@ -544,7 +513,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     return Container(
       height: chipBarHeight,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(alpha: headerProgress),
+        color: theme.colorScheme.surface,
         boxShadow: overlapsContent
             ? [
                 BoxShadow(
@@ -575,9 +544,6 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
                     color: activeSection == section
                         ? primaryColor
                         : theme.colorScheme.onSurfaceVariant,
-                    fontWeight: activeSection == section
-                        ? FontWeight.w600
-                        : FontWeight.normal,
                   ),
                   side: activeSection == section
                       ? BorderSide(color: primaryColor.withValues(alpha: 0.3))
@@ -762,7 +728,7 @@ class _QuestAndNotesCollapsibleCardState
 // Combined Perks & Masteries Card
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _PerksAndMasteriesCard extends StatelessWidget {
+class _PerksAndMasteriesCard extends StatefulWidget {
   const _PerksAndMasteriesCard({
     required this.sectionKey,
     required this.masteriesKey,
@@ -776,94 +742,45 @@ class _PerksAndMasteriesCard extends StatelessWidget {
   final bool hasMasteries;
 
   @override
+  State<_PerksAndMasteriesCard> createState() => _PerksAndMasteriesCardState();
+}
+
+class _PerksAndMasteriesCardState extends State<_PerksAndMasteriesCard> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = SharedPrefs().perksAndMasteriesExpanded;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
+    final l10n = AppLocalizations.of(context);
     final model = context.watch<CharactersModel>();
 
-    return Container(
-      key: sectionKey,
-      constraints: const BoxConstraints(maxWidth: 400),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerLow,
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(borderRadiusMedium),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Perks header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              largePadding,
-              mediumPadding,
-              mediumPadding,
-              smallPadding,
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.auto_awesome_rounded,
-                  size: iconSizeSmall,
-                  color: primaryColor,
-                ),
-                const SizedBox(width: smallPadding),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.of(context).perks,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-                _PerksCountBadge(character: character),
-              ],
-            ),
-          ),
-          // Perks content
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              largePadding,
-              0,
-              largePadding,
-              largePadding,
-            ),
-            child: PerksSection(character: character),
-          ),
-          // Masteries (if present)
-          if (hasMasteries) ...[
-            const GHCDivider(),
-            // const Divider(),
-            // Masteries header
-            Padding(
-              key: masteriesKey,
-              padding: const EdgeInsets.fromLTRB(
-                largePadding,
-                mediumPadding,
-                mediumPadding,
-                smallPadding,
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.military_tech_rounded,
-                    size: iconSizeSmall,
-                    color: primaryColor,
-                  ),
-                  const SizedBox(width: smallPadding),
-                  Expanded(
-                    child: Text(
-                      AppLocalizations.of(context).masteries,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Masteries content
+    return CollapsibleSectionCard(
+      sectionKey: widget.sectionKey,
+      title: _isExpanded
+          ? l10n.perks
+          : widget.hasMasteries
+          ? l10n.perksAndMasteries
+          : l10n.perks,
+      icon: Icons.auto_awesome_rounded,
+      initiallyExpanded: _isExpanded,
+      onExpansionChanged: (value) {
+        SharedPrefs().perksAndMasteriesExpanded = value;
+        setState(() => _isExpanded = value);
+      },
+      trailing: _PerksCountBadge(character: widget.character),
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Perks content
             Padding(
               padding: const EdgeInsets.fromLTRB(
                 largePadding,
@@ -871,14 +788,56 @@ class _PerksAndMasteriesCard extends StatelessWidget {
                 largePadding,
                 largePadding,
               ),
-              child: MasteriesSection(
-                character: character,
-                charactersModel: model,
-              ),
+              child: PerksSection(character: widget.character),
             ),
+            // Masteries (if present)
+            if (widget.hasMasteries) ...[
+              const GHCDivider(indent: true),
+              // Masteries header
+              Padding(
+                key: widget.masteriesKey,
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  mediumPadding,
+                  mediumPadding,
+                  smallPadding,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.military_tech_rounded,
+                      size: iconSizeSmall,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: smallPadding),
+                    Expanded(
+                      child: Text(
+                        l10n.masteries,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Masteries content
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  0,
+                  largePadding,
+                  largePadding,
+                ),
+                child: MasteriesSection(
+                  character: widget.character,
+                  charactersModel: model,
+                ),
+              ),
+            ],
           ],
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -97,6 +97,7 @@ class CollapsibleSectionCard extends StatefulWidget {
     required this.children,
     this.constraints = const BoxConstraints(maxWidth: 400),
     this.sectionKey,
+    this.trailing,
   });
 
   final String title;
@@ -106,6 +107,7 @@ class CollapsibleSectionCard extends StatefulWidget {
   final List<Widget> children;
   final BoxConstraints constraints;
   final GlobalKey? sectionKey;
+  final Widget? trailing;
 
   @override
   State<CollapsibleSectionCard> createState() => _CollapsibleSectionCardState();
@@ -157,6 +159,10 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                   ),
                 ),
               ),
+              if (widget.trailing != null) ...[
+                const SizedBox(width: smallPadding),
+                widget.trailing!,
+              ],
             ],
           ),
           children: widget.children,
