@@ -388,7 +388,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'This will replace your current quest and reset all progress.';
 
   @override
-  String get comingSoon => 'Coming soon';
+  String get comingSoon => 'Coming soon...';
 
   @override
   String get noPersonalQuest => 'No personal quest selected';
@@ -435,6 +435,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get perksAndMasteries => 'Perks & Masteries';
+
+  @override
+  String get town => 'TOWN';
 
   @override
   String get characters => 'CHARACTERS';

@@ -803,7 +803,7 @@ abstract class AppLocalizations {
   /// No description provided for @comingSoon.
   ///
   /// In en, this message translates to:
-  /// **'Coming soon'**
+  /// **'Coming soon...'**
   String get comingSoon;
 
   /// No description provided for @noPersonalQuest.
@@ -889,6 +889,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Perks & Masteries'**
   String get perksAndMasteries;
+
+  /// No description provided for @town.
+  ///
+  /// In en, this message translates to:
+  /// **'TOWN'**
+  String get town;
 
   /// No description provided for @characters.
   ///

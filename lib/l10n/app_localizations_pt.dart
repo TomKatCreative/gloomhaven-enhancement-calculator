@@ -388,7 +388,7 @@ class AppLocalizationsPt extends AppLocalizations {
       'Isso substituirá sua missão atual e redefinirá todo o progresso.';
 
   @override
-  String get comingSoon => 'Em breve';
+  String get comingSoon => 'Em breve...';
 
   @override
   String get noPersonalQuest => 'Nenhuma missão pessoal selecionada';
@@ -435,6 +435,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get perksAndMasteries => 'Vantagens e Maestrias';
+
+  @override
+  String get town => 'CIDADE';
 
   @override
   String get characters => 'PERSONAGENS';
