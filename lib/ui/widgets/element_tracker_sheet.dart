@@ -181,8 +181,7 @@ class _ElementTrackerSheetState extends State<ElementTrackerSheet> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final sheetColor =
-        theme.bottomNavigationBarTheme.backgroundColor ??
-        theme.colorScheme.surface;
+        theme.navigationBarTheme.backgroundColor ?? theme.colorScheme.surface;
 
     return DraggableScrollableSheet(
       controller: _controller,

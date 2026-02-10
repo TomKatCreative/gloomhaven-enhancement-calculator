@@ -260,7 +260,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   );
 
                   final baseChipColor =
-                      theme.bottomNavigationBarTheme.backgroundColor ??
+                      theme.navigationBarTheme.backgroundColor ??
                       colorScheme.surface;
                   // Lighten chip when blur/shadow is present for better visibility
                   final chipColor = Color.lerp(

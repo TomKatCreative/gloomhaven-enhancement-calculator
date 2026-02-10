@@ -103,7 +103,7 @@ class _SettingsBottomSheet extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color:
-            theme.bottomNavigationBarTheme.backgroundColor ??
+            theme.navigationBarTheme.backgroundColor ??
             theme.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(borderRadiusLarge),

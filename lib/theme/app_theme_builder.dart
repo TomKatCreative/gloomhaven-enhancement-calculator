@@ -203,13 +203,37 @@ class AppThemeBuilder {
         thickness: hairlineThickness,
       ),
 
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surfaceContainer,
         elevation: 0,
-        selectedItemColor: ColorUtils.ensureTextContrast(
-          primaryColor,
-          colorScheme.surfaceContainer,
-        ),
+        indicatorColor: primaryColor.withValues(alpha: 0.12),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(
+              color: ColorUtils.ensureTextContrast(
+                primaryColor,
+                colorScheme.surfaceContainer,
+              ),
+            );
+          }
+          return IconThemeData(color: colorScheme.onSurfaceVariant);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              fontSize: fontSizeLabelSmall,
+              fontWeight: FontWeight.w600,
+              color: ColorUtils.ensureTextContrast(
+                primaryColor,
+                colorScheme.surfaceContainer,
+              ),
+            );
+          }
+          return TextStyle(
+            fontSize: fontSizeLabelSmall,
+            color: colorScheme.onSurfaceVariant,
+          );
+        }),
       ),
 
       segmentedButtonTheme: SegmentedButtonThemeData(
