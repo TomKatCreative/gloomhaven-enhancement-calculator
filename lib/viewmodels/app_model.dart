@@ -27,12 +27,17 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 /// Manages app-level navigation and theme state.
 ///
 /// This is a lightweight model primarily handling:
-/// - Current page index (0=Characters, 1=Calculator)
+/// - Current page index (0=Town, 1=Characters, 2=Enhancements)
 /// - Theme mode delegation
 /// - Font preference
 class AppModel extends ChangeNotifier {
-  AppModel();
-  final PageController pageController = PageController();
+  AppModel() {
+    final savedPage = SharedPrefs().initialPage.clamp(0, 2);
+    _page = savedPage;
+    pageController = PageController(initialPage: savedPage);
+  }
+
+  late final PageController pageController;
   ThemeMode _themeMode = SharedPrefs().darkTheme
       ? ThemeMode.dark
       : ThemeMode.light;
@@ -65,6 +70,7 @@ class AppModel extends ChangeNotifier {
 
   set page(int page) {
     _page = page;
+    SharedPrefs().initialPage = page;
     notifyListeners();
   }
 }

@@ -13,9 +13,23 @@ void main() {
     });
 
     group('initial state', () {
-      test('page defaults to 0', () {
+      test('page defaults to 1 (Characters) when no initialPage saved', () {
         final model = AppModel();
-        expect(model.page, 0);
+        expect(model.page, 1);
+      });
+
+      test('page restores from SharedPrefs initialPage', () async {
+        SharedPreferences.setMockInitialValues({'initialPage': 2});
+        await SharedPrefs().init();
+        final model = AppModel();
+        expect(model.page, 2);
+      });
+
+      test('page clamps out-of-range initialPage to valid range', () async {
+        SharedPreferences.setMockInitialValues({'initialPage': 99});
+        await SharedPrefs().init();
+        final model = AppModel();
+        expect(model.page, 2);
       });
 
       test('themeMode defaults to light when darkTheme is false', () {
@@ -39,6 +53,13 @@ void main() {
         final model = AppModel();
         expect(model.pageController, isA<PageController>());
       });
+
+      test('pageController initialPage matches saved page', () async {
+        SharedPreferences.setMockInitialValues({'initialPage': 1});
+        await SharedPrefs().init();
+        final model = AppModel();
+        expect(model.pageController.initialPage, 1);
+      });
     });
 
     group('page setter', () {
@@ -54,6 +75,12 @@ void main() {
         model.addListener(() => notified = true);
         model.page = 1;
         expect(notified, isTrue);
+      });
+
+      test('persists to SharedPrefs', () {
+        final model = AppModel();
+        model.page = 2;
+        expect(SharedPrefs().initialPage, 2);
       });
     });
 
