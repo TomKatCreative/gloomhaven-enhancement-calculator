@@ -272,14 +272,16 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
   final bool isEditMode;
 
   static const double _maxHeight = 180.0;
+  static const double _editModeHeight = 90.0;
   static const double _minHeight = 56.0;
 
   @override
-  double get maxExtent => _maxHeight;
+  double get maxExtent =>
+      isEditMode && !character.isRetired ? _editModeHeight : _maxHeight;
 
   @override
   double get minExtent =>
-      isEditMode && !character.isRetired ? _maxHeight : _minHeight;
+      isEditMode && !character.isRetired ? _editModeHeight : _minHeight;
 
   @override
   bool shouldRebuild(covariant _CharacterHeaderDelegate oldDelegate) => true;
@@ -305,7 +307,7 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
             Positioned(
               right: -25,
               top: -25,
-              height: _maxHeight + 50,
+              height: maxExtent + 50,
               width: 225,
               child: Opacity(
                 opacity: (0.08 * (1 - progress)).clamp(0.0, 0.08),
@@ -378,26 +380,29 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
             style: theme.textTheme.displayMedium,
             textAlign: TextAlign.center,
           ),
-        const SizedBox(height: smallPadding),
-        // Level + class subtitle
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _LevelBadge(character: character),
-            const SizedBox(width: smallPadding),
-            Flexible(
-              child: AutoSizeText(
-                character.classSubtitle,
-                maxLines: 1,
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontFamily: nyala,
+        if (!isEditMode || character.isRetired) ...[
+          const SizedBox(height: smallPadding),
+          // Level + class subtitle
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _LevelBadge(character: character),
+              const SizedBox(width: smallPadding),
+              Flexible(
+                child: AutoSizeText(
+                  character.classSubtitle,
+                  maxLines: 1,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontFamily: nyala,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
         // Traits (view mode only, frosthaven classes)
-        if (character.shouldShowTraits && !isEditMode) ...[
+        if (character.shouldShowTraits &&
+            (!isEditMode || character.isRetired)) ...[
           const SizedBox(height: smallPadding),
           Opacity(
             opacity: 1.0 - progress,

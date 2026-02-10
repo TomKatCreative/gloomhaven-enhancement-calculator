@@ -185,7 +185,6 @@ class _HomeState extends State<Home> {
 
     final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
-    final brightness = Theme.of(context).brightness;
     final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
 
     // Characters page with characters: expandable FAB
@@ -198,10 +197,8 @@ class _HomeState extends State<Home> {
         ActionButton(
           tooltip: isRetired ? l10n.unretire : l10n.retire,
           icon: Icon(isRetired ? Icons.directions_walk : Icons.assist_walker),
-          color: brightness == Brightness.light ? Colors.grey : Colors.white,
-          iconColor: brightness == Brightness.light
-              ? Colors.white
-              : Colors.grey,
+          color: colorScheme.surfaceContainerHighest,
+          iconColor: colorScheme.onSurface,
           onPressed: () => _handleRetire(context, charactersModel, appModel),
         ),
         ActionButton(
