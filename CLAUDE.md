@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Gloomhaven Enhancement Calculator** - A Flutter mobile app (iOS/Android) for the Gloomhaven board game series. It provides:
+**Gloomhaven Enhancement Calculator** - A Flutter mobile app (iOS/Android/Web) for the Gloomhaven board game series. It provides:
 - Character sheet management (create, track, retire characters)
 - Enhancement cost calculator
 - Perk and mastery tracking

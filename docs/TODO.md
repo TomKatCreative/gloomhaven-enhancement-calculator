@@ -165,3 +165,70 @@ Improved: Backup → Immediate share sheet option (keep save option too)
 2. Backup age reminder (quick win)
 3. One-tap sharing (UX improvement)
 4. Auto-backup (nice-to-have)
+
+---
+
+## Character PageView Swiping Performance
+
+**Added:** 2026-02-09
+**Status:** Pending investigation
+**File:** `lib/ui/screens/characters_screen.dart:80-86`
+
+If swiping between character pages is still not smooth, investigate:
+1. Add `allowImplicitScrolling: true` to `PageView.builder` to preload adjacent pages
+2. Change `context.watch<CharactersModel>()` to more targeted selectors or move to child widgets to reduce unnecessary rebuilds
+3. Consider wrapping entire `CharacterScreen` in `RepaintBoundary` if needed
+4. Profile with Flutter DevTools Performance overlay to identify actual jank
+5. Consider caching the rasterized class icon background image
+
+---
+
+## Code Audit — Future Refactors
+
+**Added:** 2026-02-09
+**Status:** Pending
+
+Larger refactoring opportunities identified during codebase audit. These are non-urgent structural improvements that would reduce complexity and improve maintainability.
+
+### CharactersModel Decomposition
+**File:** `lib/viewmodels/characters_model.dart` (~572 lines)
+
+Extract element sheet state, scroll controllers, and navigation logic into smaller focused classes. Currently a god class managing too many concerns.
+
+### EnhancementCalculatorModel Cost Calculation Extraction
+**File:** `lib/viewmodels/enhancement_calculator_model.dart`
+
+Extract `calculateCost()` and `getCalculationBreakdown()` into a pure `CostCalculator` class, separate from state management.
+
+### SharedPrefs Enhancer Level Cascade
+**File:** `lib/shared_prefs.dart`
+
+Move the cascade validation logic (setting lvl4 triggers lvl3/2/1) out of property setters into a dedicated validator.
+
+### DatabaseHelper Decomposition
+**File:** `lib/data/database_helpers.dart`
+
+Extract backup/restore into `DatabaseBackupService`, separate from query logic.
+
+### PerkRow / MasteryRow Deduplication
+**Files:** `lib/ui/widgets/perk_row.dart`, `lib/ui/widgets/mastery_row.dart`
+
+Extract shared `CheckableRow` base component.
+
+### CharacterSectionCard / CollapsibleSectionCard Deduplication
+**File:** `lib/ui/widgets/character_section_card.dart`
+
+Extract shared title row composition.
+
+### Database Query Boilerplate
+**File:** `lib/data/database_helpers.dart`
+
+Create generic `queryAndMap<T>()` method to replace 4 identical query patterns.
+
+### InfoDialog Simplification
+**File:** `lib/ui/dialogs/info_dialog.dart`
+
+Replace per-category `_configure*` methods with data-driven configuration.
+
+### Import Style Standardization
+Some files use relative imports, most use `package:` — standardize on `package:` imports throughout the codebase.
