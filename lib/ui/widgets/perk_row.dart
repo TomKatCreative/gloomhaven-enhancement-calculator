@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/check_row_divider.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/checkable_row.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/conditional_checkbox.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/constants.dart';
 import '../../models/perk/perk.dart';
-import '../../utils/utils.dart';
 import '../../viewmodels/characters_model.dart';
 
 class PerkRow extends StatefulWidget {
@@ -23,7 +23,6 @@ class PerkRow extends StatefulWidget {
 
 class PerkRowState extends State<PerkRow> {
   final List<String?> perkIds = [];
-  double height = 0;
 
   /// Safely finds the CharacterPerk for a given perk ID.
   /// Returns null if not found (defensive against data inconsistency).
@@ -44,59 +43,36 @@ class PerkRowState extends State<PerkRow> {
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: tinyPadding),
-      child: Row(
-        children: <Widget>[
-          widget.perks[0].grouped
-              ? _buildGroupedCheckboxes(context, charactersModel)
-              : Row(
-                  children: List.generate(widget.perks.length, (index) {
-                    final characterPerk = _findCharacterPerk(
-                      widget.perks[index].perkId,
-                    );
-                    if (characterPerk == null) return const SizedBox.shrink();
-                    return ConditionalCheckbox(
-                      value: characterPerk.characterPerkIsSelected,
-                      isEditMode: charactersModel.isEditMode,
-                      isRetired: widget.character.isRetired,
-                      onChanged: (bool value) => charactersModel.togglePerk(
-                        characterPerks: widget.character.characterPerks,
-                        perk: characterPerk,
-                        value: value,
-                      ),
-                    );
-                  }),
-                ),
-          widget.perks[0].grouped
-              ? const SizedBox(width: smallPadding)
-              : CheckRowDivider(
-                  height: height,
-                  color: Theme.of(context).dividerTheme.color,
-                ),
-          SizeProviderWidget(
-            onChildSize: (Size? size) {
-              if (size != null && context.mounted) {
-                setState(() {
-                  height = size.height * 0.9;
-                });
-              }
-            },
-            child: Expanded(
-              child: RichText(
-                text: TextSpan(
-                  style: Theme.of(context).textTheme.bodyLarge,
-                  children: Utils.generateCheckRowDetails(
-                    context,
-                    widget.perks.first.perkDetails,
-                    Theme.of(context).brightness == Brightness.dark,
-                  ),
-                ),
+    return CheckableRow(
+      details: widget.perks.first.perkDetails,
+      leadingBuilder: (contentHeight) => [
+        widget.perks[0].grouped
+            ? _buildGroupedCheckboxes(context, charactersModel)
+            : Row(
+                children: List.generate(widget.perks.length, (index) {
+                  final characterPerk = _findCharacterPerk(
+                    widget.perks[index].perkId,
+                  );
+                  if (characterPerk == null) return const SizedBox.shrink();
+                  return ConditionalCheckbox(
+                    value: characterPerk.characterPerkIsSelected,
+                    isEditMode: charactersModel.isEditMode,
+                    isRetired: widget.character.isRetired,
+                    onChanged: (bool value) => charactersModel.togglePerk(
+                      characterPerks: widget.character.characterPerks,
+                      perk: characterPerk,
+                      value: value,
+                    ),
+                  );
+                }),
               ),
-            ),
-          ),
-        ],
-      ),
+        widget.perks[0].grouped
+            ? const SizedBox(width: smallPadding)
+            : CheckRowDivider(
+                height: contentHeight,
+                color: Theme.of(context).dividerTheme.color,
+              ),
+      ],
     );
   }
 
