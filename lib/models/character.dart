@@ -62,6 +62,7 @@ const String columnIsRetired = 'IsRetired';
 const String columnVariant = 'Variant';
 const String columnCharacterPersonalQuestId = 'PersonalQuestId';
 const String columnCharacterPersonalQuestProgress = 'PersonalQuestProgress';
+const String columnCharacterCampaignId = 'CampaignId';
 
 /// A player character instance with stats, resources, and progression.
 ///
@@ -107,6 +108,7 @@ class Character {
   Variant variant = Variant.base;
   String personalQuestId = '';
   List<int> personalQuestProgress = [];
+  String? campaignId;
   List<Perk> perks = [];
   List<CharacterPerk> characterPerks = [];
   List<Mastery> masteries = [];
@@ -134,6 +136,7 @@ class Character {
     this.variant = Variant.base,
     this.personalQuestId = '',
     this.personalQuestProgress = const [],
+    this.campaignId,
   });
 
   Character.fromMap(Map<String, dynamic> map) {
@@ -166,6 +169,7 @@ class Character {
     personalQuestProgress = decodeProgress(
       map[columnCharacterPersonalQuestProgress] ?? '[]',
     );
+    campaignId = map[columnCharacterCampaignId];
   }
 
   Map<String, dynamic> toMap() => {
@@ -191,6 +195,7 @@ class Character {
     columnVariant: variant.name,
     columnCharacterPersonalQuestId: personalQuestId,
     columnCharacterPersonalQuestProgress: encodeProgress(personalQuestProgress),
+    columnCharacterCampaignId: campaignId,
   };
 
   /// Resolves the full [PersonalQuest] object from the repository.
