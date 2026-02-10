@@ -265,14 +265,14 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 │   515 - Lawbringer         [swap]   │     (CollapsibleSectionCard internally)
 │   ● Kill 20 Bandits...    12/20    │
 ├─────────────────────────────────────┤
-│ Notes                               │  ← CharacterSectionCard
+│ Notes                               │  ← SectionCard
 │ "Remember to buy boots..."          │     (hidden when empty + view mode)
 ├─────────────────────────────────────┤
-│ Perks                     (3/9)     │  ← CharacterSectionCard + badge
+│ Perks                     (3/9)     │  ← SectionCard + badge
 │ [✓] Remove two -1 cards             │
 │ [ ] Add one rolling PUSH 2          │
 ├─────────────────────────────────────┤
-│ Masteries                           │  ← CharacterSectionCard
+│ Masteries                           │  ← SectionCard
 │ [✓] Complete 3 scenarios without... │     (conditional: FH/CS only)
 └─────────────────────────────────────┘
 ```
@@ -295,12 +295,12 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 
 ### Section Cards
 
-Two card widgets from `lib/ui/widgets/character_section_card.dart`:
+Two card widgets from `lib/ui/widgets/section_card.dart`:
 
-- **`CharacterSectionCard`** — static card with title row (icon + text) and child content. Used for Notes, Perks, Masteries.
-- **`CollapsibleSectionCard`** — card with `ExpansionTile` for collapsible sections. Used for General. Expansion state persisted via `SharedPrefs().generalExpanded`.
+- **`SectionCard`** — static card with title row (icon + text) and child content. Used for Notes, Perks, Masteries on the character screen, and all three sections on the calculator screen.
+- **`CollapsibleSectionCard`** — card with `ExpansionTile` for collapsible sections. Used for General section. Expansion state persisted via `SharedPrefs().generalExpanded`.
 
-Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and a default `maxWidth: 400`.
+Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and a default `maxWidth: 500`.
 
 ### Edit Mode vs View Mode
 

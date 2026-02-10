@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_cost_chip.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -50,35 +51,7 @@ class _EnhancementCalculatorScreenState
               bottom: enhancementCalculatorModel.showCost ? 90 : largePadding,
             ),
             children: <Widget>[
-              // === ENHANCEMENT ===
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: largePadding),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: largePadding,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).actionDetails,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: mediumPadding),
 
               // 1. ENHANCEMENT TYPE
               _EnhancementTypeCard(
@@ -86,74 +59,18 @@ class _EnhancementCalculatorScreenState
                 model: enhancementCalculatorModel,
               ),
 
-              // === CARD DETAILS ===
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: largePadding),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: largePadding,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).cardDetails,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: mediumPadding),
 
-              // 2. CARD DETAILS & MODIFIERS - grouped card
+              // 2. CARD DETAILS & MODIFIERS
               _CardDetailsGroupCard(
                 edition: edition,
                 model: enhancementCalculatorModel,
                 darkTheme: darkTheme,
               ),
 
-              // === DISCOUNTS ===
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: largePadding),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: largePadding,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context).discounts,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        color: Theme.of(context).dividerTheme.color,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              const SizedBox(height: mediumPadding),
 
-              // 5. DISCOUNTS - grouped card
+              // 3. DISCOUNTS
               _DiscountsGroupCard(
                 edition: edition,
                 enhancementCalculatorModel: enhancementCalculatorModel,
@@ -206,42 +123,44 @@ class _CardDetailsGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: smallPadding),
-        child: Column(
-          children: [
-            _CardLevelSection(
-              edition: edition,
-              model: model,
-              darkTheme: darkTheme,
-            ),
+    final l10n = AppLocalizations.of(context);
+
+    return SectionCard(
+      title: l10n.cardDetails,
+      icon: Icons.style_rounded,
+      contentPadding: const EdgeInsets.only(bottom: smallPadding),
+      child: Column(
+        children: [
+          _CardLevelSection(
+            edition: edition,
+            model: model,
+            darkTheme: darkTheme,
+          ),
+          const GHCDivider(indent: true),
+          _PreviousEnhancementsSection(
+            edition: edition,
+            model: model,
+            darkTheme: darkTheme,
+          ),
+          const GHCDivider(indent: true),
+          _MultipleTargetsToggle(
+            edition: edition,
+            model: model,
+            darkTheme: darkTheme,
+          ),
+          if (edition.hasLostModifier) ...[
             const GHCDivider(indent: true),
-            _PreviousEnhancementsSection(
+            _LossNonPersistentToggle(
               edition: edition,
               model: model,
               darkTheme: darkTheme,
             ),
-            const GHCDivider(indent: true),
-            _MultipleTargetsToggle(
-              edition: edition,
-              model: model,
-              darkTheme: darkTheme,
-            ),
-            if (edition.hasLostModifier) ...[
-              const GHCDivider(indent: true),
-              _LossNonPersistentToggle(
-                edition: edition,
-                model: model,
-                darkTheme: darkTheme,
-              ),
-            ],
-            if (edition.hasPersistentModifier) ...[
-              const GHCDivider(indent: true),
-              _PersistentToggle(model: model, darkTheme: darkTheme),
-            ],
           ],
-        ),
+          if (edition.hasPersistentModifier) ...[
+            const GHCDivider(indent: true),
+            _PersistentToggle(model: model, darkTheme: darkTheme),
+          ],
+        ],
       ),
     );
   }
@@ -424,18 +343,23 @@ class _MultipleTargetsToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ToggleRow(
-      infoTitle: Strings.multipleTargetsInfoTitle,
-      infoMessage: Strings.multipleTargetsInfoBody(
-        context,
-        edition: edition,
-        enhancerLvl2: edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
-        darkMode: darkTheme,
+    return ToggleGroupRow(
+      item: ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.multipleTargetsInfoTitle,
+          message: Strings.multipleTargetsInfoBody(
+            context,
+            edition: edition,
+            enhancerLvl2:
+                edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
+            darkMode: darkTheme,
+          ),
+        ),
+        title: AppLocalizations.of(context).multipleTargets,
+        value: model.multipleTargets,
+        enabled: !model.disableMultiTargetsSwitch,
+        onChanged: (value) => model.multipleTargets = value,
       ),
-      title: AppLocalizations.of(context).multipleTargets,
-      value: model.multipleTargets,
-      enabled: !model.disableMultiTargetsSwitch,
-      onChanged: (value) => model.multipleTargets = value,
     );
   }
 }
@@ -454,46 +378,51 @@ class _LossNonPersistentToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ToggleRow(
-      infoTitle: Strings.lostNonPersistentInfoTitle(edition: edition),
-      infoMessage: Strings.lostNonPersistentInfoBody(
-        context,
-        edition,
-        darkTheme,
-      ),
-      titleWidget: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ThemedSvg(assetKey: 'LOSS', width: iconSizeLarge),
-          if (edition.hasPersistentModifier) ...[
-            const SizedBox(width: largePadding),
-            SizedBox(
-              width: iconSizeLarge + 16,
-              height: iconSizeLarge + 11,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
-                  Positioned(
-                    right: 5,
-                    child: ThemedSvg(
-                      assetKey: 'NOT',
-                      width: iconSizeLarge + 11,
+    return ToggleGroupRow(
+      item: ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.lostNonPersistentInfoTitle(edition: edition),
+          message: Strings.lostNonPersistentInfoBody(
+            context,
+            edition,
+            darkTheme,
+          ),
+        ),
+        titleWidget: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ThemedSvg(assetKey: 'LOSS', width: iconSizeLarge),
+            if (edition.hasPersistentModifier) ...[
+              const SizedBox(width: largePadding),
+              SizedBox(
+                width: iconSizeLarge + 16,
+                height: iconSizeLarge + 11,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
+                    Positioned(
+                      right: 5,
+                      child: ThemedSvg(
+                        assetKey: 'NOT',
+                        width: iconSizeLarge + 11,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
+            ],
           ],
-        ],
+        ),
+        subtitle: Strings.lostNonPersistentInfoTitle(edition: edition),
+        value: model.lostNonPersistent,
+        enabled:
+            !model.persistent &&
+            (edition.hasPersistentModifier ||
+                model.enhancement?.category !=
+                    EnhancementCategory.summonPlusOne),
+        onChanged: (value) => model.lostNonPersistent = value,
       ),
-      subtitle: Strings.lostNonPersistentInfoTitle(edition: edition),
-      value: model.lostNonPersistent,
-      enabled:
-          !model.persistent &&
-          (edition.hasPersistentModifier ||
-              model.enhancement?.category != EnhancementCategory.summonPlusOne),
-      onChanged: (value) => model.lostNonPersistent = value,
     );
   }
 }
@@ -507,99 +436,19 @@ class _PersistentToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _ToggleRow(
-      infoTitle: Strings.persistentInfoTitle,
-      infoMessage: Strings.persistentInfoBody(context, darkTheme),
-      titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
-      subtitle: AppLocalizations.of(context).persistent,
-      value: model.persistent,
-      enabled:
-          model.enhancement?.category != EnhancementCategory.summonPlusOne &&
-          !model.lostNonPersistent,
-      onChanged: (value) => model.persistent = value,
-    );
-  }
-}
-
-/// A toggle row with info button, title/subtitle, and switch.
-///
-/// Used for modifier toggles like Multiple Targets, Lost Action, Persistent.
-class _ToggleRow extends StatelessWidget {
-  final String infoTitle;
-  final RichText infoMessage;
-  final String? title;
-  final Widget? titleWidget;
-  final String? subtitle;
-  final bool value;
-  final bool enabled;
-  final ValueChanged<bool> onChanged;
-
-  const _ToggleRow({
-    required this.infoTitle,
-    required this.infoMessage,
-    this.title,
-    this.titleWidget,
-    this.subtitle,
-    required this.value,
-    required this.enabled,
-    required this.onChanged,
-  }) : assert(title != null || titleWidget != null);
-
-  void _handleToggle() {
-    if (enabled) {
-      onChanged(!value);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: largePadding),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.info_outline_rounded),
-            onPressed: () => showDialog<void>(
-              context: context,
-              builder: (_) =>
-                  InfoDialog(title: infoTitle, message: infoMessage),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: _handleToggle,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: largePadding,
-                  top: smallPadding,
-                  bottom: smallPadding,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    titleWidget ??
-                        Text(title!, style: theme.textTheme.bodyLarge),
-                    if (subtitle != null)
-                      Text(
-                        subtitle!,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: _handleToggle,
-            child: Switch(value: value, onChanged: enabled ? onChanged : null),
-          ),
-        ],
+    return ToggleGroupRow(
+      item: ToggleGroupItem(
+        infoConfig: InfoButtonConfig.titleMessage(
+          title: Strings.persistentInfoTitle,
+          message: Strings.persistentInfoBody(context, darkTheme),
+        ),
+        titleWidget: ThemedSvg(assetKey: 'PERSISTENT', width: iconSizeLarge),
+        subtitle: AppLocalizations.of(context).persistent,
+        value: model.persistent,
+        enabled:
+            model.enhancement?.category != EnhancementCategory.summonPlusOne &&
+            !model.lostNonPersistent,
+        onChanged: (value) => model.persistent = value,
       ),
     );
   }
@@ -623,39 +472,42 @@ class _EnhancementTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final enhancement = model.enhancement;
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.only(left: largePadding),
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Icons.info_outline_rounded),
-              onPressed: enhancement != null
-                  ? () => showDialog<void>(
-                      context: context,
-                      builder: (_) =>
-                          InfoDialog(category: enhancement.category),
+    return SectionCard(
+      title: l10n.actionDetails,
+      icon: Icons.auto_awesome_rounded,
+      contentPadding: const EdgeInsets.only(
+        left: largePadding,
+        bottom: largePadding,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: enhancement != null
+                ? () => showDialog<void>(
+                    context: context,
+                    builder: (_) => InfoDialog(category: enhancement.category),
+                  )
+                : null,
+          ),
+          const SizedBox(width: largePadding),
+          Expanded(
+            child: EnhancementTypeBody(
+              model: model,
+              edition: edition,
+              costConfig: enhancement != null
+                  ? CostDisplayConfig(
+                      baseCost: enhancement.cost(edition: edition),
+                      discountedCost: model.enhancementCost(enhancement),
+                      marker: _buildEnhancementTypeMarker(model),
                     )
                   : null,
             ),
-            const SizedBox(width: largePadding),
-            Expanded(
-              child: EnhancementTypeBody(
-                model: model,
-                edition: edition,
-                costConfig: enhancement != null
-                    ? CostDisplayConfig(
-                        baseCost: enhancement.cost(edition: edition),
-                        discountedCost: model.enhancementCost(enhancement),
-                        marker: _buildEnhancementTypeMarker(model),
-                      )
-                    : null,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -762,7 +614,14 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
         ),
     ];
 
-    return CalculatorToggleGroupCard(items: items);
+    final l10n = AppLocalizations.of(context);
+
+    return SectionCard(
+      title: l10n.discounts,
+      icon: Icons.discount_rounded,
+      contentPadding: const EdgeInsets.only(bottom: smallPadding),
+      child: CalculatorToggleGroupCard(items: items),
+    );
   }
 
   bool _hasAnyEnhancerUpgrades() {

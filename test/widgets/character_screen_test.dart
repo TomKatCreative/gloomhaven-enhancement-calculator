@@ -9,7 +9,7 @@ import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/character_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/character_section_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 

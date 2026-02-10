@@ -50,72 +50,45 @@ class ToggleGroupItem {
        );
 }
 
-/// A card containing multiple toggle items stacked vertically with dividers.
+/// A toggle row with optional info button, title/subtitle, and switch.
 ///
-/// Used to group related toggles (e.g., modifier options or discount settings).
-class CalculatorToggleGroupCard extends StatelessWidget {
-  /// The list of toggle items to display.
-  final List<ToggleGroupItem> items;
+/// Renders a single [ToggleGroupItem] as a row. Used directly for standalone
+/// toggles, or composed by [CalculatorToggleGroupCard] for grouped toggles.
+class ToggleGroupRow extends StatelessWidget {
+  final ToggleGroupItem item;
 
-  const CalculatorToggleGroupCard({super.key, required this.items});
+  const ToggleGroupRow({super.key, required this.item});
+
+  void _handleToggle() {
+    if (item.enabled && item.onChanged != null) {
+      item.onChanged!(!item.value);
+    }
+  }
+
+  void _handleTap() {
+    if (item.onTap != null) {
+      item.onTap!();
+    } else {
+      _handleToggle();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: smallPadding),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: _buildItemsWithDividers(context),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildItemsWithDividers(BuildContext context) {
-    final widgets = <Widget>[];
-
-    for (int i = 0; i < items.length; i++) {
-      widgets.add(_buildToggleRow(context, items[i]));
-
-      // Add thin divider between items (not after the last one)
-      if (i < items.length - 1) {
-        widgets.add(const GHCDivider(indent: true));
-      }
-    }
-
-    return widgets;
-  }
-
-  Widget _buildToggleRow(BuildContext context, ToggleGroupItem item) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    void handleToggle() {
-      if (item.enabled && item.onChanged != null) {
-        item.onChanged!(!item.value);
-      }
-    }
-
-    void handleTap() {
-      if (item.onTap != null) {
-        item.onTap!();
-      } else {
-        handleToggle();
-      }
-    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: largePadding),
       child: Row(
         children: [
           // Info button
-          if (item.infoConfig != null) _buildInfoButton(context, item),
+          if (item.infoConfig != null) _buildInfoButton(context),
           // Tappable area: title/subtitle
           Expanded(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: handleTap,
+              onTap: _handleTap,
               child: Padding(
                 padding: EdgeInsets.only(
                   left: item.infoConfig != null ? largePadding : 0,
@@ -146,10 +119,10 @@ class CalculatorToggleGroupCard extends StatelessWidget {
           ),
           // Trailing widget (if any) or switch
           if (item.trailingWidget != null)
-            GestureDetector(onTap: handleTap, child: item.trailingWidget)
+            GestureDetector(onTap: _handleTap, child: item.trailingWidget)
           else
             GestureDetector(
-              onTap: handleToggle,
+              onTap: _handleToggle,
               child: Switch(
                 value: item.value,
                 onChanged: item.enabled ? item.onChanged : null,
@@ -160,24 +133,54 @@ class CalculatorToggleGroupCard extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoButton(BuildContext context, ToggleGroupItem item) {
+  Widget _buildInfoButton(BuildContext context) {
+    final config = item.infoConfig!;
     return IconButton(
       icon: const Icon(Icons.info_outline_rounded),
-      onPressed: item.infoConfig?.enabled == true
-          ? () => _showInfoDialog(context, item.infoConfig!)
+      onPressed: config.enabled
+          ? () => showDialog<void>(
+              context: context,
+              builder: (_) {
+                if (config.category != null) {
+                  return InfoDialog(category: config.category);
+                }
+                return InfoDialog(title: config.title, message: config.message);
+              },
+            )
           : null,
     );
   }
+}
 
-  void _showInfoDialog(BuildContext context, InfoButtonConfig config) {
-    showDialog<void>(
-      context: context,
-      builder: (_) {
-        if (config.category != null) {
-          return InfoDialog(category: config.category);
-        }
-        return InfoDialog(title: config.title, message: config.message);
-      },
+/// Multiple toggle items stacked vertically with dividers.
+///
+/// Used to group related toggles (e.g., discount settings).
+class CalculatorToggleGroupCard extends StatelessWidget {
+  /// The list of toggle items to display.
+  final List<ToggleGroupItem> items;
+
+  const CalculatorToggleGroupCard({super.key, required this.items});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: _buildItemsWithDividers(),
     );
+  }
+
+  List<Widget> _buildItemsWithDividers() {
+    final widgets = <Widget>[];
+
+    for (int i = 0; i < items.length; i++) {
+      widgets.add(ToggleGroupRow(item: items[i]));
+
+      // Add thin divider between items (not after the last one)
+      if (i < items.length - 1) {
+        widgets.add(const GHCDivider(indent: true));
+      }
+    }
+
+    return widgets;
   }
 }

@@ -32,7 +32,7 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/character_section_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';

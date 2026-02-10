@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 
-/// Configuration for the info button in a [CalculatorSectionCard].
+/// Configuration for an info button in calculator section cards.
 ///
 /// There are two ways to configure an info button:
 /// 1. [InfoButtonConfig.titleMessage] - Provide a title and pre-built message

@@ -9,7 +9,7 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - PQ section on character screen with progress tracking (+/- buttons in edit mode)
 - Change quest flow with confirmation dialog
 - Retirement prompt: snackbar with confetti pop on PQ completion → confirmation dialog → retire
-- `CollapsibleSectionCard` for PQ section; `CharacterSectionCard` for static sections
+- `CollapsibleSectionCard` for PQ section; `SectionCard` for static sections
 - Class unlock icon / envelope icon in ExpansionTile header row
 - `TextFormField` selector when no quest assigned (edit mode)
 - Strikethrough gold display for retired characters (gold forfeited on retirement)
@@ -215,8 +215,8 @@ Extract backup/restore into `DatabaseBackupService`, separate from query logic.
 
 Extract shared `CheckableRow` base component.
 
-### CharacterSectionCard / CollapsibleSectionCard Deduplication
-**File:** `lib/ui/widgets/character_section_card.dart`
+### SectionCard / CollapsibleSectionCard Deduplication
+**File:** `lib/ui/widgets/section_card.dart`
 
 Extract shared title row composition.
 

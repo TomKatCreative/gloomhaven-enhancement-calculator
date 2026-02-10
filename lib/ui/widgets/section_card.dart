@@ -2,21 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 
-/// Reusable card wrapper for character screen sections.
+/// Reusable card wrapper for screen sections.
 ///
 /// Provides a consistent card appearance with:
 /// - Title row (icon + text) using [contrastedPrimary]
 /// - [surfaceContainerLow] background with [outlineVariant] border
 /// - [borderRadiusMedium] corners
-/// - Optional [constraints] (default maxWidth: 400)
-class CharacterSectionCard extends StatelessWidget {
-  const CharacterSectionCard({
+/// - Optional [constraints] (default maxWidth: [maxWidth])
+/// - Customizable [contentPadding] for the child content area
+class SectionCard extends StatelessWidget {
+  const SectionCard({
     super.key,
     required this.title,
     this.icon,
     this.trailing,
     required this.child,
-    this.constraints = const BoxConstraints(maxWidth: 400),
+    this.constraints = const BoxConstraints(maxWidth: maxWidth),
+    this.contentPadding = const EdgeInsets.fromLTRB(
+      largePadding,
+      0,
+      largePadding,
+      largePadding,
+    ),
     this.sectionKey,
   });
 
@@ -25,6 +32,7 @@ class CharacterSectionCard extends StatelessWidget {
   final Widget? trailing;
   final Widget child;
   final BoxConstraints constraints;
+  final EdgeInsetsGeometry contentPadding;
   final GlobalKey? sectionKey;
 
   @override
@@ -66,20 +74,12 @@ class CharacterSectionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (trailing case final trailing?) trailing,
+                ?trailing,
               ],
             ),
           ),
           // Content
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              largePadding,
-              0,
-              largePadding,
-              largePadding,
-            ),
-            child: child,
-          ),
+          Padding(padding: contentPadding, child: child),
         ],
       ),
     );
@@ -95,7 +95,7 @@ class CollapsibleSectionCard extends StatefulWidget {
     required this.initiallyExpanded,
     required this.onExpansionChanged,
     required this.children,
-    this.constraints = const BoxConstraints(maxWidth: 400),
+    this.constraints = const BoxConstraints(maxWidth: maxWidth),
     this.sectionKey,
     this.trailing,
   });

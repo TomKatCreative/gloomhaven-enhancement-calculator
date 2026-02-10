@@ -70,42 +70,43 @@ _horizontalPadding = 16.0
 
 > **Directory**: `lib/ui/widgets/calculator/`
 
-The enhancement calculator uses a standardized card component system for consistent layout and styling across all calculator sections.
+The enhancement calculator uses `SectionCard` (from `lib/ui/widgets/section_card.dart`) for consistent card styling that matches the character screen. Each section is wrapped in a `SectionCard` with a title, icon, and customizable content padding.
 
 ### Screen Layout
 
-The calculator screen is organized into three main sections with dividers:
+The calculator screen is organized into three `SectionCard` sections:
 
 ```
-─────────── Enhancement ───────────
-┌─────────────────────────────────┐
-│ Enhancement Type Card           │
-└─────────────────────────────────┘
+┌─ Enhancement ─────────────────────┐
+│ ★ Enhancement                     │  ← SectionCard title
+│ [i]  [Enhancement Type Dropdown]  │
+│      [Cost Display]               │
+└───────────────────────────────────┘
 
-─────────── Card Details ──────────
-┌─────────────────────────────────┐
-│ Card Level (slider)             │
-│ ─────────────────────────────── │
-│ Previous Enhancements (0-3)     │
-│ ─────────────────────────────── │
-│ Multiple Targets [toggle]       │
-│ ─────────────────────────────── │
-│ Loss Non-Persistent [toggle]*   │
-│ ─────────────────────────────── │
-│ Persistent [toggle]*            │
-└─────────────────────────────────┘
+┌─ Card Details ────────────────────┐
+│ 🎴 Card details                   │  ← SectionCard title
+│ [i] Card Level (slider)           │
+│ ─────────────────────────────────  │
+│ [i] Previous Enhancements (0-3)   │
+│ ─────────────────────────────────  │
+│ [i] Multiple Targets [toggle]     │
+│ ─────────────────────────────────  │
+│ [i] Loss Non-Persistent [toggle]* │
+│ ─────────────────────────────────  │
+│ [i] Persistent [toggle]*          │
+└───────────────────────────────────┘
 * GH2E/FH only
 
-─────────── Discounts ─────────────
-┌─────────────────────────────────┐
-│ Temporary Enhancement † [toggle]│
-│ ─────────────────────────────── │
-│ Hail's Discount ‡ [toggle]      │
-│ ─────────────────────────────── │
-│ Scenario 114 Reward [toggle]*   │
-│ ─────────────────────────────── │
-│ Building 44 * [dialog]*         │
-└─────────────────────────────────┘
+┌─ Discounts ───────────────────────┐
+│ 🏷️ Discounts                      │  ← SectionCard title
+│ [i] Temporary Enhancement † [sw]  │
+│ ─────────────────────────────────  │
+│ [i] Hail's Discount ‡ [sw]       │
+│ ─────────────────────────────────  │
+│ [i] Scenario 114 Reward [sw]*    │
+│ ─────────────────────────────────  │
+│ [i] Building 44 * [dialog]*      │
+└───────────────────────────────────┘
 * Edition-specific
 ```
 
@@ -131,68 +132,27 @@ The Building 44 dialog shows enhancer upgrade levels with spoiler protection:
 
 ```
 lib/ui/widgets/calculator/
-├── calculator.dart                # Barrel export file
-├── calculator_section_card.dart   # Main card component with layout variants
-├── calculator_toggle_group_card.dart # Card with multiple toggle rows (Discounts)
-├── info_button_config.dart        # Configuration for info buttons
-├── cost_display.dart              # Standardized cost chip with strikethrough
-├── card_level_body.dart           # SfSlider for card level selection
+├── calculator.dart                 # Barrel export file
+├── calculator_toggle_group_card.dart # Column of toggle rows (used in Discounts section)
+├── info_button_config.dart         # Configuration for info buttons
+├── cost_display.dart               # Standardized cost chip with strikethrough
+├── card_level_body.dart            # SfSlider for card level selection
 ├── previous_enhancements_body.dart # Segmented button (0-3)
-└── enhancement_type_body.dart     # Dropdown selector
+└── enhancement_type_body.dart      # Dropdown selector
 ```
 
-Note: The Card Details card (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single card with internal dividers.
+Note: The Card Details section (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single `SectionCard` with internal dividers. The `CalculatorToggleGroupCard` renders a `Column` of toggle rows (no longer wraps in its own `Card`, since the outer `SectionCard` provides the container).
 
-### CalculatorSectionCard
+### CalculatorToggleGroupCard
 
-The main reusable card component with two layout variants:
-
-**Standard Layout** (`CardLayoutVariant.standard`):
-```
-+--------------------------------------------------+
-| [i] Title                                        |
-|                                                  |
-| [Body Widget - full width]                       |
-|                                                  |
-| [Cost Display Chip]                              |
-+--------------------------------------------------+
-```
-
-**Toggle Layout** (`CardLayoutVariant.toggle`):
-```
-+--------------------------------------------------+
-| [i]  Title                              [Toggle] |
-|      Subtitle (optional)                         |
-+--------------------------------------------------+
-```
-
-### Usage Example
+A column of toggle items with dividers, used inside a `SectionCard` for the Discounts section:
 
 ```dart
-// Standard card with slider body and cost display
-CalculatorSectionCard(
-  infoConfig: InfoButtonConfig.titleMessage(
-    title: 'Card Level',
-    message: richTextWidget,
-  ),
-  title: 'Card Level: 5',
-  body: CardLevelBody(model: calculatorModel),
-  costConfig: CostDisplayConfig(
-    baseCost: 100,
-    discountedCost: 75,  // Shows strikethrough when different
-  ),
-)
-
-// Toggle card
-CalculatorSectionCard(
-  layout: CardLayoutVariant.toggle,
-  infoConfig: InfoButtonConfig.titleMessage(
-    title: 'Hail\'s Discount',
-    message: richTextWidget,
-  ),
-  title: 'Hail\'s Discount',
-  toggleValue: model.hailsDiscount,
-  onToggleChanged: (value) => model.hailsDiscount = value,
+SectionCard(
+  title: l10n.discounts,
+  icon: Icons.discount_rounded,
+  contentPadding: EdgeInsets.only(bottom: smallPadding),
+  child: CalculatorToggleGroupCard(items: [...]),
 )
 ```
 
@@ -240,9 +200,9 @@ SfSlider(
 )
 ```
 
-### Adding a New Calculator Card
+### Adding a New Calculator Section
 
 1. Create a body widget in `lib/ui/widgets/calculator/` if needed
-2. Use `CalculatorSectionCard` with appropriate layout variant
-3. Configure `InfoButtonConfig` for the info dialog
+2. Wrap in `SectionCard(title: ..., icon: ..., child: ...)` in the calculator screen
+3. Configure `InfoButtonConfig` for info dialogs within the section
 4. Add `CostDisplayConfig` if the section has associated costs
