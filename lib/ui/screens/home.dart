@@ -16,6 +16,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -32,6 +33,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     future = context.read<CharactersModel>().loadCharacters();
+    context.read<TownModel>().loadWorlds();
     if (SharedPrefs().showUpdate440Dialog) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         showDialog<void>(
@@ -47,13 +49,14 @@ class _HomeState extends State<Home> {
     final appModel = context.watch<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
     final enhancementModel = context.watch<EnhancementCalculatorModel>();
+    final townModel = context.watch<TownModel>();
 
     // Hide FAB when:
-    // - On town page (0)
+    // - On town page (0) with no worlds
     // - On enhancement calculator page (2) when cost chip is expanded or nothing to clear
     // - On characters page (1) when element sheet is fully expanded
     final hideFab =
-        appModel.page == 0 ||
+        (appModel.page == 0 && townModel.worlds.isEmpty) ||
         (appModel.page == 2 &&
             (enhancementModel.isSheetExpanded || !enhancementModel.showCost)) ||
         (appModel.page == 1 && charactersModel.isElementSheetFullExpanded);
@@ -68,6 +71,7 @@ class _HomeState extends State<Home> {
         controller: context.read<AppModel>().pageController,
         onPageChanged: (index) {
           charactersModel.isEditMode = false;
+          townModel.isEditMode = false;
           context.read<AppModel>().page = index;
           // Reset sheet expanded states when navigating between pages
           context.read<EnhancementCalculatorModel>().isSheetExpanded = false;
@@ -109,7 +113,12 @@ class _HomeState extends State<Home> {
         child: AnimatedScale(
           scale: hideFab ? 0.0 : 1.0,
           duration: animationDuration,
-          child: _buildFab(appModel, charactersModel, enhancementModel),
+          child: _buildFab(
+            appModel,
+            charactersModel,
+            enhancementModel,
+            townModel,
+          ),
         ),
       ),
       bottomNavigationBar: const GHCNavigationBar(),
@@ -120,7 +129,19 @@ class _HomeState extends State<Home> {
     AppModel appModel,
     CharactersModel charactersModel,
     EnhancementCalculatorModel enhancementModel,
+    TownModel townModel,
   ) {
+    // Town page: edit mode toggle FAB
+    if (appModel.page == 0 && townModel.worlds.isNotEmpty) {
+      return FloatingActionButton(
+        heroTag: null,
+        onPressed: () => townModel.isEditMode = !townModel.isEditMode,
+        child: Icon(
+          townModel.isEditMode ? Icons.edit_off_rounded : Icons.edit_rounded,
+        ),
+      );
+    }
+
     // Calculator page: clear FAB
     if (appModel.page == 2) {
       return FloatingActionButton(

@@ -4,11 +4,13 @@ import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -78,12 +80,57 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     }
   }
 
+  Future<void> _handleDeleteWorld(
+    BuildContext context,
+    TownModel townModel,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final bool? result = await ConfirmationDialog.show(
+      context: context,
+      content: Text(l10n.deleteWorldBody),
+      confirmLabel: l10n.delete,
+      cancelLabel: l10n.cancel,
+    );
+
+    if (result == true && context.mounted) {
+      final worldName = townModel.activeWorld?.name ?? '';
+      await townModel.deleteActiveWorld();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$worldName deleted')));
+    }
+  }
+
+  Future<void> _handleDeleteCampaign(
+    BuildContext context,
+    TownModel townModel,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final bool? result = await ConfirmationDialog.show(
+      context: context,
+      content: Text(l10n.deleteCampaignBody),
+      confirmLabel: l10n.delete,
+      cancelLabel: l10n.cancel,
+    );
+
+    if (result == true && context.mounted) {
+      final campaignName = townModel.activeCampaign?.name ?? '';
+      await townModel.deleteActiveCampaign();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$campaignName deleted')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
         .read<EnhancementCalculatorModel>();
     final appModel = context.read<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
+    final townModel = context.watch<TownModel>();
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
@@ -95,8 +142,13 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
       backgroundColor: colorScheme.surface,
       centerTitle: true,
       title:
-          context.watch<AppModel>().page == 1 &&
-              charactersModel.characters.length > 1
+          context.watch<AppModel>().page == 0 && townModel.activeWorld != null
+          ? Text(
+              townModel.activeWorld!.name,
+              style: Theme.of(context).textTheme.titleMedium,
+            )
+          : context.watch<AppModel>().page == 1 &&
+                charactersModel.characters.length > 1
           ? SmoothPageIndicator(
               controller: charactersModel.pageController,
               count: charactersModel.characters.length,
@@ -141,6 +193,37 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
             )
           : Container(),
       actions: <Widget>[
+        // Town page: add campaign button
+        if (!townModel.isEditMode &&
+            appModel.page == 0 &&
+            townModel.activeWorld != null)
+          Tooltip(
+            message: l10n.createCampaign,
+            child: IconButton(
+              icon: const Icon(Icons.group_add_rounded),
+              onPressed: () async {
+                await CreateCampaignScreen.show(context, townModel);
+              },
+            ),
+          ),
+        // Town page edit mode: delete actions
+        if (townModel.isEditMode && appModel.page == 0) ...[
+          if (townModel.activeCampaign != null)
+            Tooltip(
+              message: l10n.deleteCampaign,
+              child: IconButton(
+                icon: const Icon(Icons.group_remove_rounded),
+                onPressed: () => _handleDeleteCampaign(context, townModel),
+              ),
+            ),
+          Tooltip(
+            message: l10n.deleteWorld,
+            child: IconButton(
+              icon: const Icon(Icons.delete_rounded),
+              onPressed: () => _handleDeleteWorld(context, townModel),
+            ),
+          ),
+        ],
         if (!charactersModel.isEditMode && appModel.page == 1)
           Tooltip(
             message: 'New Character',

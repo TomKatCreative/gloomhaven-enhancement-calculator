@@ -9,6 +9,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 import '../helpers/fake_database_helper.dart';
 import '../helpers/test_data.dart';
@@ -210,6 +211,9 @@ Widget _buildTestApp({
       ChangeNotifierProvider.value(value: model),
       ChangeNotifierProvider.value(value: appModel),
       ChangeNotifierProvider(create: (_) => EnhancementCalculatorModel()),
+      ChangeNotifierProvider(
+        create: (_) => TownModel(databaseHelper: FakeDatabaseHelper()),
+      ),
     ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
