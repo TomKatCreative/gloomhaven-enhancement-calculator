@@ -1,11 +1,14 @@
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
+import 'package:gloomhaven_enhancement_calc/models/world.dart';
 
 /// Test data fixtures for unit and widget tests.
 ///
@@ -287,5 +290,39 @@ class TestData {
         i < achievedCount,
       );
     });
+  }
+
+  // ── World & Campaign Factories ──
+
+  /// Creates a test [World] with sensible defaults.
+  static World createWorld({
+    String id = 'world-1',
+    String name = 'Test World',
+    GameEdition edition = GameEdition.gloomhaven,
+    int prosperityCheckmarks = 0,
+    int donatedGold = 0,
+  }) {
+    return World(
+      id: id,
+      name: name,
+      edition: edition,
+      prosperityCheckmarks: prosperityCheckmarks,
+      donatedGold: donatedGold,
+    );
+  }
+
+  /// Creates a test [Campaign] with sensible defaults.
+  static Campaign createCampaign({
+    String id = 'campaign-1',
+    String worldId = 'world-1',
+    String name = 'Test Party',
+    int reputation = 0,
+  }) {
+    return Campaign(
+      id: id,
+      worldId: worldId,
+      name: name,
+      reputation: reputation,
+    );
   }
 }

@@ -2,10 +2,12 @@ import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart'
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/world.dart';
 
 /// Fake implementation of [IDatabaseHelper] for testing.
 ///
@@ -57,6 +59,12 @@ class FakeDatabaseHelper implements IDatabaseHelper {
   /// Raw mastery definition data (returned by [queryMasteries]).
   /// If null, auto-generates from MasteriesRepository for the character's class.
   List<Map<String, Object?>>? masteriesData;
+
+  /// In-memory world storage.
+  List<World> worlds = [];
+
+  /// In-memory campaign storage keyed by world ID.
+  Map<String, List<Campaign>> campaignsMap = {};
 
   /// Next ID to assign when inserting a character.
   int _nextId = 1;
@@ -252,6 +260,96 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     return maps;
   }
 
+  // ── World CRUD ──
+
+  @override
+  Future<List<World>> queryAllWorlds() async {
+    return List.from(worlds);
+  }
+
+  @override
+  Future<void> insertWorld(World world) async {
+    worlds.add(world);
+  }
+
+  @override
+  Future<void> updateWorld(World world) async {
+    final idx = worlds.indexWhere((w) => w.id == world.id);
+    if (idx >= 0) {
+      worlds[idx] = world;
+    }
+  }
+
+  @override
+  Future<void> deleteWorld(String worldId) async {
+    // Unlink characters from campaigns in this world
+    final campaigns = campaignsMap[worldId] ?? [];
+    for (final campaign in campaigns) {
+      for (final character in characters) {
+        if (character.campaignId == campaign.id) {
+          character.campaignId = null;
+        }
+      }
+    }
+    campaignsMap.remove(worldId);
+    worlds.removeWhere((w) => w.id == worldId);
+  }
+
+  // ── Campaign CRUD ──
+
+  @override
+  Future<List<Campaign>> queryCampaigns(String worldId) async {
+    return List.from(campaignsMap[worldId] ?? []);
+  }
+
+  @override
+  Future<void> insertCampaign(Campaign campaign) async {
+    campaignsMap.putIfAbsent(campaign.worldId, () => []);
+    campaignsMap[campaign.worldId]!.add(campaign);
+  }
+
+  @override
+  Future<void> updateCampaign(Campaign campaign) async {
+    final campaigns = campaignsMap[campaign.worldId];
+    if (campaigns != null) {
+      final idx = campaigns.indexWhere((c) => c.id == campaign.id);
+      if (idx >= 0) {
+        campaigns[idx] = campaign;
+      }
+    }
+  }
+
+  @override
+  Future<void> deleteCampaign(String campaignId) async {
+    // Unlink characters from this campaign
+    for (final character in characters) {
+      if (character.campaignId == campaignId) {
+        character.campaignId = null;
+      }
+    }
+    for (final campaigns in campaignsMap.values) {
+      campaigns.removeWhere((c) => c.id == campaignId);
+    }
+  }
+
+  // ── Character-Campaign linking ──
+
+  @override
+  Future<void> assignCharacterToCampaign(
+    String characterUuid,
+    String? campaignId,
+  ) async {
+    final idx = characters.indexWhere((c) => c.uuid == characterUuid);
+    if (idx >= 0) {
+      characters[idx].campaignId = campaignId;
+    }
+  }
+
+  @override
+  Future<List<Character>> queryCharactersByCampaign(String campaignId) async {
+    return characters.where((c) => c.campaignId == campaignId).toList();
+  }
+
   /// Resets all state for test isolation.
   void reset() {
     characters = [];
@@ -263,6 +361,8 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     characterMasteriesMap = {};
     perksData = null;
     masteriesData = null;
+    worlds = [];
+    campaignsMap = {};
     _nextId = 1;
   }
 }
