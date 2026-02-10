@@ -236,6 +236,36 @@ class SharedPrefs {
   set isUSRegion(bool value) => _sharedPrefs.setBool('isUSRegion', value);
 
   // ===========================================================================
+  // Town / World / Campaign State
+  // ===========================================================================
+
+  String? get activeWorldId => _sharedPrefs.getString('activeWorldId');
+
+  set activeWorldId(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('activeWorldId');
+    } else {
+      _sharedPrefs.setString('activeWorldId', value);
+    }
+  }
+
+  String? get activeCampaignId => _sharedPrefs.getString('activeCampaignId');
+
+  set activeCampaignId(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('activeCampaignId');
+    } else {
+      _sharedPrefs.setString('activeCampaignId', value);
+    }
+  }
+
+  bool get showAllCharacters =>
+      _sharedPrefs.getBool('showAllCharacters') ?? true;
+
+  set showAllCharacters(bool value) =>
+      _sharedPrefs.setBool('showAllCharacters', value);
+
+  // ===========================================================================
   // Element Tracker States
   // Stored as int: 0=gone, 1=strong, 2=waning
   // ===========================================================================
@@ -284,6 +314,11 @@ class SharedPrefs {
         'hideCustomClassesWarningMessage': hideCustomClassesWarningMessage,
         'envelopeX': envelopeX,
         'envelopeV': envelopeV,
+        'showAllCharacters': showAllCharacters,
+      },
+      'town': {
+        if (activeWorldId != null) 'activeWorldId': activeWorldId,
+        if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
       },
       'calculator': {
         'gameEdition': gameEdition.index,
@@ -336,6 +371,20 @@ class SharedPrefs {
       }
       if (s.containsKey('envelopeX')) envelopeX = s['envelopeX'] as bool;
       if (s.containsKey('envelopeV')) envelopeV = s['envelopeV'] as bool;
+      if (s.containsKey('showAllCharacters')) {
+        showAllCharacters = s['showAllCharacters'] as bool;
+      }
+    }
+
+    // Town state
+    if (data['town'] is Map) {
+      final t = Map<String, dynamic>.from(data['town'] as Map);
+      if (t.containsKey('activeWorldId')) {
+        activeWorldId = t['activeWorldId'] as String?;
+      }
+      if (t.containsKey('activeCampaignId')) {
+        activeCampaignId = t['activeCampaignId'] as String?;
+      }
     }
 
     // Calculator

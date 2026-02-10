@@ -70,7 +70,8 @@ class CharactersModel with ChangeNotifier {
     required this.databaseHelper,
     required this.themeProvider,
     required this.showRetired,
-  });
+    bool showAllCharacters = true,
+  }) : _showAllCharacters = showAllCharacters;
 
   List<Character> _characters = [];
   Character? currentCharacter;
@@ -84,6 +85,7 @@ class CharactersModel with ChangeNotifier {
   ScrollController enhancementCalcScrollController = ScrollController();
 
   bool showRetired;
+  bool _showAllCharacters;
   bool _isEditMode = false;
   bool _isElementSheetExpanded = false;
   bool _isElementSheetFullExpanded = false;
@@ -91,6 +93,14 @@ class CharactersModel with ChangeNotifier {
   /// Notifier to trigger element sheet collapse from outside the widget.
   /// Increment the value to signal collapse.
   final ValueNotifier<int> collapseElementSheetNotifier = ValueNotifier<int>(0);
+
+  bool get showAllCharacters => _showAllCharacters;
+
+  set showAllCharacters(bool value) {
+    _showAllCharacters = value;
+    SharedPrefs().showAllCharacters = value;
+    notifyListeners();
+  }
 
   bool get isEditMode => _isEditMode;
 
@@ -210,9 +220,23 @@ class CharactersModel with ChangeNotifier {
     return !showRetired && _characters.isNotEmpty;
   }
 
-  List<Character> get characters => showRetired
-      ? _characters
-      : _characters.where((character) => !character.isRetired).toList();
+  List<Character> get characters {
+    var filtered = showRetired
+        ? _characters
+        : _characters.where((character) => !character.isRetired).toList();
+
+    // Apply campaign filter
+    if (!_showAllCharacters) {
+      final campaignId = SharedPrefs().activeCampaignId;
+      if (campaignId != null) {
+        filtered = filtered
+            .where((c) => c.campaignId == campaignId || c.campaignId == null)
+            .toList();
+      }
+    }
+
+    return filtered;
+  }
 
   set characters(List<Character> characters) {
     _characters = characters;
@@ -567,5 +591,15 @@ class CharactersModel with ChangeNotifier {
       }
     }
     return true;
+  }
+
+  /// Assigns a character to a campaign (or null to unassign).
+  Future<void> assignCharacterToCampaign(
+    Character character,
+    String? campaignId,
+  ) async {
+    character.campaignId = campaignId;
+    await databaseHelper.assignCharacterToCampaign(character.uuid, campaignId);
+    notifyListeners();
   }
 }
