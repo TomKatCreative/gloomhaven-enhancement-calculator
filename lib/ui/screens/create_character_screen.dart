@@ -111,17 +111,17 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           padding: const EdgeInsets.all(extraLargePadding),
           children: [
             _buildNameField(context, theme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
             _buildClassSelector(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildPersonalQuestSelector(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildLevelSelector(context, theme, colorScheme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
             _buildRetirementsAndProsperityRow(context, theme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
             _buildEditionToggle(context, theme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
           ],
         ),
       ),
@@ -215,8 +215,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         const SizedBox(width: smallPadding),
         // Match IconButton's 48x48 touch target size for alignment
         SizedBox(
-          width: 48,
-          height: 48,
+          width: iconSizeHero,
+          height: iconSizeHero,
           child: Center(
             child: SizedBox(
               width: iconSizeMedium,

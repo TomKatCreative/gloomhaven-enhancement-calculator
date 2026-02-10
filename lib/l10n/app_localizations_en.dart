@@ -435,4 +435,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get perksAndMasteries => 'Perks & Masteries';
+
+  @override
+  String get characters => 'CHARACTERS';
+
+  @override
+  String get enhancements => 'ENHANCEMENTS';
+
+  @override
+  String get subtract => 'Subtract';
+
+  @override
+  String get add => 'Add';
 }

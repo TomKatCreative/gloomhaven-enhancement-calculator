@@ -183,5 +183,9 @@
   "perks": "Perks",
   "masteries": "Masteries",
   "questAndNotes": "Quest & Notes",
-  "perksAndMasteries": "Perks & Masteries"
+  "perksAndMasteries": "Perks & Masteries",
+  "characters": "CHARACTERS",
+  "enhancements": "ENHANCEMENTS",
+  "subtract": "Subtract",
+  "add": "Add"
 }

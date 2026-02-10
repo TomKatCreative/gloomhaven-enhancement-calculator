@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
@@ -12,20 +13,20 @@ class GHCBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final appModel = context.watch<AppModel>();
     return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: SizedBox(
-            height: 35,
+          icon: const SizedBox(
+            height: navBarIconContainerHeight,
             child: Icon(Icons.history_edu_rounded, size: iconSizeLarge),
           ),
-          label: 'CHARACTERS',
+          label: AppLocalizations.of(context).characters,
         ),
         BottomNavigationBarItem(
-          icon: SizedBox(
-            height: 35,
+          icon: const SizedBox(
+            height: navBarIconContainerHeight,
             child: Icon(Icons.auto_awesome_rounded, size: iconSizeLarge),
           ),
-          label: 'ENHANCEMENTS',
+          label: AppLocalizations.of(context).enhancements,
         ),
       ],
       currentIndex: appModel.page,

@@ -580,32 +580,6 @@ class DatabaseMigrations {
     });
   }
 
-  // static Future<void> _handleRemainingVariantMasteries(
-  //   Transaction txn,
-  //   String tempTableMasteries,
-  // ) async {
-  //   await Future.forEach(CharacterData.masteriesMap.entries, (entry) async {
-  //     final classCode = entry.key;
-  //     final masteryLists =
-  //         entry.value.where((element) => element.variant != Variant.base);
-
-  //     for (Masteries list in masteryLists) {
-  //       for (Mastery mastery in list.masteries) {
-  //         mastery.variant = list.variant;
-  //         mastery.classCode = classCode;
-  //         try {
-  //           await txn.insert(
-  //             tempTableMasteries,
-  //             mastery.toMap('${list.masteries.indexOf(mastery)}'),
-  //           );
-  //         } catch (e) {
-  //           debugPrint('ERROR WITH MASTERIES TABLE: $e');
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
-
   static Future<void> _dropCharacterMasteriesTableAndRenameTemp(
     Transaction txn,
     String tempTableMasteries,

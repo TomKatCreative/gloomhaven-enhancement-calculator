@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 
 class AddSubtractDialog extends StatefulWidget {
   const AddSubtractDialog(this.currentValue, this.labelText, {super.key});
@@ -61,7 +62,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                     ),
                     iconSize: iconSizeXL,
                     onPressed: _hasInput ? () => _handleOperation(false) : null,
-                    tooltip: 'Subtract',
+                    tooltip: AppLocalizations.of(context).subtract,
                   ),
                 ),
                 // Input field
@@ -94,7 +95,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
                     ),
                     iconSize: iconSizeXL,
                     onPressed: _hasInput ? () => _handleOperation(true) : null,
-                    tooltip: 'Add',
+                    tooltip: AppLocalizations.of(context).add,
                   ),
                 ),
               ],

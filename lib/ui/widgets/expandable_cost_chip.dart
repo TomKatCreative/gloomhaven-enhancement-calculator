@@ -44,17 +44,17 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
 
   // Chip dimensions
   static const double _chipHeight = 56.0;
-  static const double _chipBorderRadius = 28.0;
+  static const double _chipBorderRadius = borderRadiusCard;
 
   // Card dimensions
-  static const double _cardTopRadius = 28.0;
-  static const double _cardBottomRadius = 24.0;
+  static const double _cardTopRadius = borderRadiusCard;
+  static const double _cardBottomRadius = borderRadiusPill;
   static const double _cardMaxWidth = 468.0;
   static const double _cardExpandedFraction = 0.85;
 
   // Positioning - same as FAB (both are 56dp height)
-  static const double _bottomOffset = 16.0;
-  static const double _horizontalPadding = 16.0;
+  static const double _bottomOffset = largePadding;
+  static const double _horizontalPadding = largePadding;
 
   // Blur fade threshold (pixels scrolled before blur is fully visible)
   static const double _blurFadeThreshold = 100.0;

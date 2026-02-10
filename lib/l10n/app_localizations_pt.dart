@@ -435,4 +435,16 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get perksAndMasteries => 'Vantagens e Maestrias';
+
+  @override
+  String get characters => 'PERSONAGENS';
+
+  @override
+  String get enhancements => 'MELHORIAS';
+
+  @override
+  String get subtract => 'Subtrair';
+
+  @override
+  String get add => 'Adicionar';
 }

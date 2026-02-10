@@ -36,18 +36,23 @@ class SearchSectionHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+      padding: const EdgeInsets.fromLTRB(
+        largePadding,
+        largePadding,
+        largePadding,
+        smallPadding,
+      ),
       child: Row(
         children: [
           Expanded(child: Divider(color: theme.dividerTheme.color)),
-          const SizedBox(width: 12),
+          const SizedBox(width: mediumPadding),
           if (assetKey != null) ...[
             ThemedSvg(
               assetKey: assetKey!,
               width: iconSizeMedium,
               height: iconSizeMedium,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: smallPadding),
           ],
           Text(
             title,
@@ -55,7 +60,7 @@ class SearchSectionHeader extends StatelessWidget {
               color: theme.contrastedPrimary,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: mediumPadding),
           Expanded(child: Divider(color: theme.dividerTheme.color)),
         ],
       ),

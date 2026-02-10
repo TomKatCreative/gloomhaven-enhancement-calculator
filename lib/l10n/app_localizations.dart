@@ -889,6 +889,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Perks & Masteries'**
   String get perksAndMasteries;
+
+  /// No description provided for @characters.
+  ///
+  /// In en, this message translates to:
+  /// **'CHARACTERS'**
+  String get characters;
+
+  /// No description provided for @enhancements.
+  ///
+  /// In en, this message translates to:
+  /// **'ENHANCEMENTS'**
+  String get enhancements;
+
+  /// No description provided for @subtract.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtract'**
+  String get subtract;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
 }
 
 class _AppLocalizationsDelegate

@@ -131,5 +131,9 @@
   "perks": "Vantagens",
   "masteries": "Maestrias",
   "questAndNotes": "Missão e Notas",
-  "perksAndMasteries": "Vantagens e Maestrias"
+  "perksAndMasteries": "Vantagens e Maestrias",
+  "characters": "PERSONAGENS",
+  "enhancements": "MELHORIAS",
+  "subtract": "Subtrair",
+  "add": "Adicionar"
 }

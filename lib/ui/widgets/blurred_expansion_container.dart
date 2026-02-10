@@ -53,7 +53,7 @@ class _BlurredExpansionContainerState extends State<BlurredExpansionContainer> {
           constraints: widget.constraints,
           decoration: BoxDecoration(
             border: Border.all(
-              width: 1,
+              width: dividerThickness,
               color: theme.colorScheme.outlineVariant,
             ),
             borderRadius: BorderRadius.circular(borderRadiusMedium),
