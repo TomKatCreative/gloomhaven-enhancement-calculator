@@ -318,7 +318,7 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(
           model: model,
-          child: MasteriesSection(charactersModel: model, character: character),
+          child: MasteriesSection(character: character),
         ),
       );
 
@@ -340,7 +340,7 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(
           model: model,
-          child: MasteriesSection(charactersModel: model, character: character),
+          child: MasteriesSection(character: character),
         ),
       );
 

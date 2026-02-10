@@ -764,7 +764,6 @@ class _PerksAndMasteriesCardState extends State<_PerksAndMasteriesCard> {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
     final l10n = AppLocalizations.of(context);
-    final model = context.watch<CharactersModel>();
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,
@@ -836,7 +835,6 @@ class _PerksAndMasteriesCardState extends State<_PerksAndMasteriesCard> {
                 ),
                 child: MasteriesSection(
                   character: widget.character,
-                  charactersModel: model,
                 ),
               ),
             ],
