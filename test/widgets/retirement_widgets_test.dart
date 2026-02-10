@@ -3,8 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_fab.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -59,7 +60,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find the retire button by its icon
       expect(find.byIcon(Icons.assist_walker), findsOneWidget);
       expect(find.byIcon(Icons.directions_walk), findsNothing);
     });
@@ -96,17 +96,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The action buttons are in the tree but not tappable (IgnorePointer)
-      // when the FAB is closed
-      final ignorePointers = find.ancestor(
-        of: find.byIcon(Icons.assist_walker),
-        matching: find.byType(IgnorePointer),
-      );
-      // Find the closest IgnorePointer (the one from _ExpandingActionButton)
-      final ignorePointerWidget = tester.widget<IgnorePointer>(
-        ignorePointers.first,
-      );
-      expect(ignorePointerWidget.ignoring, isTrue);
+      expect(find.byIcon(Icons.assist_walker), findsNothing);
+      expect(find.byIcon(Icons.delete_rounded), findsNothing);
     });
 
     testWidgets('tapping retire button calls retireCurrentCharacter', (
@@ -126,11 +117,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap the retire button
       await tester.tap(find.byIcon(Icons.assist_walker));
       await tester.pumpAndSettle();
 
-      // Verify the character was retired
       expect(model.currentCharacter!.isRetired, isTrue);
       expect(fakeDb.updateCalls, contains('tap-test'));
     });
@@ -154,18 +143,14 @@ void main() {
       await tester.tap(find.byIcon(Icons.assist_walker));
       await tester.pumpAndSettle();
 
-      // After retiring: edit mode is turned off, so action buttons are
-      // not tappable (IgnorePointer). The widget now shows directions_walk
-      // since the character is retired.
+      // After retiring: _handleRetire exits edit mode, so retire/delete
+      // buttons are no longer in the app bar.
+      // Re-enter edit mode to see the updated icon.
+      model.isEditMode = true;
+      await tester.pumpAndSettle();
+
       expect(find.byIcon(Icons.directions_walk), findsOneWidget);
-      final ignorePointers = find.ancestor(
-        of: find.byIcon(Icons.directions_walk),
-        matching: find.byType(IgnorePointer),
-      );
-      final ignorePointerWidget = tester.widget<IgnorePointer>(
-        ignorePointers.first,
-      );
-      expect(ignorePointerWidget.ignoring, isTrue);
+      expect(find.byIcon(Icons.assist_walker), findsNothing);
     });
   });
 
@@ -182,7 +167,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find the Tooltip with 'Retire' message
       final tooltip = find.byWidgetPredicate(
         (widget) => widget is Tooltip && widget.message == 'Retire',
       );
@@ -211,53 +195,26 @@ void main() {
   });
 }
 
-/// Builds a minimal test app with an ExpandableFab containing retire button.
+/// Builds a minimal test app with GHCAnimatedAppBar in a Scaffold.
+/// Sets appModel.page = 1 so retire/delete actions appear when in edit mode.
 Widget _buildTestApp({
   required CharactersModel model,
   required MockThemeProvider themeProvider,
 }) {
+  final appModel = AppModel();
+  appModel.page = 1;
+
   return MultiProvider(
     providers: [
       ChangeNotifierProvider.value(value: themeProvider),
       ChangeNotifierProvider.value(value: model),
-      ChangeNotifierProvider(create: (_) => AppModel()),
+      ChangeNotifierProvider.value(value: appModel),
       ChangeNotifierProvider(create: (_) => EnhancementCalculatorModel()),
     ],
-    child: MaterialApp(home: _TestFabScaffold()),
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const Scaffold(appBar: GHCAnimatedAppBar()),
+    ),
   );
-}
-
-/// A simplified scaffold with the ExpandableFab containing retire/delete buttons.
-/// This isolates the retirement functionality for testing.
-class _TestFabScaffold extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final charactersModel = context.watch<CharactersModel>();
-    final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
-
-    return Scaffold(
-      floatingActionButton: ExpandableFab(
-        isOpen: charactersModel.isEditMode,
-        onToggle: (open) => charactersModel.isEditMode = open,
-        openIcon: const Icon(Icons.edit_rounded),
-        closeIcon: const Icon(Icons.edit_off_rounded),
-        children: [
-          ActionButton(
-            tooltip: isRetired ? 'Unretire' : 'Retire',
-            icon: Icon(isRetired ? Icons.directions_walk : Icons.assist_walker),
-            onPressed: () async {
-              await charactersModel.retireCurrentCharacter();
-            },
-          ),
-          ActionButton(
-            tooltip: 'Delete',
-            icon: const Icon(Icons.delete_rounded),
-            color: Theme.of(context).colorScheme.errorContainer,
-            iconColor: Theme.of(context).colorScheme.onErrorContainer,
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
@@ -24,6 +27,57 @@ class GHCAnimatedAppBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
+  Future<void> _handleRetire(
+    BuildContext context,
+    CharactersModel charactersModel,
+    AppModel appModel,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final String message =
+        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? l10n.unretire.toLowerCase() : l10n.retire.toLowerCase()}d';
+    Character? character = charactersModel.currentCharacter;
+    await charactersModel.retireCurrentCharacter();
+    appModel.updateTheme();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+      ..clearSnackBars()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          persist: false,
+          action: charactersModel.showRetired
+              ? null
+              : SnackBarAction(
+                  label: 'Show',
+                  onPressed: () {
+                    charactersModel.toggleShowRetired(character: character);
+                  },
+                ),
+        ),
+      );
+  }
+
+  Future<void> _handleDelete(
+    BuildContext context,
+    CharactersModel charactersModel,
+  ) async {
+    final bool? result = await ConfirmationDialog.show(
+      context: context,
+      content: const Text('Are you sure? This cannot be undone'),
+      confirmLabel: 'Delete',
+      cancelLabel: 'Cancel',
+    );
+
+    if (result == true && context.mounted) {
+      final String characterName = charactersModel.currentCharacter!.name;
+      await charactersModel.deleteCurrentCharacter();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$characterName deleted')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
@@ -31,6 +85,8 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final appModel = context.read<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
 
     return AppBar(
       automaticallyImplyLeading: false,
@@ -39,7 +95,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
       backgroundColor: colorScheme.surface,
       centerTitle: true,
       title:
-          context.watch<AppModel>().page == 0 &&
+          context.watch<AppModel>().page == 1 &&
               charactersModel.characters.length > 1
           ? SmoothPageIndicator(
               controller: charactersModel.pageController,
@@ -50,7 +106,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 activeDotColor: colorScheme.onSurface,
               ),
             )
-          : context.watch<AppModel>().page == 1
+          : context.watch<AppModel>().page == 2
           ? SegmentedButton<GameEdition>(
               style: const ButtonStyle(
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -85,7 +141,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
             )
           : Container(),
       actions: <Widget>[
-        if (!charactersModel.isEditMode && appModel.page == 0)
+        if (!charactersModel.isEditMode && appModel.page == 1)
           Tooltip(
             message: 'New Character',
             child: IconButton(
@@ -95,8 +151,27 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               },
             ),
           ),
+        if (charactersModel.isEditMode && appModel.page == 1) ...[
+          Tooltip(
+            message: isRetired ? l10n.unretire : l10n.retire,
+            child: IconButton(
+              icon: Icon(
+                isRetired ? Icons.directions_walk : Icons.assist_walker,
+              ),
+              onPressed: () =>
+                  _handleRetire(context, charactersModel, appModel),
+            ),
+          ),
+          Tooltip(
+            message: l10n.delete,
+            child: IconButton(
+              icon: const Icon(Icons.delete_rounded),
+              onPressed: () => _handleDelete(context, charactersModel),
+            ),
+          ),
+        ],
         Tooltip(
-          message: 'Settings',
+          message: l10n.settings,
           child: IconButton(
             icon: const Icon(Icons.settings_rounded),
             onPressed: () async {

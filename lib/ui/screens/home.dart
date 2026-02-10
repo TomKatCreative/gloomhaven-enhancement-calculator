@@ -6,14 +6,13 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_440_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_fab.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_bottom_navigation_bar.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/town_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -43,57 +42,6 @@ class _HomeState extends State<Home> {
     }
   }
 
-  Future<void> _handleRetire(
-    BuildContext context,
-    CharactersModel charactersModel,
-    AppModel appModel,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final String message =
-        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? l10n.unretire.toLowerCase() : l10n.retire.toLowerCase()}d';
-    Character? character = charactersModel.currentCharacter;
-    await charactersModel.retireCurrentCharacter();
-    appModel.updateTheme();
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context)
-      ..clearSnackBars()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          persist: false,
-          action: charactersModel.showRetired
-              ? null
-              : SnackBarAction(
-                  label: 'Show',
-                  onPressed: () {
-                    charactersModel.toggleShowRetired(character: character);
-                  },
-                ),
-        ),
-      );
-  }
-
-  Future<void> _handleDelete(
-    BuildContext context,
-    CharactersModel charactersModel,
-  ) async {
-    final bool? result = await ConfirmationDialog.show(
-      context: context,
-      content: const Text('Are you sure? This cannot be undone'),
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
-    );
-
-    if (result == true && context.mounted) {
-      final String characterName = charactersModel.currentCharacter!.name;
-      await charactersModel.deleteCurrentCharacter();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text('$characterName deleted')));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final appModel = context.watch<AppModel>();
@@ -101,12 +49,14 @@ class _HomeState extends State<Home> {
     final enhancementModel = context.watch<EnhancementCalculatorModel>();
 
     // Hide FAB when:
-    // - On enhancement calculator page (1) when cost chip is expanded or nothing to clear
-    // - On characters page (0) when element sheet is fully expanded
+    // - On town page (0)
+    // - On enhancement calculator page (2) when cost chip is expanded or nothing to clear
+    // - On characters page (1) when element sheet is fully expanded
     final hideFab =
-        (appModel.page == 1 &&
+        appModel.page == 0 ||
+        (appModel.page == 2 &&
             (enhancementModel.isSheetExpanded || !enhancementModel.showCost)) ||
-        (appModel.page == 0 && charactersModel.isElementSheetFullExpanded);
+        (appModel.page == 1 && charactersModel.isElementSheetFullExpanded);
 
     return Scaffold(
       // this is necessary to make notched FAB background transparent, effectively
@@ -125,6 +75,7 @@ class _HomeState extends State<Home> {
           setState(() {});
         },
         children: [
+          const TownScreen(),
           FutureBuilder<List<Character>>(
             future: future,
             builder: (context, snapshot) {
@@ -153,10 +104,15 @@ class _HomeState extends State<Home> {
           const EnhancementCalculatorScreen(),
         ],
       ),
-      floatingActionButton: hideFab
-          ? null
-          : _buildFab(appModel, charactersModel, enhancementModel),
-      bottomNavigationBar: const GHCBottomNavigationBar(),
+      floatingActionButton: IgnorePointer(
+        ignoring: hideFab,
+        child: AnimatedScale(
+          scale: hideFab ? 0.0 : 1.0,
+          duration: animationDuration,
+          child: _buildFab(appModel, charactersModel, enhancementModel),
+        ),
+      ),
+      bottomNavigationBar: const GHCNavigationBar(),
     );
   }
 
@@ -165,8 +121,8 @@ class _HomeState extends State<Home> {
     CharactersModel charactersModel,
     EnhancementCalculatorModel enhancementModel,
   ) {
-    // Calculator page: simple clear FAB
-    if (appModel.page == 1) {
+    // Calculator page: clear FAB
+    if (appModel.page == 2) {
       return FloatingActionButton(
         heroTag: null,
         onPressed: () => enhancementModel.resetCost(),
@@ -174,7 +130,7 @@ class _HomeState extends State<Home> {
       );
     }
 
-    // Characters page with no characters: simple add FAB
+    // Characters page with no characters: add FAB
     if (charactersModel.characters.isEmpty) {
       return FloatingActionButton(
         heroTag: null,
@@ -183,32 +139,15 @@ class _HomeState extends State<Home> {
       );
     }
 
-    final l10n = AppLocalizations.of(context);
-    final colorScheme = Theme.of(context).colorScheme;
-    final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
-
-    // Characters page with characters: expandable FAB
-    return ExpandableFab(
-      isOpen: charactersModel.isEditMode,
-      onToggle: (open) => charactersModel.isEditMode = open,
-      openIcon: const Icon(Icons.edit_rounded),
-      closeIcon: const Icon(Icons.edit_off_rounded),
-      children: [
-        ActionButton(
-          tooltip: isRetired ? l10n.unretire : l10n.retire,
-          icon: Icon(isRetired ? Icons.directions_walk : Icons.assist_walker),
-          color: colorScheme.surfaceContainerHighest,
-          iconColor: colorScheme.onSurface,
-          onPressed: () => _handleRetire(context, charactersModel, appModel),
-        ),
-        ActionButton(
-          tooltip: l10n.delete,
-          icon: const Icon(Icons.delete_rounded),
-          color: colorScheme.errorContainer,
-          iconColor: colorScheme.onErrorContainer,
-          onPressed: () => _handleDelete(context, charactersModel),
-        ),
-      ],
+    // Characters page with characters: edit mode toggle FAB
+    return FloatingActionButton(
+      heroTag: null,
+      onPressed: () => charactersModel.isEditMode = !charactersModel.isEditMode,
+      child: Icon(
+        charactersModel.isEditMode
+            ? Icons.edit_off_rounded
+            : Icons.edit_rounded,
+      ),
     );
   }
 }
