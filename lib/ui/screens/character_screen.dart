@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character_section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
@@ -21,7 +22,7 @@ import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
 /// Indices for section navigation chips.
-enum _Section { general, quest, notes, perks, masteries }
+enum _Section { general, questAndNotes, perksAndMasteries }
 
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({required this.character, super.key});
@@ -37,13 +38,20 @@ class _CharacterScreenState extends State<CharacterScreen> {
   // Base padding for FAB clearance when sheet is collapsed
   static const double _baseFabPadding = 82.0;
 
-  // Section keys for scroll-to and scroll-spy
+  // Section keys for scroll-to and scroll-spy (one per chip)
   final _sectionKeys = {for (final s in _Section.values) s: GlobalKey()};
+
+  // Extra keys for scroll-spy on sub-sections that map to a grouped chip
+  final GlobalKey _notesKey = GlobalKey();
+  final GlobalKey _masteriesKey = GlobalKey();
 
   _Section _activeSection = _Section.general;
 
   late ScrollController _scrollController;
   bool _isScrollSpyEnabled = true;
+
+  /// How far the character header has collapsed: 0 = expanded, 1 = collapsed.
+  double _headerProgress = 0.0;
 
   @override
   void initState() {
@@ -61,26 +69,49 @@ class _CharacterScreenState extends State<CharacterScreen> {
   }
 
   void _onScroll() {
+    _updateHeaderProgress();
     if (!_isScrollSpyEnabled) return;
     _updateActiveSection();
+  }
+
+  void _updateHeaderProgress() {
+    if (!_scrollController.hasClients) return;
+    final isEditMode = context.read<CharactersModel>().isEditMode;
+    final range = (isEditMode && !widget.character.isRetired)
+        ? 0.0
+        : _CharacterHeaderDelegate._maxHeight -
+              _CharacterHeaderDelegate._minHeight;
+    final newProgress = range > 0
+        ? (_scrollController.offset / range).clamp(0.0, 1.0)
+        : 0.0;
+    if (newProgress != _headerProgress) {
+      setState(() => _headerProgress = newProgress);
+    }
   }
 
   void _updateActiveSection() {
     if (!_scrollController.hasClients) return;
 
     // Threshold: just below the pinned headers
-    const headerOffset = 160.0 + chipBarHeight;
+    const headerOffset = 180.0 + chipBarHeight;
+
+    // All keys to check: chip section keys + sub-section keys mapped to their
+    // parent chip section.
+    final allKeys = <GlobalKey, _Section>{
+      for (final entry in _sectionKeys.entries) entry.value: entry.key,
+      _notesKey: _Section.questAndNotes,
+      _masteriesKey: _Section.perksAndMasteries,
+    };
 
     _Section? closest;
     double closestDistance = double.infinity;
 
-    for (final entry in _sectionKeys.entries) {
-      final key = entry.value;
+    for (final entry in allKeys.entries) {
+      final key = entry.key;
       if (key.currentContext == null) continue;
 
-      // Skip masteries if not present
-      if (entry.key == _Section.masteries &&
-          widget.character.characterMasteries.isEmpty) {
+      // Skip masteries key if not present
+      if (key == _masteriesKey && widget.character.characterMasteries.isEmpty) {
         continue;
       }
 
@@ -94,7 +125,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
       // threshold
       if (position.dy <= headerOffset + 50 || closest == null) {
         if (distance < closestDistance || position.dy <= headerOffset + 50) {
-          closest = entry.key;
+          closest = entry.value;
           closestDistance = distance;
         }
       }
@@ -152,135 +183,126 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
 
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        // PINNED HEADER: Character name, level, class
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _CharacterHeaderDelegate(
-            character: widget.character,
-            isEditMode: model.isEditMode,
+    final theme = Theme.of(context);
+
+    return Stack(
+      children: [
+        // Background class icon — visible behind transparent headers
+        Positioned(
+          right: -30,
+          top: -30,
+          height: _CharacterHeaderDelegate._maxHeight + chipBarHeight + 30,
+          width: 250,
+          child: Opacity(
+            opacity: (0.12 * (1 - _headerProgress)).clamp(0.0, 0.12),
+            child: ClassIconSvg(
+              playerClass: widget.character.playerClass,
+              color: widget.character
+                  .getEffectiveColor(theme.brightness)
+                  .withValues(alpha: 1),
+            ),
           ),
         ),
-        // CHIP NAV BAR
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _SectionNavBarDelegate(
-            character: widget.character,
-            activeSection: _activeSection,
-            onSectionTapped: _scrollToSection,
-            hasMasteries: hasMasteries,
-          ),
-        ),
-        // GENERAL CARD (stats + resources)
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                smallPadding,
-                mediumPadding,
-                smallPadding,
-                smallPadding,
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // PINNED HEADER: Character name, level, class
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _CharacterHeaderDelegate(
+                character: widget.character,
+                isEditMode: model.isEditMode,
+                headerProgress: _headerProgress,
               ),
-              child: CollapsibleSectionCard(
-                sectionKey: _sectionKeys[_Section.general],
-                title: AppLocalizations.of(context).general,
-                icon: Icons.bar_chart_rounded,
-                initiallyExpanded: SharedPrefs().generalExpanded,
-                onExpansionChanged: (value) =>
-                    SharedPrefs().generalExpanded = value,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      largePadding,
-                      0,
-                      largePadding,
-                      largePadding,
-                    ),
-                    child: Column(
-                      children: [
-                        _StatsSection(character: widget.character),
-                        if (model.isEditMode &&
-                            !widget.character.isRetired) ...[
-                          const Divider(height: largePadding * 2),
-                          _CheckmarksAndRetirementsRow(
-                            character: widget.character,
-                          ),
-                        ],
-                        const Divider(height: largePadding * 2),
-                        _ResourcesContent(character: widget.character),
-                      ],
-                    ),
+            ),
+            // CHIP NAV BAR
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SectionNavBarDelegate(
+                character: widget.character,
+                activeSection: _activeSection,
+                onSectionTapped: _scrollToSection,
+                hasMasteries: hasMasteries,
+                headerProgress: _headerProgress,
+              ),
+            ),
+            // GENERAL CARD (stats + resources)
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    smallPadding,
+                    mediumPadding,
+                    smallPadding,
+                    smallPadding,
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        // QUEST CARD
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: Container(
-                key: _sectionKeys[_Section.quest],
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: PersonalQuestSection(character: widget.character),
-              ),
-            ),
-          ),
-        ),
-        // NOTES CARD
-        if (widget.character.notes.isNotEmpty || model.isEditMode)
-          SliverToBoxAdapter(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(smallPadding),
-                child: CharacterSectionCard(
-                  sectionKey: _sectionKeys[_Section.notes],
-                  title: AppLocalizations.of(context).notes,
-                  icon: Icons.notes_rounded,
-                  child: _NotesSection(character: widget.character),
+                  child: CollapsibleSectionCard(
+                    sectionKey: _sectionKeys[_Section.general],
+                    title: AppLocalizations.of(context).general,
+                    icon: Icons.bar_chart_rounded,
+                    initiallyExpanded: SharedPrefs().generalExpanded,
+                    onExpansionChanged: (value) =>
+                        SharedPrefs().generalExpanded = value,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          largePadding,
+                          0,
+                          largePadding,
+                          largePadding,
+                        ),
+                        child: Column(
+                          children: [
+                            _StatsSection(character: widget.character),
+                            if (model.isEditMode &&
+                                !widget.character.isRetired) ...[
+                              SizedBox(height: largePadding),
+                              // const Divider(height: largePadding * 2),
+                              _CheckmarksAndRetirementsRow(
+                                character: widget.character,
+                              ),
+                            ],
+                            const Divider(height: largePadding * 2),
+                            _ResourcesContent(character: widget.character),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        // PERKS CARD
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: CharacterSectionCard(
-                sectionKey: _sectionKeys[_Section.perks],
-                title: AppLocalizations.of(context).perks,
-                icon: Icons.auto_awesome_rounded,
-                trailing: _PerksCountBadge(character: widget.character),
-                child: PerksSection(character: widget.character),
-              ),
-            ),
-          ),
-        ),
-        // MASTERIES CARD
-        if (hasMasteries)
-          SliverToBoxAdapter(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(smallPadding),
-                child: CharacterSectionCard(
-                  sectionKey: _sectionKeys[_Section.masteries],
-                  title: AppLocalizations.of(context).masteries,
-                  icon: Icons.military_tech_rounded,
-                  child: MasteriesSection(
+            // QUEST & NOTES CARD
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(smallPadding),
+                  child: _QuestAndNotesCollapsibleCard(
+                    sectionKey: _sectionKeys[_Section.questAndNotes],
+                    notesKey: _notesKey,
                     character: widget.character,
-                    charactersModel: model,
                   ),
                 ),
               ),
             ),
-          ),
-        // BOTTOM PADDING
-        SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+            // PERKS & MASTERIES CARD
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(smallPadding),
+                  child: _PerksAndMasteriesCard(
+                    sectionKey: _sectionKeys[_Section.perksAndMasteries],
+                    masteriesKey: _masteriesKey,
+                    character: widget.character,
+                    hasMasteries: hasMasteries,
+                  ),
+                ),
+              ),
+            ),
+            // BOTTOM PADDING
+            SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+          ],
+        ),
       ],
     );
   }
@@ -291,12 +313,17 @@ class _CharacterScreenState extends State<CharacterScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _CharacterHeaderDelegate({required this.character, required this.isEditMode});
+  _CharacterHeaderDelegate({
+    required this.character,
+    required this.isEditMode,
+    required this.headerProgress,
+  });
 
   final Character character;
   final bool isEditMode;
+  final double headerProgress;
 
-  static const double _maxHeight = 160.0;
+  static const double _maxHeight = 180.0;
   static const double _minHeight = 56.0;
 
   @override
@@ -321,35 +348,11 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
     final progress = range > 0 ? (shrinkOffset / range).clamp(0.0, 1.0) : 0.0;
 
     return Material(
-      elevation: progress * 2,
-      color: colorScheme.surface,
-      child: ClipRect(
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Faded class icon background
-            Positioned(
-              right: -20,
-              top: -20,
-              bottom: -20,
-              width: 200,
-              child: Opacity(
-                opacity: (0.08 * (1 - progress)).clamp(0.0, 0.08),
-                child: ClassIconSvg(
-                  playerClass: character.playerClass,
-                  color: character
-                      .getEffectiveColor(theme.brightness)
-                      .withValues(alpha: 1),
-                ),
-              ),
-            ),
-            // Content
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: largePadding),
-              child: _buildContent(context, progress),
-            ),
-          ],
-        ),
+      elevation: 0,
+      color: colorScheme.surface.withValues(alpha: headerProgress),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: largePadding),
+        child: _buildContent(context, progress),
       ),
     );
   }
@@ -444,7 +447,10 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
             ),
           ),
         ],
-        if (character.isRetired) Text(AppLocalizations.of(context).retired),
+        if (character.isRetired) ...[
+          const SizedBox(height: smallPadding),
+          Text(AppLocalizations.of(context).retired),
+        ],
       ],
     );
   }
@@ -469,7 +475,7 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
           child: Text(
             character.name,
             maxLines: 1,
-            style: theme.textTheme.titleLarge,
+            style: theme.textTheme.headlineMedium,
             overflow: TextOverflow.fade,
             softWrap: false,
           ),
@@ -498,12 +504,14 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     required this.activeSection,
     required this.onSectionTapped,
     required this.hasMasteries,
+    required this.headerProgress,
   });
 
   final Character character;
   final _Section activeSection;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
+  final double headerProgress;
 
   @override
   double get maxExtent => chipBarHeight;
@@ -512,9 +520,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
   double get minExtent => chipBarHeight;
 
   @override
-  bool shouldRebuild(covariant _SectionNavBarDelegate oldDelegate) =>
-      activeSection != oldDelegate.activeSection ||
-      hasMasteries != oldDelegate.hasMasteries;
+  bool shouldRebuild(covariant _SectionNavBarDelegate oldDelegate) => true;
 
   @override
   Widget build(
@@ -528,19 +534,26 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
     final sections = [
       (_Section.general, l10n.general),
-      (_Section.quest, l10n.quest),
-      (_Section.notes, l10n.notes),
-      (_Section.perks, l10n.perks),
-      if (hasMasteries) (_Section.masteries, l10n.masteries),
+      (_Section.questAndNotes, l10n.questAndNotes),
+      (
+        _Section.perksAndMasteries,
+        hasMasteries ? l10n.perksAndMasteries : l10n.perks,
+      ),
     ];
 
     return Container(
       height: chipBarHeight,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(color: theme.colorScheme.outlineVariant),
-        ),
+        color: theme.colorScheme.surface.withValues(alpha: headerProgress),
+        boxShadow: overlapsContent
+            ? [
+                BoxShadow(
+                  color: theme.colorScheme.shadow.withValues(alpha: 0.15),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -634,6 +647,237 @@ class _PerksCountBadge extends StatelessWidget {
       '${character.numOfSelectedPerks}/${Character.maximumPerks(character)}',
       style: theme.textTheme.titleSmall?.copyWith(
         color: isOverLimit ? Colors.red : theme.colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Combined Quest & Notes Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _QuestAndNotesCollapsibleCard extends StatefulWidget {
+  const _QuestAndNotesCollapsibleCard({
+    required this.sectionKey,
+    required this.notesKey,
+    required this.character,
+  });
+
+  final GlobalKey? sectionKey;
+  final GlobalKey notesKey;
+  final Character character;
+
+  @override
+  State<_QuestAndNotesCollapsibleCard> createState() =>
+      _QuestAndNotesCollapsibleCardState();
+}
+
+class _QuestAndNotesCollapsibleCardState
+    extends State<_QuestAndNotesCollapsibleCard> {
+  late bool _isExpanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _isExpanded = SharedPrefs().questAndNotesExpanded;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.contrastedPrimary;
+    final l10n = AppLocalizations.of(context);
+    final model = context.watch<CharactersModel>();
+    final hasQuestAssigned = widget.character.personalQuest != null;
+    final showQuestSection = hasQuestAssigned || !widget.character.isRetired;
+    final hasNotes = widget.character.notes.isNotEmpty || model.isEditMode;
+
+    return CollapsibleSectionCard(
+      sectionKey: widget.sectionKey,
+      title: _isExpanded ? l10n.personalQuest : l10n.questAndNotes,
+      icon: Icons.map_rounded,
+      initiallyExpanded: _isExpanded,
+      onExpansionChanged: (value) {
+        SharedPrefs().questAndNotesExpanded = value;
+        setState(() => _isExpanded = value);
+      },
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Quest section
+            if (showQuestSection)
+              PersonalQuestSection(character: widget.character, embedded: true),
+            // Notes section
+            if (hasNotes) ...[
+              if (showQuestSection) const GHCDivider(indent: true),
+              // Notes header
+              Padding(
+                key: widget.notesKey,
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  mediumPadding,
+                  mediumPadding,
+                  smallPadding,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.book_rounded,
+                      size: iconSizeSmall,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: smallPadding),
+                    Expanded(
+                      child: Text(
+                        l10n.notes,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Notes content
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  0,
+                  largePadding,
+                  largePadding,
+                ),
+                child: _NotesSection(character: widget.character),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Combined Perks & Masteries Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PerksAndMasteriesCard extends StatelessWidget {
+  const _PerksAndMasteriesCard({
+    required this.sectionKey,
+    required this.masteriesKey,
+    required this.character,
+    required this.hasMasteries,
+  });
+
+  final GlobalKey? sectionKey;
+  final GlobalKey masteriesKey;
+  final Character character;
+  final bool hasMasteries;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.contrastedPrimary;
+    final model = context.watch<CharactersModel>();
+
+    return Container(
+      key: sectionKey,
+      constraints: const BoxConstraints(maxWidth: 400),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(borderRadiusMedium),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Perks header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              largePadding,
+              mediumPadding,
+              mediumPadding,
+              smallPadding,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.auto_awesome_rounded,
+                  size: iconSizeSmall,
+                  color: primaryColor,
+                ),
+                const SizedBox(width: smallPadding),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context).perks,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: primaryColor,
+                    ),
+                  ),
+                ),
+                _PerksCountBadge(character: character),
+              ],
+            ),
+          ),
+          // Perks content
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              largePadding,
+              0,
+              largePadding,
+              largePadding,
+            ),
+            child: PerksSection(character: character),
+          ),
+          // Masteries (if present)
+          if (hasMasteries) ...[
+            const GHCDivider(),
+            // const Divider(),
+            // Masteries header
+            Padding(
+              key: masteriesKey,
+              padding: const EdgeInsets.fromLTRB(
+                largePadding,
+                mediumPadding,
+                mediumPadding,
+                smallPadding,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.military_tech_rounded,
+                    size: iconSizeSmall,
+                    color: primaryColor,
+                  ),
+                  const SizedBox(width: smallPadding),
+                  Expanded(
+                    child: Text(
+                      AppLocalizations.of(context).masteries,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Masteries content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                largePadding,
+                0,
+                largePadding,
+                largePadding,
+              ),
+              child: MasteriesSection(
+                character: character,
+                charactersModel: model,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }

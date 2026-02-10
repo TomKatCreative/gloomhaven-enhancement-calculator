@@ -30,6 +30,7 @@ void main() {
       'gameEdition': 0,
       'generalExpanded': true,
       'personalQuestExpanded': false,
+      'questAndNotesExpanded': true,
     });
     await SharedPrefs().init();
 
@@ -793,15 +794,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Notes card should not appear (no CharacterSectionCard with "Notes" title
-      // as a section card — the chip bar has "Notes" but that's not a section card)
-      // Look specifically for the notes icon in a CharacterSectionCard
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is CharacterSectionCard && w.icon == Icons.notes_rounded,
-        ),
-        findsNothing,
-      );
+      // The notes icon should not appear when notes are empty and not editing
+      expect(find.byIcon(Icons.book_rounded), findsNothing);
     });
 
     /// Scrolls the CustomScrollView down enough to bring below-fold
@@ -843,12 +837,9 @@ void main() {
 
       await scrollToNotes(tester);
 
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is CharacterSectionCard && w.icon == Icons.notes_rounded,
-        ),
-        findsOneWidget,
-      );
+      // Notes header is rendered inside the combined Quest & Notes card
+      expect(find.text('Notes'), findsOneWidget);
+      expect(find.byIcon(Icons.book_rounded), findsOneWidget);
     });
 
     testWidgets('edit mode shows TextFormField even with empty notes', (
@@ -935,8 +926,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('General'), findsWidgets);
-      expect(find.text('Quest'), findsWidgets);
-      expect(find.text('Notes'), findsWidgets);
+      expect(find.text('Quest & Notes'), findsWidgets);
+      // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);
     });
   });
@@ -1002,6 +993,7 @@ void main() {
         'gameEdition': 0,
         'generalExpanded': true,
         'personalQuestExpanded': false,
+        'questAndNotesExpanded': true,
       });
       await SharedPrefs().init();
 
@@ -1054,6 +1046,7 @@ void main() {
         'gameEdition': 0,
         'generalExpanded': false,
         'personalQuestExpanded': false,
+        'questAndNotesExpanded': true,
       });
       await SharedPrefs().init();
 

@@ -429,4 +429,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get masteries => 'Masteries';
+
+  @override
+  String get questAndNotes => 'Quest & Notes';
+
+  @override
+  String get perksAndMasteries => 'Perks & Masteries';
 }

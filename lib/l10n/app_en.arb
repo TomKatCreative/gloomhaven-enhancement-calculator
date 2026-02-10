@@ -181,5 +181,7 @@
   "general": "General",
   "quest": "Quest",
   "perks": "Perks",
-  "masteries": "Masteries"
+  "masteries": "Masteries",
+  "questAndNotes": "Quest & Notes",
+  "perksAndMasteries": "Perks & Masteries"
 }

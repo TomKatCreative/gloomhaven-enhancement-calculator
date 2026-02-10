@@ -129,5 +129,7 @@
   "general": "Geral",
   "quest": "Missão",
   "perks": "Vantagens",
-  "masteries": "Maestrias"
+  "masteries": "Maestrias",
+  "questAndNotes": "Missão e Notas",
+  "perksAndMasteries": "Vantagens e Maestrias"
 }

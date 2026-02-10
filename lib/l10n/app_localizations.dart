@@ -877,6 +877,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Masteries'**
   String get masteries;
+
+  /// No description provided for @questAndNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest & Notes'**
+  String get questAndNotes;
+
+  /// No description provided for @perksAndMasteries.
+  ///
+  /// In en, this message translates to:
+  /// **'Perks & Masteries'**
+  String get perksAndMasteries;
 }
 
 class _AppLocalizationsDelegate

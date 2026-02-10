@@ -40,8 +40,15 @@ import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
 class PersonalQuestSection extends StatelessWidget {
-  const PersonalQuestSection({required this.character, super.key});
+  const PersonalQuestSection({
+    required this.character,
+    this.embedded = false,
+    super.key,
+  });
   final Character character;
+
+  /// When true, renders just the quest content without a card wrapper.
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +58,23 @@ class PersonalQuestSection extends StatelessWidget {
     // No quest assigned: show select button (hidden for retired characters)
     if (quest == null) {
       if (character.isRetired) return const SizedBox.shrink();
+      if (embedded) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: largePadding),
+          child: Center(
+            child: _SelectQuestButton(character: character, model: model),
+          ),
+        );
+      }
       return Container(
         constraints: const BoxConstraints(maxWidth: 400),
         child: _SelectQuestButton(character: character, model: model),
       );
+    }
+
+    // Embedded mode: just the content, no card wrapper
+    if (embedded) {
+      return _QuestContent(character: character, quest: quest, model: model);
     }
 
     // Quest assigned: show collapsible card

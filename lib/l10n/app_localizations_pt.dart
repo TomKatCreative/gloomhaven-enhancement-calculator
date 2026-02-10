@@ -429,4 +429,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get masteries => 'Maestrias';
+
+  @override
+  String get questAndNotes => 'Missão e Notas';
+
+  @override
+  String get perksAndMasteries => 'Vantagens e Maestrias';
 }
