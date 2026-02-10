@@ -1,7 +1,9 @@
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/world.dart';
 
 /// Abstract interface for database operations.
 ///
@@ -54,4 +56,43 @@ abstract class IDatabaseHelper {
   Future<List<Map<String, Object?>>> queryPersonalQuests({
     GameEdition? edition,
   });
+
+  // ── World CRUD ──
+
+  /// Queries all worlds from the database.
+  Future<List<World>> queryAllWorlds();
+
+  /// Inserts a new world into the database.
+  Future<void> insertWorld(World world);
+
+  /// Updates an existing world in the database.
+  Future<void> updateWorld(World world);
+
+  /// Deletes a world and all associated campaigns.
+  Future<void> deleteWorld(String worldId);
+
+  // ── Campaign CRUD ──
+
+  /// Queries all campaigns for a given world.
+  Future<List<Campaign>> queryCampaigns(String worldId);
+
+  /// Inserts a new campaign into the database.
+  Future<void> insertCampaign(Campaign campaign);
+
+  /// Updates an existing campaign in the database.
+  Future<void> updateCampaign(Campaign campaign);
+
+  /// Deletes a campaign and unlinks associated characters.
+  Future<void> deleteCampaign(String campaignId);
+
+  // ── Character-Campaign linking ──
+
+  /// Assigns a character to a campaign (or null to unassign).
+  Future<void> assignCharacterToCampaign(
+    String characterUuid,
+    String? campaignId,
+  );
+
+  /// Queries characters assigned to a specific campaign.
+  Future<List<Character>> queryCharactersByCampaign(String campaignId);
 }
