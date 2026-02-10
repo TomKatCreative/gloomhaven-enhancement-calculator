@@ -18,7 +18,7 @@ The widget uses a `Stack` with two layers:
 - 56dp tall, dynamically sized width
 - Centered icon + cost with expand arrow on right
 - Positioned 16dp from bottom
-- Background matches bottom navigation bar color
+- Background matches navigation bar color
 
 **Expanded (Card)**:
 - 85% of available screen height

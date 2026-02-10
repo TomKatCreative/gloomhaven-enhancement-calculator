@@ -185,7 +185,7 @@ The settings screen includes a persistent bottom sheet with:
 
 > **File**: `lib/ui/screens/home.dart`
 
-The main container/shell for the app, managing navigation between Characters and Enhancement Calculator pages.
+The main container/shell for the app, managing navigation between Town, Characters, and Enhancement Calculator pages.
 
 ### Structure
 
@@ -196,11 +196,12 @@ The main container/shell for the app, managing navigation between Characters and
 │                                     │
 │       PageView (swipe disabled)     │
 │                                     │
-│   Page 0: CharactersScreen          │
-│   Page 1: EnhancementCalculatorScreen│
+│   Page 0: TownScreen                │
+│   Page 1: CharactersScreen          │
+│   Page 2: EnhancementCalculatorScreen│
 │                                     │
 ├─────────────────────────────────────┤
-│      [Characters]  [Calculator]     │  ← GHCBottomNavigationBar
+│   [Town]  [Characters]  [Calculator]│  ← GHCNavigationBar (M3)
 └─────────────────────────────────────┘
                               [FAB] ←── Dynamic action button
 ```
@@ -217,11 +218,12 @@ The FAB visibility and action changes based on context:
 
 | Page | Condition | Visible? | Action |
 |------|-----------|----------|--------|
-| Calculator (1) | Cost sheet expanded OR no cost | Hidden | - |
-| Calculator (1) | Has cost to clear | Visible | Reset cost |
-| Characters (0) | Element sheet fully expanded | Hidden | - |
-| Characters (0) | No characters exist | Visible | Create character |
-| Characters (0) | Characters exist | Visible | Toggle edit mode |
+| Town (0) | Always | Hidden | - |
+| Characters (1) | Element sheet fully expanded | Hidden | - |
+| Characters (1) | No characters exist | Visible | Create character |
+| Characters (1) | Characters exist | Visible | Toggle edit mode |
+| Calculator (2) | Cost sheet expanded OR no cost | Hidden | - |
+| Calculator (2) | Has cost to clear | Visible | Reset cost |
 
 ### State Reset on Navigation
 

@@ -52,7 +52,6 @@ const double expansionBlurSigma = 12.0;
 // Layout Constraints
 const double maxWidth = 500;
 const double maxDialogWidth = 400;
-const double navBarIconContainerHeight = 35.0; // Navigation bar item height
 const double chipBarHeight = 52.0; // Section nav chip bar height
 const double blurBarHeight = 100.0; // Blur bar at bottom of calculator
 const double elementTrackerClearance =

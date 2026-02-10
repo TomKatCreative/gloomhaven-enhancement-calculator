@@ -833,9 +833,7 @@ class _PerksAndMasteriesCardState extends State<_PerksAndMasteriesCard> {
                   largePadding,
                   largePadding,
                 ),
-                child: MasteriesSection(
-                  character: widget.character,
-                ),
+                child: MasteriesSection(character: widget.character),
               ),
             ],
           ],

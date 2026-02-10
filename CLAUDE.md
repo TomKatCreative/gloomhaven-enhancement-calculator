@@ -241,7 +241,6 @@ See `docs/theme_system.md` for the full type scale reference and usage guideline
 | `hairlineThickness` | 0.5 | Thin dividers |
 | `dividerThickness` | 1.0 | Standard divider line |
 | `animationDuration` | 250ms | Standard animation duration |
-| `navBarIconContainerHeight` | 35 | Navigation bar item height |
 | `blurBarHeight` | 100 | Blur bar at bottom of calculator |
 | `formFieldSpacing` | 28 | Vertical spacing between form fields |
 

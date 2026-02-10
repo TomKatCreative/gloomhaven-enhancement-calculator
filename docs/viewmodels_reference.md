@@ -90,7 +90,7 @@ Handles app-level navigation state and page management.
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `pageController` | `PageController` | created | Controls PageView navigation |
-| `page` | `int` | 0 | Current page index (0=Characters, 1=Calculator) |
+| `page` | `int` | from SharedPrefs | Current page index (0=Town, 1=Characters, 2=Enhancements) |
 | `themeMode` | `ThemeMode` | from SharedPrefs (light/dark) | Theme mode (delegated to ThemeProvider) |
 | `useDefaultFonts` | `bool` | false | Font preference (delegated to ThemeProvider) |
 

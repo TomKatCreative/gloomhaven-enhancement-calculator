@@ -123,7 +123,7 @@ The Android system navigation bar (soft buttons at bottom of screen) color is ma
    });
    ```
 
-3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the bottom navigation bar:
+3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the navigation bar:
    ```dart
    final navBarColor = _config.useDarkMode
        ? _cachedDarkTheme!.colorScheme.surfaceContainer

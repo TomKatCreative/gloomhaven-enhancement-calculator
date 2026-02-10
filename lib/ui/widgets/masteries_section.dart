@@ -6,10 +6,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/mastery_row.dart';
 class MasteriesSection extends StatelessWidget {
   final Character character;
 
-  const MasteriesSection({
-    super.key,
-    required this.character,
-  });
+  const MasteriesSection({super.key, required this.character});
 
   @override
   Widget build(BuildContext context) {
