@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/mastery_row.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
@@ -25,7 +24,7 @@ class MasteriesSectionState extends State<MasteriesSection> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ...widget.character.masteries.map(
+        ...masteries.map(
           (mastery) => Padding(
             padding: const EdgeInsets.symmetric(vertical: tinyPadding),
             child: MasteryRow(character: widget.character, mastery: mastery),
