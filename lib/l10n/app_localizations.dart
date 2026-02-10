@@ -919,6 +919,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add'**
   String get add;
+
+  /// No description provided for @world.
+  ///
+  /// In en, this message translates to:
+  /// **'World'**
+  String get world;
+
+  /// No description provided for @worlds.
+  ///
+  /// In en, this message translates to:
+  /// **'Worlds'**
+  String get worlds;
+
+  /// No description provided for @campaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign'**
+  String get campaign;
+
+  /// No description provided for @campaigns.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaigns'**
+  String get campaigns;
+
+  /// No description provided for @party.
+  ///
+  /// In en, this message translates to:
+  /// **'Party'**
+  String get party;
+
+  /// No description provided for @createWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Create world'**
+  String get createWorld;
+
+  /// No description provided for @createCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Create party'**
+  String get createCampaign;
+
+  /// No description provided for @prosperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Prosperity'**
+  String get prosperity;
+
+  /// No description provided for @prosperityLevelN.
+  ///
+  /// In en, this message translates to:
+  /// **'Prosperity level {level}'**
+  String prosperityLevelN(int level);
+
+  /// No description provided for @reputation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reputation'**
+  String get reputation;
+
+  /// No description provided for @noWorldsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a world to track your campaign'**
+  String get noWorldsYet;
+
+  /// No description provided for @noCampaignsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a party to track reputation and assign characters'**
+  String get noCampaignsYet;
+
+  /// No description provided for @worldName.
+  ///
+  /// In en, this message translates to:
+  /// **'World name'**
+  String get worldName;
+
+  /// No description provided for @partyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Party name'**
+  String get partyName;
+
+  /// No description provided for @edition.
+  ///
+  /// In en, this message translates to:
+  /// **'Edition'**
+  String get edition;
+
+  /// No description provided for @donatedGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Donated gold'**
+  String get donatedGold;
+
+  /// No description provided for @startingProsperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting prosperity'**
+  String get startingProsperity;
+
+  /// No description provided for @startingReputation.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting reputation'**
+  String get startingReputation;
+
+  /// No description provided for @deleteWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete world?'**
+  String get deleteWorld;
+
+  /// No description provided for @deleteWorldBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this world and all its parties. Characters will be unlinked but not deleted.'**
+  String get deleteWorldBody;
+
+  /// No description provided for @deleteCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete party?'**
+  String get deleteCampaign;
+
+  /// No description provided for @deleteCampaignBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this party. Characters will be unlinked but not deleted.'**
+  String get deleteCampaignBody;
+
+  /// No description provided for @selectWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Select world'**
+  String get selectWorld;
+
+  /// No description provided for @selectCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Select party'**
+  String get selectCampaign;
+
+  /// No description provided for @renameWorld.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename world'**
+  String get renameWorld;
+
+  /// No description provided for @renameCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename party'**
+  String get renameCampaign;
+
+  /// No description provided for @checkmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'checkmarks'**
+  String get checkmarks;
 }
 
 class _AppLocalizationsDelegate

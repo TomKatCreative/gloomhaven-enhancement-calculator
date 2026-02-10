@@ -450,4 +450,90 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get add => 'Adicionar';
+
+  @override
+  String get world => 'Mundo';
+
+  @override
+  String get worlds => 'Mundos';
+
+  @override
+  String get campaign => 'Campanha';
+
+  @override
+  String get campaigns => 'Campanhas';
+
+  @override
+  String get party => 'Grupo';
+
+  @override
+  String get createWorld => 'Criar mundo';
+
+  @override
+  String get createCampaign => 'Criar grupo';
+
+  @override
+  String get prosperity => 'Prosperidade';
+
+  @override
+  String prosperityLevelN(int level) {
+    return 'Nível de prosperidade $level';
+  }
+
+  @override
+  String get reputation => 'Reputação';
+
+  @override
+  String get noWorldsYet => 'Crie um mundo para rastrear sua campanha';
+
+  @override
+  String get noCampaignsYet =>
+      'Crie um grupo para rastrear reputação e atribuir personagens';
+
+  @override
+  String get worldName => 'Nome do mundo';
+
+  @override
+  String get partyName => 'Nome do grupo';
+
+  @override
+  String get edition => 'Edição';
+
+  @override
+  String get donatedGold => 'Ouro doado';
+
+  @override
+  String get startingProsperity => 'Prosperidade inicial';
+
+  @override
+  String get startingReputation => 'Reputação inicial';
+
+  @override
+  String get deleteWorld => 'Excluir mundo?';
+
+  @override
+  String get deleteWorldBody =>
+      'Isso excluirá permanentemente este mundo e todos os seus grupos. Os personagens serão desvinculados, mas não excluídos.';
+
+  @override
+  String get deleteCampaign => 'Excluir grupo?';
+
+  @override
+  String get deleteCampaignBody =>
+      'Isso excluirá permanentemente este grupo. Os personagens serão desvinculados, mas não excluídos.';
+
+  @override
+  String get selectWorld => 'Selecionar mundo';
+
+  @override
+  String get selectCampaign => 'Selecionar grupo';
+
+  @override
+  String get renameWorld => 'Renomear mundo';
+
+  @override
+  String get renameCampaign => 'Renomear grupo';
+
+  @override
+  String get checkmarks => 'marcas';
 }

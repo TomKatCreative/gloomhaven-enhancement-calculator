@@ -450,4 +450,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get add => 'Add';
+
+  @override
+  String get world => 'World';
+
+  @override
+  String get worlds => 'Worlds';
+
+  @override
+  String get campaign => 'Campaign';
+
+  @override
+  String get campaigns => 'Campaigns';
+
+  @override
+  String get party => 'Party';
+
+  @override
+  String get createWorld => 'Create world';
+
+  @override
+  String get createCampaign => 'Create party';
+
+  @override
+  String get prosperity => 'Prosperity';
+
+  @override
+  String prosperityLevelN(int level) {
+    return 'Prosperity level $level';
+  }
+
+  @override
+  String get reputation => 'Reputation';
+
+  @override
+  String get noWorldsYet => 'Create a world to track your campaign';
+
+  @override
+  String get noCampaignsYet =>
+      'Create a party to track reputation and assign characters';
+
+  @override
+  String get worldName => 'World name';
+
+  @override
+  String get partyName => 'Party name';
+
+  @override
+  String get edition => 'Edition';
+
+  @override
+  String get donatedGold => 'Donated gold';
+
+  @override
+  String get startingProsperity => 'Starting prosperity';
+
+  @override
+  String get startingReputation => 'Starting reputation';
+
+  @override
+  String get deleteWorld => 'Delete world?';
+
+  @override
+  String get deleteWorldBody =>
+      'This will permanently delete this world and all its parties. Characters will be unlinked but not deleted.';
+
+  @override
+  String get deleteCampaign => 'Delete party?';
+
+  @override
+  String get deleteCampaignBody =>
+      'This will permanently delete this party. Characters will be unlinked but not deleted.';
+
+  @override
+  String get selectWorld => 'Select world';
+
+  @override
+  String get selectCampaign => 'Select party';
+
+  @override
+  String get renameWorld => 'Rename world';
+
+  @override
+  String get renameCampaign => 'Rename party';
+
+  @override
+  String get checkmarks => 'checkmarks';
 }

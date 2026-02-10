@@ -188,5 +188,39 @@
   "characters": "CHARACTERS",
   "enhancements": "ENHANCEMENTS",
   "subtract": "Subtract",
-  "add": "Add"
+  "add": "Add",
+  "world": "World",
+  "worlds": "Worlds",
+  "campaign": "Campaign",
+  "campaigns": "Campaigns",
+  "party": "Party",
+  "createWorld": "Create world",
+  "createCampaign": "Create party",
+  "prosperity": "Prosperity",
+  "prosperityLevelN": "Prosperity level {level}",
+  "@prosperityLevelN": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "reputation": "Reputation",
+  "noWorldsYet": "Create a world to track your campaign",
+  "noCampaignsYet": "Create a party to track reputation and assign characters",
+  "worldName": "World name",
+  "partyName": "Party name",
+  "edition": "Edition",
+  "donatedGold": "Donated gold",
+  "startingProsperity": "Starting prosperity",
+  "startingReputation": "Starting reputation",
+  "deleteWorld": "Delete world?",
+  "deleteWorldBody": "This will permanently delete this world and all its parties. Characters will be unlinked but not deleted.",
+  "deleteCampaign": "Delete party?",
+  "deleteCampaignBody": "This will permanently delete this party. Characters will be unlinked but not deleted.",
+  "selectWorld": "Select world",
+  "selectCampaign": "Select party",
+  "renameWorld": "Rename world",
+  "renameCampaign": "Rename party",
+  "checkmarks": "checkmarks"
 }
