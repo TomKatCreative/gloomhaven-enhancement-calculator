@@ -222,5 +222,6 @@
   "selectCampaign": "Select party",
   "renameWorld": "Rename world",
   "renameCampaign": "Rename party",
-  "checkmarks": "checkmarks"
+  "checkmarks": "checkmarks",
+  "openEnvelopeB": "Open envelope B"
 }

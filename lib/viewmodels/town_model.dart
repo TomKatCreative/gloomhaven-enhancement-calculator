@@ -180,10 +180,29 @@ class TownModel with ChangeNotifier {
 
   // ── Donated Gold ──
 
-  /// Updates the donated gold amount.
-  Future<void> updateDonatedGold(int amount) async {
-    if (_activeWorld == null) return;
-    _activeWorld!.donatedGold = amount;
+  /// Increments donated gold by 10 (capped at [maxDonatedGold]).
+  ///
+  /// Returns `true` when the donation just reached [maxDonatedGold],
+  /// signalling the UI to show the "open envelope B" snackbar.
+  Future<bool> incrementDonatedGold() async {
+    if (_activeWorld == null) return false;
+    final wasBelow = _activeWorld!.donatedGold < maxDonatedGold;
+    _activeWorld!.donatedGold = (_activeWorld!.donatedGold + 10).clamp(
+      0,
+      maxDonatedGold,
+    );
+    await databaseHelper.updateWorld(_activeWorld!);
+    notifyListeners();
+    return wasBelow && _activeWorld!.donatedGold >= maxDonatedGold;
+  }
+
+  /// Decrements donated gold by 10 (minimum 0).
+  Future<void> decrementDonatedGold() async {
+    if (_activeWorld == null || _activeWorld!.donatedGold <= 0) return;
+    _activeWorld!.donatedGold = (_activeWorld!.donatedGold - 10).clamp(
+      0,
+      maxDonatedGold,
+    );
     await databaseHelper.updateWorld(_activeWorld!);
     notifyListeners();
   }

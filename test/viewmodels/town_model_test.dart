@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
+import 'package:gloomhaven_enhancement_calc/models/world.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -327,6 +328,56 @@ void main() {
         model.activeCampaign!.reputation = minReputation;
         await model.decrementReputation();
         expect(model.activeCampaign?.reputation, minReputation);
+      });
+    });
+
+    group('donatedGold', () {
+      setUp(() async {
+        await model.createWorld(name: 'Test', edition: GameEdition.gloomhaven);
+      });
+
+      test('incrementDonatedGold increments by 10', () async {
+        await model.incrementDonatedGold();
+        expect(model.activeWorld?.donatedGold, 10);
+      });
+
+      test('incrementDonatedGold caps at maxDonatedGold', () async {
+        model.activeWorld!.donatedGold = 95;
+        await model.incrementDonatedGold();
+        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+      });
+
+      test('incrementDonatedGold returns true when reaching 100', () async {
+        model.activeWorld!.donatedGold = 90;
+        final result = await model.incrementDonatedGold();
+        expect(result, true);
+        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+      });
+
+      test('incrementDonatedGold returns false on other increments', () async {
+        model.activeWorld!.donatedGold = 0;
+        final result = await model.incrementDonatedGold();
+        expect(result, false);
+        expect(model.activeWorld?.donatedGold, 10);
+      });
+
+      test('incrementDonatedGold returns false when already at max', () async {
+        model.activeWorld!.donatedGold = maxDonatedGold;
+        final result = await model.incrementDonatedGold();
+        expect(result, false);
+        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+      });
+
+      test('decrementDonatedGold decrements by 10', () async {
+        model.activeWorld!.donatedGold = 30;
+        await model.decrementDonatedGold();
+        expect(model.activeWorld?.donatedGold, 20);
+      });
+
+      test('decrementDonatedGold does not go below 0', () async {
+        model.activeWorld!.donatedGold = 0;
+        await model.decrementDonatedGold();
+        expect(model.activeWorld?.donatedGold, 0);
       });
     });
 

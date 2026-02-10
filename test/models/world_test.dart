@@ -147,5 +147,11 @@ void main() {
         }
       });
     });
+
+    group('maxDonatedGold', () {
+      test('is 100', () {
+        expect(maxDonatedGold, 100);
+      });
+    });
   });
 }

@@ -1081,6 +1081,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'checkmarks'**
   String get checkmarks;
+
+  /// No description provided for @openEnvelopeB.
+  ///
+  /// In en, this message translates to:
+  /// **'Open envelope B'**
+  String get openEnvelopeB;
 }
 
 class _AppLocalizationsDelegate

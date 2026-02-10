@@ -10,6 +10,9 @@ const String columnWorldProsperityCheckmarks = 'ProsperityCheckmarks';
 const String columnWorldDonatedGold = 'DonatedGold';
 const String columnWorldCreatedAt = 'CreatedAt';
 
+/// Maximum gold that can be donated to the sanctuary.
+const int maxDonatedGold = 100;
+
 /// Prosperity level thresholds by edition.
 ///
 /// Each list maps prosperity level (index) to the minimum checkmarks required.

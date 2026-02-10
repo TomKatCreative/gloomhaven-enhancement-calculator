@@ -536,4 +536,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get checkmarks => 'marcas';
+
+  @override
+  String get openEnvelopeB => 'Abra o envelope B';
 }

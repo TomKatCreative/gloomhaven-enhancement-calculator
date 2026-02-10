@@ -5,8 +5,8 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.da
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_world_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/campaign_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/prosperity_section.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/sanctuary_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/town_empty_state.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/town/world_selector.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 import 'package:provider/provider.dart';
 
@@ -35,22 +35,6 @@ class TownScreen extends StatelessWidget {
         vertical: mediumPadding,
       ),
       children: [
-        // World selector chip
-        Center(
-          child: ActionChip(
-            avatar: const Icon(Icons.public),
-            label: Text('${world.name} (${world.edition.displayName})'),
-            onPressed: () => WorldSelector.show(
-              context: context,
-              worlds: townModel.worlds,
-              activeWorld: world,
-              onWorldSelected: (w) => townModel.setActiveWorld(w),
-              onCreateWorld: () => CreateWorldScreen.show(context, townModel),
-            ),
-          ),
-        ),
-        const SizedBox(height: largePadding),
-
         // Prosperity section
         Center(
           child: ProsperitySection(
@@ -58,6 +42,25 @@ class TownScreen extends StatelessWidget {
             isEditMode: townModel.isEditMode,
             onIncrement: () => townModel.incrementProsperity(),
             onDecrement: () => townModel.decrementProsperity(),
+          ),
+        ),
+        const SizedBox(height: largePadding),
+
+        // Sanctuary donation section
+        Center(
+          child: SanctuarySection(
+            world: world,
+            isEditMode: townModel.isEditMode,
+            onIncrement: () async {
+              final justCompleted = await townModel.incrementDonatedGold();
+              if (justCompleted && context.mounted) {
+                ScaffoldMessenger.of(context)
+                  ..clearSnackBars()
+                  ..showSnackBar(SnackBar(content: Text(l10n.openEnvelopeB)));
+              }
+              return justCompleted;
+            },
+            onDecrement: () => townModel.decrementDonatedGold(),
           ),
         ),
         const SizedBox(height: largePadding),

@@ -536,4 +536,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkmarks => 'checkmarks';
+
+  @override
+  String get openEnvelopeB => 'Open envelope B';
 }

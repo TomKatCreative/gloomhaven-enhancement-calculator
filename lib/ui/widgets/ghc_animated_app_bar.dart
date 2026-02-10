@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -6,7 +7,9 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_world_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/world_selector.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -143,9 +146,24 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
       centerTitle: true,
       title:
           context.watch<AppModel>().page == 0 && townModel.activeWorld != null
-          ? Text(
-              townModel.activeWorld!.name,
-              style: Theme.of(context).textTheme.titleMedium,
+          ? GestureDetector(
+              onTap: () => WorldSelector.show(
+                context: context,
+                worlds: townModel.worlds,
+                activeWorld: townModel.activeWorld,
+                onWorldSelected: (w) => townModel.setActiveWorld(w),
+                onCreateWorld: () => CreateWorldScreen.show(context, townModel),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    townModel.activeWorld!.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Icon(Icons.arrow_drop_down, size: iconSizeSmall),
+                ],
+              ),
             )
           : context.watch<AppModel>().page == 1 &&
                 charactersModel.characters.length > 1

@@ -30,7 +30,6 @@ class _CreateWorldScreenState extends State<CreateWorldScreen> {
   final _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
   final _nameFocusNode = FocusNode();
-  GameEdition _selectedEdition = GameEdition.gloomhaven;
 
   @override
   void dispose() {
@@ -44,7 +43,6 @@ class _CreateWorldScreenState extends State<CreateWorldScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: GHCAppBar(
@@ -83,47 +81,6 @@ class _CreateWorldScreenState extends State<CreateWorldScreen> {
                   (value == null || value.trim().isEmpty) ? l10n.name : null,
             ),
             const SizedBox(height: formFieldSpacing),
-            // Edition toggle
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.edition,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: smallPadding),
-                SizedBox(
-                  width: double.infinity,
-                  child: SegmentedButton<GameEdition>(
-                    showSelectedIcon: false,
-                    segments: [
-                      ButtonSegment(
-                        value: GameEdition.gloomhaven,
-                        label: const Text('GH'),
-                        tooltip: l10n.gloomhaven,
-                      ),
-                      ButtonSegment(
-                        value: GameEdition.gloomhaven2e,
-                        label: const Text('GH2e'),
-                        tooltip: 'Gloomhaven 2nd Edition',
-                      ),
-                      ButtonSegment(
-                        value: GameEdition.frosthaven,
-                        label: const Text('FH'),
-                        tooltip: l10n.frosthaven,
-                      ),
-                    ],
-                    selected: {_selectedEdition},
-                    onSelectionChanged: (selection) {
-                      setState(() => _selectedEdition = selection.first);
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: formFieldSpacing),
             // Starting prosperity
             TextFormField(
               decoration: InputDecoration(
@@ -152,7 +109,7 @@ class _CreateWorldScreenState extends State<CreateWorldScreen> {
 
       await widget.townModel.createWorld(
         name: _nameController.text.trim(),
-        edition: _selectedEdition,
+        edition: GameEdition.gloomhaven,
         startingProsperityCheckmarks: prosperity,
       );
 
