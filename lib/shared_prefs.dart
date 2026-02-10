@@ -99,9 +99,15 @@ class SharedPrefs {
 
   set envelopeV(bool value) => _sharedPrefs.setBool('envelopeV', value);
 
-  int get initialPage => _sharedPrefs.getInt('initialPage') ?? 0;
+  int get initialPage => _sharedPrefs.getInt('initialPage') ?? 1;
 
   set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
+
+  int get currentCharacterIndex =>
+      _sharedPrefs.getInt('currentCharacterIndex') ?? 0;
+
+  set currentCharacterIndex(int value) =>
+      _sharedPrefs.setInt('currentCharacterIndex', value);
 
   bool get generalExpanded => _sharedPrefs.getBool('generalExpanded') ?? true;
 

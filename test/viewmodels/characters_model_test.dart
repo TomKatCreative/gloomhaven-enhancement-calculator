@@ -932,7 +932,7 @@ void main() {
 
       model.onPageChanged(1);
 
-      expect(SharedPrefs().initialPage, equals(1));
+      expect(SharedPrefs().currentCharacterIndex, equals(1));
     });
 
     test('sets isScrolledToTop to true', () async {
@@ -1012,22 +1012,25 @@ void main() {
       expect(model.currentCharacter!.characterPerks, isNotEmpty);
     });
 
-    test('sets currentCharacter from SharedPrefs initialPage', () async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 1,
-        'primaryClassColor': 0xff4e7ec1,
-      });
-      await SharedPrefs().init();
+    test(
+      'sets currentCharacter from SharedPrefs currentCharacterIndex',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          'showRetiredCharacters': true,
+          'darkTheme': false,
+          'currentCharacterIndex': 1,
+          'primaryClassColor': 0xff4e7ec1,
+        });
+        await SharedPrefs().init();
 
-      fakeDb.characters = TestData.createAllActiveCharacters();
-      final model = createModel();
+        fakeDb.characters = TestData.createAllActiveCharacters();
+        final model = createModel();
 
-      await model.loadCharacters();
+        await model.loadCharacters();
 
-      expect(model.currentCharacter?.uuid, equals('test-2'));
-    });
+        expect(model.currentCharacter?.uuid, equals('test-2'));
+      },
+    );
 
     test('handles empty database gracefully', () async {
       fakeDb.characters = [];

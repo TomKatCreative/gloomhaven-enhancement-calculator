@@ -77,7 +77,7 @@ class CharactersModel with ChangeNotifier {
   IDatabaseHelper databaseHelper;
   ThemeProvider themeProvider;
   PageController pageController = PageController(
-    initialPage: SharedPrefs().initialPage,
+    initialPage: SharedPrefs().currentCharacterIndex,
   );
   bool isScrolledToTop = true;
   ScrollController charScreenScrollController = ScrollController();
@@ -228,7 +228,7 @@ class CharactersModel with ChangeNotifier {
       characters = loadedCharacters;
     }
 
-    _setCurrentCharacter(index: SharedPrefs().initialPage);
+    _setCurrentCharacter(index: SharedPrefs().currentCharacterIndex);
     notifyListeners();
     return characters;
   }
@@ -306,7 +306,7 @@ class CharactersModel with ChangeNotifier {
   }
 
   void onPageChanged(int index) {
-    SharedPrefs().initialPage = index;
+    SharedPrefs().currentCharacterIndex = index;
     isScrolledToTop = true;
     _setCurrentCharacter(index: index);
     _isEditMode = false;
@@ -389,14 +389,14 @@ class CharactersModel with ChangeNotifier {
   void _setCurrentCharacter({required int index}) {
     if (characters.isEmpty) {
       currentCharacter = null;
-      SharedPrefs().initialPage = 0;
+      SharedPrefs().currentCharacterIndex = 0;
     } else {
       if (index < 0 || index >= characters.length) {
         currentCharacter = characters.last;
-        SharedPrefs().initialPage = characters.length - 1;
+        SharedPrefs().currentCharacterIndex = characters.length - 1;
       } else {
         currentCharacter = characters[index];
-        SharedPrefs().initialPage = index;
+        SharedPrefs().currentCharacterIndex = index;
       }
     }
     updateThemeForCharacter(themeProvider);
