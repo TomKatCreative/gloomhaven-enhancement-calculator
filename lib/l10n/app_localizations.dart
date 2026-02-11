@@ -269,7 +269,7 @@ abstract class AppLocalizations {
   /// No description provided for @battleGoals.
   ///
   /// In en, this message translates to:
-  /// **'Battle goals'**
+  /// **'Battle Goals'**
   String get battleGoals;
 
   /// No description provided for @cardLevel.
@@ -857,7 +857,7 @@ abstract class AppLocalizations {
   /// No description provided for @general.
   ///
   /// In en, this message translates to:
-  /// **'General'**
+  /// **'Stats & Party'**
   String get general;
 
   /// No description provided for @quest.
@@ -920,18 +920,6 @@ abstract class AppLocalizations {
   /// **'Add'**
   String get add;
 
-  /// No description provided for @world.
-  ///
-  /// In en, this message translates to:
-  /// **'World'**
-  String get world;
-
-  /// No description provided for @worlds.
-  ///
-  /// In en, this message translates to:
-  /// **'Worlds'**
-  String get worlds;
-
   /// No description provided for @campaign.
   ///
   /// In en, this message translates to:
@@ -950,17 +938,23 @@ abstract class AppLocalizations {
   /// **'Party'**
   String get party;
 
-  /// No description provided for @createWorld.
+  /// No description provided for @parties.
   ///
   /// In en, this message translates to:
-  /// **'Create world'**
-  String get createWorld;
+  /// **'Parties'**
+  String get parties;
 
   /// No description provided for @createCampaign.
   ///
   /// In en, this message translates to:
-  /// **'Create party'**
+  /// **'Create campaign'**
   String get createCampaign;
+
+  /// No description provided for @createParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Create party'**
+  String get createParty;
 
   /// No description provided for @prosperity.
   ///
@@ -980,23 +974,23 @@ abstract class AppLocalizations {
   /// **'Reputation'**
   String get reputation;
 
-  /// No description provided for @noWorldsYet.
-  ///
-  /// In en, this message translates to:
-  /// **'Create a world to track your campaign'**
-  String get noWorldsYet;
-
   /// No description provided for @noCampaignsYet.
   ///
   /// In en, this message translates to:
-  /// **'Create a party to track reputation and assign characters'**
+  /// **'Create a campaign to track your parties'**
   String get noCampaignsYet;
 
-  /// No description provided for @worldName.
+  /// No description provided for @noPartiesYet.
   ///
   /// In en, this message translates to:
-  /// **'World name'**
-  String get worldName;
+  /// **'Create a party to track reputation and assign characters'**
+  String get noPartiesYet;
+
+  /// No description provided for @campaignName.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign name'**
+  String get campaignName;
 
   /// No description provided for @partyName.
   ///
@@ -1028,53 +1022,59 @@ abstract class AppLocalizations {
   /// **'Starting reputation'**
   String get startingReputation;
 
-  /// No description provided for @deleteWorld.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete world?'**
-  String get deleteWorld;
-
-  /// No description provided for @deleteWorldBody.
-  ///
-  /// In en, this message translates to:
-  /// **'This will permanently delete this world and all its parties. Characters will be unlinked but not deleted.'**
-  String get deleteWorldBody;
-
   /// No description provided for @deleteCampaign.
   ///
   /// In en, this message translates to:
-  /// **'Delete party?'**
+  /// **'Delete campaign?'**
   String get deleteCampaign;
 
   /// No description provided for @deleteCampaignBody.
   ///
   /// In en, this message translates to:
-  /// **'This will permanently delete this party. Characters will be unlinked but not deleted.'**
+  /// **'This will permanently delete this campaign and all its parties. Characters will be unlinked but not deleted.'**
   String get deleteCampaignBody;
 
-  /// No description provided for @selectWorld.
+  /// No description provided for @deleteParty.
   ///
   /// In en, this message translates to:
-  /// **'Select world'**
-  String get selectWorld;
+  /// **'Delete party?'**
+  String get deleteParty;
+
+  /// No description provided for @deletePartyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this party. Characters will be unlinked but not deleted.'**
+  String get deletePartyBody;
 
   /// No description provided for @selectCampaign.
   ///
   /// In en, this message translates to:
-  /// **'Select party'**
+  /// **'Select campaign'**
   String get selectCampaign;
 
-  /// No description provided for @renameWorld.
+  /// No description provided for @selectParty.
   ///
   /// In en, this message translates to:
-  /// **'Rename world'**
-  String get renameWorld;
+  /// **'Select party'**
+  String get selectParty;
+
+  /// No description provided for @switchParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch party'**
+  String get switchParty;
 
   /// No description provided for @renameCampaign.
   ///
   /// In en, this message translates to:
-  /// **'Rename party'**
+  /// **'Rename campaign'**
   String get renameCampaign;
+
+  /// No description provided for @renameParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename party'**
+  String get renameParty;
 
   /// No description provided for @checkmarks.
   ///
@@ -1087,6 +1087,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open envelope B'**
   String get openEnvelopeB;
+
+  /// No description provided for @noParty.
+  ///
+  /// In en, this message translates to:
+  /// **'No party'**
+  String get noParty;
+
+  /// No description provided for @notAssignedToParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Not assigned to a party'**
+  String get notAssignedToParty;
+
+  /// No description provided for @assignToParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign to a party'**
+  String get assignToParty;
+
+  /// No description provided for @createCampaignFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a campaign first to assign a party'**
+  String get createCampaignFirst;
+
+  /// No description provided for @scenarioLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenario location'**
+  String get scenarioLocation;
+
+  /// No description provided for @partyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Party notes'**
+  String get partyNotes;
+
+  /// No description provided for @achievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievements;
+
+  /// No description provided for @shopPriceModifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shopPriceModifier;
+
+  /// No description provided for @addPartyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add party notes...'**
+  String get addPartyNotes;
 }
 
 class _AppLocalizationsDelegate

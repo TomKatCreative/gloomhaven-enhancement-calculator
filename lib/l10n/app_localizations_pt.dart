@@ -419,7 +419,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notYet => 'Ainda Não';
 
   @override
-  String get general => 'Geral';
+  String get general => 'Estatísticas e Grupo';
 
   @override
   String get quest => 'Missão';
@@ -452,12 +452,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get add => 'Adicionar';
 
   @override
-  String get world => 'Mundo';
-
-  @override
-  String get worlds => 'Mundos';
-
-  @override
   String get campaign => 'Campanha';
 
   @override
@@ -467,10 +461,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get party => 'Grupo';
 
   @override
-  String get createWorld => 'Criar mundo';
+  String get parties => 'Grupos';
 
   @override
-  String get createCampaign => 'Criar grupo';
+  String get createCampaign => 'Criar campanha';
+
+  @override
+  String get createParty => 'Criar grupo';
 
   @override
   String get prosperity => 'Prosperidade';
@@ -484,14 +481,14 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reputation => 'Reputação';
 
   @override
-  String get noWorldsYet => 'Crie um mundo para rastrear sua campanha';
+  String get noCampaignsYet => 'Crie uma campanha para rastrear seus grupos';
 
   @override
-  String get noCampaignsYet =>
+  String get noPartiesYet =>
       'Crie um grupo para rastrear reputação e atribuir personagens';
 
   @override
-  String get worldName => 'Nome do mundo';
+  String get campaignName => 'Nome da campanha';
 
   @override
   String get partyName => 'Nome do grupo';
@@ -509,34 +506,65 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startingReputation => 'Reputação inicial';
 
   @override
-  String get deleteWorld => 'Excluir mundo?';
-
-  @override
-  String get deleteWorldBody =>
-      'Isso excluirá permanentemente este mundo e todos os seus grupos. Os personagens serão desvinculados, mas não excluídos.';
-
-  @override
-  String get deleteCampaign => 'Excluir grupo?';
+  String get deleteCampaign => 'Excluir campanha?';
 
   @override
   String get deleteCampaignBody =>
+      'Isso excluirá permanentemente esta campanha e todos os seus grupos. Os personagens serão desvinculados, mas não excluídos.';
+
+  @override
+  String get deleteParty => 'Excluir grupo?';
+
+  @override
+  String get deletePartyBody =>
       'Isso excluirá permanentemente este grupo. Os personagens serão desvinculados, mas não excluídos.';
 
   @override
-  String get selectWorld => 'Selecionar mundo';
+  String get selectCampaign => 'Selecionar campanha';
 
   @override
-  String get selectCampaign => 'Selecionar grupo';
+  String get selectParty => 'Selecionar grupo';
 
   @override
-  String get renameWorld => 'Renomear mundo';
+  String get switchParty => 'Trocar grupo';
 
   @override
-  String get renameCampaign => 'Renomear grupo';
+  String get renameCampaign => 'Renomear campanha';
+
+  @override
+  String get renameParty => 'Renomear grupo';
 
   @override
   String get checkmarks => 'marcas';
 
   @override
   String get openEnvelopeB => 'Abra o envelope B';
+
+  @override
+  String get noParty => 'Sem grupo';
+
+  @override
+  String get notAssignedToParty => 'Não atribuído a um grupo';
+
+  @override
+  String get assignToParty => 'Atribuir a um grupo';
+
+  @override
+  String get createCampaignFirst =>
+      'Crie uma campanha primeiro para atribuir um grupo';
+
+  @override
+  String get scenarioLocation => 'Local do cenário';
+
+  @override
+  String get partyNotes => 'Notas do grupo';
+
+  @override
+  String get achievements => 'Conquistas';
+
+  @override
+  String get shopPriceModifier => 'Loja';
+
+  @override
+  String get addPartyNotes => 'Adicionar notas do grupo...';
 }

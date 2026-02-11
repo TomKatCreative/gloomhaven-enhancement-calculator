@@ -101,7 +101,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get battleGoals => 'Battle goals';
+  String get battleGoals => 'Battle Goals';
 
   @override
   String get cardLevel => 'Card level';
@@ -419,7 +419,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notYet => 'Not Yet';
 
   @override
-  String get general => 'General';
+  String get general => 'Stats & Party';
 
   @override
   String get quest => 'Quest';
@@ -452,12 +452,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add => 'Add';
 
   @override
-  String get world => 'World';
-
-  @override
-  String get worlds => 'Worlds';
-
-  @override
   String get campaign => 'Campaign';
 
   @override
@@ -467,10 +461,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get party => 'Party';
 
   @override
-  String get createWorld => 'Create world';
+  String get parties => 'Parties';
 
   @override
-  String get createCampaign => 'Create party';
+  String get createCampaign => 'Create campaign';
+
+  @override
+  String get createParty => 'Create party';
 
   @override
   String get prosperity => 'Prosperity';
@@ -484,14 +481,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reputation => 'Reputation';
 
   @override
-  String get noWorldsYet => 'Create a world to track your campaign';
+  String get noCampaignsYet => 'Create a campaign to track your parties';
 
   @override
-  String get noCampaignsYet =>
+  String get noPartiesYet =>
       'Create a party to track reputation and assign characters';
 
   @override
-  String get worldName => 'World name';
+  String get campaignName => 'Campaign name';
 
   @override
   String get partyName => 'Party name';
@@ -509,34 +506,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startingReputation => 'Starting reputation';
 
   @override
-  String get deleteWorld => 'Delete world?';
-
-  @override
-  String get deleteWorldBody =>
-      'This will permanently delete this world and all its parties. Characters will be unlinked but not deleted.';
-
-  @override
-  String get deleteCampaign => 'Delete party?';
+  String get deleteCampaign => 'Delete campaign?';
 
   @override
   String get deleteCampaignBody =>
+      'This will permanently delete this campaign and all its parties. Characters will be unlinked but not deleted.';
+
+  @override
+  String get deleteParty => 'Delete party?';
+
+  @override
+  String get deletePartyBody =>
       'This will permanently delete this party. Characters will be unlinked but not deleted.';
 
   @override
-  String get selectWorld => 'Select world';
+  String get selectCampaign => 'Select campaign';
 
   @override
-  String get selectCampaign => 'Select party';
+  String get selectParty => 'Select party';
 
   @override
-  String get renameWorld => 'Rename world';
+  String get switchParty => 'Switch party';
 
   @override
-  String get renameCampaign => 'Rename party';
+  String get renameCampaign => 'Rename campaign';
+
+  @override
+  String get renameParty => 'Rename party';
 
   @override
   String get checkmarks => 'checkmarks';
 
   @override
   String get openEnvelopeB => 'Open envelope B';
+
+  @override
+  String get noParty => 'No party';
+
+  @override
+  String get notAssignedToParty => 'Not assigned to a party';
+
+  @override
+  String get assignToParty => 'Assign to a party';
+
+  @override
+  String get createCampaignFirst => 'Create a campaign first to assign a party';
+
+  @override
+  String get scenarioLocation => 'Scenario location';
+
+  @override
+  String get partyNotes => 'Party notes';
+
+  @override
+  String get achievements => 'Achievements';
+
+  @override
+  String get shopPriceModifier => 'Shop';
+
+  @override
+  String get addPartyNotes => 'Add party notes...';
 }
