@@ -68,7 +68,7 @@ class ProsperitySection extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return SectionCard(
       title: l10n.prosperity,
-      icon: Icons.location_city,
+      svgAssetKey: 'PROSPERITY',
       child: content,
     );
   }

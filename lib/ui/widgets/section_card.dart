@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 /// Reusable card wrapper for screen sections.
 ///
@@ -16,6 +17,7 @@ class SectionCard extends StatelessWidget {
     required this.title,
     this.titleWidget,
     this.icon,
+    this.svgAssetKey,
     this.trailing,
     required this.child,
     this.constraints = const BoxConstraints(maxWidth: maxWidth),
@@ -33,6 +35,9 @@ class SectionCard extends StatelessWidget {
   /// Optional widget that replaces the default [Text] title.
   final Widget? titleWidget;
   final IconData? icon;
+
+  /// SVG asset key to display before the title (alternative to [icon]).
+  final String? svgAssetKey;
   final Widget? trailing;
   final Widget child;
   final BoxConstraints constraints;
@@ -69,6 +74,13 @@ class SectionCard extends StatelessWidget {
                 if (icon != null) ...[
                   Icon(icon, size: iconSizeSmall, color: primaryColor),
                   const SizedBox(width: smallPadding),
+                ] else if (svgAssetKey != null) ...[
+                  ThemedSvg(
+                    assetKey: svgAssetKey!,
+                    width: iconSizeSmall,
+                    color: primaryColor,
+                  ),
+                  const SizedBox(width: smallPadding),
                 ],
                 Expanded(
                   child:
@@ -99,6 +111,7 @@ class CollapsibleSectionCard extends StatefulWidget {
     required this.title,
     this.titleWidget,
     this.icon,
+    this.svgAssetKey,
     required this.initiallyExpanded,
     required this.onExpansionChanged,
     required this.children,
@@ -112,6 +125,9 @@ class CollapsibleSectionCard extends StatefulWidget {
   /// Optional widget that replaces the default [Text] title.
   final Widget? titleWidget;
   final IconData? icon;
+
+  /// SVG asset key to display before the title (alternative to [icon]).
+  final String? svgAssetKey;
   final bool initiallyExpanded;
   final ValueChanged<bool> onExpansionChanged;
   final List<Widget> children;
@@ -163,7 +179,7 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                     AnimatedRotation(
                       turns: _isExpanded ? 0.5 : 0,
                       duration: animationDuration,
-                      child: Icon(Icons.expand_more, color: chevronColor),
+                      child: Icon(Icons.expand_more),
                     ),
                   ],
                 )
@@ -173,6 +189,13 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
             children: [
               if (widget.icon != null) ...[
                 Icon(widget.icon, size: iconSizeSmall, color: primaryColor),
+                const SizedBox(width: smallPadding),
+              ] else if (widget.svgAssetKey != null) ...[
+                ThemedSvg(
+                  assetKey: widget.svgAssetKey!,
+                  width: iconSizeSmall,
+                  color: primaryColor,
+                ),
                 const SizedBox(width: smallPadding),
               ],
               Flexible(

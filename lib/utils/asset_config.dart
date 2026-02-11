@@ -881,6 +881,10 @@ const Map<String, AssetConfig> assets = {
   'TRAIT': AssetConfig('ui/trait.svg', themeMode: CurrentColorTheme()),
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),
   'GOLD': AssetConfig('ui/gold.svg', themeMode: CurrentColorTheme()),
+  'PROSPERITY': AssetConfig(
+    'ui/prosperity.svg',
+    themeMode: CurrentColorTheme(),
+  ),
   'hex': AssetConfig('ui/hex.svg'),
   'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),

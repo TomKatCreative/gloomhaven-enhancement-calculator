@@ -48,7 +48,7 @@ class _TownScreenState extends State<TownScreen> {
         Center(
           child: CollapsibleSectionCard(
             title: campaign.name,
-            icon: Icons.location_city,
+            svgAssetKey: 'PROSPERITY',
             initiallyExpanded: SharedPrefs().townDetailsExpanded,
             onExpansionChanged: (v) => SharedPrefs().townDetailsExpanded = v,
             children: [
