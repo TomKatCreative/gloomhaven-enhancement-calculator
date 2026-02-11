@@ -1356,10 +1356,10 @@ class _ResourcesContent extends StatelessWidget {
       final ResourceFieldData fieldData = entry.value;
       return ResourceCard(
         resource: ResourcesRepository.resources[fieldData.resourceIndex],
-        color: Theme.of(context)
-            .extension<AppThemeExtension>()!
-            .characterPrimary
-            .withValues(alpha: 0.1),
+        color: ColorUtils.ensureContrast(
+          Theme.of(context).extension<AppThemeExtension>()!.characterPrimary,
+          Theme.of(context).colorScheme.surfaceContainerLow,
+        ).withValues(alpha: 0.1),
         count: fieldData.getter(character),
         onIncrease: () {
           final updatedCharacter = character;
