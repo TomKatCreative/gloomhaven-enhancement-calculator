@@ -2,31 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
-/// A full-page screen for creating a new campaign.
-class CreateCampaignScreen extends StatefulWidget {
+/// A full-page screen for creating a new party.
+class CreatePartyScreen extends StatefulWidget {
   final TownModel townModel;
 
-  const CreateCampaignScreen({super.key, required this.townModel});
+  const CreatePartyScreen({super.key, required this.townModel});
 
-  /// Shows the create campaign screen as a full page route.
+  /// Shows the create party screen as a full page route.
   static Future<bool?> show(BuildContext context, TownModel model) {
     return Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => CreateCampaignScreen(townModel: model)),
+      MaterialPageRoute(builder: (_) => CreatePartyScreen(townModel: model)),
     );
   }
 
   @override
-  State<CreateCampaignScreen> createState() => _CreateCampaignScreenState();
+  State<CreatePartyScreen> createState() => _CreatePartyScreenState();
 }
 
-class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
+class _CreatePartyScreenState extends State<CreatePartyScreen> {
   final _nameController = TextEditingController();
-  final _prosperityController = TextEditingController();
+  final _reputationController = TextEditingController();
   final _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
   final _nameFocusNode = FocusNode();
@@ -34,7 +33,7 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _prosperityController.dispose();
+    _reputationController.dispose();
     _scrollController.dispose();
     _nameFocusNode.dispose();
     super.dispose();
@@ -64,15 +63,15 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
           controller: _scrollController,
           padding: const EdgeInsets.all(extraLargePadding),
           children: [
-            // Campaign name
+            // Party name
             TextFormField(
               autofocus: true,
               focusNode: _nameFocusNode,
               textCapitalization: TextCapitalization.words,
               autocorrect: false,
               decoration: InputDecoration(
-                labelText: l10n.campaignName,
-                hintText: 'Gloomhaven',
+                labelText: l10n.partyName,
+                hintText: 'The Heroes',
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 border: const OutlineInputBorder(),
               ),
@@ -81,18 +80,20 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
                   (value == null || value.trim().isEmpty) ? l10n.name : null,
             ),
             const SizedBox(height: formFieldSpacing),
-            // Starting prosperity
+            // Starting reputation
             TextFormField(
               decoration: InputDecoration(
-                labelText: l10n.startingProsperity,
+                labelText: l10n.startingReputation,
                 hintText: '0',
                 floatingLabelBehavior: FloatingLabelBehavior.always,
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.location_city),
+                prefixIcon: const Icon(Icons.thumb_up_alt_outlined),
               ),
-              controller: _prosperityController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              controller: _reputationController,
+              keyboardType: const TextInputType.numberWithOptions(signed: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^-?\d*')),
+              ],
             ),
             const SizedBox(height: formFieldSpacing),
           ],
@@ -103,14 +104,13 @@ class _CreateCampaignScreenState extends State<CreateCampaignScreen> {
 
   Future<void> _onCreatePressed() async {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
-      final prosperity = _prosperityController.text.isNotEmpty
-          ? int.parse(_prosperityController.text)
+      final reputation = _reputationController.text.isNotEmpty
+          ? int.parse(_reputationController.text)
           : 0;
 
-      await widget.townModel.createCampaign(
+      await widget.townModel.createParty(
         name: _nameController.text.trim(),
-        edition: GameEdition.gloomhaven,
-        startingProsperityCheckmarks: prosperity,
+        startingReputation: reputation.clamp(-20, 20),
       );
 
       if (!mounted) return;
