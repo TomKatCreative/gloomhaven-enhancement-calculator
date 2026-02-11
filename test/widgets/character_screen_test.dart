@@ -557,7 +557,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       expect(addButtons, findsNWidgets(2));
 
       await tester.ensureVisible(addButtons.first);
@@ -578,9 +578,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
       expect(subtractButtons, findsNWidgets(2));
 
       await tester.ensureVisible(subtractButtons.first);
@@ -609,7 +607,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       await tester.ensureVisible(addButtons.last);
       await tester.pumpAndSettle();
       await tester.tap(addButtons.last);
@@ -632,9 +630,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
       await tester.ensureVisible(subtractButtons.last);
       await tester.pumpAndSettle();
       await tester.tap(subtractButtons.last);
@@ -654,7 +650,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       await tester.ensureVisible(addButtons.last);
       await tester.pumpAndSettle();
 
@@ -675,9 +671,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
       await tester.ensureVisible(subtractButtons.last);
       await tester.pumpAndSettle();
 
@@ -956,7 +950,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Scroll to the checkmarks section
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       await tester.ensureVisible(addButtons.first);
       await tester.pumpAndSettle();
 
@@ -977,7 +971,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       await tester.ensureVisible(addButtons.last);
       await tester.pumpAndSettle();
 

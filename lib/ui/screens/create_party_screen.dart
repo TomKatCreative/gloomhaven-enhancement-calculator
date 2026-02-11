@@ -2,101 +2,107 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
-/// A full-page screen for creating a new party.
-class CreatePartyScreen extends StatefulWidget {
+/// Bottom sheet for creating a new party.
+class CreatePartySheet extends StatefulWidget {
   final TownModel townModel;
 
-  const CreatePartyScreen({super.key, required this.townModel});
+  const CreatePartySheet({super.key, required this.townModel});
 
-  /// Shows the create party screen as a full page route.
+  /// Shows the create party sheet as a modal bottom sheet.
   static Future<bool?> show(BuildContext context, TownModel model) {
-    return Navigator.push<bool>(
-      context,
-      MaterialPageRoute(builder: (_) => CreatePartyScreen(townModel: model)),
+    return showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => CreatePartySheet(townModel: model),
     );
   }
 
   @override
-  State<CreatePartyScreen> createState() => _CreatePartyScreenState();
+  State<CreatePartySheet> createState() => _CreatePartySheetState();
 }
 
-class _CreatePartyScreenState extends State<CreatePartyScreen> {
+class _CreatePartySheetState extends State<CreatePartySheet> {
   final _nameController = TextEditingController();
   final _reputationController = TextEditingController();
-  final _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
-  final _nameFocusNode = FocusNode();
 
   @override
   void dispose() {
     _nameController.dispose();
     _reputationController.dispose();
-    _scrollController.dispose();
-    _nameFocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: GHCAppBar(
-        scrollController: _scrollController,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: largePadding),
-            child: TextButton.icon(
-              icon: const Icon(Icons.check),
-              label: Text(l10n.create),
-              onPressed: _onCreatePressed,
-            ),
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          largePadding,
+          largePadding,
+          largePadding,
+          MediaQuery.of(context).viewInsets.bottom + largePadding,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Text(l10n.createParty, style: theme.textTheme.titleLarge),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: _onCreatePressed,
+                    icon: const Icon(Icons.group_add_rounded),
+                    label: Text(l10n.create),
+                  ),
+                ],
+              ),
+              const Divider(height: dividerThickness),
+              const SizedBox(height: largePadding),
+              // Party name
+              TextFormField(
+                autofocus: true,
+                textCapitalization: TextCapitalization.words,
+                autocorrect: false,
+                decoration: InputDecoration(
+                  labelText: l10n.partyName,
+                  hintText: 'The Heroes',
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  border: const OutlineInputBorder(),
+                ),
+                controller: _nameController,
+                validator: (value) =>
+                    (value == null || value.trim().isEmpty) ? l10n.name : null,
+              ),
+              const SizedBox(height: formFieldSpacing),
+              // Starting reputation
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: l10n.startingReputation,
+                  hintText: '0',
+                  floatingLabelBehavior: FloatingLabelBehavior.always,
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.thumb_up_alt_outlined),
+                ),
+                controller: _reputationController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^-?\d*')),
+                ],
+              ),
+              const SizedBox(height: largePadding),
+            ],
           ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          controller: _scrollController,
-          padding: const EdgeInsets.all(extraLargePadding),
-          children: [
-            // Party name
-            TextFormField(
-              autofocus: true,
-              focusNode: _nameFocusNode,
-              textCapitalization: TextCapitalization.words,
-              autocorrect: false,
-              decoration: InputDecoration(
-                labelText: l10n.partyName,
-                hintText: 'The Heroes',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                border: const OutlineInputBorder(),
-              ),
-              controller: _nameController,
-              validator: (value) =>
-                  (value == null || value.trim().isEmpty) ? l10n.name : null,
-            ),
-            const SizedBox(height: formFieldSpacing),
-            // Starting reputation
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: l10n.startingReputation,
-                hintText: '0',
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.thumb_up_alt_outlined),
-              ),
-              controller: _reputationController,
-              keyboardType: const TextInputType.numberWithOptions(signed: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^-?\d*')),
-              ],
-            ),
-            const SizedBox(height: formFieldSpacing),
-          ],
         ),
       ),
     );

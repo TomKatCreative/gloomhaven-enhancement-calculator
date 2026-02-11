@@ -887,8 +887,8 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   IconButton(
                     iconSize: iconSizeSmall,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(smallPadding),
-                    icon: const Icon(Icons.indeterminate_check_box_rounded),
+                    padding: const EdgeInsets.all(tinyPadding),
+                    icon: const Icon(Icons.remove_circle_outline),
                     onPressed: character.previousRetirements > 0 && !isRetired
                         ? () => charactersModel.updateCharacter(
                             character
@@ -909,8 +909,8 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                   IconButton(
                     iconSize: iconSizeSmall,
                     constraints: const BoxConstraints(),
-                    padding: const EdgeInsets.all(smallPadding),
-                    icon: const Icon(Icons.add_box_rounded),
+                    padding: const EdgeInsets.all(tinyPadding),
+                    icon: const Icon(Icons.add_circle_outline),
                     onPressed: !isRetired
                         ? () => charactersModel.updateCharacter(
                             character
@@ -970,8 +970,8 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     IconButton(
                       iconSize: iconSizeSmall,
                       constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(smallPadding),
-                      icon: const Icon(Icons.indeterminate_check_box_rounded),
+                      padding: const EdgeInsets.all(tinyPadding),
+                      icon: const Icon(Icons.remove_circle_outline),
                       onPressed: character.checkMarks > 0 && !isRetired
                           ? () => charactersModel.decreaseCheckmark(character)
                           : null,
@@ -991,8 +991,8 @@ class _CheckmarksAndRetirementsRow extends StatelessWidget {
                     IconButton(
                       iconSize: iconSizeSmall,
                       constraints: const BoxConstraints(),
-                      padding: const EdgeInsets.all(smallPadding),
-                      icon: const Icon(Icons.add_box_rounded),
+                      padding: const EdgeInsets.all(tinyPadding),
+                      icon: const Icon(Icons.add_circle_outline),
                       onPressed: character.checkMarks < 18 && !isRetired
                           ? () => charactersModel.increaseCheckmark(character)
                           : null,
@@ -1491,7 +1491,7 @@ class _PartyAssignmentRow extends StatelessWidget {
         charactersModel.assignCharacterToParty(character, partyId);
       },
       onCreateParty: () async {
-        final created = await CreatePartyScreen.show(context, townModel);
+        final created = await CreatePartySheet.show(context, townModel);
         if (created == true && townModel.activeParty != null) {
           charactersModel.assignCharacterToParty(
             character,

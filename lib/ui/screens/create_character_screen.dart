@@ -335,7 +335,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             });
           },
           onCreateParty: () async {
-            final created = await CreatePartyScreen.show(context, townModel);
+            final created = await CreatePartySheet.show(context, townModel);
             if (created == true && townModel.activeParty != null) {
               setState(() {
                 _selectedPartyId = townModel.activeParty!.id;
