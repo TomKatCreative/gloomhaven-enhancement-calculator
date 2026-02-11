@@ -14,6 +14,7 @@ class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
     required this.title,
+    this.titleWidget,
     this.icon,
     this.trailing,
     required this.child,
@@ -28,6 +29,9 @@ class SectionCard extends StatelessWidget {
   });
 
   final String title;
+
+  /// Optional widget that replaces the default [Text] title.
+  final Widget? titleWidget;
   final IconData? icon;
   final Widget? trailing;
   final Widget child;
@@ -67,12 +71,14 @@ class SectionCard extends StatelessWidget {
                   const SizedBox(width: smallPadding),
                 ],
                 Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: primaryColor,
-                    ),
-                  ),
+                  child:
+                      titleWidget ??
+                      Text(
+                        title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: primaryColor,
+                        ),
+                      ),
                 ),
                 ?trailing,
               ],

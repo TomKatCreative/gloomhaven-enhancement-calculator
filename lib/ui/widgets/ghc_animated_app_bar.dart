@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -104,28 +103,6 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     }
   }
 
-  Future<void> _handleDeleteParty(
-    BuildContext context,
-    TownModel townModel,
-  ) async {
-    final l10n = AppLocalizations.of(context);
-    final bool? result = await ConfirmationDialog.show(
-      context: context,
-      content: Text(l10n.deletePartyBody),
-      confirmLabel: l10n.delete,
-      cancelLabel: l10n.cancel,
-    );
-
-    if (result == true && context.mounted) {
-      final partyName = townModel.activeParty?.name ?? '';
-      await townModel.deleteActiveParty();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text('$partyName deleted')));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
@@ -216,16 +193,8 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
             )
           : Container(),
       actions: <Widget>[
-        // Town page edit mode: delete actions
-        if (townModel.isEditMode && appModel.page == 0) ...[
-          if (townModel.activeParty != null)
-            Tooltip(
-              message: l10n.deleteParty,
-              child: IconButton(
-                icon: const Icon(Icons.group_remove_rounded),
-                onPressed: () => _handleDeleteParty(context, townModel),
-              ),
-            ),
+        // Town page edit mode: delete campaign
+        if (townModel.isEditMode && appModel.page == 0)
           Tooltip(
             message: l10n.deleteCampaign,
             child: IconButton(
@@ -233,7 +202,6 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               onPressed: () => _handleDeleteCampaign(context, townModel),
             ),
           ),
-        ],
         if (!charactersModel.isEditMode &&
             appModel.page == 1 &&
             charactersModel.characters.isNotEmpty)

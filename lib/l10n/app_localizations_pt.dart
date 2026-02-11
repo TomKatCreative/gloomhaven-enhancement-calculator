@@ -30,6 +30,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get delete => 'Excluir';
 
   @override
+  String get switchAction => 'Trocar';
+
+  @override
   String get create => 'Criar';
 
   @override
@@ -497,7 +500,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get edition => 'Edição';
 
   @override
-  String get donatedGold => 'Ouro doado';
+  String get sanctuaryDonations => 'Doações do Santuário do Grande Carvalho';
 
   @override
   String get startingProsperity => 'Prosperidade inicial';

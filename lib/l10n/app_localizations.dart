@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @switchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get switchAction;
+
   /// No description provided for @create.
   ///
   /// In en, this message translates to:
@@ -1004,11 +1010,11 @@ abstract class AppLocalizations {
   /// **'Edition'**
   String get edition;
 
-  /// No description provided for @donatedGold.
+  /// No description provided for @sanctuaryDonations.
   ///
   /// In en, this message translates to:
-  /// **'Donated gold'**
-  String get donatedGold;
+  /// **'Sanctuary of the Great Oak donations'**
+  String get sanctuaryDonations;
 
   /// No description provided for @startingProsperity.
   ///
