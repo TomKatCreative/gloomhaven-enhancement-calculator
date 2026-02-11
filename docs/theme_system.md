@@ -69,7 +69,7 @@ TextStyle(fontSize: fontSizeBodyMedium, fontFamily: pirataOne)
 The app uses a centralized contrast system to ensure text and UI elements meet WCAG AA accessibility standards (4.5:1 contrast ratio).
 
 **Implementation:**
-- **`ColorUtils.ensureTextContrast()`** - Calculates and adjusts colors for proper contrast
+- **`ColorUtils.ensureContrast()`** - Calculates and adjusts colors for proper contrast
 - **`theme.contrastedPrimary`** - Pre-calculated contrasted primary color available throughout the app
 - **Theme extension** - Contrast calculated once at theme build time for performance
 
@@ -92,7 +92,7 @@ Text(
 Text(
   'My Text',
   style: TextStyle(
-    color: ColorUtils.ensureTextContrast(
+    color: ColorUtils.ensureContrast(
       primaryColor,
       backgroundColor,
     ),

@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/resources_repository.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
@@ -316,12 +317,13 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
               height: maxExtent + 50,
               width: 225,
               child: Opacity(
-                opacity: (0.08 * (1 - progress)).clamp(0.0, 0.08),
+                opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
                 child: ClassIconSvg(
                   playerClass: character.playerClass,
-                  color: character
-                      .getEffectiveColor(theme.brightness)
-                      .withValues(alpha: 1),
+                  color: ColorUtils.ensureContrast(
+                    character.getEffectiveColor(theme.brightness),
+                    colorScheme.surface,
+                  ),
                 ),
               ),
             ),
@@ -447,9 +449,10 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
           height: iconSizeXL,
           child: ClassIconSvg(
             playerClass: character.playerClass,
-            color: character
-                .getEffectiveColor(theme.brightness)
-                .withValues(alpha: 0.6),
+            color: ColorUtils.ensureContrast(
+              character.getEffectiveColor(theme.brightness),
+              theme.colorScheme.surface,
+            ).withValues(alpha: 0.6),
           ),
         ),
         const SizedBox(width: smallPadding),

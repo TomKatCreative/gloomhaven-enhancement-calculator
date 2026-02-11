@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
@@ -346,6 +347,10 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
           playerClass: playerClass,
           width: iconSizeXL,
           height: iconSizeXL,
+          color: ColorUtils.ensureContrast(
+            Color(playerClass.primaryColor),
+            theme.colorScheme.surface,
+          ),
         ),
         title: Text(
           isUnlocked || !playerClass.locked

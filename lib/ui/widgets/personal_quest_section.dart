@@ -34,6 +34,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart'
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -459,6 +460,7 @@ class _RequirementRowState extends State<_RequirementRow> {
     if (isRetirementSnackBarVisible) return;
     isRetirementSnackBarVisible = true;
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     _showConfetti(context);
     ScaffoldMessenger.of(context)
         .showSnackBar(
@@ -466,6 +468,10 @@ class _RequirementRowState extends State<_RequirementRow> {
             content: Text(l10n.personalQuestComplete),
             action: SnackBarAction(
               label: l10n.retire,
+              textColor: ColorUtils.ensureContrast(
+                theme.colorScheme.primary,
+                theme.colorScheme.inverseSurface,
+              ),
               onPressed: () => _showRetirementDialog(context),
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
@@ -237,7 +238,13 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                       width: iconSizeMedium,
                       color: theme.colorScheme.onSurfaceVariant,
                     )
-                  : ClassIconSvg(playerClass: _selectedClass!),
+                  : ClassIconSvg(
+                      playerClass: _selectedClass!,
+                      color: ColorUtils.ensureContrast(
+                        Color(_selectedClass!.primaryColor),
+                        theme.colorScheme.surface,
+                      ),
+                    ),
             ),
           ),
         ),

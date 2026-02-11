@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -42,6 +43,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     await charactersModel.retireCurrentCharacter();
     appModel.updateTheme();
     if (!context.mounted) return;
+    final theme = Theme.of(context);
     ScaffoldMessenger.of(context)
       ..clearSnackBars()
       ..showSnackBar(
@@ -52,6 +54,10 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               ? null
               : SnackBarAction(
                   label: 'Show',
+                  textColor: ColorUtils.ensureContrast(
+                    theme.colorScheme.primary,
+                    theme.colorScheme.inverseSurface,
+                  ),
                   onPressed: () {
                     charactersModel.toggleShowRetired(character: character);
                   },

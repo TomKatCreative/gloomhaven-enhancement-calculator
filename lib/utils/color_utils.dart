@@ -20,28 +20,28 @@ class ColorUtils {
     return (lighter + 0.05) / (darker + 0.05);
   }
 
-  /// Ensures sufficient contrast between text and background colors.
+  /// Ensures sufficient contrast between a foreground color and background.
   ///
   /// If the contrast ratio is below [minContrastRatio] (default 4.5:1 for WCAG AA),
-  /// the text color will be progressively darkened (or lightened for dark backgrounds)
-  /// until sufficient contrast is achieved.
+  /// the foreground color will be progressively darkened (or lightened for dark
+  /// backgrounds) until sufficient contrast is achieved.
   ///
   /// Example:
   /// ```dart
-  /// final readableColor = ColorUtils.ensureTextContrast(
+  /// final readableColor = ColorUtils.ensureContrast(
   ///   Color(0xffdfddcb), // Light beige
   ///   Colors.white,      // White background
   /// );
   /// // Returns a darker version of the beige that's readable on white
   /// ```
-  static Color ensureTextContrast(
-    Color textColor,
+  static Color ensureContrast(
+    Color foregroundColor,
     Color backgroundColor, {
     double minContrastRatio = 4.5,
   }) {
     // If contrast is already sufficient, return original color
-    if (contrastRatio(textColor, backgroundColor) >= minContrastRatio) {
-      return textColor;
+    if (contrastRatio(foregroundColor, backgroundColor) >= minContrastRatio) {
+      return foregroundColor;
     }
 
     // Determine if we should darken or lighten based on background
@@ -49,7 +49,7 @@ class ColorUtils {
     final shouldDarken = backgroundLuminance > 0.5;
 
     // Convert to HSL for better color manipulation
-    final hsl = HSLColor.fromColor(textColor);
+    final hsl = HSLColor.fromColor(foregroundColor);
 
     // Progressively adjust lightness until contrast is sufficient
     double lightness = hsl.lightness;
@@ -93,6 +93,6 @@ class ColorUtils {
   /// );
   /// ```
   static Color readableTextColor(Color preferredColor, Color backgroundColor) {
-    return ensureTextContrast(preferredColor, backgroundColor);
+    return ensureContrast(preferredColor, backgroundColor);
   }
 }

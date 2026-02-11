@@ -113,10 +113,7 @@ class AppThemeBuilder {
           color: colorScheme.onSurfaceVariant,
         ),
         floatingLabelStyle: textTheme.bodySmall?.copyWith(
-          color: ColorUtils.ensureTextContrast(
-            primaryColor,
-            colorScheme.surface,
-          ),
+          color: ColorUtils.ensureContrast(primaryColor, colorScheme.surface),
           fontWeight: FontWeight.w500,
         ),
 
@@ -133,7 +130,10 @@ class AppThemeBuilder {
         // Focused state
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: BorderSide(color: primaryColor, width: 2.0),
+          borderSide: BorderSide(
+            color: ColorUtils.ensureContrast(primaryColor, colorScheme.surface),
+            width: 2.0,
+          ),
         ),
 
         // Error states
@@ -164,7 +164,7 @@ class AppThemeBuilder {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           textStyle: textTheme.bodyMedium,
-          foregroundColor: ColorUtils.ensureTextContrast(
+          foregroundColor: ColorUtils.ensureContrast(
             primaryColor,
             colorScheme.surface,
           ),
@@ -208,11 +208,14 @@ class AppThemeBuilder {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surfaceContainer,
         elevation: 0,
-        indicatorColor: primaryColor.withValues(alpha: 0.12),
+        indicatorColor: ColorUtils.ensureContrast(
+          primaryColor,
+          colorScheme.surfaceContainer,
+        ).withValues(alpha: 0.12),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return IconThemeData(
-              color: ColorUtils.ensureTextContrast(
+              color: ColorUtils.ensureContrast(
                 primaryColor,
                 colorScheme.surfaceContainer,
               ),
@@ -225,7 +228,7 @@ class AppThemeBuilder {
             return TextStyle(
               fontSize: fontSizeLabelSmall,
               fontWeight: FontWeight.w600,
-              color: ColorUtils.ensureTextContrast(
+              color: ColorUtils.ensureContrast(
                 primaryColor,
                 colorScheme.surfaceContainer,
               ),
@@ -259,7 +262,7 @@ class AppThemeBuilder {
           characterPrimary: primaryColor,
           characterSecondary: primaryColor,
           characterAccent: _adjustColor(primaryColor, brightness),
-          contrastedPrimary: ColorUtils.ensureTextContrast(
+          contrastedPrimary: ColorUtils.ensureContrast(
             primaryColor,
             colorScheme.surface,
           ),
