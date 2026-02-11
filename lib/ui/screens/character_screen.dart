@@ -199,7 +199,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
               ),
               child: CollapsibleSectionCard(
                 sectionKey: _sectionKeys[_Section.general],
-                title: AppLocalizations.of(context).general,
+                title: kTownSheetEnabled
+                    ? AppLocalizations.of(context).general
+                    : AppLocalizations.of(context).stats,
                 icon: Icons.bar_chart_rounded,
                 initiallyExpanded: SharedPrefs().generalExpanded,
                 onExpansionChanged: (value) =>
@@ -518,7 +520,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     final primaryColor = theme.contrastedPrimary;
 
     final sections = [
-      (_Section.general, l10n.general),
+      (_Section.general, kTownSheetEnabled ? l10n.general : l10n.stats),
       (
         _Section.questAndNotes,
         kPersonalQuestsEnabled ? l10n.questAndNotes : l10n.notes,
@@ -628,10 +630,15 @@ class _PerksCountBadge extends StatelessWidget {
     final isOverLimit =
         character.numOfSelectedPerks > Character.maximumPerks(character);
 
-    return Text(
-      '${character.numOfSelectedPerks}/${Character.maximumPerks(character)}',
-      style: theme.textTheme.titleSmall?.copyWith(
-        color: isOverLimit ? Colors.red : theme.colorScheme.onSurfaceVariant,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+      child: Text(
+        '${character.numOfSelectedPerks}/${Character.maximumPerks(character)}',
+        style: theme.textTheme.titleLarge?.copyWith(
+          color: isOverLimit
+              ? theme.colorScheme.error
+              : theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }

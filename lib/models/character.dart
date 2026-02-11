@@ -26,6 +26,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
@@ -193,9 +194,12 @@ class Character {
     columnResourceSnowthistle: resourceSnowthistle,
     columnIsRetired: isRetired ? 1 : 0,
     columnVariant: variant.name,
-    columnCharacterPersonalQuestId: personalQuestId,
-    columnCharacterPersonalQuestProgress: encodeProgress(personalQuestProgress),
-    columnCharacterPartyId: partyId,
+    if (kPersonalQuestsEnabled) columnCharacterPersonalQuestId: personalQuestId,
+    if (kPersonalQuestsEnabled)
+      columnCharacterPersonalQuestProgress: encodeProgress(
+        personalQuestProgress,
+      ),
+    if (kTownSheetEnabled) columnCharacterPartyId: partyId,
   };
 
   /// Resolves the full [PersonalQuest] object from the repository.
