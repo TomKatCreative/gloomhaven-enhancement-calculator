@@ -90,7 +90,7 @@ The app uses Provider with five main models set up in `main.dart`:
 ThemeProvider          → Theme colors, dark mode, font preferences
 AppModel               → Page navigation, app-level UI state
 EnhancementCalculatorModel → Calculator page state
-TownModel              → World/campaign CRUD, prosperity, reputation
+TownModel              → Campaign/party CRUD, prosperity, reputation
 CharactersModel        → Character CRUD, perk/mastery state (uses ProxyProvider)
 ```
 
@@ -134,7 +134,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries, worlds, campaigns (schema version 18)
+- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (schema version 18, latest released version is 17 in app v4.4.0 — do not bump past 18 until after the next release)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ## Key Domain Concepts

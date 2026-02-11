@@ -209,7 +209,7 @@ The main container/shell for the app, managing navigation between Town, Characte
 ### Initialization
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
-- Loads worlds on init via `TownModel.loadWorlds()`
+- Loads campaigns on init via `TownModel.loadCampaigns()`
 - Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
 
@@ -219,8 +219,8 @@ The FAB visibility and action changes based on context:
 
 | Page | Condition | Visible? | Action |
 |------|-----------|----------|--------|
-| Town (0) | No worlds exist | Hidden | - |
-| Town (0) | Worlds exist | Visible | Toggle edit mode |
+| Town (0) | No campaigns exist | Hidden | - |
+| Town (0) | Campaigns exist | Visible | Toggle edit mode |
 | Characters (1) | Element sheet fully expanded | Hidden | - |
 | Characters (1) | No characters exist | Visible | Create character |
 | Characters (1) | Characters exist | Visible | Toggle edit mode |
@@ -247,13 +247,13 @@ When switching pages:
 
 > **File**: `lib/ui/screens/town_screen.dart`
 
-The Town tab for managing game worlds and campaigns.
+The Town tab for managing game campaigns and parties.
 
 ### Structure
 
 ```
 ┌─────────────────────────────────────┐
-│        [🌐] World Name (Edition)    │  ← ActionChip (tappable → selector)
+│        [🌐] Campaign Name (Edition) │  ← ActionChip (tappable → selector)
 ├─────────────────────────────────────┤
 │  ┌─────────────────────────────┐    │
 │  │ Prosperity    Level 3       │    │
@@ -262,12 +262,10 @@ The Town tab for managing game worlds and campaigns.
 │  └─────────────────────────────┘    │
 │                                     │
 │  ┌─────────────────────────────┐    │
-│  │ Campaign: Adventure Party   │    │
-│  │ Reputation: +5              │    │  ← CampaignSection
-│  │         [-]          [+]    │    │     (+/- in edit mode)
+│  │ 👥 Adventure Party     [⇄] │    │  ← PartySection (trailing icon)
+│  │ Reputation: +5              │    │     ⇄ = swap (2+ parties)
+│  │         [-]          [+]    │    │     ➕ = add (1 party)
 │  └─────────────────────────────┘    │
-│                                     │
-│  [Party A] [Party B●] [Party C]    │  ← Campaign selector chips
 └─────────────────────────────────────┘
 ```
 
@@ -275,9 +273,10 @@ The Town tab for managing game worlds and campaigns.
 
 | State | Display |
 |-------|---------|
-| No worlds | `TownEmptyState` — castle icon + "Create a world" prompt + button |
-| World, no campaigns | World selector + prosperity section + "Create a party" prompt |
-| World + campaign | World selector + prosperity + campaign section + campaign chips |
+| No campaigns | `TownEmptyState` — castle icon + "Create a campaign" prompt + button |
+| Campaign, no parties | Campaign selector + prosperity section + "Create a party" prompt |
+| Campaign + 1 party | Campaign selector + prosperity + party section (trailing: add-party icon) |
+| Campaign + 2+ parties | Campaign selector + prosperity + party section (trailing: swap icon → bottom sheet) |
 
 ### Edit Mode
 
@@ -287,7 +286,8 @@ Controlled by `townModel.isEditMode` (toggled via FAB):
 |---------|-----------|-----------|
 | Prosperity | Level + progress bar | + checkmark/- steppers |
 | Reputation | Numeric display | +/- steppers |
-| App bar actions | Create campaign button | Delete campaign, delete world buttons |
+| Party trailing icon | Swap (2+ parties) or Add (1 party) | Same |
+| App bar actions | — | Delete party, delete campaign buttons |
 
 ### Section Widgets
 
@@ -295,28 +295,16 @@ Controlled by `townModel.isEditMode` (toggled via FAB):
 |--------|------|---------|
 | `TownEmptyState` | `lib/ui/widgets/town/town_empty_state.dart` | Empty state with create button |
 | `ProsperitySection` | `lib/ui/widgets/town/prosperity_section.dart` | Level display + progress bar + edit steppers |
-| `CampaignSection` | `lib/ui/widgets/town/campaign_section.dart` | Reputation display + edit steppers |
-| `WorldSelector` | `lib/ui/widgets/town/world_selector.dart` | Bottom sheet for switching/creating worlds |
+| `PartySection` | `lib/ui/widgets/town/party_section.dart` | Reputation display + edit steppers; optional `trailing` widget (forwarded to `SectionCard`) |
+| `CampaignSelector` | `lib/ui/widgets/town/campaign_selector.dart` | Bottom sheet for switching/creating campaigns |
 
----
+### Party Switching
 
-## Create World Screen
+Party switching uses an inline bottom sheet built in `_showPartySwitcher()` (in `town_screen.dart`), triggered by the swap icon in the `PartySection` header:
 
-> **File**: `lib/ui/screens/create_world_screen.dart`
-
-Pushed route for creating a new game world.
-
-### Invocation
-
-```dart
-await CreateWorldScreen.show(context, townModel);
-```
-
-### Form Fields
-
-1. **Name** — Text field for world name
-2. **Edition** — SegmentedButton (GH / GH2E / FH)
-3. **Starting Prosperity** — Numeric input (0-65, defaults to 0)
+- **1 party**: Trailing icon is `group_add_rounded` → opens `CreatePartyScreen`
+- **2+ parties**: Trailing icon is `swap_horiz_rounded` → opens bottom sheet with party list + "Create new" button
+- **Bottom sheet pattern**: Title row ("Switch party" + "Create" button), divider, `ListTile` per party (active highlighted)
 
 ---
 
@@ -324,7 +312,7 @@ await CreateWorldScreen.show(context, townModel);
 
 > **File**: `lib/ui/screens/create_campaign_screen.dart`
 
-Pushed route for creating a new campaign/party within the active world.
+Pushed route for creating a new game campaign.
 
 ### Invocation
 
@@ -334,7 +322,27 @@ await CreateCampaignScreen.show(context, townModel);
 
 ### Form Fields
 
-1. **Party Name** — Text field for campaign/party name
+1. **Name** — Text field for campaign name
+2. **Edition** — SegmentedButton (GH / GH2E / FH)
+3. **Starting Prosperity** — Numeric input (0-65, defaults to 0)
+
+---
+
+## Create Party Screen
+
+> **File**: `lib/ui/screens/create_party_screen.dart`
+
+Pushed route for creating a new party within the active campaign.
+
+### Invocation
+
+```dart
+await CreatePartyScreen.show(context, townModel);
+```
+
+### Form Fields
+
+1. **Party Name** — Text field for party name
 2. **Starting Reputation** — Numeric input (-20 to +20, defaults to 0)
 
 ---
@@ -433,7 +441,7 @@ Controlled by `charactersModel.isEditMode`:
 > **File**: `lib/ui/widgets/personal_quest_section.dart`
 
 Three display states:
-1. **Quest assigned** — `CollapsibleSectionCard` with quest title, unlock icon in header, requirements list with progress
+1. **Quest assigned** — `CollapsibleSectionCard` with quest title, unlock icon in header row, requirements list with progress
 2. **No quest + not retired** — `OutlinedButton` "Select a Personal Quest" prompt
 3. **No quest + retired** — `SizedBox.shrink()` (hidden)
 

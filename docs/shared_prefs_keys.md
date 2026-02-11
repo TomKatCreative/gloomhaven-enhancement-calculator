@@ -59,9 +59,9 @@ prefs.setPlayerClassIsUnlocked('br', true);
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `activeWorldId` | String? | null | UUID of the currently active world |
 | `activeCampaignId` | String? | null | UUID of the currently active campaign |
-| `showAllCharacters` | bool | true | Show all characters vs filter by active campaign |
+| `activePartyId` | String? | null | UUID of the currently active party |
+| `showAllCharacters` | bool | true | Show all characters vs filter by active party |
 
 ---
 
@@ -321,7 +321,7 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
 | `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
 | `classUnlocks` | Dynamic keys (class codes) for locked classes only |
-| `town` | activeWorldId, activeCampaignId |
+| `town` | activeCampaignId, activePartyId |
 
 ### Excluded Keys
 

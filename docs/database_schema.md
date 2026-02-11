@@ -42,7 +42,7 @@ Core character data storage.
 | `CharacterXp` | INTEGER | NOT NULL | Experience points |
 | `CharacterGold` | INTEGER | NOT NULL | Gold amount |
 | `CharacterNotes` | TEXT | NOT NULL | User notes |
-| `CharacterCheckMarks` | INTEGER | NOT NULL | Check marks (0-18) |
+| `CharacterCheckMarks` | INTEGER | NOT NULL | Check marks (0-18, every 3 = 1 perk) |
 | `IsRetired` | BOOL | NOT NULL | Retirement status |
 | `Variant` | TEXT | NOT NULL | Class variant name |
 
@@ -67,11 +67,11 @@ Core character data storage.
 | `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "gh_510") |
 | `PersonalQuestProgress` | TEXT | `'[]'` | JSON array of ints (progress per requirement) |
 
-**Campaign Fields** (added v18):
+**Party Fields** (added v18):
 
 | Column | Type | Default | Description |
 |--------|------|---------|-------------|
-| `CampaignId` | TEXT | NULL | FK to Campaigns._id (nullable — unassigned characters have NULL) |
+| `PartyId` | TEXT | NULL | FK to Parties._id (nullable — unassigned characters have NULL) |
 
 ---
 
@@ -159,14 +159,14 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 
 ---
 
-### Worlds
+### Campaigns
 
-Tracks game worlds with edition-specific prosperity.
+Tracks game campaigns with edition-specific prosperity.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `_id` | TEXT | PRIMARY KEY | UUID |
-| `Name` | TEXT | NOT NULL | World name |
+| `Name` | TEXT | NOT NULL | Campaign name |
 | `Edition` | TEXT | NOT NULL | GameEdition.name (e.g., "gloomhaven") |
 | `ProsperityCheckmarks` | INTEGER | NOT NULL DEFAULT 0 | Raw checkmark count |
 | `DonatedGold` | INTEGER | NOT NULL DEFAULT 0 | Sanctuary donations |
@@ -176,19 +176,19 @@ Tracks game worlds with edition-specific prosperity.
 
 ---
 
-### Campaigns
+### Parties
 
-Tracks party campaigns within a world.
+Tracks parties within a campaign.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `_id` | TEXT | PRIMARY KEY | UUID |
-| `WorldId` | TEXT | NOT NULL | FK to Worlds._id |
-| `Name` | TEXT | NOT NULL | Party/campaign name |
+| `CampaignId` | TEXT | NOT NULL | FK to Campaigns._id |
+| `Name` | TEXT | NOT NULL | Party name |
 | `Reputation` | INTEGER | NOT NULL DEFAULT 0 | Party reputation (-20 to +20) |
 | `CreatedAt` | DATETIME | | Creation timestamp |
 
-**Foreign Key**: `WorldId REFERENCES Worlds(_id) ON DELETE CASCADE`
+**Foreign Key**: `CampaignId REFERENCES Campaigns(_id) ON DELETE CASCADE`
 
 **Added in**: v18
 
@@ -227,30 +227,30 @@ Tracks party campaigns within a world.
 |--------|-------------|
 | `queryPersonalQuests({String? edition})` | Fetch quest definitions, optionally filtered by edition |
 
-### World Operations
-
-| Method | Description |
-|--------|-------------|
-| `queryAllWorlds()` | Fetch all worlds |
-| `insertWorld(World)` | Create a new world |
-| `updateWorld(World)` | Update world data (name, prosperity, etc.) |
-| `deleteWorld(String worldId)` | Cascading delete (world + campaigns + unlink characters) |
-
 ### Campaign Operations
 
 | Method | Description |
 |--------|-------------|
-| `queryCampaigns(String worldId)` | Fetch campaigns for a world |
+| `queryAllCampaigns()` | Fetch all campaigns |
 | `insertCampaign(Campaign)` | Create a new campaign |
-| `updateCampaign(Campaign)` | Update campaign data |
-| `deleteCampaign(String campaignId)` | Delete campaign and unlink characters |
+| `updateCampaign(Campaign)` | Update campaign data (name, prosperity, etc.) |
+| `deleteCampaign(String campaignId)` | Cascading delete (campaign + parties + unlink characters) |
 
-### Character-Campaign Linking
+### Party Operations
 
 | Method | Description |
 |--------|-------------|
-| `assignCharacterToCampaign(String uuid, String? campaignId)` | Link/unlink a character to a campaign |
-| `queryCharactersByCampaign(String campaignId)` | Fetch characters in a campaign |
+| `queryParties(String campaignId)` | Fetch parties for a campaign |
+| `insertParty(Party)` | Create a new party |
+| `updateParty(Party)` | Update party data |
+| `deleteParty(String partyId)` | Delete party and unlink characters |
+
+### Character-Party Linking
+
+| Method | Description |
+|--------|-------------|
+| `assignCharacterToParty(String uuid, String? partyId)` | Link/unlink a character to a party |
+| `queryCharactersByParty(String partyId)` | Fetch characters in a party |
 
 ### Backup Operations
 
@@ -280,7 +280,7 @@ Tracks party campaigns within a world.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
-| v18 | Personal Quests table, PQ columns on Characters, Worlds/Campaigns tables, CampaignId on Characters |
+| v18 | Personal Quests table, PQ columns on Characters, Campaigns/Parties tables, PartyId on Characters |
 
 ### Critical Migrations
 
@@ -423,20 +423,20 @@ The backup JSON structure:
       "CharacterMasteryAchieved": 0
     }
   ],
-  "Worlds": [
+  "Campaigns": [
     {
       "_id": "uuid-string",
-      "Name": "My World",
+      "Name": "My Campaign",
       "Edition": "gloomhaven",
       "ProsperityCheckmarks": 12,
       "DonatedGold": 50,
       "CreatedAt": "2025-01-15T10:30:00.000"
     }
   ],
-  "Campaigns": [
+  "Parties": [
     {
       "_id": "uuid-string",
-      "WorldId": "uuid-string",
+      "CampaignId": "uuid-string",
       "Name": "Party One",
       "Reputation": 3,
       "CreatedAt": "2025-01-15T10:30:00.000"
@@ -445,7 +445,7 @@ The backup JSON structure:
 }
 ```
 
-**Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Worlds and Campaigns tables ARE included in backup since they contain user-created data.
+**Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Campaigns and Parties tables ARE included in backup since they contain user-created data.
 
 ---
 

@@ -25,13 +25,13 @@ This document provides a comprehensive reference for the app's data models, thei
 └─────────────────┘
 
 ┌─────────────────┐     ┌─────────────────┐
-│     World       │────▶│    Campaign     │
+│    Campaign     │────▶│     Party       │
 │  (town state)   │     │ (party state)   │
 └─────────────────┘     └────────┬────────┘
                                  │
                                  ▼
                         ┌─────────────────┐
-                        │    Character    │  (optional campaign link)
+                        │    Character    │  (optional party link)
                         └─────────────────┘
 
 ┌─────────────────┐
@@ -63,7 +63,7 @@ Represents a player's character instance with stats, resources, and progression.
 | `checkMarks` | `int` | 0 | Check marks earned (0-18, every 3 = 1 perk) |
 | `isRetired` | `bool` | false | Retirement status |
 | `variant` | `Variant` | base | Class variant (affects perks/masteries) |
-| `campaignId` | `String?` | null | FK to Campaign (nullable — unassigned characters have null) |
+| `partyId` | `String?` | null | FK to Party (nullable — unassigned characters have null) |
 
 **Frosthaven Resources** (all default 0):
 | Field | Type | Description |
@@ -411,18 +411,18 @@ Where L = starting level, P = prosperity level.
 
 ---
 
-## World
+## Campaign
 
-> **File**: `lib/models/world.dart`
+> **File**: `lib/models/campaign.dart`
 
-Represents a persistent game world with edition-specific prosperity tracking.
+Represents a persistent game campaign with edition-specific prosperity tracking.
 
 ### Fields
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `String` | required | UUID identifier |
-| `name` | `String` | required | World name |
+| `name` | `String` | required | Campaign name |
 | `edition` | `GameEdition` | required | Game edition (affects prosperity thresholds) |
 | `prosperityCheckmarks` | `int` | 0 | Raw checkmark count |
 | `donatedGold` | `int` | 0 | Sanctuary donations |
@@ -450,19 +450,19 @@ Represents a persistent game world with edition-specific prosperity tracking.
 
 ---
 
-## Campaign
+## Party
 
-> **File**: `lib/models/campaign.dart`
+> **File**: `lib/models/party.dart`
 
-Represents a party campaign within a world, tracking reputation.
+Represents a party within a campaign, tracking reputation.
 
 ### Fields
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `id` | `String` | required | UUID identifier |
-| `worldId` | `String` | required | FK to World |
-| `name` | `String` | required | Party/campaign name |
+| `campaignId` | `String` | required | FK to Campaign |
+| `name` | `String` | required | Party name |
 | `reputation` | `int` | 0 | Party reputation (-20 to +20) |
 | `createdAt` | `DateTime?` | null | Creation timestamp |
 

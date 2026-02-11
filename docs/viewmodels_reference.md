@@ -268,14 +268,14 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `_isElementSheetFullExpanded` | `bool` | false | Element tracker full expansion |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
 | `collapseElementSheetNotifier` | `ValueNotifier<int>` | 0 | Signal to collapse element sheet |
-| `_showAllCharacters` | `bool` | from prefs | Filter characters by active campaign |
+| `_showAllCharacters` | `bool` | from prefs | Filter characters by active party |
 
 ### Getters
 
 | Getter | Returns | Description |
 |--------|---------|-------------|
-| `characters` | `List<Character>` | Filtered list (respects showRetired and campaign filter) |
-| `showAllCharacters` | `bool` | Whether to show all characters or filter by campaign |
+| `characters` | `List<Character>` | Filtered list (respects showRetired and party filter) |
+| `showAllCharacters` | `bool` | Whether to show all characters or filter by party |
 | `isEditMode` | `bool` | Current edit mode state |
 | `isElementSheetExpanded` | `bool` | Partial expansion state |
 | `isElementSheetFullExpanded` | `bool` | Full expansion state |
@@ -307,11 +307,11 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `updatePersonalQuestProgress(Character, int index, int value)` | `Future<bool>` | Update a single requirement's progress. Returns `true` if quest just transitioned from incomplete → complete |
 | `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets |
 
-### Campaign Methods
+### Party Methods
 
 | Method | Description |
 |--------|-------------|
-| `assignCharacterToCampaign(Character, String? campaignId)` | Link or unlink a character to a campaign |
+| `assignCharacterToParty(Character, String? partyId)` | Link or unlink a character to a party |
 
 ### Perk/Mastery Methods
 
@@ -373,13 +373,13 @@ When toggling `showRetired`, the model calculates the correct navigation target:
 
 > **File**: `lib/viewmodels/town_model.dart`
 
-Manages world and campaign CRUD operations, prosperity/reputation state, and active selection persistence.
+Manages campaign and party CRUD operations, prosperity/reputation state, and active selection persistence.
 
 ### Responsibilities
 
-- World list management (load, create, rename, delete)
-- Campaign management within active world
-- Active world/campaign selection (persisted to SharedPrefs)
+- Campaign list management (load, create, rename, delete)
+- Party management within active campaign
+- Active campaign/party selection (persisted to SharedPrefs)
 - Prosperity checkmark increment/decrement
 - Reputation increment/decrement with bounds (-20 to +20)
 - Edit mode toggling
@@ -387,27 +387,27 @@ Manages world and campaign CRUD operations, prosperity/reputation state, and act
 ### Dependencies
 
 - `DatabaseHelper` (injected) - for persistence
-- `SharedPrefs` - for active world/campaign ID persistence
+- `SharedPrefs` - for active campaign/party ID persistence
 
 ### Key Properties
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| `worlds` | `List<World>` | [] | All worlds loaded from database |
-| `campaigns` | `List<Campaign>` | [] | Campaigns for active world |
-| `activeWorld` | `World?` | null | Currently selected world |
+| `campaigns` | `List<Campaign>` | [] | All campaigns loaded from database |
+| `parties` | `List<Party>` | [] | Parties for active campaign |
 | `activeCampaign` | `Campaign?` | null | Currently selected campaign |
+| `activeParty` | `Party?` | null | Currently selected party |
 | `isEditMode` | `bool` | false | Edit mode state |
 
-### World Methods
+### Campaign Methods
 
 | Method | Description |
 |--------|-------------|
-| `loadWorlds()` | Load all worlds from database, restore active selection from SharedPrefs |
-| `createWorld(name, edition, startingProsperity)` | Create world and set as active |
-| `setActiveWorld(World)` | Switch active world, load its campaigns |
-| `renameWorld(String name)` | Rename the active world |
-| `deleteActiveWorld()` | Delete active world and its campaigns |
+| `loadCampaigns()` | Load all campaigns from database, restore active selection from SharedPrefs |
+| `createCampaign(name, edition, startingProsperity)` | Create campaign and set as active |
+| `setActiveCampaign(Campaign)` | Switch active campaign, load its parties |
+| `renameCampaign(String name)` | Rename the active campaign |
+| `deleteActiveCampaign()` | Delete active campaign and its parties |
 
 ### Prosperity Methods
 
@@ -416,14 +416,14 @@ Manages world and campaign CRUD operations, prosperity/reputation state, and act
 | `incrementProsperity()` | Add one checkmark (up to max threshold) |
 | `decrementProsperity()` | Remove one checkmark (min 0) |
 
-### Campaign Methods
+### Party Methods
 
 | Method | Description |
 |--------|-------------|
-| `createCampaign(name, startingReputation)` | Create campaign in active world, set as active |
-| `setActiveCampaign(Campaign)` | Switch active campaign |
-| `renameCampaign(String name)` | Rename the active campaign |
-| `deleteActiveCampaign()` | Delete active campaign and unlink characters |
+| `createParty(name, startingReputation)` | Create party in active campaign, set as active |
+| `setActiveParty(Party)` | Switch active party |
+| `renameParty(String name)` | Rename the active party |
+| `deleteActiveParty()` | Delete active party and unlink characters |
 
 ### Reputation Methods
 
@@ -434,8 +434,8 @@ Manages world and campaign CRUD operations, prosperity/reputation state, and act
 
 ### State Persistence
 
-- `activeWorldId` key in SharedPrefs (nullable String)
 - `activeCampaignId` key in SharedPrefs (nullable String)
+- `activePartyId` key in SharedPrefs (nullable String)
 
 ---
 

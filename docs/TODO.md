@@ -86,40 +86,41 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 
 ## Status: Implemented
 
-World/campaign management for tracking persistent game state across play groups.
+Campaign/party management for tracking persistent game state across play groups.
 
 ### What's Implemented
 
-- **World model** (`lib/models/world.dart`): Edition-specific prosperity tracking with level computation from checkmark thresholds
-- **Campaign model** (`lib/models/campaign.dart`): Party reputation tracking with bounds (-20 to +20)
-- **Character-Campaign linking**: Nullable `campaignId` FK on Characters (existing characters unassigned)
-- **TownModel** (`lib/viewmodels/town_model.dart`): ChangeNotifier for world/campaign CRUD, prosperity/reputation management, active selection persistence via SharedPrefs
-- **Campaign filtering** on CharactersModel: `showAllCharacters` toggle filters character list by active campaign
-- **DB migration v18**: Worlds/Campaigns tables + CampaignId column (bundled with Personal Quests migration)
-- **Town screen** (`lib/ui/screens/town_screen.dart`): Empty state → world selector → prosperity section → campaign section
-- **Create World/Campaign screens**: Pushed-route forms following CreateCharacterScreen pattern
-- **Section widgets**: `TownEmptyState`, `ProsperitySection`, `CampaignSection`, `WorldSelector`
-- **App bar integration**: World name title, create/delete actions in edit mode
+- **Campaign model** (`lib/models/campaign.dart`): Edition-specific prosperity tracking with level computation from checkmark thresholds
+- **Party model** (`lib/models/party.dart`): Party reputation tracking with bounds (-20 to +20)
+- **Character-Party linking**: Nullable `partyId` FK on Characters (existing characters unassigned)
+- **TownModel** (`lib/viewmodels/town_model.dart`): ChangeNotifier for campaign/party CRUD, prosperity/reputation management, active selection persistence via SharedPrefs
+- **Party filtering** on CharactersModel: `showAllCharacters` toggle filters character list by active party
+- **DB migration v18**: Campaigns/Parties tables + PartyId column (bundled with Personal Quests migration)
+- **Town screen** (`lib/ui/screens/town_screen.dart`): Empty state → campaign card (prosperity + sanctuary) → party section
+- **Party switching**: Swap icon in PartySection header opens bottom sheet (2+ parties); add icon opens CreatePartyScreen (1 party)
+- **Create Campaign/Party screens**: Pushed-route forms following CreateCharacterScreen pattern
+- **Section widgets**: `TownEmptyState`, `ProsperitySection`, `PartySection`, `CampaignSelector`
+- **App bar integration**: Campaign name title, create/delete actions in edit mode
 - **FAB edit mode**: Same toggle pattern as Characters page
 - **Localization**: EN + PT strings for all town UI
-- **Backup/restore**: Worlds and Campaigns tables included in backup, SharedPrefs town state included
-- **Full test coverage**: World model tests (36), Campaign model tests, TownModel tests (28), 649 total tests passing
+- **Backup/restore**: Campaigns and Parties tables included in backup, SharedPrefs town state included
+- **Full test coverage**: Campaign model tests (36), Party model tests, TownModel tests (28), 714 total tests passing
 
 ### Architecture
 
 | Level | What it tracks | Scope |
 |-------|---------------|-------|
-| **World** | Prosperity, donated gold | Persistent across all parties |
-| **Campaign** (Party) | Party name, reputation | Per party group |
-| **Character** | XP, gold, perks, etc. | Per character (optionally linked to campaign) |
+| **Campaign** | Prosperity, donated gold | Persistent across all parties |
+| **Party** | Party name, reputation | Per party group |
+| **Character** | XP, gold, perks, etc. | Per character (optionally linked to party) |
 
 ### Remaining Work
 
 - **Achievement/scenario tracking** — Complex, needs scenario data repository (deferred)
 - **Frosthaven extensions** — Buildings, morale, seasons (future sprint)
 - **GH2E prosperity thresholds** — May differ from GH, needs research
-- **Character assignment UI** — UI for assigning characters to campaigns from the Characters tab
-- **Campaign filter toggle** — UI toggle on Characters tab to filter by active campaign
+- **Character assignment UI** — UI for assigning characters to parties from the Characters tab
+- **Party filter toggle** — UI toggle on Characters tab to filter by active party
 
 ---
 
