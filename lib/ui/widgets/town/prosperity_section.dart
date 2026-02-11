@@ -121,7 +121,7 @@ class _ProsperityContent extends StatelessWidget {
           children: [
             Text(
               l10n.prosperityLevelN(campaign.prosperityLevel),
-              style: theme.textTheme.headlineSmall,
+              style: theme.textTheme.bodySmall,
             ),
             const Spacer(),
             Text(
