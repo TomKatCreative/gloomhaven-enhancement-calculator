@@ -8,6 +8,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
@@ -18,7 +19,10 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/party_assignment_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 import 'package:provider/provider.dart';
 
 /// Indices for section navigation chips.
@@ -186,7 +190,12 @@ class _CharacterScreenState extends State<CharacterScreen> {
         SliverToBoxAdapter(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(smallPadding),
+              padding: const EdgeInsets.fromLTRB(
+                smallPadding,
+                mediumPadding,
+                smallPadding,
+                smallPadding,
+              ),
               child: CollapsibleSectionCard(
                 sectionKey: _sectionKeys[_Section.general],
                 title: AppLocalizations.of(context).general,
@@ -204,6 +213,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
                     ),
                     child: Column(
                       children: [
+                        _PartyAssignmentRow(character: widget.character),
+                        const Divider(height: largePadding * 2),
                         _StatsSection(character: widget.character),
                         if (model.isEditMode &&
                             !widget.character.isRetired) ...[
@@ -1389,5 +1400,105 @@ class _NotesSection extends StatelessWidget {
             ),
           )
         : Text(character.notes);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Party Assignment Row
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _PartyAssignmentRow extends StatelessWidget {
+  const _PartyAssignmentRow({required this.character});
+  final Character character;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final townModel = context.watch<TownModel>();
+    final charactersModel = context.read<CharactersModel>();
+
+    final party = _resolveParty(townModel);
+
+    // No party assigned: show outlined button (like "Select a Personal Quest")
+    if (party == null) {
+      final primaryColor = theme.contrastedPrimary;
+      return Center(
+        child: OutlinedButton.icon(
+          onPressed: () => _onTap(context, townModel, charactersModel),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: primaryColor,
+            side: BorderSide(color: primaryColor),
+          ),
+          icon: const Icon(Icons.groups_3_rounded, size: iconSizeSmall),
+          label: Text(l10n.assignToParty),
+        ),
+      );
+    }
+
+    // Party assigned: show tappable row with party name
+    return InkWell(
+      borderRadius: BorderRadius.circular(borderRadiusMedium),
+      onTap: () => _onTap(context, townModel, charactersModel),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: smallPadding),
+        child: Row(
+          children: [
+            Icon(
+              Icons.groups_3_rounded,
+              size: iconSizeMedium,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: mediumPadding),
+            Expanded(child: Text(party.name, style: theme.textTheme.bodyLarge)),
+            Icon(
+              Icons.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Party? _resolveParty(TownModel townModel) {
+    if (character.partyId == null) return null;
+    for (final party in townModel.parties) {
+      if (party.id == character.partyId) return party;
+    }
+    return null;
+  }
+
+  void _onTap(
+    BuildContext context,
+    TownModel townModel,
+    CharactersModel charactersModel,
+  ) {
+    if (townModel.activeCampaign == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).createCampaignFirst),
+        ),
+      );
+      return;
+    }
+
+    PartyAssignmentSheet.show(
+      context: context,
+      parties: townModel.parties,
+      currentPartyId: character.partyId,
+      onPartySelected: (partyId) {
+        charactersModel.assignCharacterToParty(character, partyId);
+      },
+      onCreateParty: () async {
+        final created = await CreatePartyScreen.show(context, townModel);
+        if (created == true && townModel.activeParty != null) {
+          charactersModel.assignCharacterToParty(
+            character,
+            townModel.activeParty!.id,
+          );
+        }
+      },
+    );
   }
 }

@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_440_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
@@ -33,7 +32,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     future = context.read<CharactersModel>().loadCharacters();
-    context.read<TownModel>().loadWorlds();
+    context.read<TownModel>().loadCampaigns();
     if (SharedPrefs().showUpdate440Dialog) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         showDialog<void>(
@@ -52,14 +51,16 @@ class _HomeState extends State<Home> {
     final townModel = context.watch<TownModel>();
 
     // Hide FAB when:
-    // - On town page (0) with no worlds
-    // - On enhancement calculator page (2) when cost chip is expanded or nothing to clear
+    // - On town page (0) with no campaigns
+    // - On characters page (1) with no characters (empty state has inline button)
     // - On characters page (1) when element sheet is fully expanded
+    // - On enhancement calculator page (2) when cost chip is expanded or nothing to clear
     final hideFab =
-        (appModel.page == 0 && townModel.worlds.isEmpty) ||
+        (appModel.page == 0 && townModel.campaigns.isEmpty) ||
+        (appModel.page == 1 && charactersModel.characters.isEmpty) ||
+        (appModel.page == 1 && charactersModel.isElementSheetFullExpanded) ||
         (appModel.page == 2 &&
-            (enhancementModel.isSheetExpanded || !enhancementModel.showCost)) ||
-        (appModel.page == 1 && charactersModel.isElementSheetFullExpanded);
+            (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
 
     return Scaffold(
       // this is necessary to make notched FAB background transparent, effectively
@@ -132,7 +133,7 @@ class _HomeState extends State<Home> {
     TownModel townModel,
   ) {
     // Town page: edit mode toggle FAB
-    if (appModel.page == 0 && townModel.worlds.isNotEmpty) {
+    if (appModel.page == 0 && townModel.campaigns.isNotEmpty) {
       return FloatingActionButton(
         heroTag: null,
         onPressed: () => townModel.isEditMode = !townModel.isEditMode,
@@ -151,16 +152,7 @@ class _HomeState extends State<Home> {
       );
     }
 
-    // Characters page with no characters: add FAB
-    if (charactersModel.characters.isEmpty) {
-      return FloatingActionButton(
-        heroTag: null,
-        onPressed: () => CreateCharacterScreen.show(context, charactersModel),
-        child: const Icon(Icons.add),
-      );
-    }
-
-    // Characters page with characters: edit mode toggle FAB
+    // Characters page: edit mode toggle FAB
     return FloatingActionButton(
       heroTag: null,
       onPressed: () => charactersModel.isEditMode = !charactersModel.isEditMode,

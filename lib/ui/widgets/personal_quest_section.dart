@@ -351,7 +351,7 @@ class _RequirementRowState extends State<_RequirementRow> {
                     // which is 14
                     Opacity(
                       opacity: 0,
-                      child: Text('14', style: theme.textTheme.bodySmall),
+                      child: Text('20', style: theme.textTheme.bodySmall),
                     ),
                     Text(
                       '${widget.progress}',

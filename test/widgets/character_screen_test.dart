@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 import '../helpers/fake_database_helper.dart';
 import '../helpers/test_helpers.dart';
@@ -84,6 +85,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<MockThemeProvider>.value(value: mockTheme),
         ChangeNotifierProvider<CharactersModel>.value(value: model),
+        ChangeNotifierProvider<TownModel>(
+          create: (_) => TownModel(databaseHelper: fakeDb),
+        ),
       ],
       child: MaterialApp(
         theme: testThemeData(),
@@ -286,7 +290,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final battleGoalsTooltip = find.byWidgetPredicate(
-        (w) => w is Tooltip && w.message == 'Battle goals',
+        (w) => w is Tooltip && w.message == 'Battle Goals',
       );
       expect(battleGoalsTooltip, findsOneWidget);
 
@@ -457,9 +461,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Previous retirements'), findsOneWidget);
-      // Battle goals appears in both the chip nav bar label and in the
+      // Battle Goals appears in both the chip nav bar label and in the
       // checkmarks row — look for it inside the General card content
-      expect(find.text('Battle goals'), findsWidgets);
+      expect(find.text('Battle Goals'), findsWidgets);
     });
 
     testWidgets('section hidden in view mode', (tester) async {
@@ -925,7 +929,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('General'), findsWidgets);
+      expect(find.text('Stats & Party'), findsWidgets);
       expect(find.text('Quest & Notes'), findsWidgets);
       // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);

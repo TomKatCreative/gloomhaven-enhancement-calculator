@@ -15,7 +15,11 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/party_assignment_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 /// A full-page screen for creating new characters.
@@ -49,6 +53,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       TextEditingController();
   final TextEditingController _personalQuestTextFieldController =
       TextEditingController();
+  final TextEditingController _partyTextFieldController =
+      TextEditingController();
 
   GameEdition _selectedEdition = GameEdition.gloomhaven;
   PlayerClass? _selectedClass;
@@ -59,6 +65,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   Variant _variant = Variant.base;
   int _selectedLevel = 1;
   String? _selectedPersonalQuestId;
+  String? _selectedPartyId;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -76,6 +83,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     _previousRetirementsTextFieldController.dispose();
     _prosperityLevelTextFieldController.dispose();
     _personalQuestTextFieldController.dispose();
+    _partyTextFieldController.dispose();
     _nameFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -115,6 +123,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             _buildClassSelector(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildPersonalQuestSelector(context, theme),
+            const SizedBox(height: formFieldSpacing),
+            _buildPartySelector(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildLevelSelector(context, theme, colorScheme),
             const SizedBox(height: formFieldSpacing),
@@ -277,6 +287,64 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               }
             : null,
       ),
+    );
+  }
+
+  Widget _buildPartySelector(BuildContext context, ThemeData theme) {
+    final townModel = context.read<TownModel>();
+    final hasCampaign = townModel.activeCampaign != null;
+
+    if (!hasCampaign) return const SizedBox.shrink();
+
+    return TextFormField(
+      readOnly: true,
+      controller: _partyTextFieldController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context).party,
+        hintText: AppLocalizations.of(context).selectParty,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        border: const OutlineInputBorder(),
+        suffixIcon: _selectedPartyId != null
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    _selectedPartyId = null;
+                    _partyTextFieldController.clear();
+                  });
+                },
+              )
+            : const Icon(Icons.chevron_right),
+      ),
+      onTap: () {
+        PartyAssignmentSheet.show(
+          context: context,
+          parties: townModel.parties,
+          currentPartyId: _selectedPartyId,
+          onPartySelected: (partyId) {
+            setState(() {
+              _selectedPartyId = partyId;
+              if (partyId == null) {
+                _partyTextFieldController.clear();
+              } else {
+                final party = townModel.parties.firstWhere(
+                  (p) => p.id == partyId,
+                );
+                _partyTextFieldController.text = party.name;
+              }
+            });
+          },
+          onCreateParty: () async {
+            final created = await CreatePartyScreen.show(context, townModel);
+            if (created == true && townModel.activeParty != null) {
+              setState(() {
+                _selectedPartyId = townModel.activeParty!.id;
+                _partyTextFieldController.text = townModel.activeParty!.name;
+              });
+            }
+          },
+        );
+      },
     );
   }
 
@@ -458,6 +526,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             : 0,
         variant: _variant,
         personalQuestId: _selectedPersonalQuestId,
+        partyId: _selectedPartyId,
       );
       if (!mounted) return;
       Navigator.pop(context, true);
