@@ -225,12 +225,12 @@ class CharactersModel with ChangeNotifier {
         ? _characters
         : _characters.where((character) => !character.isRetired).toList();
 
-    // Apply campaign filter
+    // Apply party filter
     if (!_showAllCharacters) {
-      final campaignId = SharedPrefs().activeCampaignId;
-      if (campaignId != null) {
+      final partyId = SharedPrefs().activePartyId;
+      if (partyId != null) {
         filtered = filtered
-            .where((c) => c.campaignId == campaignId || c.campaignId == null)
+            .where((c) => c.partyId == partyId || c.partyId == null)
             .toList();
       }
     }
@@ -346,6 +346,7 @@ class CharactersModel with ChangeNotifier {
     int prosperityLevel = 0,
     Variant variant = Variant.base,
     String? personalQuestId,
+    String? partyId,
   }) async {
     final pqId = personalQuestId ?? '';
     final pqProgress = personalQuestId != null
@@ -367,6 +368,7 @@ class CharactersModel with ChangeNotifier {
       variant: variant,
       personalQuestId: pqId,
       personalQuestProgress: pqProgress,
+      partyId: partyId,
     );
     character.id = await databaseHelper.insertCharacter(character);
     character.characterPerks = await _loadPerks(character);
@@ -593,13 +595,13 @@ class CharactersModel with ChangeNotifier {
     return true;
   }
 
-  /// Assigns a character to a campaign (or null to unassign).
-  Future<void> assignCharacterToCampaign(
+  /// Assigns a character to a party (or null to unassign).
+  Future<void> assignCharacterToParty(
     Character character,
-    String? campaignId,
+    String? partyId,
   ) async {
-    character.campaignId = campaignId;
-    await databaseHelper.assignCharacterToCampaign(character.uuid, campaignId);
+    character.partyId = partyId;
+    await databaseHelper.assignCharacterToParty(character.uuid, partyId);
     notifyListeners();
   }
 }

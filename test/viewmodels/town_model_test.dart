@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-import 'package:gloomhaven_enhancement_calc/models/world.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,278 +21,173 @@ void main() {
   });
 
   group('TownModel', () {
-    group('loadWorlds', () {
-      test('loads empty list when no worlds exist', () async {
-        await model.loadWorlds();
-        expect(model.worlds, isEmpty);
-        expect(model.activeWorld, isNull);
+    group('loadCampaigns', () {
+      test('loads empty list when no campaigns exist', () async {
+        await model.loadCampaigns();
+        expect(model.campaigns, isEmpty);
+        expect(model.activeCampaign, isNull);
       });
 
-      test('loads worlds and sets first as active', () async {
-        final world = TestData.createWorld();
-        fakeDb.worlds = [world];
-
-        await model.loadWorlds();
-
-        expect(model.worlds, hasLength(1));
-        expect(model.activeWorld?.id, 'world-1');
-      });
-
-      test('restores active world from SharedPrefs', () async {
-        final world1 = TestData.createWorld(id: 'w-1', name: 'World 1');
-        final world2 = TestData.createWorld(id: 'w-2', name: 'World 2');
-        fakeDb.worlds = [world1, world2];
-        SharedPrefs().activeWorldId = 'w-2';
-
-        await model.loadWorlds();
-
-        expect(model.activeWorld?.id, 'w-2');
-        expect(model.activeWorld?.name, 'World 2');
-      });
-
-      test('falls back to first world if saved ID not found', () async {
-        final world = TestData.createWorld(id: 'w-1');
-        fakeDb.worlds = [world];
-        SharedPrefs().activeWorldId = 'nonexistent';
-
-        await model.loadWorlds();
-
-        expect(model.activeWorld?.id, 'w-1');
-      });
-
-      test('loads campaigns for active world', () async {
-        final world = TestData.createWorld();
+      test('loads campaigns and sets first as active', () async {
         final campaign = TestData.createCampaign();
-        fakeDb.worlds = [world];
-        fakeDb.campaignsMap = {
-          'world-1': [campaign],
-        };
+        fakeDb.campaigns = [campaign];
 
-        await model.loadWorlds();
+        await model.loadCampaigns();
 
         expect(model.campaigns, hasLength(1));
         expect(model.activeCampaign?.id, 'campaign-1');
       });
 
       test('restores active campaign from SharedPrefs', () async {
-        final world = TestData.createWorld();
-        final c1 = TestData.createCampaign(id: 'c-1', name: 'Party 1');
-        final c2 = TestData.createCampaign(id: 'c-2', name: 'Party 2');
-        fakeDb.worlds = [world];
-        fakeDb.campaignsMap = {
-          'world-1': [c1, c2],
-        };
+        final c1 = TestData.createCampaign(id: 'c-1', name: 'Campaign 1');
+        final c2 = TestData.createCampaign(id: 'c-2', name: 'Campaign 2');
+        fakeDb.campaigns = [c1, c2];
         SharedPrefs().activeCampaignId = 'c-2';
 
-        await model.loadWorlds();
+        await model.loadCampaigns();
 
         expect(model.activeCampaign?.id, 'c-2');
+        expect(model.activeCampaign?.name, 'Campaign 2');
+      });
+
+      test('falls back to first campaign if saved ID not found', () async {
+        final campaign = TestData.createCampaign(id: 'c-1');
+        fakeDb.campaigns = [campaign];
+        SharedPrefs().activeCampaignId = 'nonexistent';
+
+        await model.loadCampaigns();
+
+        expect(model.activeCampaign?.id, 'c-1');
+      });
+
+      test('loads parties for active campaign', () async {
+        final campaign = TestData.createCampaign();
+        final party = TestData.createParty();
+        fakeDb.campaigns = [campaign];
+        fakeDb.partiesMap = {
+          'campaign-1': [party],
+        };
+
+        await model.loadCampaigns();
+
+        expect(model.parties, hasLength(1));
+        expect(model.activeParty?.id, 'party-1');
+      });
+
+      test('restores active party from SharedPrefs', () async {
+        final campaign = TestData.createCampaign();
+        final p1 = TestData.createParty(id: 'p-1', name: 'Party 1');
+        final p2 = TestData.createParty(id: 'p-2', name: 'Party 2');
+        fakeDb.campaigns = [campaign];
+        fakeDb.partiesMap = {
+          'campaign-1': [p1, p2],
+        };
+        SharedPrefs().activePartyId = 'p-2';
+
+        await model.loadCampaigns();
+
+        expect(model.activeParty?.id, 'p-2');
       });
     });
 
-    group('createWorld', () {
-      test('creates and sets active world', () async {
-        await model.createWorld(
-          name: 'New World',
+    group('createCampaign', () {
+      test('creates and sets active campaign', () async {
+        await model.createCampaign(
+          name: 'New Campaign',
           edition: GameEdition.gloomhaven,
         );
 
-        expect(model.worlds, hasLength(1));
-        expect(model.activeWorld?.name, 'New World');
-        expect(model.activeWorld?.edition, GameEdition.gloomhaven);
-        expect(SharedPrefs().activeWorldId, isNotNull);
+        expect(model.campaigns, hasLength(1));
+        expect(model.activeCampaign?.name, 'New Campaign');
+        expect(model.activeCampaign?.edition, GameEdition.gloomhaven);
+        expect(SharedPrefs().activeCampaignId, isNotNull);
       });
 
-      test('clears previous campaign state', () async {
-        // Setup existing world with campaign
-        await model.createWorld(
-          name: 'World 1',
+      test('clears previous party state', () async {
+        // Setup existing campaign with party
+        await model.createCampaign(
+          name: 'Campaign 1',
           edition: GameEdition.gloomhaven,
         );
-        await model.createCampaign(name: 'Party 1');
-        expect(model.activeCampaign, isNotNull);
+        await model.createParty(name: 'Party 1');
+        expect(model.activeParty, isNotNull);
 
-        // Create new world — should clear campaign
-        await model.createWorld(
-          name: 'World 2',
+        // Create new campaign — should clear party
+        await model.createCampaign(
+          name: 'Campaign 2',
           edition: GameEdition.frosthaven,
         );
-        expect(model.activeCampaign, isNull);
-        expect(model.campaigns, isEmpty);
+        expect(model.activeParty, isNull);
+        expect(model.parties, isEmpty);
       });
 
       test('accepts starting prosperity checkmarks', () async {
-        await model.createWorld(
+        await model.createCampaign(
           name: 'Advanced',
           edition: GameEdition.gloomhaven,
           startingProsperityCheckmarks: 10,
         );
 
-        expect(model.activeWorld?.prosperityCheckmarks, 10);
-        expect(model.activeWorld?.prosperityLevel, 3);
-      });
-    });
-
-    group('setActiveWorld', () {
-      test('switches active world and loads campaigns', () async {
-        final w1 = TestData.createWorld(id: 'w-1', name: 'World 1');
-        final w2 = TestData.createWorld(id: 'w-2', name: 'World 2');
-        final c2 = TestData.createCampaign(
-          id: 'c-2',
-          worldId: 'w-2',
-          name: 'Party',
-        );
-        fakeDb.worlds = [w1, w2];
-        fakeDb.campaignsMap = {
-          'w-2': [c2],
-        };
-        await model.loadWorlds();
-
-        await model.setActiveWorld(w2);
-
-        expect(model.activeWorld?.id, 'w-2');
-        expect(model.campaigns, hasLength(1));
-        expect(SharedPrefs().activeWorldId, 'w-2');
-      });
-    });
-
-    group('renameWorld', () {
-      test('updates world name', () async {
-        await model.createWorld(
-          name: 'Old Name',
-          edition: GameEdition.gloomhaven,
-        );
-
-        await model.renameWorld('New Name');
-
-        expect(model.activeWorld?.name, 'New Name');
-      });
-    });
-
-    group('deleteActiveWorld', () {
-      test('deletes world and falls back to next', () async {
-        final w1 = TestData.createWorld(id: 'w-1', name: 'World 1');
-        final w2 = TestData.createWorld(id: 'w-2', name: 'World 2');
-        fakeDb.worlds = [w1, w2];
-        await model.loadWorlds();
-        await model.setActiveWorld(w1);
-
-        await model.deleteActiveWorld();
-
-        expect(model.worlds, hasLength(1));
-        expect(model.activeWorld?.id, 'w-2');
-      });
-
-      test('sets null when last world deleted', () async {
-        await model.createWorld(
-          name: 'Only World',
-          edition: GameEdition.gloomhaven,
-        );
-
-        await model.deleteActiveWorld();
-
-        expect(model.worlds, isEmpty);
-        expect(model.activeWorld, isNull);
-        expect(SharedPrefs().activeWorldId, isNull);
-      });
-    });
-
-    group('prosperity', () {
-      setUp(() async {
-        await model.createWorld(
-          name: 'Test',
-          edition: GameEdition.gloomhaven,
-          startingProsperityCheckmarks: 5,
-        );
-      });
-
-      test('incrementProsperity increases by 1', () async {
-        await model.incrementProsperity();
-        expect(model.activeWorld?.prosperityCheckmarks, 6);
-      });
-
-      test('decrementProsperity decreases by 1', () async {
-        await model.decrementProsperity();
-        expect(model.activeWorld?.prosperityCheckmarks, 4);
-      });
-
-      test('decrementProsperity does not go below 0', () async {
-        await model.createWorld(
-          name: 'Zero',
-          edition: GameEdition.gloomhaven,
-          startingProsperityCheckmarks: 0,
-        );
-
-        await model.decrementProsperity();
-        expect(model.activeWorld?.prosperityCheckmarks, 0);
-      });
-    });
-
-    group('createCampaign', () {
-      setUp(() async {
-        await model.createWorld(
-          name: 'Test World',
-          edition: GameEdition.gloomhaven,
-        );
-      });
-
-      test('creates and sets active campaign', () async {
-        await model.createCampaign(name: 'Heroes');
-
-        expect(model.campaigns, hasLength(1));
-        expect(model.activeCampaign?.name, 'Heroes');
-        expect(SharedPrefs().activeCampaignId, isNotNull);
-      });
-
-      test('accepts starting reputation', () async {
-        await model.createCampaign(name: 'Infamous', startingReputation: -5);
-
-        expect(model.activeCampaign?.reputation, -5);
+        expect(model.activeCampaign?.prosperityCheckmarks, 10);
+        expect(model.activeCampaign?.prosperityLevel, 3);
       });
     });
 
     group('setActiveCampaign', () {
-      test('switches active campaign', () async {
-        await model.createWorld(name: 'World', edition: GameEdition.gloomhaven);
-        await model.createCampaign(name: 'Party 1');
-        await model.createCampaign(name: 'Party 2');
+      test('switches active campaign and loads parties', () async {
+        final c1 = TestData.createCampaign(id: 'c-1', name: 'Campaign 1');
+        final c2 = TestData.createCampaign(id: 'c-2', name: 'Campaign 2');
+        final p2 = TestData.createParty(
+          id: 'p-2',
+          campaignId: 'c-2',
+          name: 'Party',
+        );
+        fakeDb.campaigns = [c1, c2];
+        fakeDb.partiesMap = {
+          'c-2': [p2],
+        };
+        await model.loadCampaigns();
 
-        model.setActiveCampaign(model.campaigns.first);
+        await model.setActiveCampaign(c2);
 
-        expect(model.activeCampaign?.name, 'Party 1');
+        expect(model.activeCampaign?.id, 'c-2');
+        expect(model.parties, hasLength(1));
+        expect(SharedPrefs().activeCampaignId, 'c-2');
       });
     });
 
     group('renameCampaign', () {
       test('updates campaign name', () async {
-        await model.createWorld(name: 'World', edition: GameEdition.gloomhaven);
-        await model.createCampaign(name: 'Old Party');
+        await model.createCampaign(
+          name: 'Old Name',
+          edition: GameEdition.gloomhaven,
+        );
 
-        await model.renameCampaign('New Party');
+        await model.renameCampaign('New Name');
 
-        expect(model.activeCampaign?.name, 'New Party');
+        expect(model.activeCampaign?.name, 'New Name');
       });
     });
 
     group('deleteActiveCampaign', () {
-      setUp(() async {
-        await model.createWorld(name: 'World', edition: GameEdition.gloomhaven);
-      });
-
-      test('deletes and falls back to next campaign', () async {
-        await model.createCampaign(name: 'Party 1');
-        await model.createCampaign(name: 'Party 2');
-        // Active is Party 2 (last created)
-        model.setActiveCampaign(model.campaigns.last);
+      test('deletes campaign and falls back to next', () async {
+        final c1 = TestData.createCampaign(id: 'c-1', name: 'Campaign 1');
+        final c2 = TestData.createCampaign(id: 'c-2', name: 'Campaign 2');
+        fakeDb.campaigns = [c1, c2];
+        await model.loadCampaigns();
+        await model.setActiveCampaign(c1);
 
         await model.deleteActiveCampaign();
 
         expect(model.campaigns, hasLength(1));
-        expect(model.activeCampaign?.name, 'Party 1');
+        expect(model.activeCampaign?.id, 'c-2');
       });
 
       test('sets null when last campaign deleted', () async {
-        await model.createCampaign(name: 'Only Party');
+        await model.createCampaign(
+          name: 'Only Campaign',
+          edition: GameEdition.gloomhaven,
+        );
 
         await model.deleteActiveCampaign();
 
@@ -302,82 +197,297 @@ void main() {
       });
     });
 
+    group('prosperity', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Test',
+          edition: GameEdition.gloomhaven,
+          startingProsperityCheckmarks: 5,
+        );
+      });
+
+      test('incrementProsperity increases by 1', () async {
+        await model.incrementProsperity();
+        expect(model.activeCampaign?.prosperityCheckmarks, 6);
+      });
+
+      test('decrementProsperity decreases by 1', () async {
+        await model.decrementProsperity();
+        expect(model.activeCampaign?.prosperityCheckmarks, 4);
+      });
+
+      test('decrementProsperity does not go below 0', () async {
+        await model.createCampaign(
+          name: 'Zero',
+          edition: GameEdition.gloomhaven,
+          startingProsperityCheckmarks: 0,
+        );
+
+        await model.decrementProsperity();
+        expect(model.activeCampaign?.prosperityCheckmarks, 0);
+      });
+    });
+
+    group('createParty', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Test Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+      });
+
+      test('creates and sets active party', () async {
+        await model.createParty(name: 'Heroes');
+
+        expect(model.parties, hasLength(1));
+        expect(model.activeParty?.name, 'Heroes');
+        expect(SharedPrefs().activePartyId, isNotNull);
+      });
+
+      test('accepts starting reputation', () async {
+        await model.createParty(name: 'Infamous', startingReputation: -5);
+
+        expect(model.activeParty?.reputation, -5);
+      });
+    });
+
+    group('setActiveParty', () {
+      test('switches active party', () async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Party 1');
+        await model.createParty(name: 'Party 2');
+
+        model.setActiveParty(model.parties.first);
+
+        expect(model.activeParty?.name, 'Party 1');
+      });
+    });
+
+    group('renameParty', () {
+      test('updates party name', () async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Old Party');
+
+        await model.renameParty('New Party');
+
+        expect(model.activeParty?.name, 'New Party');
+      });
+    });
+
+    group('deleteActiveParty', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+      });
+
+      test('deletes and falls back to next party', () async {
+        await model.createParty(name: 'Party 1');
+        await model.createParty(name: 'Party 2');
+        // Active is Party 2 (last created)
+        model.setActiveParty(model.parties.last);
+
+        await model.deleteActiveParty();
+
+        expect(model.parties, hasLength(1));
+        expect(model.activeParty?.name, 'Party 1');
+      });
+
+      test('sets null when last party deleted', () async {
+        await model.createParty(name: 'Only Party');
+
+        await model.deleteActiveParty();
+
+        expect(model.parties, isEmpty);
+        expect(model.activeParty, isNull);
+        expect(SharedPrefs().activePartyId, isNull);
+      });
+    });
+
+    group('updatePartyLocation', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Party');
+      });
+
+      test('updates location on active party', () async {
+        await model.updatePartyLocation('Scenario 42');
+        expect(model.activeParty?.location, 'Scenario 42');
+      });
+
+      test('persists location to database', () async {
+        await model.updatePartyLocation('Scenario 42');
+        // The fake DB stores the party by reference, so check via queryParties
+        final parties = await fakeDb.queryParties(model.activeCampaign!.id);
+        expect(parties.first.location, 'Scenario 42');
+      });
+
+      test('does nothing when no active party', () async {
+        await model.deleteActiveParty();
+        await model.updatePartyLocation('Scenario 42');
+        expect(model.activeParty, isNull);
+      });
+    });
+
+    group('updatePartyNotes', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Party');
+      });
+
+      test('updates notes on active party', () async {
+        await model.updatePartyNotes('Watch out for traps');
+        expect(model.activeParty?.notes, 'Watch out for traps');
+      });
+
+      test('persists notes to database', () async {
+        await model.updatePartyNotes('Important note');
+        final parties = await fakeDb.queryParties(model.activeCampaign!.id);
+        expect(parties.first.notes, 'Important note');
+      });
+
+      test('does nothing when no active party', () async {
+        await model.deleteActiveParty();
+        await model.updatePartyNotes('Notes');
+        expect(model.activeParty, isNull);
+      });
+    });
+
+    group('toggleAchievement', () {
+      setUp(() async {
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Party');
+      });
+
+      test('adds achievement when not present', () async {
+        await model.toggleAchievement('Achievement 1');
+        expect(model.activeParty?.achievements, contains('Achievement 1'));
+      });
+
+      test('removes achievement when already present', () async {
+        await model.toggleAchievement('Achievement 1');
+        expect(model.activeParty?.achievements, contains('Achievement 1'));
+
+        await model.toggleAchievement('Achievement 1');
+        expect(
+          model.activeParty?.achievements,
+          isNot(contains('Achievement 1')),
+        );
+      });
+
+      test('can toggle multiple achievements', () async {
+        await model.toggleAchievement('Achievement 1');
+        await model.toggleAchievement('Achievement 2');
+        expect(model.activeParty?.achievements, hasLength(2));
+        expect(model.activeParty?.achievements, contains('Achievement 1'));
+        expect(model.activeParty?.achievements, contains('Achievement 2'));
+      });
+
+      test('does nothing when no active party', () async {
+        await model.deleteActiveParty();
+        await model.toggleAchievement('Achievement 1');
+        expect(model.activeParty, isNull);
+      });
+    });
+
     group('reputation', () {
       setUp(() async {
-        await model.createWorld(name: 'World', edition: GameEdition.gloomhaven);
-        await model.createCampaign(name: 'Party');
+        await model.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await model.createParty(name: 'Party');
       });
 
       test('incrementReputation increases by 1', () async {
         await model.incrementReputation();
-        expect(model.activeCampaign?.reputation, 1);
+        expect(model.activeParty?.reputation, 1);
       });
 
       test('decrementReputation decreases by 1', () async {
         await model.decrementReputation();
-        expect(model.activeCampaign?.reputation, -1);
+        expect(model.activeParty?.reputation, -1);
       });
 
       test('incrementReputation does not exceed 20', () async {
-        model.activeCampaign!.reputation = maxReputation;
+        model.activeParty!.reputation = maxReputation;
         await model.incrementReputation();
-        expect(model.activeCampaign?.reputation, maxReputation);
+        expect(model.activeParty?.reputation, maxReputation);
       });
 
       test('decrementReputation does not go below -20', () async {
-        model.activeCampaign!.reputation = minReputation;
+        model.activeParty!.reputation = minReputation;
         await model.decrementReputation();
-        expect(model.activeCampaign?.reputation, minReputation);
+        expect(model.activeParty?.reputation, minReputation);
       });
     });
 
     group('donatedGold', () {
       setUp(() async {
-        await model.createWorld(name: 'Test', edition: GameEdition.gloomhaven);
+        await model.createCampaign(
+          name: 'Test',
+          edition: GameEdition.gloomhaven,
+        );
       });
 
       test('incrementDonatedGold increments by 10', () async {
         await model.incrementDonatedGold();
-        expect(model.activeWorld?.donatedGold, 10);
+        expect(model.activeCampaign?.donatedGold, 10);
       });
 
       test('incrementDonatedGold caps at maxDonatedGold', () async {
-        model.activeWorld!.donatedGold = 95;
+        model.activeCampaign!.donatedGold = 95;
         await model.incrementDonatedGold();
-        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+        expect(model.activeCampaign?.donatedGold, maxDonatedGold);
       });
 
       test('incrementDonatedGold returns true when reaching 100', () async {
-        model.activeWorld!.donatedGold = 90;
+        model.activeCampaign!.donatedGold = 90;
         final result = await model.incrementDonatedGold();
         expect(result, true);
-        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+        expect(model.activeCampaign?.donatedGold, maxDonatedGold);
       });
 
       test('incrementDonatedGold returns false on other increments', () async {
-        model.activeWorld!.donatedGold = 0;
+        model.activeCampaign!.donatedGold = 0;
         final result = await model.incrementDonatedGold();
         expect(result, false);
-        expect(model.activeWorld?.donatedGold, 10);
+        expect(model.activeCampaign?.donatedGold, 10);
       });
 
       test('incrementDonatedGold returns false when already at max', () async {
-        model.activeWorld!.donatedGold = maxDonatedGold;
+        model.activeCampaign!.donatedGold = maxDonatedGold;
         final result = await model.incrementDonatedGold();
         expect(result, false);
-        expect(model.activeWorld?.donatedGold, maxDonatedGold);
+        expect(model.activeCampaign?.donatedGold, maxDonatedGold);
       });
 
       test('decrementDonatedGold decrements by 10', () async {
-        model.activeWorld!.donatedGold = 30;
+        model.activeCampaign!.donatedGold = 30;
         await model.decrementDonatedGold();
-        expect(model.activeWorld?.donatedGold, 20);
+        expect(model.activeCampaign?.donatedGold, 20);
       });
 
       test('decrementDonatedGold does not go below 0', () async {
-        model.activeWorld!.donatedGold = 0;
+        model.activeCampaign!.donatedGold = 0;
         await model.decrementDonatedGold();
-        expect(model.activeWorld?.donatedGold, 0);
+        expect(model.activeCampaign?.donatedGold, 0);
       });
     });
 

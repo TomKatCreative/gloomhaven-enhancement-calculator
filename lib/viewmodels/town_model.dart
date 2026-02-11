@@ -2,31 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-import 'package:gloomhaven_enhancement_calc/models/world.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:uuid/uuid.dart';
 
-/// Manages world and campaign state for the Town screen.
+/// Manages campaign and party state for the Town screen.
 ///
-/// Handles CRUD operations for worlds and campaigns, and persists
-/// the active world/campaign selection in SharedPrefs.
+/// Handles CRUD operations for campaigns and parties, and persists
+/// the active campaign/party selection in SharedPrefs.
 class TownModel with ChangeNotifier {
   TownModel({required this.databaseHelper});
 
   final IDatabaseHelper databaseHelper;
 
-  List<World> _worlds = [];
   List<Campaign> _campaigns = [];
-  World? _activeWorld;
+  List<Party> _parties = [];
   Campaign? _activeCampaign;
+  Party? _activeParty;
   bool _isEditMode = false;
 
   // ── Getters ──
 
-  List<World> get worlds => List.unmodifiable(_worlds);
   List<Campaign> get campaigns => List.unmodifiable(_campaigns);
-  World? get activeWorld => _activeWorld;
+  List<Party> get parties => List.unmodifiable(_parties);
   Campaign? get activeCampaign => _activeCampaign;
+  Party? get activeParty => _activeParty;
 
   bool get isEditMode => _isEditMode;
 
@@ -37,42 +37,9 @@ class TownModel with ChangeNotifier {
 
   // ── Loading ──
 
-  /// Loads all worlds from the database and restores active selection.
-  Future<void> loadWorlds() async {
-    _worlds = await databaseHelper.queryAllWorlds();
-
-    // Restore active world from SharedPrefs
-    final savedWorldId = SharedPrefs().activeWorldId;
-    if (savedWorldId != null) {
-      _activeWorld = _worlds.cast<World?>().firstWhere(
-        (w) => w?.id == savedWorldId,
-        orElse: () => null,
-      );
-    }
-
-    // Fall back to first world if saved one not found
-    if (_activeWorld == null && _worlds.isNotEmpty) {
-      _activeWorld = _worlds.first;
-      SharedPrefs().activeWorldId = _activeWorld!.id;
-    }
-
-    // Load campaigns for active world
-    if (_activeWorld != null) {
-      await _loadCampaigns();
-    }
-
-    notifyListeners();
-  }
-
-  /// Loads campaigns for the active world and restores active campaign.
-  Future<void> _loadCampaigns() async {
-    if (_activeWorld == null) {
-      _campaigns = [];
-      _activeCampaign = null;
-      return;
-    }
-
-    _campaigns = await databaseHelper.queryCampaigns(_activeWorld!.id);
+  /// Loads all campaigns from the database and restores active selection.
+  Future<void> loadCampaigns() async {
+    _campaigns = await databaseHelper.queryAllCampaigns();
 
     // Restore active campaign from SharedPrefs
     final savedCampaignId = SharedPrefs().activeCampaignId;
@@ -88,139 +55,54 @@ class TownModel with ChangeNotifier {
       _activeCampaign = _campaigns.first;
       SharedPrefs().activeCampaignId = _activeCampaign!.id;
     }
-  }
 
-  // ── World CRUD ──
-
-  /// Creates a new world and sets it as active.
-  Future<void> createWorld({
-    required String name,
-    required GameEdition edition,
-    int startingProsperityCheckmarks = 0,
-  }) async {
-    final world = World(
-      id: const Uuid().v1(),
-      name: name,
-      edition: edition,
-      prosperityCheckmarks: startingProsperityCheckmarks,
-    );
-
-    await databaseHelper.insertWorld(world);
-    _worlds.add(world);
-    _activeWorld = world;
-    SharedPrefs().activeWorldId = world.id;
-
-    // Clear campaign state for new world
-    _campaigns = [];
-    _activeCampaign = null;
-    SharedPrefs().activeCampaignId = null;
-
-    _isEditMode = false;
-    notifyListeners();
-  }
-
-  /// Sets the active world and loads its campaigns.
-  Future<void> setActiveWorld(World world) async {
-    _activeWorld = world;
-    SharedPrefs().activeWorldId = world.id;
-    _activeCampaign = null;
-    SharedPrefs().activeCampaignId = null;
-    await _loadCampaigns();
-    _isEditMode = false;
-    notifyListeners();
-  }
-
-  /// Renames the active world.
-  Future<void> renameWorld(String newName) async {
-    if (_activeWorld == null) return;
-    _activeWorld!.name = newName;
-    await databaseHelper.updateWorld(_activeWorld!);
-    notifyListeners();
-  }
-
-  /// Deletes the active world and all its campaigns.
-  Future<void> deleteActiveWorld() async {
-    if (_activeWorld == null) return;
-    await databaseHelper.deleteWorld(_activeWorld!.id);
-    _worlds.remove(_activeWorld);
-    _campaigns = [];
-    _activeCampaign = null;
-    SharedPrefs().activeCampaignId = null;
-
-    if (_worlds.isNotEmpty) {
-      _activeWorld = _worlds.first;
-      SharedPrefs().activeWorldId = _activeWorld!.id;
-      await _loadCampaigns();
-    } else {
-      _activeWorld = null;
-      SharedPrefs().activeWorldId = null;
+    // Load parties for active campaign
+    if (_activeCampaign != null) {
+      await _loadParties();
     }
 
-    _isEditMode = false;
     notifyListeners();
   }
 
-  // ── Prosperity ──
+  /// Loads parties for the active campaign and restores active party.
+  Future<void> _loadParties() async {
+    if (_activeCampaign == null) {
+      _parties = [];
+      _activeParty = null;
+      return;
+    }
 
-  /// Increments prosperity checkmarks by 1.
-  Future<void> incrementProsperity() async {
-    if (_activeWorld == null) return;
-    _activeWorld!.prosperityCheckmarks++;
-    await databaseHelper.updateWorld(_activeWorld!);
-    notifyListeners();
-  }
+    _parties = await databaseHelper.queryParties(_activeCampaign!.id);
 
-  /// Decrements prosperity checkmarks by 1 (minimum 0).
-  Future<void> decrementProsperity() async {
-    if (_activeWorld == null || _activeWorld!.prosperityCheckmarks <= 0) return;
-    _activeWorld!.prosperityCheckmarks--;
-    await databaseHelper.updateWorld(_activeWorld!);
-    notifyListeners();
-  }
+    // Restore active party from SharedPrefs
+    final savedPartyId = SharedPrefs().activePartyId;
+    if (savedPartyId != null) {
+      _activeParty = _parties.cast<Party?>().firstWhere(
+        (p) => p?.id == savedPartyId,
+        orElse: () => null,
+      );
+    }
 
-  // ── Donated Gold ──
-
-  /// Increments donated gold by 10 (capped at [maxDonatedGold]).
-  ///
-  /// Returns `true` when the donation just reached [maxDonatedGold],
-  /// signalling the UI to show the "open envelope B" snackbar.
-  Future<bool> incrementDonatedGold() async {
-    if (_activeWorld == null) return false;
-    final wasBelow = _activeWorld!.donatedGold < maxDonatedGold;
-    _activeWorld!.donatedGold = (_activeWorld!.donatedGold + 10).clamp(
-      0,
-      maxDonatedGold,
-    );
-    await databaseHelper.updateWorld(_activeWorld!);
-    notifyListeners();
-    return wasBelow && _activeWorld!.donatedGold >= maxDonatedGold;
-  }
-
-  /// Decrements donated gold by 10 (minimum 0).
-  Future<void> decrementDonatedGold() async {
-    if (_activeWorld == null || _activeWorld!.donatedGold <= 0) return;
-    _activeWorld!.donatedGold = (_activeWorld!.donatedGold - 10).clamp(
-      0,
-      maxDonatedGold,
-    );
-    await databaseHelper.updateWorld(_activeWorld!);
-    notifyListeners();
+    // Fall back to first party if saved one not found
+    if (_activeParty == null && _parties.isNotEmpty) {
+      _activeParty = _parties.first;
+      SharedPrefs().activePartyId = _activeParty!.id;
+    }
   }
 
   // ── Campaign CRUD ──
 
-  /// Creates a new campaign in the active world and sets it as active.
+  /// Creates a new campaign and sets it as active.
   Future<void> createCampaign({
     required String name,
-    int startingReputation = 0,
+    required GameEdition edition,
+    int startingProsperityCheckmarks = 0,
   }) async {
-    if (_activeWorld == null) return;
-
     final campaign = Campaign(
       id: const Uuid().v1(),
-      worldId: _activeWorld!.id,
       name: name,
-      reputation: startingReputation,
+      edition: edition,
+      prosperityCheckmarks: startingProsperityCheckmarks,
     );
 
     await databaseHelper.insertCampaign(campaign);
@@ -228,13 +110,23 @@ class TownModel with ChangeNotifier {
     _activeCampaign = campaign;
     SharedPrefs().activeCampaignId = campaign.id;
 
+    // Clear party state for new campaign
+    _parties = [];
+    _activeParty = null;
+    SharedPrefs().activePartyId = null;
+
+    _isEditMode = false;
     notifyListeners();
   }
 
-  /// Sets the active campaign.
-  void setActiveCampaign(Campaign campaign) {
+  /// Sets the active campaign and loads its parties.
+  Future<void> setActiveCampaign(Campaign campaign) async {
     _activeCampaign = campaign;
     SharedPrefs().activeCampaignId = campaign.id;
+    _activeParty = null;
+    SharedPrefs().activePartyId = null;
+    await _loadParties();
+    _isEditMode = false;
     notifyListeners();
   }
 
@@ -246,20 +138,156 @@ class TownModel with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Deletes the active campaign and unlinks characters.
+  /// Deletes the active campaign and all its parties.
   Future<void> deleteActiveCampaign() async {
     if (_activeCampaign == null) return;
     await databaseHelper.deleteCampaign(_activeCampaign!.id);
     _campaigns.remove(_activeCampaign);
+    _parties = [];
+    _activeParty = null;
+    SharedPrefs().activePartyId = null;
 
     if (_campaigns.isNotEmpty) {
       _activeCampaign = _campaigns.first;
       SharedPrefs().activeCampaignId = _activeCampaign!.id;
+      await _loadParties();
     } else {
       _activeCampaign = null;
       SharedPrefs().activeCampaignId = null;
     }
 
+    _isEditMode = false;
+    notifyListeners();
+  }
+
+  // ── Prosperity ──
+
+  /// Increments prosperity checkmarks by 1.
+  Future<void> incrementProsperity() async {
+    if (_activeCampaign == null) return;
+    _activeCampaign!.prosperityCheckmarks++;
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+  }
+
+  /// Decrements prosperity checkmarks by 1 (minimum 0).
+  Future<void> decrementProsperity() async {
+    if (_activeCampaign == null || _activeCampaign!.prosperityCheckmarks <= 0) {
+      return;
+    }
+    _activeCampaign!.prosperityCheckmarks--;
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+  }
+
+  // ── Donated Gold ──
+
+  /// Increments donated gold by [amount] (capped at [maxDonatedGold]).
+  ///
+  /// Returns `true` when the donation just reached [maxDonatedGold],
+  /// signalling the UI to show the "open envelope B" snackbar.
+  Future<bool> incrementDonatedGold({int amount = 10}) async {
+    if (_activeCampaign == null) return false;
+    final wasBelow = _activeCampaign!.donatedGold < maxDonatedGold;
+    _activeCampaign!.donatedGold = (_activeCampaign!.donatedGold + amount)
+        .clamp(0, maxDonatedGold);
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+    return wasBelow && _activeCampaign!.donatedGold >= maxDonatedGold;
+  }
+
+  /// Decrements donated gold by [amount] (minimum 0).
+  Future<void> decrementDonatedGold({int amount = 10}) async {
+    if (_activeCampaign == null || _activeCampaign!.donatedGold <= 0) return;
+    _activeCampaign!.donatedGold = (_activeCampaign!.donatedGold - amount)
+        .clamp(0, maxDonatedGold);
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+  }
+
+  // ── Party CRUD ──
+
+  /// Creates a new party in the active campaign and sets it as active.
+  Future<void> createParty({
+    required String name,
+    int startingReputation = 0,
+  }) async {
+    if (_activeCampaign == null) return;
+
+    final party = Party(
+      id: const Uuid().v1(),
+      campaignId: _activeCampaign!.id,
+      name: name,
+      reputation: startingReputation,
+    );
+
+    await databaseHelper.insertParty(party);
+    _parties.add(party);
+    _activeParty = party;
+    SharedPrefs().activePartyId = party.id;
+
+    notifyListeners();
+  }
+
+  /// Sets the active party.
+  void setActiveParty(Party party) {
+    _activeParty = party;
+    SharedPrefs().activePartyId = party.id;
+    notifyListeners();
+  }
+
+  /// Renames the active party.
+  Future<void> renameParty(String newName) async {
+    if (_activeParty == null) return;
+    _activeParty!.name = newName;
+    await databaseHelper.updateParty(_activeParty!);
+    notifyListeners();
+  }
+
+  /// Deletes the active party and unlinks characters.
+  Future<void> deleteActiveParty() async {
+    if (_activeParty == null) return;
+    await databaseHelper.deleteParty(_activeParty!.id);
+    _parties.remove(_activeParty);
+
+    if (_parties.isNotEmpty) {
+      _activeParty = _parties.first;
+      SharedPrefs().activePartyId = _activeParty!.id;
+    } else {
+      _activeParty = null;
+      SharedPrefs().activePartyId = null;
+    }
+
+    notifyListeners();
+  }
+
+  // ── Party Details ──
+
+  /// Updates the active party's scenario location.
+  Future<void> updatePartyLocation(String location) async {
+    if (_activeParty == null) return;
+    _activeParty!.location = location;
+    await databaseHelper.updateParty(_activeParty!);
+    notifyListeners();
+  }
+
+  /// Updates the active party's notes.
+  Future<void> updatePartyNotes(String notes) async {
+    if (_activeParty == null) return;
+    _activeParty!.notes = notes;
+    await databaseHelper.updateParty(_activeParty!);
+    notifyListeners();
+  }
+
+  /// Toggles an achievement on/off for the active party.
+  Future<void> toggleAchievement(String achievement) async {
+    if (_activeParty == null) return;
+    if (_activeParty!.achievements.contains(achievement)) {
+      _activeParty!.achievements.remove(achievement);
+    } else {
+      _activeParty!.achievements.add(achievement);
+    }
+    await databaseHelper.updateParty(_activeParty!);
     notifyListeners();
   }
 
@@ -267,23 +295,21 @@ class TownModel with ChangeNotifier {
 
   /// Increments reputation by 1 (max 20).
   Future<void> incrementReputation() async {
-    if (_activeCampaign == null ||
-        _activeCampaign!.reputation >= maxReputation) {
+    if (_activeParty == null || _activeParty!.reputation >= maxReputation) {
       return;
     }
-    _activeCampaign!.reputation++;
-    await databaseHelper.updateCampaign(_activeCampaign!);
+    _activeParty!.reputation++;
+    await databaseHelper.updateParty(_activeParty!);
     notifyListeners();
   }
 
   /// Decrements reputation by 1 (min -20).
   Future<void> decrementReputation() async {
-    if (_activeCampaign == null ||
-        _activeCampaign!.reputation <= minReputation) {
+    if (_activeParty == null || _activeParty!.reputation <= minReputation) {
       return;
     }
-    _activeCampaign!.reputation--;
-    await databaseHelper.updateCampaign(_activeCampaign!);
+    _activeParty!.reputation--;
+    await databaseHelper.updateParty(_activeParty!);
     notifyListeners();
   }
 }
