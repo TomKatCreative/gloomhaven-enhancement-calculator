@@ -206,10 +206,12 @@ The main container/shell for the app, managing navigation between Town, Characte
                               [FAB] ←── Dynamic action button
 ```
 
+> **Feature flag**: The Town page (Page 0) and its "Town" nav destination are gated by `kTownSheetEnabled`. When disabled, the PageView only has two pages: Characters (index 0) and Calculator (index 1). Page indices and navigation destinations shift accordingly.
+
 ### Initialization
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
-- Loads campaigns on init via `TownModel.loadCampaigns()`
+- Loads campaigns on init via `TownModel.loadCampaigns()` (only when `kTownSheetEnabled`)
 - Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
 
@@ -246,6 +248,8 @@ When switching pages:
 ## Town Screen
 
 > **File**: `lib/ui/screens/town_screen.dart`
+>
+> **Gated by** `kTownSheetEnabled` — the entire Town tab is hidden from navigation when this flag is `false`.
 
 The Town tab for managing game campaigns and parties.
 
@@ -396,7 +400,7 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 ### Chip Nav Bar
 
 `_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets:
-- Labels: General, Quest, Notes, Perks, Masteries (Masteries hidden if class has none)
+- Labels: General, Quest & Notes, Perks, Masteries (Masteries hidden if class has none). When `kPersonalQuestsEnabled` is `false`, the label is just "Notes" instead of "Quest & Notes".
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header

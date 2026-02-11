@@ -7,9 +7,11 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 18
+- **Current Schema Version**: 17 (production) / 18 (with feature flags enabled)
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
+
+> **Conditional schema**: The database version is controlled by feature flags `kTownSheetEnabled` and `kPersonalQuestsEnabled` in `lib/data/constants.dart`. When both are `false` (production), the schema stays at v17. When either is `true`, migration v18 runs to create PersonalQuests, Campaigns, and Parties tables plus new columns on Characters.
 
 ## Tables
 
@@ -142,6 +144,8 @@ Join table linking characters to their mastery achievements.
 
 ---
 
+> **Gated by** `kPersonalQuestsEnabled` — this table only exists when the feature flag is enabled.
+
 ### PersonalQuestsTable
 
 Personal quest definitions seeded from `PersonalQuestsRepository`.
@@ -159,6 +163,8 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 
 ---
 
+> **Gated by** `kTownSheetEnabled` — this table only exists when the feature flag is enabled.
+
 ### Campaigns
 
 Tracks game campaigns with edition-specific prosperity.
@@ -175,6 +181,8 @@ Tracks game campaigns with edition-specific prosperity.
 **Added in**: v18
 
 ---
+
+> **Gated by** `kTownSheetEnabled` — this table only exists when the feature flag is enabled.
 
 ### Parties
 
@@ -280,7 +288,7 @@ Tracks parties within a campaign.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
-| v18 | Personal Quests table, PQ columns on Characters, Campaigns/Parties tables, PartyId on Characters |
+| v18 | Personal Quests table, PQ columns on Characters, Campaigns/Parties tables, PartyId on Characters (**conditional** — only applies when feature flags enabled) |
 
 ### Critical Migrations
 

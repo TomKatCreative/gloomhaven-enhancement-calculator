@@ -1,5 +1,7 @@
 # Personal Quests
 
+> **Feature flag**: `kPersonalQuestsEnabled` in `lib/data/constants.dart` — currently `false`
+
 ## Status: Phase 1 Implemented
 
 Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
@@ -83,6 +85,8 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 ---
 
 ## Town Sheet — Foundation
+
+> **Feature flag**: `kTownSheetEnabled` in `lib/data/constants.dart` — currently `false`
 
 ## Status: Implemented
 
