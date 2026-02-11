@@ -3,28 +3,31 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-/// Displays sanctuary donation progress with +10/+1/-1/-10 stepper controls.
+/// Displays sanctuary donation progress with a Syncfusion slider and ± buttons.
 class SanctuarySection extends StatelessWidget {
   const SanctuarySection({
     super.key,
     required this.campaign,
     required this.isEditMode,
+    required this.onChanged,
     required this.onIncrement,
     required this.onDecrement,
-    required this.onIncrementSmall,
-    required this.onDecrementSmall,
     this.embedded = false,
   });
 
   final Campaign campaign;
   final bool isEditMode;
 
-  /// Returns `true` when the donation just reached [maxDonatedGold].
+  /// Called when the slider is dragged (snaps to 10-gold increments).
+  final ValueChanged<int> onChanged;
+
+  /// Increment by 1 gold. Returns `true` when just reached [maxDonatedGold].
   final Future<bool> Function() onIncrement;
+
+  /// Decrement by 1 gold.
   final VoidCallback onDecrement;
-  final Future<bool> Function() onIncrementSmall;
-  final VoidCallback onDecrementSmall;
 
   /// When true, renders just the inner content without a [SectionCard] wrapper.
   final bool embedded;
@@ -34,10 +37,9 @@ class SanctuarySection extends StatelessWidget {
     final content = _SanctuaryContent(
       campaign: campaign,
       isEditMode: isEditMode,
+      onChanged: onChanged,
       onIncrement: onIncrement,
       onDecrement: onDecrement,
-      onIncrementSmall: onIncrementSmall,
-      onDecrementSmall: onDecrementSmall,
     );
 
     if (embedded) {
@@ -46,7 +48,7 @@ class SanctuarySection extends StatelessWidget {
 
     final l10n = AppLocalizations.of(context);
     return SectionCard(
-      title: l10n.donatedGold,
+      title: l10n.sanctuaryDonations,
       icon: Icons.paid,
       child: content,
     );
@@ -57,101 +59,69 @@ class _SanctuaryContent extends StatelessWidget {
   const _SanctuaryContent({
     required this.campaign,
     required this.isEditMode,
+    required this.onChanged,
     required this.onIncrement,
     required this.onDecrement,
-    required this.onIncrementSmall,
-    required this.onDecrementSmall,
   });
 
   final Campaign campaign;
   final bool isEditMode;
+  final ValueChanged<int> onChanged;
   final Future<bool> Function() onIncrement;
   final VoidCallback onDecrement;
-  final Future<bool> Function() onIncrementSmall;
-  final VoidCallback onDecrementSmall;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final progress = (campaign.donatedGold / maxDonatedGold).clamp(0.0, 1.0);
     final isComplete = campaign.donatedGold >= maxDonatedGold;
+
+    final slider = SfSlider(
+      min: 0.0,
+      max: 100.0,
+      value: campaign.donatedGold.toDouble(),
+      interval: 10,
+      minorTicksPerInterval: 5,
+      stepSize: isEditMode ? 10 : null,
+      showTicks: true,
+      showLabels: true,
+      activeColor: theme.colorScheme.primary,
+      onChanged: isEditMode
+          ? (dynamic value) => onChanged((value as double).round())
+          : (_) {},
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Amount display
-        Row(
-          children: [
-            Text(
-              '${campaign.donatedGold} / $maxDonatedGold ${l10n.gold.toLowerCase()}',
-              style: theme.textTheme.headlineSmall,
+        Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            '${campaign.donatedGold} / $maxDonatedGold',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: isComplete ? theme.colorScheme.primary : null,
             ),
-            const Spacer(),
-            if (isComplete)
-              Icon(
-                Icons.check_circle,
-                size: iconSizeMedium,
-                color: theme.colorScheme.primary,
-              ),
-          ],
-        ),
-        const SizedBox(height: smallPadding),
-        // Progress bar
-        ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadiusSmall),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: smallPadding,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
           ),
         ),
-        // Edit mode stepper: -10, -1, +1, +10
+        const SizedBox(height: smallPadding),
+        // Donation slider — interactive in edit mode, visual-only otherwise
+        if (isEditMode) slider else IgnorePointer(child: slider),
+        // Edit mode ± buttons for fine-grained adjustments
         if (isEditMode) ...[
           const SizedBox(height: mediumPadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-                ),
+              IconButton.filled(
                 onPressed: campaign.donatedGold > 0 ? onDecrement : null,
-                icon: const Icon(Icons.remove, size: iconSizeTiny),
-                label: const Text('10'),
+                icon: const Icon(Icons.remove),
               ),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-                ),
-                onPressed: campaign.donatedGold > 0 ? onDecrementSmall : null,
-                icon: const Icon(Icons.remove, size: iconSizeTiny),
-                label: const Text('1'),
-              ),
-              const SizedBox(width: mediumPadding),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-                ),
-                onPressed: campaign.donatedGold < maxDonatedGold
-                    ? onIncrementSmall
-                    : null,
-                icon: const Icon(Icons.add, size: iconSizeTiny),
-                label: const Text('1'),
-              ),
-              TextButton.icon(
-                style: TextButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-                ),
+              const SizedBox(width: largePadding),
+              IconButton.filled(
                 onPressed: campaign.donatedGold < maxDonatedGold
                     ? onIncrement
                     : null,
-                icon: const Icon(Icons.add, size: iconSizeTiny),
-                label: const Text('10'),
+                icon: const Icon(Icons.add),
               ),
             ],
           ),

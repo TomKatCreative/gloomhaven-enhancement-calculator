@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 
 /// Placeholder achievement labels for the party sheet.
@@ -20,6 +21,7 @@ class PartySection extends StatefulWidget {
     required this.onLocationChanged,
     required this.onNotesChanged,
     required this.onToggleAchievement,
+    this.onNameChanged,
   });
 
   final Party party;
@@ -30,6 +32,7 @@ class PartySection extends StatefulWidget {
   final ValueChanged<String> onLocationChanged;
   final ValueChanged<String> onNotesChanged;
   final ValueChanged<String> onToggleAchievement;
+  final ValueChanged<String>? onNameChanged;
 
   @override
   State<PartySection> createState() => _PartySectionState();
@@ -38,12 +41,15 @@ class PartySection extends StatefulWidget {
 class _PartySectionState extends State<PartySection> {
   late TextEditingController _locationController;
   late TextEditingController _notesController;
+  late TextEditingController _nameController;
+  bool _isEditingName = false;
 
   @override
   void initState() {
     super.initState();
     _locationController = TextEditingController(text: widget.party.location);
     _notesController = TextEditingController(text: widget.party.notes);
+    _nameController = TextEditingController(text: widget.party.name);
   }
 
   @override
@@ -52,6 +58,12 @@ class _PartySectionState extends State<PartySection> {
     if (oldWidget.party.id != widget.party.id) {
       _locationController.text = widget.party.location;
       _notesController.text = widget.party.notes;
+      _nameController.text = widget.party.name;
+      _isEditingName = false;
+    }
+    // Exit name editing when leaving edit mode
+    if (!widget.isEditMode && oldWidget.isEditMode) {
+      _commitNameEdit();
     }
   }
 
@@ -59,7 +71,19 @@ class _PartySectionState extends State<PartySection> {
   void dispose() {
     _locationController.dispose();
     _notesController.dispose();
+    _nameController.dispose();
     super.dispose();
+  }
+
+  void _commitNameEdit() {
+    if (!_isEditingName) return;
+    final trimmed = _nameController.text.trim();
+    if (trimmed.isNotEmpty && trimmed != widget.party.name) {
+      widget.onNameChanged?.call(trimmed);
+    } else {
+      _nameController.text = widget.party.name;
+    }
+    setState(() => _isEditingName = false);
   }
 
   @override
@@ -69,8 +93,41 @@ class _PartySectionState extends State<PartySection> {
 
     return SectionCard(
       title: widget.party.name,
+      titleWidget: _isEditingName
+          ? TextField(
+              controller: _nameController,
+              autofocus: true,
+              textCapitalization: TextCapitalization.words,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.contrastedPrimary,
+              ),
+              decoration: const InputDecoration(
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+                border: InputBorder.none,
+              ),
+              onSubmitted: (_) => _commitNameEdit(),
+            )
+          : null,
       icon: Icons.groups,
-      trailing: widget.trailing,
+      trailing: widget.isEditMode
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(_isEditingName ? Icons.check : Icons.edit_rounded),
+                  onPressed: () {
+                    if (_isEditingName) {
+                      _commitNameEdit();
+                    } else {
+                      setState(() => _isEditingName = true);
+                    }
+                  },
+                ),
+                if (widget.trailing != null) widget.trailing!,
+              ],
+            )
+          : widget.trailing,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

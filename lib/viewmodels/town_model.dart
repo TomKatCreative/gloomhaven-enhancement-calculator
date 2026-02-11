@@ -162,17 +162,32 @@ class TownModel with ChangeNotifier {
 
   // ── Prosperity ──
 
-  /// Increments prosperity checkmarks by 1.
+  /// Increments prosperity checkmarks by 1 (capped at max level threshold).
   Future<void> incrementProsperity() async {
     if (_activeCampaign == null) return;
+    final maxCheckmarks = prosperityThresholds[_activeCampaign!.edition]!.last;
+    if (_activeCampaign!.prosperityCheckmarks >= maxCheckmarks) return;
     _activeCampaign!.prosperityCheckmarks++;
     await databaseHelper.updateCampaign(_activeCampaign!);
     notifyListeners();
   }
 
-  /// Decrements prosperity checkmarks by 1 (minimum 0).
+  /// Sets prosperity checkmarks to the threshold for the given [level] (1–9).
+  ///
+  /// The minimum checkmarks is 1 (a campaign always has at least one).
+  Future<void> setProsperityLevel(int level) async {
+    if (_activeCampaign == null) return;
+    final thresholds = prosperityThresholds[_activeCampaign!.edition]!;
+    final clamped = level.clamp(1, thresholds.length);
+    final checkmarks = thresholds[clamped - 1];
+    _activeCampaign!.prosperityCheckmarks = checkmarks < 1 ? 1 : checkmarks;
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+  }
+
+  /// Decrements prosperity checkmarks by 1 (minimum 1).
   Future<void> decrementProsperity() async {
-    if (_activeCampaign == null || _activeCampaign!.prosperityCheckmarks <= 0) {
+    if (_activeCampaign == null || _activeCampaign!.prosperityCheckmarks <= 1) {
       return;
     }
     _activeCampaign!.prosperityCheckmarks--;
@@ -181,6 +196,19 @@ class TownModel with ChangeNotifier {
   }
 
   // ── Donated Gold ──
+
+  /// Sets donated gold to [value] (clamped 0–[maxDonatedGold]).
+  ///
+  /// Returns `true` when the donation just reached [maxDonatedGold],
+  /// signalling the UI to show the "open envelope B" snackbar.
+  Future<bool> setDonatedGold(int value) async {
+    if (_activeCampaign == null) return false;
+    final wasBelow = _activeCampaign!.donatedGold < maxDonatedGold;
+    _activeCampaign!.donatedGold = value.clamp(0, maxDonatedGold);
+    await databaseHelper.updateCampaign(_activeCampaign!);
+    notifyListeners();
+    return wasBelow && _activeCampaign!.donatedGold >= maxDonatedGold;
+  }
 
   /// Increments donated gold by [amount] (capped at [maxDonatedGold]).
   ///

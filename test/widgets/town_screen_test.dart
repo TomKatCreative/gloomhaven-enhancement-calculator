@@ -31,7 +31,7 @@ void main() {
   }
 
   group('TownScreen party switching', () {
-    group('trailing icon', () {
+    group('trailing icons', () {
       testWidgets('hidden in view mode', (tester) async {
         await townModel.createCampaign(
           name: 'Campaign',
@@ -43,11 +43,11 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.swap_horiz_rounded), findsNothing);
-        expect(find.byIcon(Icons.group_add_rounded), findsNothing);
+        expect(find.byIcon(Icons.edit_rounded), findsNothing);
+        expect(find.byIcon(Icons.more_vert), findsNothing);
       });
 
-      testWidgets('shows group_add icon when only one party exists', (
+      testWidgets('shows edit icon and overflow menu in edit mode', (
         tester,
       ) async {
         await townModel.createCampaign(
@@ -60,45 +60,28 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
+        expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
+        expect(find.byIcon(Icons.more_vert), findsOneWidget);
+      });
+
+      testWidgets('no trailing icons when no parties exist', (tester) async {
+        await townModel.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        townModel.isEditMode = true;
+
+        await tester.pumpWidget(buildTownScreen());
+        await tester.pumpAndSettle();
+
+        expect(find.byIcon(Icons.edit_rounded), findsNothing);
+        // Create party button still visible in empty state
         expect(find.byIcon(Icons.group_add_rounded), findsOneWidget);
-        expect(find.byIcon(Icons.swap_horiz_rounded), findsNothing);
-      });
-
-      testWidgets('shows swap_horiz icon when two or more parties exist', (
-        tester,
-      ) async {
-        await townModel.createCampaign(
-          name: 'Campaign',
-          edition: GameEdition.gloomhaven,
-        );
-        await townModel.createParty(name: 'Party 1');
-        await townModel.createParty(name: 'Party 2');
-        townModel.isEditMode = true;
-
-        await tester.pumpWidget(buildTownScreen());
-        await tester.pumpAndSettle();
-
-        expect(find.byIcon(Icons.swap_horiz_rounded), findsOneWidget);
-        expect(find.byIcon(Icons.group_add_rounded), findsNothing);
-      });
-
-      testWidgets('no trailing icon when no parties exist', (tester) async {
-        await townModel.createCampaign(
-          name: 'Campaign',
-          edition: GameEdition.gloomhaven,
-        );
-        townModel.isEditMode = true;
-
-        await tester.pumpWidget(buildTownScreen());
-        await tester.pumpAndSettle();
-
-        expect(find.byIcon(Icons.swap_horiz_rounded), findsNothing);
-        expect(find.byIcon(Icons.group_add_rounded), findsNothing);
       });
     });
 
-    group('party switcher bottom sheet', () {
-      testWidgets('swap icon opens bottom sheet with party list', (
+    group('party overflow menu', () {
+      testWidgets('switch party opens bottom sheet with party list', (
         tester,
       ) async {
         await townModel.createCampaign(
@@ -112,7 +95,12 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+        // Open overflow menu
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+
+        // Tap "Switch Party"
+        await tester.tap(find.text('Switch'));
         await tester.pumpAndSettle();
 
         // Bottom sheet shows both party names
@@ -129,18 +117,19 @@ void main() {
         );
         await townModel.createParty(name: 'Alpha');
         await townModel.createParty(name: 'Bravo');
-        // Active party is Bravo (last created)
         expect(townModel.activeParty?.name, 'Bravo');
         townModel.isEditMode = true;
 
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        // Open sheet
-        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+        // Open overflow menu → Switch Party
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Switch'));
         await tester.pumpAndSettle();
 
-        // Tap Alpha in the bottom sheet (find ListTile text)
+        // Tap Alpha in the bottom sheet
         final alphaInSheet = find.descendant(
           of: find.byType(ListTile),
           matching: find.text('Alpha'),
@@ -163,7 +152,10 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+        // Open overflow menu → Switch Party
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Switch'));
         await tester.pumpAndSettle();
 
         // "Create" button visible in the sheet header
@@ -183,7 +175,10 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+        // Open overflow menu → Switch Party
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Switch'));
         await tester.pumpAndSettle();
 
         expect(find.text('Alpha'), findsWidgets);

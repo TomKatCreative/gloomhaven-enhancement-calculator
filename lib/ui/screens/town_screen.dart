@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
@@ -65,6 +66,8 @@ class _TownScreenState extends State<TownScreen> {
                       embedded: true,
                       campaign: campaign,
                       isEditMode: townModel.isEditMode,
+                      onLevelChanged: (level) =>
+                          townModel.setProsperityLevel(level),
                       onIncrement: () => townModel.incrementProsperity(),
                       onDecrement: () => townModel.decrementProsperity(),
                     ),
@@ -79,7 +82,7 @@ class _TownScreenState extends State<TownScreen> {
                         ),
                         const SizedBox(width: smallPadding),
                         Text(
-                          l10n.donatedGold,
+                          l10n.sanctuaryDonations,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
                                 color: Theme.of(
@@ -94,9 +97,10 @@ class _TownScreenState extends State<TownScreen> {
                       embedded: true,
                       campaign: campaign,
                       isEditMode: townModel.isEditMode,
-                      onIncrement: () async {
-                        final justCompleted = await townModel
-                            .incrementDonatedGold();
+                      onChanged: (value) async {
+                        final justCompleted = await townModel.setDonatedGold(
+                          value,
+                        );
                         if (justCompleted && context.mounted) {
                           ScaffoldMessenger.of(context)
                             ..clearSnackBars()
@@ -104,10 +108,8 @@ class _TownScreenState extends State<TownScreen> {
                               SnackBar(content: Text(l10n.openEnvelopeB)),
                             );
                         }
-                        return justCompleted;
                       },
-                      onDecrement: () => townModel.decrementDonatedGold(),
-                      onIncrementSmall: () async {
+                      onIncrement: () async {
                         final justCompleted = await townModel
                             .incrementDonatedGold(amount: 1);
                         if (justCompleted && context.mounted) {
@@ -119,7 +121,7 @@ class _TownScreenState extends State<TownScreen> {
                         }
                         return justCompleted;
                       },
-                      onDecrementSmall: () =>
+                      onDecrement: () =>
                           townModel.decrementDonatedGold(amount: 1),
                     ),
                   ],
@@ -137,25 +139,49 @@ class _TownScreenState extends State<TownScreen> {
               party: townModel.activeParty!,
               isEditMode: townModel.isEditMode,
               trailing: townModel.isEditMode
-                  ? townModel.parties.length > 1
-                        ? IconButton(
-                            icon: const Icon(Icons.swap_horiz_rounded),
-                            tooltip: l10n.switchParty,
-                            onPressed: () =>
-                                _showPartySwitcher(context, townModel),
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.group_add_rounded),
-                            tooltip: l10n.createParty,
-                            onPressed: () =>
-                                CreatePartyScreen.show(context, townModel),
-                          )
+                  ? PopupMenuButton<_PartyAction>(
+                      onSelected: (action) {
+                        switch (action) {
+                          case _PartyAction.switchParty:
+                            _showPartySwitcher(context, townModel);
+                          case _PartyAction.deleteParty:
+                            _handleDeleteParty(context, townModel);
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: _PartyAction.switchParty,
+                          child: ListTile(
+                            title: Text(l10n.switchAction),
+                            trailing: const Icon(Icons.swap_horiz_rounded),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: _PartyAction.deleteParty,
+                          child: ListTile(
+                            title: Text(
+                              l10n.delete,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.group_remove_rounded,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
+                    )
                   : null,
               onIncrementReputation: () => townModel.incrementReputation(),
               onDecrementReputation: () => townModel.decrementReputation(),
               onLocationChanged: (v) => townModel.updatePartyLocation(v),
               onNotesChanged: (v) => townModel.updatePartyNotes(v),
               onToggleAchievement: (v) => townModel.toggleAchievement(v),
+              onNameChanged: (v) => townModel.renameParty(v),
             ),
           )
         else
@@ -173,9 +199,10 @@ class _TownScreenState extends State<TownScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: mediumPadding),
-                  FilledButton.tonal(
-                    onPressed: () => CreatePartyScreen.show(context, townModel),
-                    child: Text(l10n.createParty),
+                  FilledButton.tonalIcon(
+                    onPressed: () => CreatePartySheet.show(context, townModel),
+                    icon: const Icon(Icons.group_add_rounded),
+                    label: Text(l10n.createParty),
                   ),
                 ],
               ),
@@ -185,6 +212,28 @@ class _TownScreenState extends State<TownScreen> {
         const SizedBox(height: extraLargePadding),
       ],
     );
+  }
+
+  Future<void> _handleDeleteParty(
+    BuildContext context,
+    TownModel townModel,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final bool? result = await ConfirmationDialog.show(
+      context: context,
+      content: Text(l10n.deletePartyBody),
+      confirmLabel: l10n.delete,
+      cancelLabel: l10n.cancel,
+    );
+
+    if (result == true && context.mounted) {
+      final partyName = townModel.activeParty?.name ?? '';
+      await townModel.deleteActiveParty();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(SnackBar(content: Text('$partyName deleted')));
+    }
   }
 
   void _showPartySwitcher(BuildContext context, TownModel townModel) {
@@ -211,7 +260,7 @@ class _TownScreenState extends State<TownScreen> {
                   TextButton.icon(
                     onPressed: () {
                       Navigator.pop(context);
-                      CreatePartyScreen.show(context, townModel);
+                      CreatePartySheet.show(context, townModel);
                     },
                     icon: const Icon(Icons.add),
                     label: Text(l10n.create),
@@ -243,3 +292,5 @@ class _TownScreenState extends State<TownScreen> {
     );
   }
 }
+
+enum _PartyAction { switchParty, deleteParty }

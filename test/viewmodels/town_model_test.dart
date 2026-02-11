@@ -489,6 +489,35 @@ void main() {
         await model.decrementDonatedGold();
         expect(model.activeCampaign?.donatedGold, 0);
       });
+
+      test('setDonatedGold sets value directly', () async {
+        await model.setDonatedGold(42);
+        expect(model.activeCampaign?.donatedGold, 42);
+      });
+
+      test('setDonatedGold clamps to 0–100', () async {
+        await model.setDonatedGold(-5);
+        expect(model.activeCampaign?.donatedGold, 0);
+        await model.setDonatedGold(200);
+        expect(model.activeCampaign?.donatedGold, maxDonatedGold);
+      });
+
+      test('setDonatedGold returns true when reaching 100', () async {
+        model.activeCampaign!.donatedGold = 50;
+        final result = await model.setDonatedGold(100);
+        expect(result, true);
+      });
+
+      test('setDonatedGold returns false when already at max', () async {
+        model.activeCampaign!.donatedGold = maxDonatedGold;
+        final result = await model.setDonatedGold(100);
+        expect(result, false);
+      });
+
+      test('setDonatedGold returns false when not reaching max', () async {
+        final result = await model.setDonatedGold(50);
+        expect(result, false);
+      });
     });
 
     group('isEditMode', () {

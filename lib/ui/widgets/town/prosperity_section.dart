@@ -3,6 +3,31 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
+
+/// Converts prosperity checkmarks to a slider position (1.0–9.0).
+///
+/// Within a level bracket, interpolates linearly so the thumb shows
+/// proportional progress toward the next level.
+double _checkmarksToSliderValue(int checkmarks, List<int> thresholds) {
+  // Find which bracket we're in
+  int level = 1;
+  for (int i = thresholds.length - 1; i >= 0; i--) {
+    if (checkmarks >= thresholds[i]) {
+      level = i + 1;
+      break;
+    }
+  }
+
+  // At max level, return max
+  if (level >= thresholds.length) return thresholds.length.toDouble();
+
+  final bracketStart = thresholds[level - 1];
+  final bracketEnd = thresholds[level];
+  final fraction = (checkmarks - bracketStart) / (bracketEnd - bracketStart);
+
+  return level + fraction;
+}
 
 /// Displays prosperity level with checkmark progress and edit controls.
 class ProsperitySection extends StatelessWidget {
@@ -10,6 +35,7 @@ class ProsperitySection extends StatelessWidget {
     super.key,
     required this.campaign,
     required this.isEditMode,
+    required this.onLevelChanged,
     required this.onIncrement,
     required this.onDecrement,
     this.embedded = false,
@@ -17,6 +43,7 @@ class ProsperitySection extends StatelessWidget {
 
   final Campaign campaign;
   final bool isEditMode;
+  final ValueChanged<int> onLevelChanged;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
 
@@ -28,6 +55,7 @@ class ProsperitySection extends StatelessWidget {
     final content = _ProsperityContent(
       campaign: campaign,
       isEditMode: isEditMode,
+      onLevelChanged: onLevelChanged,
       onIncrement: onIncrement,
       onDecrement: onDecrement,
     );
@@ -49,12 +77,14 @@ class _ProsperityContent extends StatelessWidget {
   const _ProsperityContent({
     required this.campaign,
     required this.isEditMode,
+    required this.onLevelChanged,
     required this.onIncrement,
     required this.onDecrement,
   });
 
   final Campaign campaign;
   final bool isEditMode;
+  final ValueChanged<int> onLevelChanged;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
 
@@ -62,17 +92,25 @@ class _ProsperityContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final nextLevel = campaign.checkmarksForNextLevel;
-    final currentThreshold = campaign.checkmarksForCurrentLevel;
+    final thresholds = prosperityThresholds[campaign.edition]!;
+    final sliderValue = _checkmarksToSliderValue(
+      campaign.prosperityCheckmarks,
+      thresholds,
+    );
 
-    // Progress within the current level bracket
-    final progressInBracket = nextLevel != null
-        ? (campaign.prosperityCheckmarks - currentThreshold)
-        : 0;
-    final bracketSize = nextLevel != null ? (nextLevel - currentThreshold) : 1;
-    final progress = nextLevel != null
-        ? (progressInBracket / bracketSize).clamp(0.0, 1.0)
-        : 1.0;
+    final slider = SfSlider(
+      min: 1.0,
+      max: 9.0,
+      value: sliderValue,
+      interval: 1,
+      stepSize: isEditMode ? 1 : null,
+      showTicks: true,
+      showLabels: true,
+      activeColor: theme.colorScheme.primary,
+      onChanged: isEditMode
+          ? (dynamic value) => onLevelChanged((value as double).round())
+          : (_) {},
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,47 +124,33 @@ class _ProsperityContent extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              '${campaign.prosperityCheckmarks} ${l10n.checkmarks}',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+              '${campaign.prosperityCheckmarks} / ${thresholds.last}',
+              style: theme.textTheme.bodySmall,
             ),
           ],
         ),
         const SizedBox(height: smallPadding),
-        // Progress bar toward next level
-        ClipRRect(
-          borderRadius: BorderRadius.circular(borderRadiusSmall),
-          child: LinearProgressIndicator(
-            value: progress,
-            minHeight: smallPadding,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-          ),
-        ),
-        if (nextLevel != null) ...[
-          const SizedBox(height: tinyPadding),
-          Text(
-            '${campaign.prosperityCheckmarks}/$nextLevel',
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-        // Edit mode stepper
+        // Prosperity slider — interactive in edit mode, visual-only otherwise
+        if (isEditMode) slider else IgnorePointer(child: slider),
+        // Edit mode stepper for fine-grained checkmark adjustments
         if (isEditMode) ...[
           const SizedBox(height: mediumPadding),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton.filled(
-                onPressed: campaign.prosperityCheckmarks > 0
+                onPressed: campaign.prosperityCheckmarks > 1
                     ? onDecrement
                     : null,
                 icon: const Icon(Icons.remove),
               ),
               const SizedBox(width: largePadding),
               IconButton.filled(
-                onPressed: onIncrement,
+                onPressed:
+                    campaign.prosperityCheckmarks <
+                        prosperityThresholds[campaign.edition]!.last
+                    ? onIncrement
+                    : null,
                 icon: const Icon(Icons.add),
               ),
             ],
