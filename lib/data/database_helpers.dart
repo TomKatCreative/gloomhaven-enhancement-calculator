@@ -375,6 +375,9 @@ class DatabaseHelper implements IDatabaseHelper {
     }
 
     for (var i = 0; i < json[0].length; i++) {
+      // Skip tables that don't exist in the current schema
+      if (!tables.contains(json[0][i])) continue;
+
       for (var k = 0; k < json[1][i].length; k++) {
         // This handles the case where a user tries to restore a backup
         // from a database version before 7 (Resources), 18 (Personal Quests),
@@ -389,10 +392,20 @@ class DatabaseHelper implements IDatabaseHelper {
           json[1][i][k][columnResourceFlamefruit] ??= 0;
           json[1][i][k][columnResourceCorpsecap] ??= 0;
           json[1][i][k][columnResourceSnowthistle] ??= 0;
-          json[1][i][k][columnCharacterPersonalQuestId] ??= '';
-          json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
-          // PartyId is nullable, no default needed — just ensure key exists
-          json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
+          if (kPersonalQuestsEnabled) {
+            json[1][i][k][columnCharacterPersonalQuestId] ??= '';
+            json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
+          } else {
+            // Strip columns that don't exist in the current schema
+            json[1][i][k].remove(columnCharacterPersonalQuestId);
+            json[1][i][k].remove(columnCharacterPersonalQuestProgress);
+          }
+          if (kTownSheetEnabled) {
+            // PartyId is nullable, no default needed — just ensure key exists
+            json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
+          } else {
+            json[1][i][k].remove(columnCharacterPartyId);
+          }
         }
 
         // Default missing party detail columns (added in v19)
