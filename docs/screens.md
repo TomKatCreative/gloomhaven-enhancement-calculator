@@ -17,7 +17,7 @@ await CreateCharacterScreen.show(context, charactersModel);
 
 1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
 2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
-3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected.
+3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected (no form validator needed). Create button uses `theme.contrastedPrimary` for contrast-aware coloring.
 4. **Personal Quest** — *(gated by `kPersonalQuestsEnabled`)* Read-only field that opens PQ selector dialog. Only enabled for Gloomhaven edition; dimmed with "Coming soon" hint for other editions.
 5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
 6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
@@ -363,15 +363,15 @@ Displays and edits a single character's stats, perks, masteries, and resources. 
 
 ### Architecture
 
-Uses a `CustomScrollView` with slivers for efficient scrolling and pinned headers:
+Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with slivers for efficient scrolling and pinned headers. The background icon extends through both the header and chip nav bar, fading as the header collapses. A `ListenableBuilder` with a `ValueNotifier<double>` isolates icon opacity rebuilds from the rest of the widget tree.
 
 ```
 ┌─────────────────────────────────────┐
-│ Character Name          [Lvl Badge] │  ← SliverPersistentHeader (pinned)
-│ Class Name • (retired)              │     Collapses from 160px → 56px
+│ Character Name    [class icon bg]   │  ← SliverPersistentHeader (pinned)
+│ Class Name • (retired)              │     Collapses from 180px → 56px
 ├─────────────────────────────────────┤
 │ [General] [Quest] [Notes] [Perks]   │  ← SliverPersistentHeader (pinned)
-│                           [Master.] │     Chip nav bar with scroll-spy
+│             [class icon extends ↓]  │     Transparent when not overlapping
 ├─────────────────────────────────────┤
 │ ▼ General (collapsible)             │  ← CollapsibleSectionCard
 │   XP: 45/95    Gold: 120            │
@@ -396,10 +396,10 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 ### Pinned Header
 
 `_CharacterHeaderDelegate` — a `SliverPersistentHeaderDelegate` that:
-- Expands to 160px (name, class info, traits, level badge, faded class icon background)
+- Expands to 180px (name, class info, traits, level badge, faded class icon background)
 - Collapses to 56px (name only) on scroll
-- In edit mode with non-retired character: stays at max height (name `TextFormField`)
-- Elevation increases with scroll progress
+- In edit mode with non-retired character: stays at 90px (name `TextFormField`)
+- Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
 
 ### Chip Nav Bar
 
@@ -408,6 +408,7 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
+- **Transparent background** when not overlapping content (lets Stack background icon show through); switches to opaque `surface` with drop shadow when content scrolls behind it
 
 ### Section Cards
 

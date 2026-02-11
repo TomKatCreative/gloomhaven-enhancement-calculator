@@ -53,6 +53,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
   _Section _activeSection = _Section.general;
 
   late ScrollController _scrollController;
+  final ValueNotifier<double> _scrollOffsetNotifier = ValueNotifier(0.0);
   bool _isScrollSpyEnabled = true;
 
   @override
@@ -67,10 +68,14 @@ class _CharacterScreenState extends State<CharacterScreen> {
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
+    _scrollOffsetNotifier.dispose();
     super.dispose();
   }
 
   void _onScroll() {
+    // Guard against brief multi-attachment during character transitions
+    if (_scrollController.positions.length != 1) return;
+    _scrollOffsetNotifier.value = _scrollController.offset;
     if (!_isScrollSpyEnabled) return;
     _updateActiveSection();
   }
@@ -165,108 +170,144 @@ class _CharacterScreenState extends State<CharacterScreen> {
         : _baseFabPadding;
 
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
+    final theme = Theme.of(context);
 
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        // PINNED HEADER: Character name, level, class
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _CharacterHeaderDelegate(
-            character: widget.character,
-            isEditMode: model.isEditMode,
-          ),
-        ),
-        // CHIP NAV BAR
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _SectionNavBarDelegate(
-            character: widget.character,
-            activeSection: _activeSection,
-            onSectionTapped: _scrollToSection,
-            hasMasteries: hasMasteries,
-          ),
-        ),
-        // GENERAL CARD (stats + resources)
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                smallPadding,
-                mediumPadding,
-                smallPadding,
-                smallPadding,
-              ),
-              child: CollapsibleSectionCard(
-                sectionKey: _sectionKeys[_Section.general],
-                title: kTownSheetEnabled
-                    ? AppLocalizations.of(context).general
-                    : AppLocalizations.of(context).stats,
-                icon: Icons.bar_chart_rounded,
-                initiallyExpanded: SharedPrefs().generalExpanded,
-                onExpansionChanged: (value) =>
-                    SharedPrefs().generalExpanded = value,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      largePadding,
-                      0,
-                      largePadding,
-                      largePadding,
-                    ),
-                    child: Column(
-                      children: [
-                        if (kTownSheetEnabled) ...[
-                          _PartyAssignmentRow(character: widget.character),
-                          const Divider(height: largePadding * 2),
-                        ],
-                        _StatsSection(character: widget.character),
-                        if (model.isEditMode &&
-                            !widget.character.isRetired) ...[
-                          SizedBox(height: largePadding),
-                          _CheckmarksAndRetirementsRow(
-                            character: widget.character,
-                          ),
-                        ],
-                        const Divider(height: largePadding * 2),
-                        _ResourcesContent(character: widget.character),
-                      ],
-                    ),
-                  ),
-                ],
+    return Stack(
+      children: [
+        // Background class icon — extends through transparent header and nav bar
+        Positioned(
+          right: -32,
+          top: -45,
+          height: _CharacterHeaderDelegate._maxHeight + chipBarHeight + 75,
+          width: 260,
+          child: ListenableBuilder(
+            listenable: _scrollOffsetNotifier,
+            child: ClassIconSvg(
+              playerClass: widget.character.playerClass,
+              color: ColorUtils.ensureContrast(
+                widget.character.getEffectiveColor(theme.brightness),
+                theme.colorScheme.surface,
               ),
             ),
+            builder: (context, child) {
+              final range = model.isEditMode && !widget.character.isRetired
+                  ? 0.0
+                  : _CharacterHeaderDelegate._maxHeight -
+                        _CharacterHeaderDelegate._minHeight;
+              final offset = _scrollOffsetNotifier.value;
+              final progress = range > 0
+                  ? (offset / range).clamp(0.0, 1.0)
+                  : 0.0;
+              return Opacity(
+                opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
+                child: child,
+              );
+            },
           ),
         ),
-        // QUEST & NOTES CARD
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: _QuestAndNotesCollapsibleCard(
-                sectionKey: _sectionKeys[_Section.questAndNotes],
-                notesKey: _notesKey,
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // PINNED HEADER: Character name, level, class
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _CharacterHeaderDelegate(
                 character: widget.character,
+                isEditMode: model.isEditMode,
               ),
             ),
-          ),
-        ),
-        // PERKS & MASTERIES CARD
-        SliverToBoxAdapter(
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(smallPadding),
-              child: _PerksAndMasteriesCard(
-                sectionKey: _sectionKeys[_Section.perksAndMasteries],
-                masteriesKey: _masteriesKey,
+            // CHIP NAV BAR
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SectionNavBarDelegate(
                 character: widget.character,
+                activeSection: _activeSection,
+                onSectionTapped: _scrollToSection,
                 hasMasteries: hasMasteries,
               ),
             ),
-          ),
+            // GENERAL CARD (stats + resources)
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    smallPadding,
+                    mediumPadding,
+                    smallPadding,
+                    smallPadding,
+                  ),
+                  child: CollapsibleSectionCard(
+                    sectionKey: _sectionKeys[_Section.general],
+                    title: kTownSheetEnabled
+                        ? AppLocalizations.of(context).general
+                        : AppLocalizations.of(context).stats,
+                    icon: Icons.bar_chart_rounded,
+                    initiallyExpanded: SharedPrefs().generalExpanded,
+                    onExpansionChanged: (value) =>
+                        SharedPrefs().generalExpanded = value,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          largePadding,
+                          0,
+                          largePadding,
+                          largePadding,
+                        ),
+                        child: Column(
+                          children: [
+                            if (kTownSheetEnabled) ...[
+                              _PartyAssignmentRow(character: widget.character),
+                              const Divider(height: largePadding * 2),
+                            ],
+                            _StatsSection(character: widget.character),
+                            if (model.isEditMode &&
+                                !widget.character.isRetired) ...[
+                              SizedBox(height: largePadding),
+                              _CheckmarksAndRetirementsRow(
+                                character: widget.character,
+                              ),
+                            ],
+                            const Divider(height: largePadding * 2),
+                            _ResourcesContent(character: widget.character),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // QUEST & NOTES CARD
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(smallPadding),
+                  child: _QuestAndNotesCollapsibleCard(
+                    sectionKey: _sectionKeys[_Section.questAndNotes],
+                    notesKey: _notesKey,
+                    character: widget.character,
+                  ),
+                ),
+              ),
+            ),
+            // PERKS & MASTERIES CARD
+            SliverToBoxAdapter(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(smallPadding),
+                  child: _PerksAndMasteriesCard(
+                    sectionKey: _sectionKeys[_Section.perksAndMasteries],
+                    masteriesKey: _masteriesKey,
+                    character: widget.character,
+                    hasMasteries: hasMasteries,
+                  ),
+                ),
+              ),
+            ),
+            // BOTTOM PADDING
+            SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+          ],
         ),
-        // BOTTOM PADDING
-        SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
       ],
     );
   }
@@ -314,12 +355,12 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Faded class icon background
+            // Faded class icon background (matches Stack icon position/size)
             Positioned(
-              right: -25,
-              top: -25,
-              height: maxExtent + 50,
-              width: 225,
+              right: -32,
+              top: -45,
+              height: _CharacterHeaderDelegate._maxHeight + chipBarHeight + 75,
+              width: 260,
               child: Opacity(
                 opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
                 child: ClassIconSvg(
@@ -534,7 +575,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     return Container(
       height: chipBarHeight,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: overlapsContent ? theme.colorScheme.surface : Colors.transparent,
         boxShadow: overlapsContent
             ? [
                 BoxShadow(
