@@ -195,6 +195,31 @@ Where L = starting level, P = prosperity level.
 - One-time reads use `context.read<Model>()`
 - Complex widgets are StatefulWidget with local controllers
 
+### Popup Menus
+
+All `PopupMenuButton` items use `ListTile` with **text on the left** (`title`) and **icon on the right** (`trailing`). This keeps menu text aligned to the start for readability.
+
+```dart
+// ✅ Correct - text left, icon right
+PopupMenuItem(
+  value: MyAction.doSomething,
+  child: ListTile(
+    title: Text(l10n.doSomething),
+    trailing: const Icon(Icons.arrow_forward),
+    contentPadding: EdgeInsets.zero,
+  ),
+),
+
+// ❌ Wrong - icon left, text right
+PopupMenuItem(
+  child: ListTile(
+    leading: const Icon(Icons.arrow_forward),
+    title: Text(l10n.doSomething),
+    ...
+  ),
+),
+```
+
 ### Design Constants (IMPORTANT)
 
 **NEVER hardcode pixel values for padding, icon sizes, border radii, or animation durations.** Always use the constants defined in `lib/data/constants.dart`. This ensures visual consistency and makes future adjustments easy.

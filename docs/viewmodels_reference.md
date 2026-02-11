@@ -413,8 +413,17 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 
 | Method | Description |
 |--------|-------------|
+| `setProsperityLevel(int level)` | Set checkmarks to the threshold for the given level (1–9) |
 | `incrementProsperity()` | Add one checkmark (up to max threshold) |
-| `decrementProsperity()` | Remove one checkmark (min 0) |
+| `decrementProsperity()` | Remove one checkmark (min 1) |
+
+### Donated Gold Methods
+
+| Method | Description |
+|--------|-------------|
+| `setDonatedGold(int value)` | Set donated gold directly (clamped 0–100); returns `true` when just reaching 100 |
+| `incrementDonatedGold({int amount})` | Add gold (default 10, capped at 100); returns `true` when just reaching 100 |
+| `decrementDonatedGold({int amount})` | Remove gold (default 10, min 0) |
 
 ### Party Methods
 
