@@ -364,7 +364,10 @@ class CharactersModel with ChangeNotifier {
       playerClass: selectedClass,
       previousRetirements: previousRetirements,
       xp: PlayerClasses.xpByLevel(initialLevel),
-      gold: _calculateStartingGold(edition, initialLevel, prosperityLevel),
+      gold: edition.startingGold(
+        level: initialLevel,
+        prosperityLevel: prosperityLevel,
+      ),
       variant: variant,
       personalQuestId: pqId,
       personalQuestProgress: pqProgress,
@@ -381,26 +384,6 @@ class CharactersModel with ChangeNotifier {
     }
     _setCurrentCharacter(index: characters.indexOf(character));
     notifyListeners();
-  }
-
-  /// Calculate starting gold based on game edition rules.
-  ///
-  /// - Gloomhaven: 15 × (L + 1), where L is starting level
-  /// - Gloomhaven 2e: 10 × P + 15, where P is prosperity level
-  /// - Frosthaven: 10 × P + 20, where P is prosperity level
-  int _calculateStartingGold(
-    GameEdition edition,
-    int startingLevel,
-    int prosperityLevel,
-  ) {
-    switch (edition) {
-      case GameEdition.gloomhaven:
-        return 15 * (startingLevel + 1);
-      case GameEdition.gloomhaven2e:
-        return 10 * prosperityLevel + 15;
-      case GameEdition.frosthaven:
-        return 10 * prosperityLevel + 20;
-    }
   }
 
   Future<void> deleteCurrentCharacter() async {
