@@ -138,6 +138,12 @@ class SharedPrefs {
   set townDetailsExpanded(bool value) =>
       _sharedPrefs.setBool('townDetailsExpanded', value);
 
+  bool get partyDetailsExpanded =>
+      _sharedPrefs.getBool('partyDetailsExpanded') ?? true;
+
+  set partyDetailsExpanded(bool value) =>
+      _sharedPrefs.setBool('partyDetailsExpanded', value);
+
   int get targetCardLvl => _sharedPrefs.getInt('targetCardLvl') ?? 0;
 
   set targetCardLvl(int value) => _sharedPrefs.setInt('targetCardLvl', value);

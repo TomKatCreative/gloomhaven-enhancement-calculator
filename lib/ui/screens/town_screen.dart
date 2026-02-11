@@ -138,44 +138,18 @@ class _TownScreenState extends State<TownScreen> {
             child: PartySection(
               party: townModel.activeParty!,
               isEditMode: townModel.isEditMode,
-              trailing: townModel.isEditMode
-                  ? PopupMenuButton<_PartyAction>(
-                      onSelected: (action) {
-                        switch (action) {
-                          case _PartyAction.switchParty:
-                            _showPartySwitcher(context, townModel);
-                          case _PartyAction.deleteParty:
-                            _handleDeleteParty(context, townModel);
-                        }
-                      },
-                      itemBuilder: (_) => [
-                        PopupMenuItem(
-                          value: _PartyAction.switchParty,
-                          child: ListTile(
-                            title: Text(l10n.switchAction),
-                            trailing: const Icon(Icons.swap_horiz_rounded),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: _PartyAction.deleteParty,
-                          child: ListTile(
-                            title: Text(
-                              l10n.delete,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                            ),
-                            trailing: Icon(
-                              Icons.group_remove_rounded,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                        ),
-                      ],
-                    )
-                  : null,
+              initiallyExpanded: SharedPrefs().partyDetailsExpanded,
+              onExpansionChanged: (v) => SharedPrefs().partyDetailsExpanded = v,
+              onMenuAction: (action) {
+                switch (action) {
+                  case PartyAction.rename:
+                    break; // Handled internally by PartySection
+                  case PartyAction.switchParty:
+                    _showPartySwitcher(context, townModel);
+                  case PartyAction.deleteParty:
+                    _handleDeleteParty(context, townModel);
+                }
+              },
               onIncrementReputation: () => townModel.incrementReputation(),
               onDecrementReputation: () => townModel.decrementReputation(),
               onLocationChanged: (v) => townModel.updatePartyLocation(v),
@@ -292,5 +266,3 @@ class _TownScreenState extends State<TownScreen> {
     );
   }
 }
-
-enum _PartyAction { switchParty, deleteParty }

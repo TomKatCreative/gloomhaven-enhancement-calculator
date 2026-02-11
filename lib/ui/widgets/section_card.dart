@@ -97,6 +97,7 @@ class CollapsibleSectionCard extends StatefulWidget {
   const CollapsibleSectionCard({
     super.key,
     required this.title,
+    this.titleWidget,
     this.icon,
     required this.initiallyExpanded,
     required this.onExpansionChanged,
@@ -107,6 +108,9 @@ class CollapsibleSectionCard extends StatefulWidget {
   });
 
   final String title;
+
+  /// Optional widget that replaces the default [Text] title.
+  final Widget? titleWidget;
   final IconData? icon;
   final bool initiallyExpanded;
   final ValueChanged<bool> onExpansionChanged;
@@ -158,12 +162,14 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                 const SizedBox(width: smallPadding),
               ],
               Flexible(
-                child: Text(
-                  widget.title,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    color: primaryColor,
-                  ),
-                ),
+                child:
+                    widget.titleWidget ??
+                    Text(
+                      widget.title,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: primaryColor,
+                      ),
+                    ),
               ),
               if (widget.trailing != null) ...[
                 const SizedBox(width: smallPadding),

@@ -8,6 +8,9 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 /// Placeholder achievement labels for the party sheet.
 const _achievementLabels = ['Achievement 1', 'Achievement 2', 'Achievement 3'];
 
+/// Actions available in the party overflow menu.
+enum PartyAction { rename, switchParty, deleteParty }
+
 /// Displays party info: reputation tracker, shop price modifier,
 /// scenario location, notes, and achievements.
 class PartySection extends StatefulWidget {
@@ -15,7 +18,9 @@ class PartySection extends StatefulWidget {
     super.key,
     required this.party,
     required this.isEditMode,
-    this.trailing,
+    required this.initiallyExpanded,
+    required this.onExpansionChanged,
+    required this.onMenuAction,
     required this.onIncrementReputation,
     required this.onDecrementReputation,
     required this.onLocationChanged,
@@ -26,7 +31,9 @@ class PartySection extends StatefulWidget {
 
   final Party party;
   final bool isEditMode;
-  final Widget? trailing;
+  final bool initiallyExpanded;
+  final ValueChanged<bool> onExpansionChanged;
+  final ValueChanged<PartyAction> onMenuAction;
   final VoidCallback onIncrementReputation;
   final VoidCallback onDecrementReputation;
   final ValueChanged<String> onLocationChanged;
@@ -86,13 +93,21 @@ class _PartySectionState extends State<PartySection> {
     setState(() => _isEditingName = false);
   }
 
+  void _handleMenuAction(PartyAction action) {
+    if (action == PartyAction.rename) {
+      setState(() => _isEditingName = true);
+    } else {
+      widget.onMenuAction(action);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
-    return SectionCard(
-      title: widget.party.name,
+    return CollapsibleSectionCard(
+      title: _isEditingName ? '' : widget.party.name,
       titleWidget: _isEditingName
           ? TextField(
               controller: _nameController,
@@ -101,148 +116,184 @@ class _PartySectionState extends State<PartySection> {
               style: theme.textTheme.titleLarge?.copyWith(
                 color: theme.contrastedPrimary,
               ),
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
                 border: InputBorder.none,
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: _commitNameEdit,
+                ),
+                suffixIconConstraints: const BoxConstraints(),
               ),
               onSubmitted: (_) => _commitNameEdit(),
             )
           : null,
       icon: Icons.groups,
+      initiallyExpanded: widget.initiallyExpanded,
+      onExpansionChanged: widget.onExpansionChanged,
       trailing: widget.isEditMode
-          ? Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(_isEditingName ? Icons.check : Icons.edit_rounded),
-                  onPressed: () {
-                    if (_isEditingName) {
-                      _commitNameEdit();
-                    } else {
-                      setState(() => _isEditingName = true);
-                    }
-                  },
+          ? PopupMenuButton<PartyAction>(
+              onSelected: _handleMenuAction,
+              itemBuilder: (_) => [
+                PopupMenuItem(
+                  value: PartyAction.rename,
+                  child: ListTile(
+                    title: Text(l10n.renameParty),
+                    trailing: const Icon(Icons.edit_rounded),
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
-                if (widget.trailing != null) widget.trailing!,
+                PopupMenuItem(
+                  value: PartyAction.switchParty,
+                  child: ListTile(
+                    title: Text(l10n.switchAction),
+                    trailing: const Icon(Icons.swap_horiz_rounded),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                PopupMenuItem(
+                  value: PartyAction.deleteParty,
+                  child: ListTile(
+                    title: Text(
+                      l10n.delete,
+                      style: TextStyle(color: theme.colorScheme.error),
+                    ),
+                    trailing: Icon(
+                      Icons.group_remove_rounded,
+                      color: theme.colorScheme.error,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               ],
             )
-          : widget.trailing,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Reputation display with shop price modifier
-          Row(
+          : null,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            largePadding,
+            0,
+            largePadding,
+            largePadding,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.reputation, style: theme.textTheme.titleMedium),
-              const Spacer(),
-              _ShopPriceLabel(
-                modifier: widget.party.shopPriceModifier,
-                label: l10n.shopPriceModifier,
-                theme: theme,
+              // Reputation display with shop price modifier
+              Row(
+                children: [
+                  Text(l10n.reputation, style: theme.textTheme.titleMedium),
+                  const Spacer(),
+                  _ShopPriceLabel(
+                    modifier: widget.party.shopPriceModifier,
+                    label: l10n.shopPriceModifier,
+                    theme: theme,
+                  ),
+                  const SizedBox(width: largePadding),
+                  Text(
+                    _formatReputation(widget.party.reputation),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: _reputationColor(widget.party.reputation, theme),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: largePadding),
-              Text(
-                _formatReputation(widget.party.reputation),
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: _reputationColor(widget.party.reputation, theme),
+              // Edit mode stepper
+              if (widget.isEditMode) ...[
+                const SizedBox(height: mediumPadding),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton.filled(
+                      onPressed: widget.party.reputation > minReputation
+                          ? widget.onDecrementReputation
+                          : null,
+                      icon: const Icon(Icons.remove),
+                    ),
+                    const SizedBox(width: largePadding),
+                    IconButton.filled(
+                      onPressed: widget.party.reputation < maxReputation
+                          ? widget.onIncrementReputation
+                          : null,
+                      icon: const Icon(Icons.add),
+                    ),
+                  ],
                 ),
+              ],
+              const Divider(height: extraLargePadding),
+              // Scenario location
+              if (widget.isEditMode)
+                TextFormField(
+                  controller: _locationController,
+                  decoration: InputDecoration(
+                    labelText: l10n.scenarioLocation,
+                    border: const OutlineInputBorder(),
+                  ),
+                  onChanged: widget.onLocationChanged,
+                )
+              else if (widget.party.location.isNotEmpty) ...[
+                Text(
+                  l10n.scenarioLocation,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: tinyPadding),
+                Text(widget.party.location, style: theme.textTheme.bodyLarge),
+              ],
+              // Party notes
+              if (widget.isEditMode) ...[
+                const SizedBox(height: largePadding),
+                TextFormField(
+                  controller: _notesController,
+                  decoration: InputDecoration(
+                    labelText: l10n.partyNotes,
+                    hintText: l10n.addPartyNotes,
+                    border: const OutlineInputBorder(),
+                  ),
+                  maxLines: null,
+                  minLines: 2,
+                  onChanged: widget.onNotesChanged,
+                ),
+              ] else if (widget.party.notes.isNotEmpty) ...[
+                const SizedBox(height: mediumPadding),
+                Text(
+                  l10n.partyNotes,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: tinyPadding),
+                Text(widget.party.notes, style: theme.textTheme.bodyMedium),
+              ],
+              // Achievements
+              const SizedBox(height: mediumPadding),
+              Text(
+                l10n.achievements,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: smallPadding),
+              Wrap(
+                spacing: smallPadding,
+                runSpacing: tinyPadding,
+                children: _achievementLabels.map((label) {
+                  final selected = widget.party.achievements.contains(label);
+                  return FilterChip(
+                    label: Text(label),
+                    selected: selected,
+                    onSelected: widget.isEditMode
+                        ? (_) => widget.onToggleAchievement(label)
+                        : null,
+                  );
+                }).toList(),
               ),
             ],
           ),
-          // Edit mode stepper
-          if (widget.isEditMode) ...[
-            const SizedBox(height: mediumPadding),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton.filled(
-                  onPressed: widget.party.reputation > minReputation
-                      ? widget.onDecrementReputation
-                      : null,
-                  icon: const Icon(Icons.remove),
-                ),
-                const SizedBox(width: largePadding),
-                IconButton.filled(
-                  onPressed: widget.party.reputation < maxReputation
-                      ? widget.onIncrementReputation
-                      : null,
-                  icon: const Icon(Icons.add),
-                ),
-              ],
-            ),
-          ],
-          const Divider(height: extraLargePadding),
-          // Scenario location
-          if (widget.isEditMode)
-            TextFormField(
-              controller: _locationController,
-              decoration: InputDecoration(
-                labelText: l10n.scenarioLocation,
-                border: const OutlineInputBorder(),
-              ),
-              onChanged: widget.onLocationChanged,
-            )
-          else if (widget.party.location.isNotEmpty) ...[
-            Text(
-              l10n.scenarioLocation,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: tinyPadding),
-            Text(widget.party.location, style: theme.textTheme.bodyLarge),
-          ],
-          // Party notes
-          if (widget.isEditMode) ...[
-            const SizedBox(height: largePadding),
-            TextFormField(
-              controller: _notesController,
-              decoration: InputDecoration(
-                labelText: l10n.partyNotes,
-                hintText: l10n.addPartyNotes,
-                border: const OutlineInputBorder(),
-              ),
-              maxLines: null,
-              minLines: 2,
-              onChanged: widget.onNotesChanged,
-            ),
-          ] else if (widget.party.notes.isNotEmpty) ...[
-            const SizedBox(height: mediumPadding),
-            Text(
-              l10n.partyNotes,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: tinyPadding),
-            Text(widget.party.notes, style: theme.textTheme.bodyMedium),
-          ],
-          // Achievements
-          const SizedBox(height: mediumPadding),
-          Text(
-            l10n.achievements,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: smallPadding),
-          Wrap(
-            spacing: smallPadding,
-            runSpacing: tinyPadding,
-            children: _achievementLabels.map((label) {
-              final selected = widget.party.achievements.contains(label);
-              return FilterChip(
-                label: Text(label),
-                selected: selected,
-                onSelected: widget.isEditMode
-                    ? (_) => widget.onToggleAchievement(label)
-                    : null,
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

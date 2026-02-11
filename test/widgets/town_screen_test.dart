@@ -31,7 +31,7 @@ void main() {
   }
 
   group('TownScreen party switching', () {
-    group('trailing icons', () {
+    group('overflow menu visibility', () {
       testWidgets('hidden in view mode', (tester) async {
         await townModel.createCampaign(
           name: 'Campaign',
@@ -43,13 +43,10 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.edit_rounded), findsNothing);
         expect(find.byIcon(Icons.more_vert), findsNothing);
       });
 
-      testWidgets('shows edit icon and overflow menu in edit mode', (
-        tester,
-      ) async {
+      testWidgets('shows overflow menu in edit mode', (tester) async {
         await townModel.createCampaign(
           name: 'Campaign',
           edition: GameEdition.gloomhaven,
@@ -60,11 +57,10 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
         expect(find.byIcon(Icons.more_vert), findsOneWidget);
       });
 
-      testWidgets('no trailing icons when no parties exist', (tester) async {
+      testWidgets('no overflow menu when no parties exist', (tester) async {
         await townModel.createCampaign(
           name: 'Campaign',
           edition: GameEdition.gloomhaven,
@@ -74,7 +70,7 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.edit_rounded), findsNothing);
+        expect(find.byIcon(Icons.more_vert), findsNothing);
         // Create party button still visible in empty state
         expect(find.byIcon(Icons.group_add_rounded), findsOneWidget);
       });
@@ -99,7 +95,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
 
-        // Tap "Switch Party"
+        // Tap "Switch"
         await tester.tap(find.text('Switch'));
         await tester.pumpAndSettle();
 
@@ -123,7 +119,7 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        // Open overflow menu → Switch Party
+        // Open overflow menu → Switch
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Switch'));
@@ -152,7 +148,7 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        // Open overflow menu → Switch Party
+        // Open overflow menu → Switch
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Switch'));
@@ -175,7 +171,7 @@ void main() {
         await tester.pumpWidget(buildTownScreen());
         await tester.pumpAndSettle();
 
-        // Open overflow menu → Switch Party
+        // Open overflow menu → Switch
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Switch'));
@@ -184,6 +180,25 @@ void main() {
         expect(find.text('Alpha'), findsWidgets);
         expect(find.text('Bravo'), findsWidgets);
         expect(find.text('Charlie'), findsWidgets);
+      });
+
+      testWidgets('rename option appears in overflow menu', (tester) async {
+        await townModel.createCampaign(
+          name: 'Campaign',
+          edition: GameEdition.gloomhaven,
+        );
+        await townModel.createParty(name: 'Alpha');
+        townModel.isEditMode = true;
+
+        await tester.pumpWidget(buildTownScreen());
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.byIcon(Icons.more_vert));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Rename party'), findsOneWidget);
+        expect(find.text('Switch'), findsOneWidget);
+        expect(find.text('Delete'), findsOneWidget);
       });
     });
   });
