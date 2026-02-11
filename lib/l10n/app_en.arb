@@ -28,6 +28,7 @@
   "notes": "Notes",
   "retired": "(retired)",
   "previousRetirements": "Previous retirements",
+  "retirements": "Retirements",
   "pocketItemsAllowed": "{count} pocket item{count, plural, =1{} other{s}} allowed",
   "@pocketItemsAllowed": {
     "placeholders": {
@@ -142,7 +143,15 @@
     }
   },
   "startingLevel": "Starting level",
-  "prosperityLevel": "Prosperity level",
+  "levelExceedsProsperity": "Max starting level at this prosperity is {maxLevel}",
+  "@levelExceedsProsperity": {
+    "placeholders": {
+      "maxLevel": {
+        "type": "int"
+      }
+    }
+  },
+  "prosperityLevel": "Prosperity",
   "pleaseSelectClass": "Please select a Class",
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
@@ -180,6 +189,7 @@
   "unretire": "Unretire",
   "notYet": "Not Yet",
   "general": "Stats & Party",
+  "stats": "Stats",
   "quest": "Quest",
   "perks": "Perks",
   "masteries": "Masteries",
@@ -197,7 +207,7 @@
   "createCampaign": "Create campaign",
   "createParty": "Create party",
   "prosperity": "Prosperity",
-  "prosperityLevelN": "Prosperity level {level}",
+  "prosperityLevelN": "Prosperity {level}",
   "@prosperityLevelN": {
     "placeholders": {
       "level": {

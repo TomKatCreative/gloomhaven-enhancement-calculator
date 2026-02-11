@@ -93,6 +93,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get previousRetirements => 'Aposentadorias anteriores';
 
   @override
+  String get retirements => 'Aposentadorias';
+
+  @override
   String pocketItemsAllowed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
@@ -357,7 +360,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startingLevel => 'Nível inicial';
 
   @override
-  String get prosperityLevel => 'Nível de prosperidade';
+  String levelExceedsProsperity(int maxLevel) {
+    return 'Nível inicial máximo nesta prosperidade é $maxLevel';
+  }
+
+  @override
+  String get prosperityLevel => 'Prosperidade';
 
   @override
   String get pleaseSelectClass => 'Por favor, selecione uma Classe';
@@ -425,6 +433,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get general => 'Estatísticas e Grupo';
 
   @override
+  String get stats => 'Estatísticas';
+
+  @override
   String get quest => 'Missão';
 
   @override
@@ -477,7 +488,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String prosperityLevelN(int level) {
-    return 'Nível de prosperidade $level';
+    return 'Prosperidade $level';
   }
 
   @override

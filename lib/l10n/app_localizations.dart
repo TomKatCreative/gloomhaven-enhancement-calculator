@@ -266,6 +266,12 @@ abstract class AppLocalizations {
   /// **'Previous retirements'**
   String get previousRetirements;
 
+  /// No description provided for @retirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Retirements'**
+  String get retirements;
+
   /// No description provided for @pocketItemsAllowed.
   ///
   /// In en, this message translates to:
@@ -740,10 +746,16 @@ abstract class AppLocalizations {
   /// **'Starting level'**
   String get startingLevel;
 
+  /// No description provided for @levelExceedsProsperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Max starting level at this prosperity is {maxLevel}'**
+  String levelExceedsProsperity(int maxLevel);
+
   /// No description provided for @prosperityLevel.
   ///
   /// In en, this message translates to:
-  /// **'Prosperity level'**
+  /// **'Prosperity'**
   String get prosperityLevel;
 
   /// No description provided for @pleaseSelectClass.
@@ -866,6 +878,12 @@ abstract class AppLocalizations {
   /// **'Stats & Party'**
   String get general;
 
+  /// No description provided for @stats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get stats;
+
   /// No description provided for @quest.
   ///
   /// In en, this message translates to:
@@ -971,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @prosperityLevelN.
   ///
   /// In en, this message translates to:
-  /// **'Prosperity level {level}'**
+  /// **'Prosperity {level}'**
   String prosperityLevelN(int level);
 
   /// No description provided for @reputation.
