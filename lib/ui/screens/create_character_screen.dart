@@ -2,6 +2,7 @@ import 'package:faker/faker.dart' as faker;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
@@ -103,6 +104,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             child: TextButton.icon(
               icon: const Icon(Icons.how_to_reg_rounded),
               label: Text(AppLocalizations.of(context).create),
+              style: TextButton.styleFrom(
+                foregroundColor: theme.contrastedPrimary,
+              ),
               onPressed: _selectedClass != null ? _onCreatePressed : null,
             ),
           ),
@@ -230,9 +234,6 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       children: [
         Expanded(
           child: TextFormField(
-            validator: (value) => _selectedClass == null
-                ? AppLocalizations.of(context).pleaseSelectClass
-                : null,
             readOnly: true,
             controller: _classTextFieldController,
             decoration: InputDecoration(
@@ -264,7 +265,6 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                       .getDisplayName(_variant);
                   _selectedClass = selectedPlayerClass.playerClass;
                 });
-                _formKey.currentState?.validate();
               }
             },
           ),

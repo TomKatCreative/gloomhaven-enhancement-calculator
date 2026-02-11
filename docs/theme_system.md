@@ -78,6 +78,7 @@ The app uses a centralized contrast system to ensure text and UI elements meet W
 - Bottom navigation bar selected items
 - Dialog action buttons
 - Section headers and primary-colored text
+- Create button in CreateCharacterScreen
 - Any text using `theme.contrastedPrimary`
 
 **Adding contrast to new components:**

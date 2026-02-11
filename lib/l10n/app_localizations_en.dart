@@ -368,9 +368,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prosperityLevel => 'Prosperity';
 
   @override
-  String get pleaseSelectClass => 'Please select a Class';
-
-  @override
   String get createCharacter => 'Create character';
 
   @override

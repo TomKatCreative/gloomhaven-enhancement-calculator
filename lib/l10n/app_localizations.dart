@@ -758,12 +758,6 @@ abstract class AppLocalizations {
   /// **'Prosperity'**
   String get prosperityLevel;
 
-  /// No description provided for @pleaseSelectClass.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a Class'**
-  String get pleaseSelectClass;
-
   /// No description provided for @createCharacter.
   ///
   /// In en, this message translates to:
