@@ -116,60 +116,24 @@ void main() {
 
     group('startingGold', () {
       test('Gloomhaven: 15 * (level + 1)', () {
-        expect(
-          GameEdition.gloomhaven.startingGold(level: 1),
-          30,
-        );
-        expect(
-          GameEdition.gloomhaven.startingGold(level: 2),
-          45,
-        );
-        expect(
-          GameEdition.gloomhaven.startingGold(level: 5),
-          90,
-        );
-        expect(
-          GameEdition.gloomhaven.startingGold(level: 9),
-          150,
-        );
+        expect(GameEdition.gloomhaven.startingGold(level: 1), 30);
+        expect(GameEdition.gloomhaven.startingGold(level: 2), 45);
+        expect(GameEdition.gloomhaven.startingGold(level: 5), 90);
+        expect(GameEdition.gloomhaven.startingGold(level: 9), 150);
       });
 
       test('Gloomhaven 2e: 10 * prosperity + 15', () {
-        expect(
-          GameEdition.gloomhaven2e.startingGold(prosperityLevel: 0),
-          15,
-        );
-        expect(
-          GameEdition.gloomhaven2e.startingGold(prosperityLevel: 1),
-          25,
-        );
-        expect(
-          GameEdition.gloomhaven2e.startingGold(prosperityLevel: 3),
-          45,
-        );
-        expect(
-          GameEdition.gloomhaven2e.startingGold(prosperityLevel: 9),
-          105,
-        );
+        expect(GameEdition.gloomhaven2e.startingGold(prosperityLevel: 0), 15);
+        expect(GameEdition.gloomhaven2e.startingGold(prosperityLevel: 1), 25);
+        expect(GameEdition.gloomhaven2e.startingGold(prosperityLevel: 3), 45);
+        expect(GameEdition.gloomhaven2e.startingGold(prosperityLevel: 9), 105);
       });
 
       test('Frosthaven: 10 * prosperity + 20', () {
-        expect(
-          GameEdition.frosthaven.startingGold(prosperityLevel: 0),
-          20,
-        );
-        expect(
-          GameEdition.frosthaven.startingGold(prosperityLevel: 1),
-          30,
-        );
-        expect(
-          GameEdition.frosthaven.startingGold(prosperityLevel: 4),
-          60,
-        );
-        expect(
-          GameEdition.frosthaven.startingGold(prosperityLevel: 9),
-          110,
-        );
+        expect(GameEdition.frosthaven.startingGold(prosperityLevel: 0), 20);
+        expect(GameEdition.frosthaven.startingGold(prosperityLevel: 1), 30);
+        expect(GameEdition.frosthaven.startingGold(prosperityLevel: 4), 60);
+        expect(GameEdition.frosthaven.startingGold(prosperityLevel: 9), 110);
       });
 
       test('uses default parameter values', () {

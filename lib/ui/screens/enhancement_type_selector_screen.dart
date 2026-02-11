@@ -112,33 +112,34 @@ class _EnhancementTypeSelectorScreenState
         .toList();
   }
 
-  /// Returns the section title if this index starts a new category.
+  /// Groups the filtered enhancements into sections by [EnhancementCategory].
   ///
-  /// Used to insert [SearchSectionHeader] widgets between category groups.
-  String? _getSectionHeader(int index) {
+  /// Each section is a `(title, assetKey, items)` record used to build
+  /// [SliverPersistentHeader] + [SliverList] pairs.
+  List<(String title, String? assetKey, List<Enhancement> items)>
+  get _sections {
     final enhancements = _filteredEnhancements;
-    if (index >= enhancements.length) return null;
+    final sections = <(String, String?, List<Enhancement>)>[];
+    String? currentTitle;
+    String? currentAssetKey;
+    List<Enhancement> currentItems = [];
 
-    final current = enhancements[index];
-    final currentSection = current.category.sectionTitle;
-
-    // First item always shows header
-    if (index == 0) return currentSection;
-
-    // Show header if section changed from previous item
-    final previous = enhancements[index - 1];
-    if (previous.category.sectionTitle != currentSection) {
-      return currentSection;
+    for (final e in enhancements) {
+      final title = e.category.sectionTitle;
+      if (title != currentTitle) {
+        if (currentTitle != null) {
+          sections.add((currentTitle, currentAssetKey, currentItems));
+        }
+        currentTitle = title;
+        currentAssetKey = e.category.sectionAssetKey;
+        currentItems = [];
+      }
+      currentItems.add(e);
     }
-
-    return null;
-  }
-
-  /// Returns the asset key for a section's icon.
-  String? _getSectionAssetKey(int index) {
-    final enhancements = _filteredEnhancements;
-    if (index >= enhancements.length) return null;
-    return enhancements[index].category.sectionAssetKey;
+    if (currentTitle != null) {
+      sections.add((currentTitle, currentAssetKey, currentItems));
+    }
+    return sections;
   }
 
   @override
@@ -167,35 +168,35 @@ class _EnhancementTypeSelectorScreenState
       ),
       body: SafeArea(
         top: false,
-        child: ListView.builder(
+        child: CustomScrollView(
           controller: _scrollController,
-          padding: const EdgeInsets.only(bottom: 16),
-          itemCount: _filteredEnhancements.length,
-          itemBuilder: (context, index) {
-            final enhancement = _filteredEnhancements[index];
-            final isSelected = widget.currentSelection == enhancement;
-            final sectionHeader = _getSectionHeader(index);
-            final sectionAssetKey = _getSectionAssetKey(index);
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Show section header if this item starts a new section
-                if (sectionHeader != null)
-                  SearchSectionHeader(
-                    title: sectionHeader,
-                    assetKey: sectionAssetKey,
+          slivers: [
+            for (final (title, assetKey, items) in _sections)
+              SliverMainAxisGroup(
+                slivers: [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: SearchSectionHeaderDelegate(
+                      title: title,
+                      assetKey: assetKey,
+                    ),
                   ),
-                // Enhancement item
-                _buildEnhancementTile(
-                  context,
-                  enhancement,
-                  isSelected: isSelected,
-                  model: model,
-                ),
-              ],
-            );
-          },
+                  SliverList.builder(
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final enhancement = items[index];
+                      return _buildEnhancementTile(
+                        context,
+                        enhancement,
+                        isSelected: widget.currentSelection == enhancement,
+                        model: model,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            const SliverPadding(padding: EdgeInsets.only(bottom: largePadding)),
+          ],
         ),
       ),
     );

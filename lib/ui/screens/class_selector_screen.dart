@@ -161,26 +161,27 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     return false;
   }
 
-  /// Returns the section header title if this index starts a new category.
+  /// Groups the filtered classes into sections by [ClassCategory].
   ///
-  /// Used to insert [SearchSectionHeader] widgets between category groups.
-  String? _getSectionHeader(int index) {
+  /// Each section is a `(title, items)` record used to build
+  /// [SliverPersistentHeader] + [SliverList] pairs.
+  List<(String title, List<PlayerClass> items)> get _sections {
     final classes = _filteredClasses;
-    if (index >= classes.length) return null;
+    final sections = <(String, List<PlayerClass>)>[];
+    String? currentTitle;
+    List<PlayerClass> currentItems = [];
 
-    final current = classes[index];
-    final currentSection = _getCategoryTitle(current.category);
-
-    // First item always shows header
-    if (index == 0) return currentSection;
-
-    // Show header if section changed from previous item
-    final previous = classes[index - 1];
-    if (_getCategoryTitle(previous.category) != currentSection) {
-      return currentSection;
+    for (final pc in classes) {
+      final title = _getCategoryTitle(pc.category);
+      if (title != currentTitle) {
+        if (currentTitle != null) sections.add((currentTitle, currentItems));
+        currentTitle = title;
+        currentItems = [];
+      }
+      currentItems.add(pc);
     }
-
-    return null;
+    if (currentTitle != null) sections.add((currentTitle, currentItems));
+    return sections;
   }
 
   /// Maps [ClassCategory] enum to human-readable section title.
@@ -276,25 +277,29 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                 ],
               ),
             ),
-            // Class list with section headers
+            // Class list with sticky section headers
             Expanded(
-              child: ListView.builder(
+              child: CustomScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(bottom: 16),
-                itemCount: _filteredClasses.length,
-                itemBuilder: (context, index) {
-                  final playerClass = _filteredClasses[index];
-                  final sectionHeader = _getSectionHeader(index);
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (sectionHeader != null)
-                        SearchSectionHeader(title: sectionHeader),
-                      _buildClassTile(playerClass),
-                    ],
-                  );
-                },
+                slivers: [
+                  for (final (title, items) in _sections)
+                    SliverMainAxisGroup(
+                      slivers: [
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchSectionHeaderDelegate(title: title),
+                        ),
+                        SliverList.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) =>
+                              _buildClassTile(items[index]),
+                        ),
+                      ],
+                    ),
+                  const SliverPadding(
+                    padding: EdgeInsets.only(bottom: largePadding),
+                  ),
+                ],
               ),
             ),
           ],

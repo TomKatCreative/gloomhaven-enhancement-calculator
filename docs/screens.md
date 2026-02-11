@@ -41,6 +41,8 @@ A reusable section divider with optional icon:
 ─────────── [Icon] Title ───────────
 ```
 
+**SearchSectionHeaderDelegate** (same file): A `SliverPersistentHeaderDelegate` that wraps `SearchSectionHeader` with a solid surface background for use as a sticky/pinned header in `CustomScrollView`. Both selector screens use this delegate with `SliverPersistentHeader(pinned: true)` to keep the current section header visible at the top of the scroll view.
+
 ### ClassSelectorScreen
 
 > **File**: `lib/ui/screens/class_selector_screen.dart`
@@ -67,7 +69,7 @@ Full-page screen for selecting a player class during character creation.
 - Search filters by class name or variant names (e.g., "Bruiser" finds Brute)
 - Category filter chips for game editions
 - "Hide locked classes" toggle
-- Section headers group classes by `ClassCategory`
+- Sticky section headers group classes by `ClassCategory` (pinned via `SliverPersistentHeader`)
 - Variant selection dialog for multi-edition classes
 - Custom class warning dialog for community content
 
@@ -102,7 +104,7 @@ Full-page screen for selecting enhancement types in the calculator.
 
 **Features:**
 - Search filters by enhancement name
-- Section headers with category icons group by `EnhancementCategory`
+- Sticky section headers with category icons group by `EnhancementCategory` (pinned via `SliverPersistentHeader`)
 - Cost display shows base cost and discounted cost (with strikethrough)
 - Edition-aware: only shows enhancements available in selected `GameEdition`
 - Highlights currently selected enhancement
@@ -123,7 +125,7 @@ Both selectors follow these conventions:
 - **AppBar search**: Search field in AppBar title with transparent background
 - **SafeArea**: Bottom-only SafeArea for device navigation buttons
 - **Static show()**: Invoked via static method returning `Future<T?>`
-- **Section headers**: Use `SearchSectionHeader` widget for category grouping
+- **Sticky section headers**: `CustomScrollView` with `SliverPersistentHeader(pinned: true)` + `SliverList` pairs per section, using `SearchSectionHeaderDelegate` for pinned category headers
 
 ---
 

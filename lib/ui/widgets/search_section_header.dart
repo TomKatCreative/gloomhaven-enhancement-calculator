@@ -21,6 +21,47 @@ import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 ///   assetKey: 'MOVE', // Optional icon from asset_config.dart
 /// )
 /// ```
+/// A [SliverPersistentHeaderDelegate] that pins a [SearchSectionHeader] to
+/// the top of a [CustomScrollView].
+///
+/// Uses a solid `colorScheme.surface` background so list items don't show
+/// through the pinned header.
+///
+/// Used by:
+/// - [ClassSelectorScreen] — sticky category headers
+/// - [EnhancementTypeSelectorScreen] — sticky category headers with icons
+class SearchSectionHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final String title;
+  final String? assetKey;
+
+  const SearchSectionHeaderDelegate({required this.title, this.assetKey});
+
+  // largePadding(16) + iconSizeMedium(26) + smallPadding(8) = 50
+  static const _height = largePadding + iconSizeMedium + smallPadding;
+
+  @override
+  double get maxExtent => _height;
+
+  @override
+  double get minExtent => _height;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
+      child: SearchSectionHeader(title: title, assetKey: assetKey),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant SearchSectionHeaderDelegate oldDelegate) =>
+      title != oldDelegate.title || assetKey != oldDelegate.assetKey;
+}
+
 class SearchSectionHeader extends StatelessWidget {
   /// The section title to display.
   final String title;
@@ -49,14 +90,14 @@ class SearchSectionHeader extends StatelessWidget {
           if (assetKey != null) ...[
             ThemedSvg(
               assetKey: assetKey!,
-              width: iconSizeMedium,
-              height: iconSizeMedium,
+              width: iconSizeSmall,
+              height: iconSizeSmall,
             ),
             const SizedBox(width: smallPadding),
           ],
           Text(
             title,
-            style: theme.textTheme.bodyLarge?.copyWith(
+            style: theme.textTheme.bodySmall?.copyWith(
               color: theme.contrastedPrimary,
             ),
           ),
