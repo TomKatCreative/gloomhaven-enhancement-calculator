@@ -132,6 +132,12 @@ class SharedPrefs {
   set perksAndMasteriesExpanded(bool value) =>
       _sharedPrefs.setBool('perksAndMasteriesExpanded', value);
 
+  bool get townDetailsExpanded =>
+      _sharedPrefs.getBool('townDetailsExpanded') ?? true;
+
+  set townDetailsExpanded(bool value) =>
+      _sharedPrefs.setBool('townDetailsExpanded', value);
+
   int get targetCardLvl => _sharedPrefs.getInt('targetCardLvl') ?? 0;
 
   set targetCardLvl(int value) => _sharedPrefs.setInt('targetCardLvl', value);
@@ -236,18 +242,8 @@ class SharedPrefs {
   set isUSRegion(bool value) => _sharedPrefs.setBool('isUSRegion', value);
 
   // ===========================================================================
-  // Town / World / Campaign State
+  // Town / Campaign / Party State
   // ===========================================================================
-
-  String? get activeWorldId => _sharedPrefs.getString('activeWorldId');
-
-  set activeWorldId(String? value) {
-    if (value == null) {
-      _sharedPrefs.remove('activeWorldId');
-    } else {
-      _sharedPrefs.setString('activeWorldId', value);
-    }
-  }
 
   String? get activeCampaignId => _sharedPrefs.getString('activeCampaignId');
 
@@ -256,6 +252,16 @@ class SharedPrefs {
       _sharedPrefs.remove('activeCampaignId');
     } else {
       _sharedPrefs.setString('activeCampaignId', value);
+    }
+  }
+
+  String? get activePartyId => _sharedPrefs.getString('activePartyId');
+
+  set activePartyId(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('activePartyId');
+    } else {
+      _sharedPrefs.setString('activePartyId', value);
     }
   }
 
@@ -317,8 +323,8 @@ class SharedPrefs {
         'showAllCharacters': showAllCharacters,
       },
       'town': {
-        if (activeWorldId != null) 'activeWorldId': activeWorldId,
         if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
+        if (activePartyId != null) 'activePartyId': activePartyId,
       },
       'calculator': {
         'gameEdition': gameEdition.index,
@@ -379,11 +385,11 @@ class SharedPrefs {
     // Town state
     if (data['town'] is Map) {
       final t = Map<String, dynamic>.from(data['town'] as Map);
-      if (t.containsKey('activeWorldId')) {
-        activeWorldId = t['activeWorldId'] as String?;
-      }
       if (t.containsKey('activeCampaignId')) {
         activeCampaignId = t['activeCampaignId'] as String?;
+      }
+      if (t.containsKey('activePartyId')) {
+        activePartyId = t['activePartyId'] as String?;
       }
     }
 

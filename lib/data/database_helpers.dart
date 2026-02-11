@@ -16,11 +16,11 @@ import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
-import 'package:gloomhaven_enhancement_calc/models/world.dart';
 
 import 'database_migrations.dart';
 
@@ -45,8 +45,8 @@ class DatabaseHelper implements IDatabaseHelper {
     tableCharacterPerks,
     tableCharacterMasteries,
     tableMetaData,
-    tableWorlds,
     tableCampaigns,
+    tableParties,
   ];
 
   Future<Database> get database async => _database ??= await _initDatabase();
@@ -87,7 +87,7 @@ class DatabaseHelper implements IDatabaseHelper {
     await db.transaction((txn) async {
       await DatabaseMigrations.createMetaDataTable(txn, version);
       await _createTables(txn);
-      await _createWorldCampaignTables(txn);
+      await _createCampaignPartyTables(txn);
       await _seedPerks(txn);
       await _seedMasteries(txn);
       await _seedPersonalQuests(txn);
@@ -121,7 +121,7 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnVariant $textType,
         $columnCharacterPersonalQuestId $textType DEFAULT '',
         $columnCharacterPersonalQuestProgress $textType DEFAULT '[]',
-        $columnCharacterCampaignId TEXT DEFAULT NULL
+        $columnCharacterPartyId TEXT DEFAULT NULL
       )''');
 
     await txn.execute('''
@@ -213,26 +213,29 @@ class DatabaseHelper implements IDatabaseHelper {
     }
   }
 
-  /// Creates Worlds and Campaigns tables (for fresh installs).
-  Future<void> _createWorldCampaignTables(Transaction txn) async {
-    await txn.execute('''
-      $createTable $tableWorlds (
-        $columnWorldId $idTextPrimaryType,
-        $columnWorldName $textType,
-        $columnWorldEdition $textType,
-        $columnWorldProsperityCheckmarks $integerType DEFAULT 0,
-        $columnWorldDonatedGold $integerType DEFAULT 0,
-        $columnWorldCreatedAt $dateTimeType
-      )''');
-
+  /// Creates Campaigns and Parties tables (for fresh installs).
+  Future<void> _createCampaignPartyTables(Transaction txn) async {
     await txn.execute('''
       $createTable $tableCampaigns (
         $columnCampaignId $idTextPrimaryType,
-        $columnCampaignWorldId $textType,
         $columnCampaignName $textType,
-        $columnCampaignReputation $integerType DEFAULT 0,
-        $columnCampaignCreatedAt $dateTimeType,
-        FOREIGN KEY ($columnCampaignWorldId) REFERENCES $tableWorlds($columnWorldId) ON DELETE CASCADE
+        $columnCampaignEdition $textType,
+        $columnCampaignProsperityCheckmarks $integerType DEFAULT 0,
+        $columnCampaignDonatedGold $integerType DEFAULT 0,
+        $columnCampaignCreatedAt $dateTimeType
+      )''');
+
+    await txn.execute('''
+      $createTable $tableParties (
+        $columnPartyId $idTextPrimaryType,
+        $columnPartyCampaignId $textType,
+        $columnPartyName $textType,
+        $columnPartyReputation $integerType DEFAULT 0,
+        $columnPartyCreatedAt $dateTimeType,
+        $columnPartyLocation $textType DEFAULT '',
+        $columnPartyNotes $textType DEFAULT '',
+        $columnPartyAchievements $textType DEFAULT '[]',
+        FOREIGN KEY ($columnPartyCampaignId) REFERENCES $tableCampaigns($columnCampaignId) ON DELETE CASCADE
       )''');
   }
 
@@ -311,11 +314,11 @@ class DatabaseHelper implements IDatabaseHelper {
       15: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
       // v17: Rename item_minus_one to ITEM_MINUS_ONE
       16: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
-      // v18: Add Personal Quests + Worlds/Campaigns tables + CampaignId column
+      // v18: Add Personal Quests + Campaigns/Parties tables + PartyId column
       17: () async {
         await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
         await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
-        await DatabaseMigrations.createWorldCampaignTablesAndAddCampaignIdToCharacters(
+        await DatabaseMigrations.createCampaignPartyTablesAndAddPartyIdToCharacters(
           txn,
         );
       },
@@ -364,7 +367,8 @@ class DatabaseHelper implements IDatabaseHelper {
     for (var i = 0; i < json[0].length; i++) {
       for (var k = 0; k < json[1][i].length; k++) {
         // This handles the case where a user tries to restore a backup
-        // from a database version before 7 (Resources) or 18 (Personal Quests)
+        // from a database version before 7 (Resources), 18 (Personal Quests),
+        // or 19 (Party details)
         if (i < 1) {
           json[1][i][k][columnResourceHide] ??= 0;
           json[1][i][k][columnResourceMetal] ??= 0;
@@ -377,8 +381,15 @@ class DatabaseHelper implements IDatabaseHelper {
           json[1][i][k][columnResourceSnowthistle] ??= 0;
           json[1][i][k][columnCharacterPersonalQuestId] ??= '';
           json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
-          // CampaignId is nullable, no default needed — just ensure key exists
-          json[1][i][k].putIfAbsent(columnCharacterCampaignId, () => null);
+          // PartyId is nullable, no default needed — just ensure key exists
+          json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
+        }
+
+        // Default missing party detail columns (added in v19)
+        if (json[0][i] == tableParties) {
+          json[1][i][k][columnPartyLocation] ??= '';
+          json[1][i][k][columnPartyNotes] ??= '';
+          json[1][i][k][columnPartyAchievements] ??= '[]';
         }
 
         batch.insert(json[0][i], json[1][i][k]);
@@ -587,75 +598,12 @@ class DatabaseHelper implements IDatabaseHelper {
     });
   }
 
-  // ── World CRUD ──
-
-  @override
-  Future<List<World>> queryAllWorlds() async {
-    Database db = await database;
-    final maps = await db.query(tableWorlds);
-    return maps.map((m) => World.fromMap(m)).toList();
-  }
-
-  @override
-  Future<void> insertWorld(World world) async {
-    Database db = await database;
-    await db.insert(tableWorlds, world.toMap());
-  }
-
-  @override
-  Future<void> updateWorld(World world) async {
-    Database db = await database;
-    await db.update(
-      tableWorlds,
-      world.toMap(),
-      where: '$columnWorldId = ?',
-      whereArgs: [world.id],
-    );
-  }
-
-  @override
-  Future<void> deleteWorld(String worldId) async {
-    Database db = await database;
-    await db.transaction((txn) async {
-      // Unlink characters from campaigns in this world
-      final campaigns = await txn.query(
-        tableCampaigns,
-        where: '$columnCampaignWorldId = ?',
-        whereArgs: [worldId],
-      );
-      for (final campaign in campaigns) {
-        final campaignId = campaign[columnCampaignId] as String;
-        await txn.update(
-          tableCharacters,
-          {columnCharacterCampaignId: null},
-          where: '$columnCharacterCampaignId = ?',
-          whereArgs: [campaignId],
-        );
-      }
-      // Delete campaigns (CASCADE would handle this but being explicit)
-      await txn.delete(
-        tableCampaigns,
-        where: '$columnCampaignWorldId = ?',
-        whereArgs: [worldId],
-      );
-      await txn.delete(
-        tableWorlds,
-        where: '$columnWorldId = ?',
-        whereArgs: [worldId],
-      );
-    });
-  }
-
   // ── Campaign CRUD ──
 
   @override
-  Future<List<Campaign>> queryCampaigns(String worldId) async {
+  Future<List<Campaign>> queryAllCampaigns() async {
     Database db = await database;
-    final maps = await db.query(
-      tableCampaigns,
-      where: '$columnCampaignWorldId = ?',
-      whereArgs: [worldId],
-    );
+    final maps = await db.query(tableCampaigns);
     return maps.map((m) => Campaign.fromMap(m)).toList();
   }
 
@@ -680,11 +628,25 @@ class DatabaseHelper implements IDatabaseHelper {
   Future<void> deleteCampaign(String campaignId) async {
     Database db = await database;
     await db.transaction((txn) async {
-      // Unlink characters from this campaign
-      await txn.update(
-        tableCharacters,
-        {columnCharacterCampaignId: null},
-        where: '$columnCharacterCampaignId = ?',
+      // Unlink characters from parties in this campaign
+      final parties = await txn.query(
+        tableParties,
+        where: '$columnPartyCampaignId = ?',
+        whereArgs: [campaignId],
+      );
+      for (final party in parties) {
+        final partyId = party[columnPartyId] as String;
+        await txn.update(
+          tableCharacters,
+          {columnCharacterPartyId: null},
+          where: '$columnCharacterPartyId = ?',
+          whereArgs: [partyId],
+        );
+      }
+      // Delete parties (CASCADE would handle this but being explicit)
+      await txn.delete(
+        tableParties,
+        where: '$columnPartyCampaignId = ?',
         whereArgs: [campaignId],
       );
       await txn.delete(
@@ -695,29 +657,78 @@ class DatabaseHelper implements IDatabaseHelper {
     });
   }
 
-  // ── Character-Campaign linking ──
+  // ── Party CRUD ──
 
   @override
-  Future<void> assignCharacterToCampaign(
+  Future<List<Party>> queryParties(String campaignId) async {
+    Database db = await database;
+    final maps = await db.query(
+      tableParties,
+      where: '$columnPartyCampaignId = ?',
+      whereArgs: [campaignId],
+    );
+    return maps.map((m) => Party.fromMap(m)).toList();
+  }
+
+  @override
+  Future<void> insertParty(Party party) async {
+    Database db = await database;
+    await db.insert(tableParties, party.toMap());
+  }
+
+  @override
+  Future<void> updateParty(Party party) async {
+    Database db = await database;
+    await db.update(
+      tableParties,
+      party.toMap(),
+      where: '$columnPartyId = ?',
+      whereArgs: [party.id],
+    );
+  }
+
+  @override
+  Future<void> deleteParty(String partyId) async {
+    Database db = await database;
+    await db.transaction((txn) async {
+      // Unlink characters from this party
+      await txn.update(
+        tableCharacters,
+        {columnCharacterPartyId: null},
+        where: '$columnCharacterPartyId = ?',
+        whereArgs: [partyId],
+      );
+      await txn.delete(
+        tableParties,
+        where: '$columnPartyId = ?',
+        whereArgs: [partyId],
+      );
+    });
+  }
+
+  // ── Character-Party linking ──
+
+  @override
+  Future<void> assignCharacterToParty(
     String characterUuid,
-    String? campaignId,
+    String? partyId,
   ) async {
     Database db = await database;
     await db.update(
       tableCharacters,
-      {columnCharacterCampaignId: campaignId},
+      {columnCharacterPartyId: partyId},
       where: '$columnCharacterUuid = ?',
       whereArgs: [characterUuid],
     );
   }
 
   @override
-  Future<List<Character>> queryCharactersByCampaign(String campaignId) async {
+  Future<List<Character>> queryCharactersByParty(String partyId) async {
     Database db = await database;
     final maps = await db.query(
       tableCharacters,
-      where: '$columnCharacterCampaignId = ?',
-      whereArgs: [campaignId],
+      where: '$columnCharacterPartyId = ?',
+      whereArgs: [partyId],
     );
     return maps.map((m) => Character.fromMap(m)).toList();
   }

@@ -5,10 +5,10 @@ import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
-import 'package:gloomhaven_enhancement_calc/models/world.dart';
 
 /// Test data fixtures for unit and widget tests.
 ///
@@ -292,17 +292,17 @@ class TestData {
     });
   }
 
-  // ── World & Campaign Factories ──
+  // ── Campaign & Party Factories ──
 
-  /// Creates a test [World] with sensible defaults.
-  static World createWorld({
-    String id = 'world-1',
-    String name = 'Test World',
+  /// Creates a test [Campaign] with sensible defaults.
+  static Campaign createCampaign({
+    String id = 'campaign-1',
+    String name = 'Test Campaign',
     GameEdition edition = GameEdition.gloomhaven,
     int prosperityCheckmarks = 0,
     int donatedGold = 0,
   }) {
-    return World(
+    return Campaign(
       id: id,
       name: name,
       edition: edition,
@@ -311,18 +311,24 @@ class TestData {
     );
   }
 
-  /// Creates a test [Campaign] with sensible defaults.
-  static Campaign createCampaign({
-    String id = 'campaign-1',
-    String worldId = 'world-1',
+  /// Creates a test [Party] with sensible defaults.
+  static Party createParty({
+    String id = 'party-1',
+    String campaignId = 'campaign-1',
     String name = 'Test Party',
     int reputation = 0,
+    String location = '',
+    String notes = '',
+    List<String>? achievements,
   }) {
-    return Campaign(
+    return Party(
       id: id,
-      worldId: worldId,
+      campaignId: campaignId,
       name: name,
       reputation: reputation,
+      location: location,
+      notes: notes,
+      achievements: achievements,
     );
   }
 }

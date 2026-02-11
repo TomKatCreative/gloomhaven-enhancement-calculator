@@ -8,6 +8,7 @@ import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/legacy_mastery.dart'
     as legacy;
@@ -17,7 +18,6 @@ import 'package:gloomhaven_enhancement_calc/models/perk/legacy_perk.dart'
     as legacy;
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
-import 'package:gloomhaven_enhancement_calc/models/world.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sqflite/sqflite.dart';
@@ -627,32 +627,35 @@ class DatabaseMigrations {
     await createAndSeedPersonalQuestsTable(txn);
   }
 
-  /// Creates Worlds and Campaigns tables, and adds CampaignId column to Characters.
-  static Future<void> createWorldCampaignTablesAndAddCampaignIdToCharacters(
+  /// Creates Campaigns and Parties tables, and adds PartyId column to Characters.
+  static Future<void> createCampaignPartyTablesAndAddPartyIdToCharacters(
     Transaction txn,
   ) async {
     await txn.execute('''
-      ${DatabaseHelper.createTable} $tableWorlds (
-        $columnWorldId ${DatabaseHelper.idTextPrimaryType},
-        $columnWorldName ${DatabaseHelper.textType},
-        $columnWorldEdition ${DatabaseHelper.textType},
-        $columnWorldProsperityCheckmarks ${DatabaseHelper.integerType} DEFAULT 0,
-        $columnWorldDonatedGold ${DatabaseHelper.integerType} DEFAULT 0,
-        $columnWorldCreatedAt ${DatabaseHelper.dateTimeType}
+      ${DatabaseHelper.createTable} $tableCampaigns (
+        $columnCampaignId ${DatabaseHelper.idTextPrimaryType},
+        $columnCampaignName ${DatabaseHelper.textType},
+        $columnCampaignEdition ${DatabaseHelper.textType},
+        $columnCampaignProsperityCheckmarks ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnCampaignDonatedGold ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnCampaignCreatedAt ${DatabaseHelper.dateTimeType}
       )''');
 
     await txn.execute('''
-      ${DatabaseHelper.createTable} $tableCampaigns (
-        $columnCampaignId ${DatabaseHelper.idTextPrimaryType},
-        $columnCampaignWorldId ${DatabaseHelper.textType},
-        $columnCampaignName ${DatabaseHelper.textType},
-        $columnCampaignReputation ${DatabaseHelper.integerType} DEFAULT 0,
-        $columnCampaignCreatedAt ${DatabaseHelper.dateTimeType},
-        FOREIGN KEY ($columnCampaignWorldId) REFERENCES $tableWorlds($columnWorldId) ON DELETE CASCADE
+      ${DatabaseHelper.createTable} $tableParties (
+        $columnPartyId ${DatabaseHelper.idTextPrimaryType},
+        $columnPartyCampaignId ${DatabaseHelper.textType},
+        $columnPartyName ${DatabaseHelper.textType},
+        $columnPartyReputation ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnPartyCreatedAt ${DatabaseHelper.dateTimeType},
+        $columnPartyLocation ${DatabaseHelper.textType} DEFAULT '',
+        $columnPartyNotes ${DatabaseHelper.textType} DEFAULT '',
+        $columnPartyAchievements ${DatabaseHelper.textType} DEFAULT '[]',
+        FOREIGN KEY ($columnPartyCampaignId) REFERENCES $tableCampaigns($columnCampaignId) ON DELETE CASCADE
       )''');
 
     await txn.rawInsert(
-      'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterCampaignId TEXT DEFAULT NULL',
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterPartyId TEXT DEFAULT NULL',
     );
   }
 }
