@@ -13,17 +13,19 @@ Use the static `show()` method:
 await CreateCharacterScreen.show(context, charactersModel);
 ```
 
-### Form Fields
+### Form Fields (top to bottom)
 
-1. **Name** - Text field with random name generator (faker)
-2. **Class** - Opens `ClassSelectorScreen` for class selection
-3. **Starting Level** - SfSlider (1-9)
-4. **Previous Retirements / Prosperity Level** - Two numeric fields in a row
-5. **Game Edition** - 3-way SegmentedButton (GH / GH2E / FH)
+1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
+2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
+3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected.
+4. **Personal Quest** — *(gated by `kPersonalQuestsEnabled`)* Read-only field that opens PQ selector dialog. Only enabled for Gloomhaven edition; dimmed with "Coming soon" hint for other editions.
+5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
+6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
+7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition.
 
-### Edition-Specific Behavior
+### Gold Calculation Display
 
-The prosperity level field is disabled when Gloomhaven is selected (original GH uses level-based gold, not prosperity). See CLAUDE.md "Game Editions (GameEdition)" section for the gold/level formulas.
+A real-time gold display (GOLD SVG icon + calculated amount) appears inline with either the level slider (GH) or prosperity slider (GH2E/FH), depending on which parameter drives gold for that edition. Uses `GameEdition.startingGold(level:, prosperityLevel:)` and updates reactively as sliders change.
 
 ---
 
@@ -257,7 +259,7 @@ The Town tab for managing game campaigns and parties.
 
 ```
 ┌─────────────────────────────────────┐
-│        [🌐] Campaign Name (Edition) │  ← ActionChip (tappable → selector)
+│   [PROSPERITY] Campaign Name (Ed.)  │  ← CollapsibleSectionCard (svgAssetKey: 'PROSPERITY')
 ├─────────────────────────────────────┤
 │  ┌─────────────────────────────┐    │
 │  │ Prosperity    Level 3       │    │
@@ -400,7 +402,7 @@ Uses a `CustomScrollView` with slivers for efficient scrolling and pinned header
 ### Chip Nav Bar
 
 `_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets:
-- Labels: General, Quest & Notes, Perks, Masteries (Masteries hidden if class has none). When `kPersonalQuestsEnabled` is `false`, the label is just "Notes" instead of "Quest & Notes".
+- Labels: General, Quest & Notes, Perks, Masteries (Masteries hidden if class has none). When `kPersonalQuestsEnabled` is `false`, the label is just "Notes" instead of "Quest & Notes". When `kTownSheetEnabled` is `true`, the General section title and chip label show "General" (since it includes the party assignment row); when `false`, they show "Stats".
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
@@ -411,6 +413,8 @@ Two card widgets from `lib/ui/widgets/section_card.dart`:
 
 - **`SectionCard`** — static card with title row (icon + text) and child content. Used for Notes, Perks, Masteries on the character screen, and all three sections on the calculator screen.
 - **`CollapsibleSectionCard`** — card with `ExpansionTile` for collapsible sections. Used for General section. Expansion state persisted via `SharedPrefs().generalExpanded`.
+
+Both accept either a Material `icon` (IconData) or an `svgAssetKey` (String) for the title row icon. When `svgAssetKey` is provided (and `icon` is null), a `ThemedSvg` widget renders the SVG icon at `iconSizeSmall` in `contrastedPrimary` color. Both also support an optional `titleWidget` to replace the default `Text` title, and an optional `trailing` widget.
 
 Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and a default `maxWidth: 500`.
 

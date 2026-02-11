@@ -286,7 +286,7 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | Method | Description |
 |--------|-------------|
 | `loadCharacters()` | Load all characters from database with perks/masteries |
-| `createCharacter(name, class, variant, level, retirements, prosperity, edition)` | Create new character with edition-specific gold |
+| `createCharacter(name, class, variant, level, retirements, prosperity, edition)` | Create new character with gold calculated via `edition.startingGold()` |
 | `updateCharacter(Character)` | Save character changes to database |
 | `deleteCurrentCharacter()` | Delete current character and navigate |
 | `retireCurrentCharacter()` | Toggle retirement status |
@@ -340,16 +340,6 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 |--------|-------------|
 | `setElementSheetExpanded(bool)` | Set partial expansion |
 | `setElementSheetFullExpanded(bool)` | Set full expansion |
-
-### Starting Gold Calculation
-
-The `_calculateStartingGold` method implements edition-specific formulas:
-
-```dart
-// Gloomhaven: 15 × (level + 1)
-// GH2E: 10 × prosperity + 15
-// Frosthaven: 10 × prosperity + 20
-```
 
 ### Toggle Retired Visibility Logic
 

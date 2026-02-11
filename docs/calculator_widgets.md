@@ -70,7 +70,7 @@ _horizontalPadding = 16.0
 
 > **Directory**: `lib/ui/widgets/calculator/`
 
-The enhancement calculator uses `SectionCard` (from `lib/ui/widgets/section_card.dart`) for consistent card styling that matches the character screen. Each section is wrapped in a `SectionCard` with a title, icon, and customizable content padding.
+The enhancement calculator uses `SectionCard` (from `lib/ui/widgets/section_card.dart`) for consistent card styling that matches the character screen. Each section is wrapped in a `SectionCard` with a title, icon (either Material `icon` or `svgAssetKey` for SVG icons via `ThemedSvg`), and customizable content padding.
 
 ### Screen Layout
 

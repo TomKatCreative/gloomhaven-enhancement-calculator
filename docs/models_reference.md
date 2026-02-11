@@ -390,6 +390,12 @@ Enum representing game editions with edition-specific rules.
 | `gloomhaven2e` | Gloomhaven 2nd Edition |
 | `frosthaven` | Frosthaven |
 
+### Getters
+
+| Getter | Type | Description |
+|--------|------|-------------|
+| `displayName` | `String` | Human-readable edition name (e.g., "Gloomhaven 2e") |
+
 ### Edition-Specific Properties
 
 | Property | GH | GH2E | FH |
@@ -398,6 +404,14 @@ Enum representing game editions with edition-specific rules.
 | `hasPersistentModifier` | false | false | true |
 | `hasEnhancerLevels` | false | false | true |
 | `supportsPartyBoon` | true | true | false |
+| `multiTargetAppliesToAll` | true | false | false |
+
+### Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `maxStartingLevel(int prosperityLevel)` | `int` | Max starting level for a given prosperity. GH: prosperity level directly. GH2E/FH: `(prosperity / 2).ceil()` |
+| `startingGold({int level, int prosperityLevel})` | `int` | Starting gold for a new character. GH: `15 × (level + 1)`. GH2E: `10 × prosperity + 15`. FH: `10 × prosperity + 20` |
 
 ### Starting Character Rules
 
