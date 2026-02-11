@@ -924,7 +924,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Stats & Party'), findsWidgets);
+      expect(
+        find.text(kTownSheetEnabled ? 'Stats & Party' : 'Stats'),
+        findsWidgets,
+      );
       expect(
         find.text(kPersonalQuestsEnabled ? 'Quest & Notes' : 'Notes'),
         findsWidgets,
