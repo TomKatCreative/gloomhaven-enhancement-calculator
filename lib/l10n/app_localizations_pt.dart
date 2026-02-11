@@ -535,7 +535,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get renameCampaign => 'Renomear campanha';
 
   @override
-  String get renameParty => 'Renomear grupo';
+  String get renameParty => 'Renomear';
 
   @override
   String get checkmarks => 'marcas';

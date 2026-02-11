@@ -438,8 +438,9 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 
 | Method | Description |
 |--------|-------------|
-| `incrementReputation()` | Increase reputation (max +20) |
-| `decrementReputation()` | Decrease reputation (min -20) |
+| `setReputation(int value)` | Set reputation to exact value, clamped to -20..+20 |
+| `incrementReputation()` | Increase reputation by 1 (max +20) |
+| `decrementReputation()` | Decrease reputation by 1 (min -20) |
 
 ### State Persistence
 

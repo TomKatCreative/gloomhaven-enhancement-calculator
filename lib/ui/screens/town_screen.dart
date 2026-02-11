@@ -152,6 +152,7 @@ class _TownScreenState extends State<TownScreen> {
               },
               onIncrementReputation: () => townModel.incrementReputation(),
               onDecrementReputation: () => townModel.decrementReputation(),
+              onReputationChanged: (v) => townModel.setReputation(v),
               onLocationChanged: (v) => townModel.updatePartyLocation(v),
               onNotesChanged: (v) => townModel.updatePartyNotes(v),
               onToggleAchievement: (v) => townModel.toggleAchievement(v),

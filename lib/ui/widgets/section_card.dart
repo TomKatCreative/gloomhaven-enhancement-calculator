@@ -136,6 +136,7 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
+    final chevronColor = _isExpanded ? primaryColor : theme.colorScheme.primary;
 
     return Container(
       key: widget.sectionKey,
@@ -148,12 +149,25 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          iconColor: _isExpanded ? primaryColor : theme.colorScheme.primary,
+          iconColor: chevronColor,
           onExpansionChanged: (value) {
             widget.onExpansionChanged(value);
             setState(() => _isExpanded = value);
           },
           initiallyExpanded: _isExpanded,
+          trailing: widget.trailing != null
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    widget.trailing!,
+                    AnimatedRotation(
+                      turns: _isExpanded ? 0.5 : 0,
+                      duration: animationDuration,
+                      child: Icon(Icons.expand_more, color: chevronColor),
+                    ),
+                  ],
+                )
+              : null,
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -171,10 +185,6 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                       ),
                     ),
               ),
-              if (widget.trailing != null) ...[
-                const SizedBox(width: smallPadding),
-                widget.trailing!,
-              ],
             ],
           ),
           children: widget.children,

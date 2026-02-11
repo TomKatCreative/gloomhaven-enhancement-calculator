@@ -3,6 +3,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/stepper_buttons.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 /// Displays sanctuary donation progress with a Syncfusion slider and ± buttons.
@@ -109,21 +110,11 @@ class _SanctuaryContent extends StatelessWidget {
         // Edit mode ± buttons for fine-grained adjustments
         if (isEditMode) ...[
           const SizedBox(height: mediumPadding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton.filled(
-                onPressed: campaign.donatedGold > 0 ? onDecrement : null,
-                icon: const Icon(Icons.remove),
-              ),
-              const SizedBox(width: largePadding),
-              IconButton.filled(
-                onPressed: campaign.donatedGold < maxDonatedGold
-                    ? onIncrement
-                    : null,
-                icon: const Icon(Icons.add),
-              ),
-            ],
+          StepperButtons(
+            onDecrement: campaign.donatedGold > 0 ? onDecrement : null,
+            onIncrement: campaign.donatedGold < maxDonatedGold
+                ? onIncrement
+                : null,
           ),
         ],
       ],

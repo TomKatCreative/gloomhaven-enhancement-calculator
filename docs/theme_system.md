@@ -107,6 +107,20 @@ Text(
 
 ---
 
+## ColorScheme & Component Themes
+
+The app's `ColorScheme` maps `secondaryContainer`/`onSecondaryContainer` to match `primaryContainer`/`onPrimaryContainer`. This ensures M3 components that use secondary container colors (FilterChip selected state, SegmentedButton selected state) automatically get correct contrast with the character's primary color — no per-widget overrides needed.
+
+### Component Theme Overrides
+
+| Component | Override | Reason |
+|-----------|----------|--------|
+| `ChipThemeData` | `showCheckmark: false` | Hides checkmark on selected FilterChips |
+| `PopupMenuThemeData` | `labelTextStyle: bodySmall` | Consistent popup menu text size |
+| `SegmentedButtonThemeData` | None (M3 defaults) | Uses `secondaryContainer`/`onSecondaryContainer` from colorScheme |
+
+---
+
 ## Android System Navigation Bar
 
 The Android system navigation bar (soft buttons at bottom of screen) color is managed by `ThemeProvider`.

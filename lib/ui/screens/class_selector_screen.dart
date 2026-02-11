@@ -307,7 +307,6 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     required ClassCategory category,
     required String label,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isSelected = _selectedCategories.contains(category);
 
     return FilterChip(
@@ -323,14 +322,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
           }
         });
       },
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isSelected
-              ? colorScheme.onPrimaryContainer
-              : colorScheme.onSurface,
-        ),
-      ),
+      label: Text(label),
     );
   }
 

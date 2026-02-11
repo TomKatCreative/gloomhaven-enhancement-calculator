@@ -535,7 +535,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get renameCampaign => 'Rename campaign';
 
   @override
-  String get renameParty => 'Rename party';
+  String get renameParty => 'Rename';
 
   @override
   String get checkmarks => 'checkmarks';

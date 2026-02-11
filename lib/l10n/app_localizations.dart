@@ -1079,7 +1079,7 @@ abstract class AppLocalizations {
   /// No description provided for @renameParty.
   ///
   /// In en, this message translates to:
-  /// **'Rename party'**
+  /// **'Rename'**
   String get renameParty;
 
   /// No description provided for @checkmarks.

@@ -196,7 +196,7 @@ void main() {
         await tester.tap(find.byIcon(Icons.more_vert));
         await tester.pumpAndSettle();
 
-        expect(find.text('Rename party'), findsOneWidget);
+        expect(find.text('Rename'), findsOneWidget);
         expect(find.text('Switch'), findsOneWidget);
         expect(find.text('Delete'), findsOneWidget);
       });

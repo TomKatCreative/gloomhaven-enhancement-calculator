@@ -81,6 +81,8 @@ class AppThemeBuilder {
       // Also set secondary to match for consistency
       secondary: primaryColor,
       onSecondary: onPrimary,
+      secondaryContainer: primaryContainer,
+      onSecondaryContainer: onPrimaryContainer,
     );
 
     final textTheme = config.useDefaultFonts
@@ -236,22 +238,7 @@ class AppThemeBuilder {
         }),
       ),
 
-      segmentedButtonTheme: SegmentedButtonThemeData(
-        style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colorScheme.onPrimaryContainer;
-            }
-            return colorScheme.onSurface;
-          }),
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colorScheme.primaryContainer;
-            }
-            return null;
-          }),
-        ),
-      ),
+      segmentedButtonTheme: const SegmentedButtonThemeData(),
 
       cardTheme: CardThemeData(
         elevation: brightness == Brightness.dark ? 4 : 1,
@@ -260,10 +247,11 @@ class AppThemeBuilder {
             : colorScheme.surfaceContainerLow,
       ),
 
-      chipTheme: ChipThemeData(
-        showCheckmark: false,
-        selectedColor: colorScheme.primaryContainer,
+      popupMenuTheme: PopupMenuThemeData(
+        labelTextStyle: WidgetStatePropertyAll(textTheme.bodySmall),
       ),
+
+      chipTheme: ChipThemeData(showCheckmark: false),
 
       // Add custom extension with exact character color
       extensions: [

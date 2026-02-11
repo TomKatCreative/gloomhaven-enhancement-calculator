@@ -3,6 +3,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/stepper_buttons.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 /// Converts prosperity checkmarks to a slider position (1.0–9.0).
@@ -135,25 +136,13 @@ class _ProsperityContent extends StatelessWidget {
         // Edit mode stepper for fine-grained checkmark adjustments
         if (isEditMode) ...[
           const SizedBox(height: mediumPadding),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton.filled(
-                onPressed: campaign.prosperityCheckmarks > 1
-                    ? onDecrement
-                    : null,
-                icon: const Icon(Icons.remove),
-              ),
-              const SizedBox(width: largePadding),
-              IconButton.filled(
-                onPressed:
-                    campaign.prosperityCheckmarks <
-                        prosperityThresholds[campaign.edition]!.last
-                    ? onIncrement
-                    : null,
-                icon: const Icon(Icons.add),
-              ),
-            ],
+          StepperButtons(
+            onDecrement: campaign.prosperityCheckmarks > 1 ? onDecrement : null,
+            onIncrement:
+                campaign.prosperityCheckmarks <
+                    prosperityThresholds[campaign.edition]!.last
+                ? onIncrement
+                : null,
           ),
         ],
       ],

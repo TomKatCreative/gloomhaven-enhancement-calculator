@@ -4,6 +4,8 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/stepper_buttons.dart';
+import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 /// Placeholder achievement labels for the party sheet.
 const _achievementLabels = ['Achievement 1', 'Achievement 2', 'Achievement 3'];
@@ -23,6 +25,7 @@ class PartySection extends StatefulWidget {
     required this.onMenuAction,
     required this.onIncrementReputation,
     required this.onDecrementReputation,
+    required this.onReputationChanged,
     required this.onLocationChanged,
     required this.onNotesChanged,
     required this.onToggleAchievement,
@@ -36,6 +39,7 @@ class PartySection extends StatefulWidget {
   final ValueChanged<PartyAction> onMenuAction;
   final VoidCallback onIncrementReputation;
   final VoidCallback onDecrementReputation;
+  final ValueChanged<int> onReputationChanged;
   final ValueChanged<String> onLocationChanged;
   final ValueChanged<String> onNotesChanged;
   final ValueChanged<String> onToggleAchievement;
@@ -93,6 +97,44 @@ class _PartySectionState extends State<PartySection> {
     setState(() => _isEditingName = false);
   }
 
+  List<Widget> _buildReputationSlider(ThemeData theme) {
+    final slider = SfSlider(
+      min: minReputation.toDouble(),
+      max: maxReputation.toDouble(),
+      value: widget.party.reputation.toDouble(),
+      stepSize: widget.isEditMode ? 1 : null,
+      showTicks: true,
+      showLabels: true,
+      interval: 10,
+      activeColor: theme.colorScheme.primary,
+      onChanged: widget.isEditMode
+          ? (dynamic value) =>
+                widget.onReputationChanged((value as double).round())
+          : (_) {},
+    );
+
+    if (!widget.isEditMode) {
+      return [
+        const SizedBox(height: smallPadding),
+        IgnorePointer(child: slider),
+      ];
+    }
+
+    return [
+      const SizedBox(height: smallPadding),
+      slider,
+      const SizedBox(height: mediumPadding),
+      StepperButtons(
+        onDecrement: widget.party.reputation > minReputation
+            ? widget.onDecrementReputation
+            : null,
+        onIncrement: widget.party.reputation < maxReputation
+            ? widget.onIncrementReputation
+            : null,
+      ),
+    ];
+  }
+
   void _handleMenuAction(PartyAction action) {
     if (action == PartyAction.rename) {
       setState(() => _isEditingName = true);
@@ -134,36 +176,49 @@ class _PartySectionState extends State<PartySection> {
       onExpansionChanged: widget.onExpansionChanged,
       trailing: widget.isEditMode
           ? PopupMenuButton<PartyAction>(
+              iconColor: theme.colorScheme.onSurfaceVariant,
               onSelected: _handleMenuAction,
               itemBuilder: (_) => [
                 PopupMenuItem(
                   value: PartyAction.rename,
-                  child: ListTile(
-                    title: Text(l10n.renameParty),
-                    trailing: const Icon(Icons.edit_rounded),
-                    contentPadding: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.renameParty),
+                      const SizedBox(width: largePadding),
+                      Icon(
+                        Icons.edit_rounded,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ),
                 ),
                 PopupMenuItem(
                   value: PartyAction.switchParty,
-                  child: ListTile(
-                    title: Text(l10n.switchAction),
-                    trailing: const Icon(Icons.swap_horiz_rounded),
-                    contentPadding: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.switchAction),
+                      const SizedBox(width: largePadding),
+                      Icon(
+                        Icons.swap_horiz_rounded,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ),
                 ),
                 PopupMenuItem(
                   value: PartyAction.deleteParty,
-                  child: ListTile(
-                    title: Text(
-                      l10n.delete,
-                      style: TextStyle(color: theme.colorScheme.error),
-                    ),
-                    trailing: Icon(
-                      Icons.group_remove_rounded,
-                      color: theme.colorScheme.error,
-                    ),
-                    contentPadding: EdgeInsets.zero,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.delete),
+                      const SizedBox(width: largePadding),
+                      Icon(
+                        Icons.delete_rounded,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -199,28 +254,8 @@ class _PartySectionState extends State<PartySection> {
                   ),
                 ],
               ),
-              // Edit mode stepper
-              if (widget.isEditMode) ...[
-                const SizedBox(height: mediumPadding),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton.filled(
-                      onPressed: widget.party.reputation > minReputation
-                          ? widget.onDecrementReputation
-                          : null,
-                      icon: const Icon(Icons.remove),
-                    ),
-                    const SizedBox(width: largePadding),
-                    IconButton.filled(
-                      onPressed: widget.party.reputation < maxReputation
-                          ? widget.onIncrementReputation
-                          : null,
-                      icon: const Icon(Icons.add),
-                    ),
-                  ],
-                ),
-              ],
+              // Reputation slider and stepper
+              ..._buildReputationSlider(theme),
               const Divider(height: extraLargePadding),
               // Scenario location
               if (widget.isEditMode)

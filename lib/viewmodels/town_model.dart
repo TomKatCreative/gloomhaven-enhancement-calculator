@@ -340,4 +340,12 @@ class TownModel with ChangeNotifier {
     await databaseHelper.updateParty(_activeParty!);
     notifyListeners();
   }
+
+  /// Sets reputation to an exact value, clamped to [-20, 20].
+  Future<void> setReputation(int value) async {
+    if (_activeParty == null) return;
+    _activeParty!.reputation = value.clamp(minReputation, maxReputation);
+    await databaseHelper.updateParty(_activeParty!);
+    notifyListeners();
+  }
 }
