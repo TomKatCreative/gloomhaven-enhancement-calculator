@@ -22,6 +22,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
 /// Manages app-level navigation and theme state.
@@ -32,7 +33,8 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 /// - Font preference
 class AppModel extends ChangeNotifier {
   AppModel() {
-    final savedPage = SharedPrefs().initialPage.clamp(0, 2);
+    final maxPage = kTownSheetEnabled ? 2 : 1;
+    final savedPage = SharedPrefs().initialPage.clamp(0, maxPage);
     _page = savedPage;
     pageController = PageController(initialPage: savedPage);
   }

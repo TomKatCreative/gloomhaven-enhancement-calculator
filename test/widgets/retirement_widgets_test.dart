@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
@@ -197,13 +198,13 @@ void main() {
 }
 
 /// Builds a minimal test app with GHCAnimatedAppBar in a Scaffold.
-/// Sets appModel.page = 1 so retire/delete actions appear when in edit mode.
+/// Sets appModel.page to the characters page so retire/delete actions appear.
 Widget _buildTestApp({
   required CharactersModel model,
   required MockThemeProvider themeProvider,
 }) {
   final appModel = AppModel();
-  appModel.page = 1;
+  appModel.page = kTownSheetEnabled ? 1 : 0;
 
   return MultiProvider(
     providers: [

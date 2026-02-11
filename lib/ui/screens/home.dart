@@ -32,7 +32,7 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     future = context.read<CharactersModel>().loadCharacters();
-    context.read<TownModel>().loadCampaigns();
+    if (kTownSheetEnabled) context.read<TownModel>().loadCampaigns();
     if (SharedPrefs().showUpdate440Dialog) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         showDialog<void>(
@@ -50,16 +50,23 @@ class _HomeState extends State<Home> {
     final enhancementModel = context.watch<EnhancementCalculatorModel>();
     final townModel = context.watch<TownModel>();
 
+    const charactersPage = kTownSheetEnabled ? 1 : 0;
+    const calculatorPage = kTownSheetEnabled ? 2 : 1;
+
     // Hide FAB when:
     // - On town page (0) with no campaigns
-    // - On characters page (1) with no characters (empty state has inline button)
-    // - On characters page (1) when element sheet is fully expanded
-    // - On enhancement calculator page (2) when cost chip is expanded or nothing to clear
+    // - On characters page with no characters (empty state has inline button)
+    // - On characters page when element sheet is fully expanded
+    // - On enhancement calculator page when cost chip is expanded or nothing to clear
     final hideFab =
-        (appModel.page == 0 && townModel.campaigns.isEmpty) ||
-        (appModel.page == 1 && charactersModel.characters.isEmpty) ||
-        (appModel.page == 1 && charactersModel.isElementSheetFullExpanded) ||
-        (appModel.page == 2 &&
+        (kTownSheetEnabled &&
+            appModel.page == 0 &&
+            townModel.campaigns.isEmpty) ||
+        (appModel.page == charactersPage &&
+            charactersModel.characters.isEmpty) ||
+        (appModel.page == charactersPage &&
+            charactersModel.isElementSheetFullExpanded) ||
+        (appModel.page == calculatorPage &&
             (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
 
     return Scaffold(
@@ -72,7 +79,7 @@ class _HomeState extends State<Home> {
         controller: context.read<AppModel>().pageController,
         onPageChanged: (index) {
           charactersModel.isEditMode = false;
-          townModel.isEditMode = false;
+          if (kTownSheetEnabled) townModel.isEditMode = false;
           context.read<AppModel>().page = index;
           // Reset sheet expanded states when navigating between pages
           context.read<EnhancementCalculatorModel>().isSheetExpanded = false;
@@ -80,7 +87,7 @@ class _HomeState extends State<Home> {
           setState(() {});
         },
         children: [
-          const TownScreen(),
+          if (kTownSheetEnabled) const TownScreen(),
           FutureBuilder<List<Character>>(
             future: future,
             builder: (context, snapshot) {
@@ -132,8 +139,12 @@ class _HomeState extends State<Home> {
     EnhancementCalculatorModel enhancementModel,
     TownModel townModel,
   ) {
+    const calculatorPage = kTownSheetEnabled ? 2 : 1;
+
     // Town page: edit mode toggle FAB
-    if (appModel.page == 0 && townModel.campaigns.isNotEmpty) {
+    if (kTownSheetEnabled &&
+        appModel.page == 0 &&
+        townModel.campaigns.isNotEmpty) {
       return FloatingActionButton(
         heroTag: null,
         onPressed: () => townModel.isEditMode = !townModel.isEditMode,
@@ -144,7 +155,7 @@ class _HomeState extends State<Home> {
     }
 
     // Calculator page: clear FAB
-    if (appModel.page == 2) {
+    if (appModel.page == calculatorPage) {
       return FloatingActionButton(
         heroTag: null,
         onPressed: () => enhancementModel.resetCost(),

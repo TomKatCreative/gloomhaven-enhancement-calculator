@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 
@@ -19,17 +20,19 @@ void main() {
       });
 
       test('page restores from SharedPrefs initialPage', () async {
-        SharedPreferences.setMockInitialValues({'initialPage': 2});
+        final maxPage = kTownSheetEnabled ? 2 : 1;
+        SharedPreferences.setMockInitialValues({'initialPage': maxPage});
         await SharedPrefs().init();
         final model = AppModel();
-        expect(model.page, 2);
+        expect(model.page, maxPage);
       });
 
       test('page clamps out-of-range initialPage to valid range', () async {
+        final maxPage = kTownSheetEnabled ? 2 : 1;
         SharedPreferences.setMockInitialValues({'initialPage': 99});
         await SharedPrefs().init();
         final model = AppModel();
-        expect(model.page, 2);
+        expect(model.page, maxPage);
       });
 
       test('themeMode defaults to light when darkTheme is false', () {

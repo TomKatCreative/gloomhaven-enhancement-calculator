@@ -79,3 +79,7 @@ class GameEditionColors {
   static const Color gloomhavenLight = Color(0xff6ab7ff);
   static const Color frosthavenPrimary = Color(0xffa98274);
 }
+
+// Feature flags — set to `true` to enable unreleased features.
+const bool kTownSheetEnabled = false;
+const bool kPersonalQuestsEnabled = false;

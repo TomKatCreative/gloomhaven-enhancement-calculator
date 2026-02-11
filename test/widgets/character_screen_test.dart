@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -835,8 +836,8 @@ void main() {
 
       await scrollToNotes(tester);
 
-      // Notes header is rendered inside the combined Quest & Notes card
-      expect(find.text('Notes'), findsOneWidget);
+      // Notes card title (and chip label when PQ disabled) both say "Notes"
+      expect(find.text('Notes'), findsWidgets);
       expect(find.byIcon(Icons.book_rounded), findsOneWidget);
     });
 
@@ -924,7 +925,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Stats & Party'), findsWidgets);
-      expect(find.text('Quest & Notes'), findsWidgets);
+      expect(
+        find.text(kPersonalQuestsEnabled ? 'Quest & Notes' : 'Notes'),
+        findsWidgets,
+      );
       // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);
     });

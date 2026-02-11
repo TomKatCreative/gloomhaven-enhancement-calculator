@@ -4,6 +4,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
@@ -121,6 +122,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final l10n = AppLocalizations.of(context);
     final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
 
+    const charactersPage = kTownSheetEnabled ? 1 : 0;
+    const calculatorPage = kTownSheetEnabled ? 2 : 1;
+
     return AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,
@@ -128,7 +132,8 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
       backgroundColor: colorScheme.surface,
       centerTitle: true,
       title:
-          context.watch<AppModel>().page == 0 &&
+          kTownSheetEnabled &&
+              context.watch<AppModel>().page == 0 &&
               townModel.activeCampaign != null
           ? GestureDetector(
               onTap: () => CampaignSelector.show(
@@ -153,7 +158,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 ],
               ),
             )
-          : context.watch<AppModel>().page == 1 &&
+          : context.watch<AppModel>().page == charactersPage &&
                 charactersModel.characters.length > 1
           ? SmoothPageIndicator(
               controller: charactersModel.pageController,
@@ -164,7 +169,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 activeDotColor: colorScheme.onSurface,
               ),
             )
-          : context.watch<AppModel>().page == 2
+          : context.watch<AppModel>().page == calculatorPage
           ? SegmentedButton<GameEdition>(
               style: const ButtonStyle(
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -200,7 +205,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
           : Container(),
       actions: <Widget>[
         // Town page edit mode: delete campaign
-        if (townModel.isEditMode && appModel.page == 0)
+        if (kTownSheetEnabled && townModel.isEditMode && appModel.page == 0)
           Tooltip(
             message: l10n.deleteCampaign,
             child: IconButton(
@@ -209,7 +214,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
             ),
           ),
         if (!charactersModel.isEditMode &&
-            appModel.page == 1 &&
+            appModel.page == charactersPage &&
             charactersModel.characters.isNotEmpty)
           Tooltip(
             message: 'New Character',
@@ -220,7 +225,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               },
             ),
           ),
-        if (charactersModel.isEditMode && appModel.page == 1) ...[
+        if (charactersModel.isEditMode && appModel.page == charactersPage) ...[
           Tooltip(
             message: isRetired ? l10n.unretire : l10n.retire,
             child: IconButton(

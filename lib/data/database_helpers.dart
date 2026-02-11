@@ -2,6 +2,7 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
@@ -30,7 +31,9 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 18;
+  static const _databaseVersion = (kTownSheetEnabled || kPersonalQuestsEnabled)
+      ? 18
+      : 17;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -45,8 +48,8 @@ class DatabaseHelper implements IDatabaseHelper {
     tableCharacterPerks,
     tableCharacterMasteries,
     tableMetaData,
-    tableCampaigns,
-    tableParties,
+    if (kTownSheetEnabled) tableCampaigns,
+    if (kTownSheetEnabled) tableParties,
   ];
 
   Future<Database> get database async => _database ??= await _initDatabase();
@@ -70,6 +73,7 @@ class DatabaseHelper implements IDatabaseHelper {
       version: _databaseVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
+      onDowngrade: onDatabaseDowngradeDelete,
     );
   }
 
@@ -87,42 +91,46 @@ class DatabaseHelper implements IDatabaseHelper {
     await db.transaction((txn) async {
       await DatabaseMigrations.createMetaDataTable(txn, version);
       await _createTables(txn);
-      await _createCampaignPartyTables(txn);
+      if (kTownSheetEnabled) await _createCampaignPartyTables(txn);
       await _seedPerks(txn);
       await _seedMasteries(txn);
-      await _seedPersonalQuests(txn);
+      if (kPersonalQuestsEnabled) await _seedPersonalQuests(txn);
     });
   }
 
   /// Creates all database tables (Characters, Perks, CharacterPerks,
   /// Masteries, CharacterMasteries).
   Future<void> _createTables(Transaction txn) async {
-    await txn.execute('''
-      $createTable $tableCharacters (
-        $columnCharacterId $idType,
-        $columnCharacterUuid $textType,
-        $columnCharacterName $textType,
-        $columnCharacterClassCode $textType,
-        $columnPreviousRetirements $integerType,
-        $columnCharacterXp $integerType,
-        $columnCharacterGold $integerType,
-        $columnCharacterNotes $textType,
-        $columnCharacterCheckMarks $integerType,
-        $columnIsRetired $boolType,
-        $columnResourceHide $integerType,
-        $columnResourceMetal $integerType,
-        $columnResourceLumber $integerType,
-        $columnResourceArrowvine $integerType,
-        $columnResourceAxenut $integerType,
-        $columnResourceRockroot $integerType,
-        $columnResourceFlamefruit $integerType,
-        $columnResourceCorpsecap $integerType,
-        $columnResourceSnowthistle $integerType,
-        $columnVariant $textType,
-        $columnCharacterPersonalQuestId $textType DEFAULT '',
-        $columnCharacterPersonalQuestProgress $textType DEFAULT '[]',
-        $columnCharacterPartyId TEXT DEFAULT NULL
-      )''');
+    final characterColumns = [
+      '$columnCharacterId $idType',
+      '$columnCharacterUuid $textType',
+      '$columnCharacterName $textType',
+      '$columnCharacterClassCode $textType',
+      '$columnPreviousRetirements $integerType',
+      '$columnCharacterXp $integerType',
+      '$columnCharacterGold $integerType',
+      '$columnCharacterNotes $textType',
+      '$columnCharacterCheckMarks $integerType',
+      '$columnIsRetired $boolType',
+      '$columnResourceHide $integerType',
+      '$columnResourceMetal $integerType',
+      '$columnResourceLumber $integerType',
+      '$columnResourceArrowvine $integerType',
+      '$columnResourceAxenut $integerType',
+      '$columnResourceRockroot $integerType',
+      '$columnResourceFlamefruit $integerType',
+      '$columnResourceCorpsecap $integerType',
+      '$columnResourceSnowthistle $integerType',
+      '$columnVariant $textType',
+      if (kPersonalQuestsEnabled)
+        "$columnCharacterPersonalQuestId $textType DEFAULT ''",
+      if (kPersonalQuestsEnabled)
+        "$columnCharacterPersonalQuestProgress $textType DEFAULT '[]'",
+      if (kTownSheetEnabled) '$columnCharacterPartyId TEXT DEFAULT NULL',
+    ];
+    await txn.execute(
+      '$createTable $tableCharacters (${characterColumns.join(', ')})',
+    );
 
     await txn.execute('''
       $createTable $tablePerks (
@@ -155,13 +163,15 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnCharacterMasteryAchieved $boolType
       )''');
 
-    await txn.execute('''
-      $createTable $tablePersonalQuests (
-        $columnPersonalQuestId $idTextPrimaryType,
-        $columnPersonalQuestNumber $textType,
-        $columnPersonalQuestTitle $textType,
-        $columnPersonalQuestEdition $textType
-      )''');
+    if (kPersonalQuestsEnabled) {
+      await txn.execute('''
+        $createTable $tablePersonalQuests (
+          $columnPersonalQuestId $idTextPrimaryType,
+          $columnPersonalQuestNumber $textType,
+          $columnPersonalQuestTitle $textType,
+          $columnPersonalQuestEdition $textType
+        )''');
+    }
   }
 
   /// Seeds the Perks table from PerksRepository.

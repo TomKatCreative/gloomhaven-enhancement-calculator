@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
@@ -25,11 +26,12 @@ class GHCNavigationBar extends StatelessWidget {
         charactersModel.isElementSheetExpanded = false;
       },
       destinations: [
-        NavigationDestination(
-          icon: const Icon(Icons.castle_outlined),
-          selectedIcon: const Icon(Icons.castle),
-          label: l10n.town,
-        ),
+        if (kTownSheetEnabled)
+          NavigationDestination(
+            icon: const Icon(Icons.castle_outlined),
+            selectedIcon: const Icon(Icons.castle),
+            label: l10n.town,
+          ),
         NavigationDestination(
           icon: const Icon(Icons.history_edu_outlined),
           selectedIcon: const Icon(Icons.history_edu),

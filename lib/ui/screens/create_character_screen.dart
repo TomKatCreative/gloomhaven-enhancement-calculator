@@ -122,10 +122,14 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             _buildNameField(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildClassSelector(context, theme),
-            const SizedBox(height: formFieldSpacing),
-            _buildPersonalQuestSelector(context, theme),
-            const SizedBox(height: formFieldSpacing),
-            _buildPartySelector(context, theme),
+            if (kPersonalQuestsEnabled) ...[
+              const SizedBox(height: formFieldSpacing),
+              _buildPersonalQuestSelector(context, theme),
+            ],
+            if (kTownSheetEnabled) ...[
+              const SizedBox(height: formFieldSpacing),
+              _buildPartySelector(context, theme),
+            ],
             const SizedBox(height: formFieldSpacing),
             _buildLevelSelector(context, theme, colorScheme),
             const SizedBox(height: formFieldSpacing),
@@ -532,8 +536,10 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             ? int.parse(_prosperityLevelTextFieldController.text)
             : 0,
         variant: _variant,
-        personalQuestId: _selectedPersonalQuestId,
-        partyId: _selectedPartyId,
+        personalQuestId: kPersonalQuestsEnabled
+            ? _selectedPersonalQuestId
+            : null,
+        partyId: kTownSheetEnabled ? _selectedPartyId : null,
       );
       if (!mounted) return;
       Navigator.pop(context, true);
