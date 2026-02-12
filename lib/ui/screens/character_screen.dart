@@ -50,7 +50,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
   final GlobalKey _notesKey = GlobalKey();
   final GlobalKey _masteriesKey = GlobalKey();
 
-  _Section _activeSection = _Section.general;
+  final ValueNotifier<_Section> _activeSectionNotifier = ValueNotifier(
+    _Section.general,
+  );
 
   late ScrollController _scrollController;
   final ValueNotifier<double> _scrollOffsetNotifier = ValueNotifier(0.0);
@@ -69,6 +71,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
   void dispose() {
     _scrollController.removeListener(_onScroll);
     _scrollOffsetNotifier.dispose();
+    _activeSectionNotifier.dispose();
     super.dispose();
   }
 
@@ -119,8 +122,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
       }
     }
 
-    if (closest != null && closest != _activeSection) {
-      setState(() => _activeSection = closest!);
+    if (closest != null && closest != _activeSectionNotifier.value) {
+      _activeSectionNotifier.value = closest;
     }
   }
 
@@ -131,7 +134,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     // Temporarily disable scroll spy while programmatic scroll is in progress
     _isScrollSpyEnabled = false;
-    setState(() => _activeSection = section);
+    _activeSectionNotifier.value = section;
 
     // Use ensureVisible to compute the exact offset (it correctly handles
     // collapsing pinned headers), then back off by mediumPadding for breathing
@@ -221,7 +224,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
               pinned: true,
               delegate: _SectionNavBarDelegate(
                 character: widget.character,
-                activeSection: _activeSection,
+                activeSectionNotifier: _activeSectionNotifier,
                 onSectionTapped: _scrollToSection,
                 hasMasteries: hasMasteries,
               ),
@@ -531,13 +534,13 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
 class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
   _SectionNavBarDelegate({
     required this.character,
-    required this.activeSection,
+    required this.activeSectionNotifier,
     required this.onSectionTapped,
     required this.hasMasteries,
   });
 
   final Character character;
-  final _Section activeSection;
+  final ValueNotifier<_Section> activeSectionNotifier;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
 
@@ -558,7 +561,6 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
   ) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final primaryColor = theme.contrastedPrimary;
 
     final sections = [
       (_Section.general, kTownSheetEnabled ? l10n.general : l10n.stats),
@@ -586,35 +588,45 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
               ]
             : null,
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-        child: Row(
-          children: [
-            for (final (section, label) in sections)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: tinyPadding),
-                child: ChoiceChip(
-                  label: Text(label),
-                  selected: activeSection == section,
-                  onSelected: (_) => onSectionTapped(section),
-                  selectedColor: theme
-                      .extension<AppThemeExtension>()!
-                      .characterPrimary
-                      .withValues(alpha: 0.15),
-                  labelStyle: TextStyle(
-                    color: activeSection == section
-                        ? primaryColor
-                        : theme.colorScheme.onSurfaceVariant,
+      child: ValueListenableBuilder<_Section>(
+        valueListenable: activeSectionNotifier,
+        builder: (context, activeSection, _) {
+          final primaryColor = theme.contrastedPrimary;
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+            child: Row(
+              children: [
+                for (final (section, label) in sections)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: tinyPadding,
+                    ),
+                    child: ChoiceChip(
+                      label: Text(label),
+                      selected: activeSection == section,
+                      onSelected: (_) => onSectionTapped(section),
+                      selectedColor: theme
+                          .extension<AppThemeExtension>()!
+                          .characterPrimary
+                          .withValues(alpha: 0.15),
+                      labelStyle: TextStyle(
+                        color: activeSection == section
+                            ? primaryColor
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      side: activeSection == section
+                          ? BorderSide(
+                              color: primaryColor.withValues(alpha: 0.3),
+                            )
+                          : null,
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
-                  side: activeSection == section
-                      ? BorderSide(color: primaryColor.withValues(alpha: 0.3))
-                      : null,
-                  visualDensity: VisualDensity.compact,
-                ),
-              ),
-          ],
-        ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
