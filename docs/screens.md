@@ -382,8 +382,9 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 │   515 - Lawbringer         [swap]   │     (CollapsibleSectionCard internally)
 │   ● Kill 20 Bandits...    12/20    │
 ├─────────────────────────────────────┤
-│ Notes                               │  ← SectionCard
-│ "Remember to buy boots..."          │     (hidden when empty + view mode)
+│ Notes                               │  ← CollapsibleSectionCard
+│ "Remember to buy boots..."          │     (entire sliver + chip hidden when
+│                                     │      empty + view mode)
 ├─────────────────────────────────────┤
 │ Perks                     (3/9)     │  ← SectionCard + badge
 │ [✓] Remove two -1 cards             │
@@ -421,7 +422,7 @@ Two card widgets from `lib/ui/widgets/section_card.dart`:
 
 Both accept either a Material `icon` (IconData) or an `svgAssetKey` (String) for the title row icon. When `svgAssetKey` is provided (and `icon` is null), a `ThemedSvg` widget renders the SVG icon at `iconSizeSmall` in `contrastedPrimary` color. Both also support an optional `titleWidget` to replace the default `Text` title, and an optional `trailing` widget.
 
-Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and a default `maxWidth: 500`.
+Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and responsive max-width via `ResponsiveLayout.contentMaxWidth(context)` (phones: unconstrained, medium tablets: 560, large tablets: 700).
 
 ### Edit Mode vs View Mode
 
@@ -472,7 +473,7 @@ Three display states:
 - Retired characters have disabled edit controls and strikethrough gold
 - Bottom padding adjusts for element sheet expansion state
 - `ValueKey` on form fields keyed to character UUID
-- Max-width constraints (400px) on section cards for responsive design
+- Responsive max-width constraints via `ResponsiveLayout` (phones: fills screen, tablets: capped)
 - Scroll controller from `CharactersModel` for app bar animations
 
 ---

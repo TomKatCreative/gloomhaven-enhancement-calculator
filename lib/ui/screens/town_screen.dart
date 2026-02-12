@@ -163,7 +163,9 @@ class _TownScreenState extends State<TownScreen> {
           // No party prompt
           Center(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: maxWidth),
+              constraints: BoxConstraints(
+                maxWidth: ResponsiveLayout.contentMaxWidth(context),
+              ),
               child: Column(
                 children: [
                   Text(

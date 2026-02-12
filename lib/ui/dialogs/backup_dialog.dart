@@ -174,7 +174,9 @@ class _BackupDialogState extends State<BackupDialog> {
 
     return AlertDialog(
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,

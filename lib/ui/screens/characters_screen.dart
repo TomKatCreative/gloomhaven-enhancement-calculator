@@ -95,7 +95,9 @@ class _CharactersScreenState extends State<CharactersScreen>
           final character = charactersModel.characters[index];
 
           return Container(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.characterMaxWidth(context),
+            ),
             child: CharacterScreen(character: character),
           );
         },

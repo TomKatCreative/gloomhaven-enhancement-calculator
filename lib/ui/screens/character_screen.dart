@@ -178,6 +178,10 @@ class _CharacterScreenState extends State<CharacterScreen> {
         : _baseFabPadding;
 
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
+    final hasQuestOrNotes =
+        kPersonalQuestsEnabled ||
+        widget.character.notes.isNotEmpty ||
+        (model.isEditMode && !widget.character.isRetired);
     final theme = Theme.of(context);
 
     return Stack(
@@ -238,6 +242,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 activeSectionNotifier: _activeSectionNotifier,
                 onSectionTapped: _scrollToSection,
                 hasMasteries: hasMasteries,
+                hasQuestOrNotes: hasQuestOrNotes,
                 isEditMode: model.isEditMode && !widget.character.isRetired,
               ),
             ),
@@ -293,18 +298,19 @@ class _CharacterScreenState extends State<CharacterScreen> {
               ),
             ),
             // QUEST & NOTES CARD
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(smallPadding),
-                  child: _QuestAndNotesCollapsibleCard(
-                    sectionKey: _sectionKeys[_Section.questAndNotes],
-                    notesKey: _notesKey,
-                    character: widget.character,
+            if (hasQuestOrNotes)
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(smallPadding),
+                    child: _QuestAndNotesCollapsibleCard(
+                      sectionKey: _sectionKeys[_Section.questAndNotes],
+                      notesKey: _notesKey,
+                      character: widget.character,
+                    ),
                   ),
                 ),
               ),
-            ),
             // PERKS & MASTERIES CARD
             SliverToBoxAdapter(
               child: Center(
@@ -582,6 +588,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     required this.activeSectionNotifier,
     required this.onSectionTapped,
     required this.hasMasteries,
+    required this.hasQuestOrNotes,
     required this.isEditMode,
   });
 
@@ -589,6 +596,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
   final ValueNotifier<_Section> activeSectionNotifier;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
+  final bool hasQuestOrNotes;
   final bool isEditMode;
 
   @override
@@ -611,10 +619,11 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
     final sections = [
       (_Section.general, kTownSheetEnabled ? l10n.general : l10n.stats),
-      (
-        _Section.questAndNotes,
-        kPersonalQuestsEnabled ? l10n.questAndNotes : l10n.notes,
-      ),
+      if (hasQuestOrNotes)
+        (
+          _Section.questAndNotes,
+          kPersonalQuestsEnabled ? l10n.questAndNotes : l10n.notes,
+        ),
       (
         _Section.perksAndMasteries,
         hasMasteries ? l10n.perksAndMasteries : l10n.perks,

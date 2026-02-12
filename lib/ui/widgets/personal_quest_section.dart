@@ -68,7 +68,9 @@ class PersonalQuestSection extends StatelessWidget {
         );
       }
       return Container(
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.contentMaxWidth(context),
+        ),
         child: _SelectQuestButton(character: character, model: model),
       );
     }

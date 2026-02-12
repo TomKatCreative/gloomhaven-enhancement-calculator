@@ -52,9 +52,9 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
         child: Text('Custom classes', style: theme.textTheme.headlineLarge),
       ),
       content: Container(
-        constraints: const BoxConstraints(
-          maxWidth: maxDialogWidth,
-          minWidth: maxDialogWidth,
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+          minWidth: ResponsiveLayout.dialogMaxWidth(context),
         ),
         child: SingleChildScrollView(
           child: Column(

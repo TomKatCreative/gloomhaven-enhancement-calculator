@@ -40,7 +40,9 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
     return AlertDialog(
       title: Center(child: Text('Adjust ${widget.labelText}')),
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

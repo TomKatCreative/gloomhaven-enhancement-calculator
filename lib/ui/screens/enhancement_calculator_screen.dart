@@ -39,45 +39,49 @@ class _EnhancementCalculatorScreenState
 
     return Stack(
       children: [
-        Container(
-          constraints: const BoxConstraints(maxWidth: maxWidth),
-          padding: const EdgeInsets.symmetric(horizontal: smallPadding),
-          child: ListView(
-            controller: context
-                .read<CharactersModel>()
-                .enhancementCalcScrollController,
-            padding: EdgeInsets.only(
-              // Extra padding when chip and FAB are present
-              bottom: enhancementCalculatorModel.showCost ? 90 : largePadding,
+        Center(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.contentMaxWidth(context),
             ),
-            children: <Widget>[
-              const SizedBox(height: mediumPadding),
-
-              // 1. ENHANCEMENT TYPE
-              _EnhancementTypeCard(
-                edition: edition,
-                model: enhancementCalculatorModel,
+            padding: const EdgeInsets.symmetric(horizontal: smallPadding),
+            child: ListView(
+              controller: context
+                  .read<CharactersModel>()
+                  .enhancementCalcScrollController,
+              padding: EdgeInsets.only(
+                // Extra padding when chip and FAB are present
+                bottom: enhancementCalculatorModel.showCost ? 90 : largePadding,
               ),
+              children: <Widget>[
+                const SizedBox(height: mediumPadding),
 
-              const SizedBox(height: mediumPadding),
+                // 1. ENHANCEMENT TYPE
+                _EnhancementTypeCard(
+                  edition: edition,
+                  model: enhancementCalculatorModel,
+                ),
 
-              // 2. CARD DETAILS & MODIFIERS
-              _CardDetailsGroupCard(
-                edition: edition,
-                model: enhancementCalculatorModel,
-                darkTheme: darkTheme,
-              ),
+                const SizedBox(height: mediumPadding),
 
-              const SizedBox(height: mediumPadding),
+                // 2. CARD DETAILS & MODIFIERS
+                _CardDetailsGroupCard(
+                  edition: edition,
+                  model: enhancementCalculatorModel,
+                  darkTheme: darkTheme,
+                ),
 
-              // 3. DISCOUNTS
-              _DiscountsGroupCard(
-                edition: edition,
-                enhancementCalculatorModel: enhancementCalculatorModel,
-                darkTheme: darkTheme,
-                onSettingChanged: () => setState(() {}),
-              ),
-            ],
+                const SizedBox(height: mediumPadding),
+
+                // 3. DISCOUNTS
+                _DiscountsGroupCard(
+                  edition: edition,
+                  enhancementCalculatorModel: enhancementCalculatorModel,
+                  darkTheme: darkTheme,
+                  onSettingChanged: () => setState(() {}),
+                ),
+              ],
+            ),
           ),
         ),
         // Cost chip overlay with animated appearance
@@ -212,9 +216,11 @@ class _CardLevelSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: largePadding),
-              Text(
-                '${AppLocalizations.of(context).cardLevel}: ${level == 0 ? '1/X' : level + 1}',
-                style: theme.textTheme.bodyLarge,
+              Flexible(
+                child: Text(
+                  '${AppLocalizations.of(context).cardLevel}: ${level == 0 ? '1/X' : level + 1}',
+                  style: theme.textTheme.bodyLarge,
+                ),
               ),
             ],
           ),
@@ -293,9 +299,11 @@ class _PreviousEnhancementsSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: largePadding),
-              Text(
-                AppLocalizations.of(context).previousEnhancements,
-                style: theme.textTheme.bodyLarge,
+              Flexible(
+                child: Text(
+                  AppLocalizations.of(context).previousEnhancements,
+                  style: theme.textTheme.bodyLarge,
+                ),
               ),
             ],
           ),

@@ -89,7 +89,9 @@ class ConfirmationDialog extends StatelessWidget {
             )
           : null,
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: SingleChildScrollView(child: content),
       ),
       actions: <Widget>[

@@ -88,7 +88,9 @@ class _EnvelopePuzzleDialogState extends State<EnvelopePuzzleDialog> {
 
     return AlertDialog(
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

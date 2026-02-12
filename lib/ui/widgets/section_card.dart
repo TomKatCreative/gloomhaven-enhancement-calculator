@@ -9,7 +9,7 @@ import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 /// - Title row (icon + text) using [contrastedPrimary]
 /// - [surfaceContainerLow] background with [outlineVariant] border
 /// - [borderRadiusMedium] corners
-/// - Optional [constraints] (default maxWidth: [maxWidth])
+/// - Optional [constraints] (default: [ResponsiveLayout.contentMaxWidth])
 /// - Customizable [contentPadding] for the child content area
 class SectionCard extends StatelessWidget {
   const SectionCard({
@@ -20,7 +20,7 @@ class SectionCard extends StatelessWidget {
     this.svgAssetKey,
     this.trailing,
     required this.child,
-    this.constraints = const BoxConstraints(maxWidth: maxWidth),
+    this.constraints,
     this.contentPadding = const EdgeInsets.fromLTRB(
       largePadding,
       0,
@@ -40,7 +40,9 @@ class SectionCard extends StatelessWidget {
   final String? svgAssetKey;
   final Widget? trailing;
   final Widget child;
-  final BoxConstraints constraints;
+
+  /// Optional constraints. Defaults to [ResponsiveLayout.contentMaxWidth].
+  final BoxConstraints? constraints;
   final EdgeInsetsGeometry contentPadding;
   final GlobalKey? sectionKey;
 
@@ -48,10 +50,13 @@ class SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
+    final effectiveConstraints =
+        constraints ??
+        BoxConstraints(maxWidth: ResponsiveLayout.contentMaxWidth(context));
 
     return Container(
       key: sectionKey,
-      constraints: constraints,
+      constraints: effectiveConstraints,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         border: Border.all(color: theme.colorScheme.outlineVariant),
@@ -115,7 +120,7 @@ class CollapsibleSectionCard extends StatefulWidget {
     required this.initiallyExpanded,
     required this.onExpansionChanged,
     required this.children,
-    this.constraints = const BoxConstraints(maxWidth: maxWidth),
+    this.constraints,
     this.sectionKey,
     this.trailing,
   });
@@ -131,7 +136,9 @@ class CollapsibleSectionCard extends StatefulWidget {
   final bool initiallyExpanded;
   final ValueChanged<bool> onExpansionChanged;
   final List<Widget> children;
-  final BoxConstraints constraints;
+
+  /// Optional constraints. Defaults to [ResponsiveLayout.contentMaxWidth].
+  final BoxConstraints? constraints;
   final GlobalKey? sectionKey;
   final Widget? trailing;
 
@@ -153,10 +160,13 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
     final chevronColor = _isExpanded ? primaryColor : theme.colorScheme.primary;
+    final effectiveConstraints =
+        widget.constraints ??
+        BoxConstraints(maxWidth: ResponsiveLayout.contentMaxWidth(context));
 
     return Container(
       key: widget.sectionKey,
-      constraints: widget.constraints,
+      constraints: effectiveConstraints,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         border: Border.all(color: theme.colorScheme.outlineVariant),

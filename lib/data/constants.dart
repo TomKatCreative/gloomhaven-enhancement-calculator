@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/widgets.dart';
 
 // =============================================================================
 // DESIGN CONSTANTS
@@ -50,8 +50,6 @@ const Duration animationDuration = Duration(milliseconds: 250);
 const double expansionBlurSigma = 12.0;
 
 // Layout Constraints
-const double maxWidth = 500;
-const double maxDialogWidth = 400;
 const double chipBarHeight = 60.0; // Section nav chip bar height
 const double blurBarHeight = 100.0; // Blur bar at bottom of calculator
 const double elementTrackerClearance =
@@ -78,6 +76,44 @@ class GameEditionColors {
   static const Color gloomhavenPrimary = Color(0xff005cb2);
   static const Color gloomhavenLight = Color(0xff6ab7ff);
   static const Color frosthavenPrimary = Color(0xffa98274);
+}
+
+// Responsive Breakpoints (Material 3 window size classes)
+const double _compactBreakpoint = 600.0;
+const double _mediumBreakpoint = 840.0;
+
+/// Provides responsive max-width constraints based on screen size.
+///
+/// Uses Material 3 window size classes:
+/// - Compact (<600dp): phones — no constraint, content fills width
+/// - Medium (600–839dp): small tablets — moderate cap
+/// - Expanded (840dp+): large tablets — wider cap
+class ResponsiveLayout {
+  ResponsiveLayout._();
+
+  /// Max width for general content (calculator, settings, town sections).
+  static double contentMaxWidth(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < _compactBreakpoint) return double.infinity;
+    if (width < _mediumBreakpoint) return 560;
+    return 700;
+  }
+
+  /// Max width for character screen pages.
+  static double characterMaxWidth(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < _compactBreakpoint) return double.infinity;
+    if (width < _mediumBreakpoint) return 700;
+    return 840;
+  }
+
+  /// Max width for dialog content containers.
+  static double dialogMaxWidth(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < _compactBreakpoint) return 400;
+    if (width < _mediumBreakpoint) return 480;
+    return 560;
+  }
 }
 
 // Feature flags — set to `true` to enable unreleased features.

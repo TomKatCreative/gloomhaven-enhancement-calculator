@@ -54,7 +54,9 @@ class RestoreDialog {
       builder: (context) {
         return AlertDialog(
           content: Container(
-            constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+            ),
             child: Text(l10n.restoreWarning),
           ),
           actions: <Widget>[
@@ -171,7 +173,9 @@ class RestoreDialog {
             ),
           ],
           content: Container(
-            constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+            ),
             child: SingleChildScrollView(
               child: Text(l10n.restoreErrorMessage(error.toString())),
             ),

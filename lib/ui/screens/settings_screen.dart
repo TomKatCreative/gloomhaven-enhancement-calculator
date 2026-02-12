@@ -54,7 +54,9 @@ class SettingsScreenState extends State<SettingsScreen> {
         ),
         body: Center(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: maxWidth),
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.contentMaxWidth(context),
+            ),
             child: ListView(
               controller: scrollController,
               children: <Widget>[

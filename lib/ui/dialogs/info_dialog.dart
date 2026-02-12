@@ -328,7 +328,9 @@ class _InfoDialogState extends State<InfoDialog> {
     return AlertDialog(
       title: _buildTitle(context),
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
