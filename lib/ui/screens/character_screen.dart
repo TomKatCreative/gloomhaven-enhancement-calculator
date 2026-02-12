@@ -86,7 +86,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
   void _updateActiveSection() {
     if (!_scrollController.hasClients) return;
 
-    // Threshold: just below the pinned headers
+    // Threshold: max header height + chip bar = the bottom edge of the two
+    // pinned headers. Sections whose top is at or above this Y coordinate are
+    // considered "scrolled to the top" for scroll-spy purposes.
     const headerOffset = 180.0 + chipBarHeight;
 
     // All keys to check: chip section keys + sub-section keys mapped to their
@@ -132,7 +134,8 @@ class _CharacterScreenState extends State<CharacterScreen> {
     if (key.currentContext == null) return;
     if (!_scrollController.hasClients) return;
 
-    // Temporarily disable scroll spy while programmatic scroll is in progress
+    // Disable scroll spy during the programmatic scroll so intermediate
+    // positions don't fight the chip we just activated.
     _isScrollSpyEnabled = false;
     _activeSectionNotifier.value = section;
 
@@ -159,6 +162,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
       curve: Curves.easeInOut,
     );
 
+    // Re-enable scroll spy now that the animation has settled.
     _isScrollSpyEnabled = true;
   }
 
@@ -177,7 +181,11 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     return Stack(
       children: [
-        // Background class icon — extends through transparent header and nav bar
+        // Background class icon — extends through transparent header and nav bar.
+        // Fades from 15% → 0% opacity as the header collapses. `range` is the
+        // header's collapse distance (maxExtent − minExtent); `progress` is how
+        // far through that range the user has scrolled. Hidden in edit mode
+        // (non-retired) where the header + chip bar are fully opaque.
         Positioned(
           right: -32,
           top: -45,
@@ -193,14 +201,16 @@ class _CharacterScreenState extends State<CharacterScreen> {
               ),
             ),
             builder: (context, child) {
-              final range = model.isEditMode && !widget.character.isRetired
-                  ? 0.0
-                  : _CharacterHeaderDelegate._maxHeight -
-                        _CharacterHeaderDelegate._minHeight;
+              final isFixedHeader =
+                  model.isEditMode && !widget.character.isRetired;
+              if (isFixedHeader) {
+                return const Opacity(opacity: 0, child: SizedBox.shrink());
+              }
+              final range =
+                  _CharacterHeaderDelegate._maxHeight -
+                  _CharacterHeaderDelegate._minHeight;
               final offset = _scrollOffsetNotifier.value;
-              final progress = range > 0
-                  ? (offset / range).clamp(0.0, 1.0)
-                  : 0.0;
+              final progress = (offset / range).clamp(0.0, 1.0);
               return Opacity(
                 opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
                 child: child,
@@ -227,6 +237,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 activeSectionNotifier: _activeSectionNotifier,
                 onSectionTapped: _scrollToSection,
                 hasMasteries: hasMasteries,
+                isEditMode: model.isEditMode && !widget.character.isRetired,
               ),
             ),
             // GENERAL CARD (stats + resources)
@@ -330,6 +341,10 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
   static const double _editModeHeight = 90.0;
   static const double _minHeight = 56.0;
 
+  // In edit mode (non-retired) the header is fixed-height: maxExtent ==
+  // minExtent, so the sliver never collapses. This means overlapsContent
+  // snaps immediately on the first scroll pixel — handled by the chip bar's
+  // showOpaqueBar logic.
   @override
   double get maxExtent =>
       isEditMode && !character.isRetired ? _editModeHeight : _maxHeight;
@@ -358,23 +373,26 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Faded class icon background (matches Stack icon position/size)
-            Positioned(
-              right: -32,
-              top: -45,
-              height: _CharacterHeaderDelegate._maxHeight + chipBarHeight + 75,
-              width: 260,
-              child: Opacity(
-                opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
-                child: ClassIconSvg(
-                  playerClass: character.playerClass,
-                  color: ColorUtils.ensureContrast(
-                    character.getEffectiveColor(theme.brightness),
-                    colorScheme.surface,
+            // Faded class icon background (matches Stack icon position/size).
+            // Hidden in edit mode where the header is fully opaque.
+            if (!isEditMode || character.isRetired)
+              Positioned(
+                right: -32,
+                top: -45,
+                height:
+                    _CharacterHeaderDelegate._maxHeight + chipBarHeight + 75,
+                width: 260,
+                child: Opacity(
+                  opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
+                  child: ClassIconSvg(
+                    playerClass: character.playerClass,
+                    color: ColorUtils.ensureContrast(
+                      character.getEffectiveColor(theme.brightness),
+                      colorScheme.surface,
+                    ),
                   ),
                 ),
               ),
-            ),
             // Content
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: largePadding),
@@ -537,12 +555,14 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     required this.activeSectionNotifier,
     required this.onSectionTapped,
     required this.hasMasteries,
+    required this.isEditMode,
   });
 
   final Character character;
   final ValueNotifier<_Section> activeSectionNotifier;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
+  final bool isEditMode;
 
   @override
   double get maxExtent => chipBarHeight;
@@ -574,10 +594,17 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
       ),
     ];
 
+    // In edit mode the header is fixed-height (doesn't collapse), so
+    // overlapsContent snaps from false→true on the first pixel of scroll.
+    // Always use an opaque background to avoid that jarring flash.
+    // Shadow still uses overlapsContent — it only appears when content
+    // actually scrolls behind the bar.
+    final showOpaqueBar = isEditMode || overlapsContent;
+
     return Container(
       height: chipBarHeight,
       decoration: BoxDecoration(
-        color: overlapsContent ? theme.colorScheme.surface : Colors.transparent,
+        color: showOpaqueBar ? theme.colorScheme.surface : Colors.transparent,
         boxShadow: overlapsContent
             ? [
                 BoxShadow(

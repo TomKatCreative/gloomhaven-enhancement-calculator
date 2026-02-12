@@ -371,7 +371,8 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 │ Class Name • (retired)              │     Collapses from 180px → 56px
 ├─────────────────────────────────────┤
 │ [General] [Quest] [Notes] [Perks]   │  ← SliverPersistentHeader (pinned)
-│             [class icon extends ↓]  │     Transparent when not overlapping
+│             [class icon extends ↓]  │     Transparent → opaque on scroll
+│                                     │     (always opaque in edit mode)
 ├─────────────────────────────────────┤
 │ ▼ General (collapsible)             │  ← CollapsibleSectionCard
 │   XP: 45/95    Gold: 120            │
@@ -408,7 +409,7 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
-- **Transparent background** when not overlapping content (lets Stack background icon show through); switches to opaque `surface` with drop shadow when content scrolls behind it
+- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); switches to opaque `surface` with drop shadow when content scrolls behind it. In edit mode (non-retired), always opaque — the header is fixed-height so `overlapsContent` would snap on the first scroll pixel, causing a jarring flash. Shadow still uses `overlapsContent` so it only appears when content actually scrolls behind the bar.
 
 ### Section Cards
 
@@ -434,6 +435,7 @@ Controlled by `charactersModel.isEditMode`:
 | Personal Quest | Progress text (e.g., "12/20") | +/- buttons per requirement, swap quest |
 | Resources | Read-only cards | Cards with +/- callbacks |
 | Notes | Plain text | Multiline text field |
+| Chip Nav Bar | Transparent → opaque on scroll | Always opaque (fixed-height header) |
 | Retired badge | Shows if retired | Hidden |
 
 ### Content Widgets

@@ -935,6 +935,59 @@ void main() {
       // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);
     });
+
+    /// Finds the chip bar [Container] — the one rendered by
+    /// `_SectionNavBarDelegate.build()` with a [BoxDecoration].
+    /// It is the ancestor of a [ChoiceChip] that has a `BoxDecoration`.
+    Finder findChipBarContainer() {
+      return find.ancestor(
+        of: find.byType(ChoiceChip).first,
+        matching: find.byWidgetPredicate(
+          (w) => w is Container && w.decoration is BoxDecoration,
+        ),
+      );
+    }
+
+    testWidgets('chip bar is opaque in edit mode (non-retired)', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final chipBar = findChipBarContainer();
+      expect(chipBar, findsOneWidget);
+
+      final container = tester.widget<Container>(chipBar);
+      final decoration = container.decoration! as BoxDecoration;
+      // In edit mode, the bar should be opaque (surface color, not transparent)
+      // even before any scrolling occurs
+      expect(decoration.color, isNot(Colors.transparent));
+    });
+
+    testWidgets('chip bar is transparent in view mode (initial state)', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final chipBar = findChipBarContainer();
+      expect(chipBar, findsOneWidget);
+
+      final container = tester.widget<Container>(chipBar);
+      final decoration = container.decoration! as BoxDecoration;
+      // In view mode before scrolling, the bar should be transparent
+      expect(decoration.color, Colors.transparent);
+    });
   });
 
   // ────────────────────────────────────────────────────────────────────────
