@@ -226,7 +226,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                     fixedCenter: true,
                     dotHeight: 10,
                     dotWidth: 10,
-                    activeDotColor: colorScheme.onSurface,
+                    activeDotColor: colorScheme.primary,
                   ),
                 )
               : context.watch<AppModel>().page == calculatorPage
