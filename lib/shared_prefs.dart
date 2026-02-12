@@ -1,3 +1,4 @@
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,7 +100,8 @@ class SharedPrefs {
 
   set envelopeV(bool value) => _sharedPrefs.setBool('envelopeV', value);
 
-  int get initialPage => _sharedPrefs.getInt('initialPage') ?? 1;
+  int get initialPage =>
+      _sharedPrefs.getInt('initialPage') ?? (kTownSheetEnabled ? 1 : 0);
 
   set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
 
@@ -328,10 +330,11 @@ class SharedPrefs {
         'envelopeV': envelopeV,
         'showAllCharacters': showAllCharacters,
       },
-      'town': {
-        if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
-        if (activePartyId != null) 'activePartyId': activePartyId,
-      },
+      if (kTownSheetEnabled)
+        'town': {
+          if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
+          if (activePartyId != null) 'activePartyId': activePartyId,
+        },
       'calculator': {
         'gameEdition': gameEdition.index,
         'enhancementType': enhancementTypeIndex,
@@ -388,8 +391,8 @@ class SharedPrefs {
       }
     }
 
-    // Town state
-    if (data['town'] is Map) {
+    // Town state (only when town sheet feature is enabled)
+    if (kTownSheetEnabled && data['town'] is Map) {
       final t = Map<String, dynamic>.from(data['town'] as Map);
       if (t.containsKey('activeCampaignId')) {
         activeCampaignId = t['activeCampaignId'] as String?;

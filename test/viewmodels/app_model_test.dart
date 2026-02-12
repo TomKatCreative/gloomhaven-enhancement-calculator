@@ -14,9 +14,9 @@ void main() {
     });
 
     group('initial state', () {
-      test('page defaults to 1 (Characters) when no initialPage saved', () {
+      test('page defaults to Characters tab when no initialPage saved', () {
         final model = AppModel();
-        expect(model.page, 1);
+        expect(model.page, kTownSheetEnabled ? 1 : 0);
       });
 
       test('page restores from SharedPrefs initialPage', () async {

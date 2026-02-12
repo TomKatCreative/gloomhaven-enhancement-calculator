@@ -164,6 +164,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
               controller: charactersModel.pageController,
               count: charactersModel.characters.length,
               effect: ScrollingDotsEffect(
+                fixedCenter: true,
                 dotHeight: 10,
                 dotWidth: 10,
                 activeDotColor: colorScheme.onSurface,
