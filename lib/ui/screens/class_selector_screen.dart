@@ -206,7 +206,6 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
         controller: _searchController,
         focusNode: _searchFocusNode,
         searchQuery: _searchQuery,
-        scrollController: _scrollController,
         onChanged: (value) => setState(() => _searchQuery = value),
         onClear: () {
           _searchController.clear();
