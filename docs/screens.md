@@ -401,6 +401,7 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 - Collapses to 56px (name only) on scroll
 - In edit mode with non-retired character: stays at 90px (name `TextFormField`)
 - Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
+- **Background tint**: Once content scrolls behind the pinned headers (scroll offset > collapse range), the `Material` background transitions from `surface` to an 8% primary tint via `TweenAnimationBuilder` (300ms). Resets instantly on character switch via `ValueKey(character.uuid)`.
 
 ### Chip Nav Bar
 
@@ -409,7 +410,7 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
-- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); switches to opaque `surface` with drop shadow when content scrolls behind it. In edit mode (non-retired), always opaque — the header is fixed-height so `overlapsContent` would snap on the first scroll pixel, causing a jarring flash. Shadow still uses `overlapsContent` so it only appears when content actually scrolls behind the bar.
+- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `TweenAnimationBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`_CharacterHeaderDelegate`) also tint in sync using the same pattern.
 
 ### Section Cards
 

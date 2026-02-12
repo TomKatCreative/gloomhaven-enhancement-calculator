@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
@@ -367,8 +368,34 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
     final range = maxExtent - minExtent;
     final progress = range > 0 ? (shrinkOffset / range).clamp(0.0, 1.0) : 0.0;
 
-    return Material(
-      color: colorScheme.surface,
+    // Tint only when content is actually scrolling behind the pinned headers,
+    // not during the header's collapse animation. The first pinned sliver never
+    // receives overlapsContent, so check the scroll offset directly instead.
+    final controller = Provider.of<CharactersModel>(
+      context,
+      listen: false,
+    ).charScreenScrollController;
+    final scrollOffset =
+        controller.hasClients && controller.positions.length == 1
+        ? controller.offset
+        : 0.0;
+    final isContentBehind = scrollOffset > range;
+
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(character.uuid),
+      tween: Tween<double>(end: isContentBehind ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      builder: (context, tintProgress, child) {
+        return Material(
+          color: Color.lerp(
+            colorScheme.surface,
+            AppBarUtils.getTintedBackground(colorScheme),
+            tintProgress,
+          ),
+          child: child,
+        );
+      },
       child: ClipRect(
         child: Stack(
           fit: StackFit.expand,
@@ -594,27 +621,40 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
       ),
     ];
 
-    // In edit mode the header is fixed-height (doesn't collapse), so
-    // overlapsContent snaps from false→true on the first pixel of scroll.
-    // Always use an opaque background to avoid that jarring flash.
-    // Shadow still uses overlapsContent — it only appears when content
-    // actually scrolls behind the bar.
-    final showOpaqueBar = isEditMode || overlapsContent;
+    // Opacity follows scroll position directly (no animation delay) so the
+    // bar goes transparent as soon as the header starts re-expanding.
+    // Tint color still fades in smoothly via TweenAnimationBuilder.
+    final controller = Provider.of<CharactersModel>(
+      context,
+      listen: false,
+    ).charScreenScrollController;
+    final scrollOffset =
+        controller.hasClients && controller.positions.length == 1
+        ? controller.offset
+        : 0.0;
+    // Header collapse range: 180 − 56 = 124. In edit mode (fixed header) = 0.
+    final headerRange = isEditMode ? 0.0 : 124.0;
+    final isOpaque = isEditMode || scrollOffset >= headerRange;
 
-    return Container(
-      height: chipBarHeight,
-      decoration: BoxDecoration(
-        color: showOpaqueBar ? theme.colorScheme.surface : Colors.transparent,
-        boxShadow: overlapsContent
-            ? [
-                BoxShadow(
-                  color: theme.colorScheme.shadow.withValues(alpha: 0.15),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-      ),
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(character.uuid),
+      tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      builder: (context, tintProgress, child) {
+        final color = isOpaque
+            ? Color.lerp(
+                theme.colorScheme.surface,
+                AppBarUtils.getTintedBackground(theme.colorScheme),
+                tintProgress,
+              )
+            : Colors.transparent;
+        return Container(
+          height: chipBarHeight,
+          decoration: BoxDecoration(color: color),
+          child: child,
+        );
+      },
       child: ValueListenableBuilder<_Section>(
         valueListenable: activeSectionNotifier,
         builder: (context, activeSection, _) {
@@ -661,6 +701,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Level Badge (shared between expanded and collapsed header)
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _LevelBadge extends StatelessWidget {
