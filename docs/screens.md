@@ -444,7 +444,7 @@ Controlled by `charactersModel.isEditMode`:
 
 - `_StatsSection` — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
 - `_CheckmarksAndRetirementsRow` — edit-mode only row with +/- controls
-- `_ResourcesContent` — 9 `ResourceCard` widgets for all resource types
+- `_ResourcesContent` — 9 `ResourceCard` inventory slots; tap opens `ResourceStepperSheet` in edit mode
 - `PersonalQuestSection` — PQ progress with retirement prompt (see below)
 - `_NotesSection` — User notes (hidden when empty and not editing)
 - `PerksSection` — Perk checkboxes with parsed game text

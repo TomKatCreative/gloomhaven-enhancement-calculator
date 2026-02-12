@@ -709,7 +709,7 @@ void main() {
       expect(find.byType(ResourceCard), findsNWidgets(9));
     });
 
-    testWidgets('resource buttons hidden in view mode', (tester) async {
+    testWidgets('resource cards not tappable in view mode', (tester) async {
       final character = TestData.createCharacter();
       final model = await setupModel(character: character, isEditMode: false);
 
@@ -721,23 +721,14 @@ void main() {
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      expect(
-        find.descendant(
-          of: find.byType(ResourceCard),
-          matching: find.byIcon(Icons.remove_rounded),
-        ),
-        findsNothing,
-      );
-      expect(
-        find.descendant(
-          of: find.byType(ResourceCard),
-          matching: find.byIcon(Icons.add_rounded),
-        ),
-        findsNothing,
-      );
+      // Tap a resource card — should not open a stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.add_rounded), findsNothing);
     });
 
-    testWidgets('resource buttons hidden for retired character', (
+    testWidgets('resource cards not tappable for retired character', (
       tester,
     ) async {
       final character = TestData.createRetiredCharacter();
@@ -751,7 +742,10 @@ void main() {
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.remove_rounded), findsNothing);
+      // Tap a resource card — should not open a stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
       expect(find.byIcon(Icons.add_rounded), findsNothing);
     });
 
@@ -767,10 +761,14 @@ void main() {
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      final addIcons = find.byIcon(Icons.add_rounded);
-      expect(addIcons, findsWidgets);
+      // Tap the resource card to open the stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
 
-      await tester.tap(addIcons.first);
+      // Tap the add button in the stepper sheet
+      final addIcon = find.byIcon(Icons.add_rounded);
+      expect(addIcon, findsOneWidget);
+      await tester.tap(addIcon);
       await tester.pumpAndSettle();
 
       expect(fakeDb.updateCalls, contains('res-test'));
@@ -1073,11 +1071,16 @@ void main() {
       );
       expect(initialCountText, findsOneWidget);
 
-      final addIcons = find.descendant(
-        of: firstCard,
-        matching: find.byIcon(Icons.add_rounded),
-      );
-      await tester.tap(addIcons.first);
+      // Tap the resource card to open the stepper sheet
+      await tester.tap(firstCard);
+      await tester.pumpAndSettle();
+
+      // Tap the add button in the stepper sheet
+      await tester.tap(find.byIcon(Icons.add_rounded));
+      await tester.pumpAndSettle();
+
+      // Dismiss the sheet
+      await tester.tapAt(Offset.zero);
       await tester.pumpAndSettle();
 
       final updatedCountText = find.descendant(

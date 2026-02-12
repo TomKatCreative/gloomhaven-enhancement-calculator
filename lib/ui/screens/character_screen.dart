@@ -21,6 +21,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_stepper_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/party_assignment_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -1466,11 +1467,24 @@ class _ResourcesContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.read<CharactersModel>();
-    final cards = _buildResourceCards(context, character, charactersModel);
+    final theme = Theme.of(context);
+    final charactersModel = context.read<CharactersModel>();
+    final canEdit = charactersModel.isEditMode && !character.isRetired;
+    final iconColor = ColorUtils.ensureContrast(
+      theme.extension<AppThemeExtension>()!.characterPrimary,
+      theme.colorScheme.surfaceContainerHigh,
+    );
+    final cards = _buildResourceCards(
+      context,
+      character,
+      charactersModel,
+      iconColor: iconColor,
+      canEdit: canEdit,
+    );
+
     return LayoutBuilder(
       builder: (context, constraints) {
-        const minCardWidth = 100.0;
+        const minCardWidth = 75.0;
         final crossAxisCount = (constraints.maxWidth / minCardWidth)
             .floor()
             .clamp(3, cards.length);
@@ -1480,45 +1494,38 @@ class _ResourcesContent extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           mainAxisSpacing: smallPadding,
           crossAxisSpacing: smallPadding,
-          childAspectRatio: _resourceCardAspectRatio(context),
           children: cards,
         );
       },
     );
   }
 
-  double _resourceCardAspectRatio(BuildContext context) {
-    final canEdit =
-        context.read<CharactersModel>().isEditMode && !character.isRetired;
-    // Match original ResourceCard proportions: 100 wide × 100 or 75 tall
-    return canEdit ? 100 / 100 : 100 / 75;
-  }
-
   List<Widget> _buildResourceCards(
     BuildContext context,
     Character character,
-    CharactersModel charactersModel,
-  ) {
+    CharactersModel charactersModel, {
+    required Color iconColor,
+    required bool canEdit,
+  }) {
     return resourceFields.entries.map((entry) {
       final ResourceFieldData fieldData = entry.value;
+      final resource = ResourcesRepository.resources[fieldData.resourceIndex];
       return ResourceCard(
-        resource: ResourcesRepository.resources[fieldData.resourceIndex],
-        color: ColorUtils.ensureContrast(
-          Theme.of(context).extension<AppThemeExtension>()!.characterPrimary,
-          Theme.of(context).colorScheme.surfaceContainerLow,
-        ).withValues(alpha: 0.1),
+        resource: resource,
+        iconColor: iconColor,
         count: fieldData.getter(character),
-        onIncrease: () {
-          final updatedCharacter = character;
-          fieldData.setter(updatedCharacter, fieldData.getter(character) + 1);
-          charactersModel.updateCharacter(updatedCharacter);
-        },
-        onDecrease: () {
-          final updatedCharacter = character;
-          fieldData.setter(updatedCharacter, fieldData.getter(character) - 1);
-          charactersModel.updateCharacter(updatedCharacter);
-        },
-        canEdit: charactersModel.isEditMode && !character.isRetired,
+        onTap: canEdit
+            ? () => ResourceStepperSheet.show(
+                context: context,
+                resource: resource,
+                iconColor: iconColor,
+                initialCount: fieldData.getter(character),
+                onCountChanged: (newCount) {
+                  fieldData.setter(character, newCount);
+                  charactersModel.updateCharacter(character);
+                },
+              )
+            : null,
       );
     }).toList();
   }
