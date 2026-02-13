@@ -98,7 +98,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Section header
-        expect(find.text('Personal Quest'), findsOneWidget);
+        expect(find.text('Personal quest'), findsOneWidget);
         // Quest display name
         expect(find.textContaining('515: Lawbringer'), findsOneWidget);
       });
@@ -183,7 +183,7 @@ void main() {
         expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(3));
       });
 
-      testWidgets('shows envelope icon in header for envelope quests', (
+      testWidgets('shows envelope letter in header for envelope quests', (
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-6');
@@ -197,8 +197,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Icon should be in the header row
-        expect(find.byIcon(Icons.mail_outline), findsOneWidget);
+        // "X" should be in the header row (styled with PirataOne font)
+        expect(find.text('X'), findsOneWidget);
       });
     });
 
@@ -471,9 +471,14 @@ void main() {
         expect(find.byIcon(Icons.radio_button_unchecked), findsNothing);
       });
 
-      testWidgets('tapping swap button opens confirmation dialog', (
+      testWidgets('tapping swap button opens selector directly', (
         tester,
       ) async {
+        tester.view.physicalSize = const Size(800, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
         final character = TestData.createCharacter(uuid: 'test-pq-16');
         character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
@@ -488,20 +493,64 @@ void main() {
         await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
 
-        // Should show confirmation dialog
-        expect(find.text('Change Personal Quest?'), findsOneWidget);
-        expect(
-          find.text(
-            'This will replace your current quest and reset all progress.',
-          ),
-          findsOneWidget,
-        );
-        expect(find.text('Change'), findsOneWidget);
-        expect(find.text('Cancel'), findsOneWidget);
+        // Should open the selector bottom sheet directly (no confirmation first)
+        // displayName format is "515 - Lawbringer"
+        expect(find.text('515 - Lawbringer'), findsOneWidget);
+        // The remove button in the sheet header
+        expect(find.byIcon(Icons.remove_circle_outline), findsWidgets);
       });
 
-      testWidgets('cancelling confirmation dialog keeps quest', (tester) async {
-        final character = TestData.createCharacter(uuid: 'test-pq-17');
+      testWidgets(
+        'selecting a quest in selector shows Change confirmation dialog',
+        (tester) async {
+          tester.view.physicalSize = const Size(800, 1200);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+
+          final character = TestData.createCharacter(uuid: 'test-pq-17');
+          character.personalQuestId = 'pq_gh_515';
+          character.personalQuestProgress = [5];
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Tap swap to open selector
+          await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+          await tester.pumpAndSettle();
+
+          // Pick a different quest from the list
+          await tester.tap(find.textContaining('510 -').last);
+          await tester.pumpAndSettle();
+
+          // Should show the Change confirmation dialog
+          expect(find.text('Change personal quest?'), findsOneWidget);
+          expect(
+            find.text(
+              'This will replace your current quest and reset all progress.',
+            ),
+            findsOneWidget,
+          );
+          expect(find.text('Change'), findsOneWidget);
+          expect(find.text('Cancel'), findsOneWidget);
+        },
+      );
+
+      testWidgets('cancelling Change confirmation keeps original quest', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final character = TestData.createCharacter(uuid: 'test-pq-17b');
         character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
@@ -511,18 +560,60 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Tap swap button to open dialog
+        // Open selector → pick a quest → Cancel
         await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
-
-        // Tap Cancel
+        await tester.tap(find.textContaining('510 -').last);
+        await tester.pumpAndSettle();
         await tester.tap(find.text('Cancel'));
         await tester.pumpAndSettle();
 
-        // Quest should still be displayed
+        // Quest should still be the original
         expect(find.textContaining('515: Lawbringer'), findsOneWidget);
         expect(find.text('5/20'), findsOneWidget);
       });
+
+      testWidgets(
+        'removing quest in selector shows Remove confirmation dialog',
+        (tester) async {
+          tester.view.physicalSize = const Size(800, 1200);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+
+          final character = TestData.createCharacter(uuid: 'test-pq-17c');
+          character.personalQuestId = 'pq_gh_515';
+          character.personalQuestProgress = [5];
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // Open selector → tap remove (red X) in the sheet header
+          await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+          await tester.pumpAndSettle();
+          // .last finds the remove icon in the sheet header (not the -/+
+          // control behind the sheet)
+          await tester.tap(find.byIcon(Icons.remove_circle_outline).last);
+          await tester.pumpAndSettle();
+
+          // Should show the Remove confirmation dialog
+          expect(find.text('Remove personal quest?'), findsOneWidget);
+          expect(
+            find.text(
+              'This will remove your current quest and reset all progress.',
+            ),
+            findsOneWidget,
+          );
+          expect(find.text('Remove'), findsOneWidget);
+          expect(find.text('Cancel'), findsOneWidget);
+        },
+      );
     });
 
     group('retirement prompt', () {
@@ -888,7 +979,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Header should be visible
-        expect(find.text('Personal Quest'), findsOneWidget);
+        expect(find.text('Personal quest'), findsOneWidget);
         // Content should be collapsed - quest name not visible
         expect(find.textContaining('515: Lawbringer'), findsNothing);
       });

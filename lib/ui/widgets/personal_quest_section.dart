@@ -180,10 +180,14 @@ class _QuestContent extends StatelessWidget {
                         const TextSpan(text: ' · '),
                         WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
-                          child: Icon(
-                            Icons.mail_outline,
-                            size: iconSizeMedium,
-                            color: theme.colorScheme.onSurfaceVariant,
+                          child: Text(
+                            'X',
+                            style: TextStyle(
+                              fontFamily: 'PirataOne',
+                              fontWeight: FontWeight.normal,
+                              fontSize: iconSizeMedium,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ),
                       ],
@@ -239,16 +243,6 @@ class _QuestContent extends StatelessWidget {
   }
 
   Future<void> _changeQuest(BuildContext context) async {
-    // Show warning dialog
-    final confirmed = await ConfirmationDialog.show(
-      context: context,
-      title: AppLocalizations.of(context).changePersonalQuest,
-      content: Text(AppLocalizations.of(context).changePersonalQuestBody),
-      confirmLabel: AppLocalizations.of(context).change,
-      cancelLabel: AppLocalizations.of(context).cancel,
-    );
-    if (confirmed != true || !context.mounted) return;
-
     final result = await showPersonalQuestSelectorDialog(
       context: context,
       edition: GameEdition.gloomhaven,

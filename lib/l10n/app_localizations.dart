@@ -785,7 +785,7 @@ abstract class AppLocalizations {
   /// No description provided for @personalQuest.
   ///
   /// In en, this message translates to:
-  /// **'Personal Quest'**
+  /// **'Personal quest'**
   String get personalQuest;
 
   /// No description provided for @selectPersonalQuest.
@@ -803,7 +803,7 @@ abstract class AppLocalizations {
   /// No description provided for @changePersonalQuest.
   ///
   /// In en, this message translates to:
-  /// **'Change Personal Quest?'**
+  /// **'Change personal quest?'**
   String get changePersonalQuest;
 
   /// No description provided for @changePersonalQuestBody.
@@ -811,6 +811,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This will replace your current quest and reset all progress.'**
   String get changePersonalQuestBody;
+
+  /// No description provided for @removePersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove personal quest?'**
+  String get removePersonalQuest;
+
+  /// No description provided for @removePersonalQuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove your current quest and reset all progress.'**
+  String get removePersonalQuestBody;
 
   /// No description provided for @comingSoon.
   ///
@@ -829,6 +841,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change'**
   String get change;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
 
   /// No description provided for @progressOf.
   ///

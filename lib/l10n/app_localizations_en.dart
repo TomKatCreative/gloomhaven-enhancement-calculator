@@ -380,7 +380,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNotes => 'Add notes...';
 
   @override
-  String get personalQuest => 'Personal Quest';
+  String get personalQuest => 'Personal quest';
 
   @override
   String get selectPersonalQuest => 'Select personal quest...';
@@ -389,11 +389,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAPersonalQuest => 'Select a Personal Quest';
 
   @override
-  String get changePersonalQuest => 'Change Personal Quest?';
+  String get changePersonalQuest => 'Change personal quest?';
 
   @override
   String get changePersonalQuestBody =>
       'This will replace your current quest and reset all progress.';
+
+  @override
+  String get removePersonalQuest => 'Remove personal quest?';
+
+  @override
+  String get removePersonalQuestBody =>
+      'This will remove your current quest and reset all progress.';
 
   @override
   String get comingSoon => 'Coming soon...';
@@ -403,6 +410,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get change => 'Change';
+
+  @override
+  String get remove => 'Remove';
 
   @override
   String progressOf(int current, int target) {

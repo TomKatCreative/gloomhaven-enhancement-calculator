@@ -14,6 +14,7 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_con
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 
 /// Result type for the personal quest selector dialog.
@@ -84,7 +85,7 @@ class _PersonalQuestSelectorSheet extends StatelessWidget {
                           Icons.remove_circle_outline,
                           color: theme.colorScheme.error,
                         ),
-                        onPressed: () => Navigator.pop(context, PQRemoved()),
+                        onPressed: () => _confirmRemove(context),
                       ),
                     ],
                   )
@@ -99,7 +100,10 @@ class _PersonalQuestSelectorSheet extends StatelessWidget {
               controller: scrollController,
               itemCount: filteredQuests.length,
               itemBuilder: (context, index) {
-                return _PersonalQuestTile(quest: filteredQuests[index]);
+                return _PersonalQuestTile(
+                  quest: filteredQuests[index],
+                  requireConfirmation: currentQuest != null,
+                );
               },
             ),
           ),
@@ -107,11 +111,29 @@ class _PersonalQuestSelectorSheet extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _confirmRemove(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await ConfirmationDialog.show(
+      context: context,
+      title: l10n.removePersonalQuest,
+      content: Text(l10n.removePersonalQuestBody),
+      confirmLabel: l10n.remove,
+      cancelLabel: l10n.cancel,
+    );
+    if (confirmed == true && context.mounted) {
+      Navigator.pop(context, PQRemoved());
+    }
+  }
 }
 
 class _PersonalQuestTile extends StatelessWidget {
-  const _PersonalQuestTile({required this.quest});
+  const _PersonalQuestTile({
+    required this.quest,
+    this.requireConfirmation = false,
+  });
   final PersonalQuest quest;
+  final bool requireConfirmation;
 
   @override
   Widget build(BuildContext context) {
@@ -119,8 +141,26 @@ class _PersonalQuestTile extends StatelessWidget {
     return ListTile(
       title: Text(quest.displayName, style: theme.textTheme.bodyLarge),
       trailing: _buildUnlockIcon(context),
-      onTap: () => Navigator.pop(context, PQSelected(quest)),
+      onTap: () => _onSelect(context),
     );
+  }
+
+  Future<void> _onSelect(BuildContext context) async {
+    if (!requireConfirmation) {
+      Navigator.pop(context, PQSelected(quest));
+      return;
+    }
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await ConfirmationDialog.show(
+      context: context,
+      title: l10n.changePersonalQuest,
+      content: Text(l10n.changePersonalQuestBody),
+      confirmLabel: l10n.change,
+      cancelLabel: l10n.cancel,
+    );
+    if (confirmed == true && context.mounted) {
+      Navigator.pop(context, PQSelected(quest));
+    }
   }
 
   Widget _buildUnlockIcon(BuildContext context) {
@@ -135,10 +175,21 @@ class _PersonalQuestTile extends StatelessWidget {
       );
     }
     if (quest.unlockEnvelope != null) {
-      return Icon(
-        Icons.mail_outline,
-        size: iconSizeMedium,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      return SizedBox(
+        width: iconSizeMedium,
+        height: iconSizeMedium,
+        child: Center(
+          child: Text(
+            'X',
+            style: TextStyle(
+              fontFamily: 'PirataOne',
+              fontWeight: FontWeight.normal,
+              fontSize: iconSizeMedium,
+              height: 1,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
       );
     }
     return const SizedBox.shrink();
