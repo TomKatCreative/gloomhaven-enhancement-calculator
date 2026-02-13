@@ -34,21 +34,26 @@ class GHCAnimatedAppBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
   bool _isScrolledToTop = true;
+  bool _isCalcScrolledToTop = true;
   String? _currentCharacterUuid;
+  int? _currentPage;
   late final ScrollController _charScrollController;
+  late final ScrollController _calcScrollController;
 
   @override
   void initState() {
     super.initState();
-    _charScrollController = context
-        .read<CharactersModel>()
-        .charScreenScrollController;
+    final charactersModel = context.read<CharactersModel>();
+    _charScrollController = charactersModel.charScreenScrollController;
+    _calcScrollController = charactersModel.enhancementCalcScrollController;
     _charScrollController.addListener(_scrollListener);
+    _calcScrollController.addListener(_calcScrollListener);
   }
 
   @override
   void dispose() {
     _charScrollController.removeListener(_scrollListener);
+    _calcScrollController.removeListener(_calcScrollListener);
     super.dispose();
   }
 
@@ -69,6 +74,15 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     final isContentBehind = _charScrollController.offset > collapseRange;
     if (isContentBehind == !_isScrolledToTop) return;
     setState(() => _isScrolledToTop = !isContentBehind);
+  }
+
+  void _calcScrollListener() {
+    if (!_calcScrollController.hasClients) return;
+    if (_calcScrollController.positions.length != 1) return;
+
+    final isScrolled = _calcScrollController.offset > 0;
+    if (isScrolled == !_isCalcScrolledToTop) return;
+    setState(() => _isCalcScrolledToTop = !isScrolled);
   }
 
   Future<void> _handleRetire(
@@ -171,8 +185,30 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
       _isScrolledToTop = true;
     }
 
+    // When the page changes, read the target page's scroll position so the
+    // tint state is correct immediately (before any scroll events fire).
+    if (appModel.page != _currentPage) {
+      _currentPage = appModel.page;
+      if (appModel.page == charactersPage) {
+        final isFixedHeader =
+            charactersModel.isEditMode &&
+            !(charactersModel.currentCharacter?.isRetired ?? true);
+        final collapseRange = isFixedHeader ? 0.0 : 124.0;
+        _isScrolledToTop =
+            !_charScrollController.hasClients ||
+            _charScrollController.offset <= collapseRange;
+      } else if (appModel.page == calculatorPage) {
+        _isCalcScrolledToTop =
+            !_calcScrollController.hasClients ||
+            _calcScrollController.offset <= 0;
+      }
+    }
+
     final isOnCharactersPage = appModel.page == charactersPage;
-    final showTint = isOnCharactersPage && !_isScrolledToTop;
+    final isOnCalcPage = appModel.page == calculatorPage;
+    final showTint =
+        (isOnCharactersPage && !_isScrolledToTop) ||
+        (isOnCalcPage && !_isCalcScrolledToTop);
 
     return TweenAnimationBuilder<double>(
       key: ValueKey(uuid),
