@@ -122,6 +122,48 @@ The app's `ColorScheme` maps `secondaryContainer`/`onSecondaryContainer` to matc
 
 ---
 
+## Scroll-Aware Tint
+
+Pinned headers throughout the app use an M3-inspired scroll-aware tint to indicate when content is scrolling behind them. The tint is an 8% primary color overlay on the surface color.
+
+### Implementation
+
+**`AppBarUtils.getTintedBackground(colorScheme)`** (`lib/ui/widgets/app_bar_utils.dart`) returns `Color.alphaBlend(primary.withAlpha(0.08), surface)`. This is the single source of truth for the tinted background color.
+
+### Where It's Applied
+
+| Component | File | Behavior |
+|-----------|------|----------|
+| Character header (`_CharacterHeaderDelegate`) | `character_screen.dart` | Transparent when expanded; tints when content scrolls behind pinned header |
+| Chip nav bar (`_SectionNavBarDelegate`) | `character_screen.dart` | Same — transparent when header expanding, tints when content overlaps |
+| Calculator page app bar | `enhancement_calculator_screen.dart` | Tints when `CustomScrollView` content scrolls behind pinned app bar |
+| Main app bar (`GHCAnimatedAppBar`) | `ghc_animated_app_bar.dart` | Tints in sync with character header on characters page |
+
+### Animation Pattern
+
+All tinted headers use the same `TweenAnimationBuilder<double>` pattern:
+
+```dart
+TweenAnimationBuilder<double>(
+  key: ValueKey(character.uuid),  // resets on character switch
+  tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
+  duration: const Duration(milliseconds: 300),
+  curve: Curves.easeInOut,
+  builder: (context, tintProgress, child) {
+    final tinted = AppBarUtils.getTintedBackground(colorScheme);
+    final color = Color.lerp(surface, tinted, tintProgress)!;
+    // ...
+  },
+)
+```
+
+### Edit Mode Behavior
+
+- **View mode** (and retired edit mode): Background opacity follows scroll position directly (transparent as long as header is expanding). Tint color fades in/out smoothly via the 300ms animation.
+- **Edit mode** (non-retired): Always opaque. Tint animates in/out based on `overlapsContent` only.
+
+---
+
 ## Android System Navigation Bar
 
 The Android system navigation bar (soft buttons at bottom of screen) color is managed by `ThemeProvider`.

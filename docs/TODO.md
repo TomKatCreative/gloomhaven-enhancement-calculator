@@ -230,7 +230,7 @@ If swiping between character pages is still not smooth, investigate:
 Larger refactoring opportunities identified during codebase audit. These are non-urgent structural improvements that would reduce complexity and improve maintainability.
 
 ### CharactersModel Decomposition
-**File:** `lib/viewmodels/characters_model.dart` (~572 lines)
+**File:** `lib/viewmodels/characters_model.dart` (~590 lines)
 
 Extract element sheet state, scroll controllers, and navigation logic into smaller focused classes. Currently a god class managing too many concerns.
 

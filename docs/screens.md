@@ -370,7 +370,7 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 │ Character Name    [class icon bg]   │  ← SliverPersistentHeader (pinned)
 │ Class Name • (retired)              │     Collapses from 180px → 56px
 ├─────────────────────────────────────┤
-│ [General] [Quest] [Notes] [Perks]   │  ← SliverPersistentHeader (pinned)
+│ [Stats] [Notes] [Perks & Masteries] │  ← SliverPersistentHeader (pinned)
 │             [class icon extends ↓]  │     Transparent → opaque on scroll
 │                                     │     (always opaque in edit mode)
 ├─────────────────────────────────────┤
@@ -395,6 +395,18 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 └─────────────────────────────────────┘
 ```
 
+### Section-to-Chip Mapping
+
+The chip nav bar groups multiple sections under single chips:
+
+| Chip | Enum value | Sections | Scroll-spy keys |
+|------|------------|----------|-----------------|
+| Stats / General | `general` | General (resources, XP, gold) | `_sectionKeys[general]` |
+| Notes / Quest & Notes | `questAndNotes` | Personal Quest + Notes | `_sectionKeys[questAndNotes]` + `_notesKey` |
+| Perks / Perks & Masteries | `perksAndMasteries` | Perks + Masteries | `_sectionKeys[perksAndMasteries]` + `_masteriesKey` |
+
+The `questAndNotes` chip is **conditional** — hidden when no quest is assigned AND notes are empty AND not in edit mode. Label is "Notes" when `kPersonalQuestsEnabled` is `false`, "Quest & Notes" when `true`. First chip label is "Stats" when `kTownSheetEnabled` is `false`, "General" when `true`.
+
 ### Pinned Header
 
 `_CharacterHeaderDelegate` — a `SliverPersistentHeaderDelegate` that:
@@ -406,8 +418,8 @@ Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with sl
 
 ### Chip Nav Bar
 
-`_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets:
-- Labels: General, Quest & Notes, Perks, Masteries (Masteries hidden if class has none). When `kPersonalQuestsEnabled` is `false`, the label is just "Notes" instead of "Quest & Notes". When `kTownSheetEnabled` is `true`, the General section title and chip label show "General" (since it includes the party assignment row); when `false`, they show "Stats".
+`_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets (2–3 chips, see Section-to-Chip Mapping above):
+- Labels vary by feature flags and context: Stats/General, Notes/Quest & Notes, Perks/Perks & Masteries. The third chip label is "Perks" when the class has no masteries, "Perks & Masteries" when it does.
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
@@ -444,7 +456,7 @@ Controlled by `charactersModel.isEditMode`:
 
 - `_StatsSection` — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
 - `_CheckmarksAndRetirementsRow` — edit-mode only row with +/- controls
-- `_ResourcesContent` — 9 `ResourceCard` inventory slots; tap opens `ResourceStepperSheet` in edit mode
+- `_ResourcesContent` — 9 `ResourceCard` inventory-slot cells with a "Resources" header; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
 - `PersonalQuestSection` — PQ progress with retirement prompt (see below)
 - `_NotesSection` — User notes (hidden when empty and not editing)
 - `PerksSection` — Perk checkboxes with parsed game text

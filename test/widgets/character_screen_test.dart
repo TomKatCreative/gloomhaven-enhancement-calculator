@@ -1122,8 +1122,7 @@ void main() {
       // General card should exist
       expect(
         find.byWidgetPredicate(
-          (w) =>
-              w is CollapsibleSectionCard && w.icon == Icons.bar_chart_rounded,
+          (w) => w is CollapsibleSectionCard && w.icon == Icons.badge_rounded,
         ),
         findsOneWidget,
       );
@@ -1169,8 +1168,7 @@ void main() {
       // General card present
       expect(
         find.byWidgetPredicate(
-          (w) =>
-              w is CollapsibleSectionCard && w.icon == Icons.bar_chart_rounded,
+          (w) => w is CollapsibleSectionCard && w.icon == Icons.badge_rounded,
         ),
         findsOneWidget,
       );
