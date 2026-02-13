@@ -316,7 +316,6 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
 
     return FilterChip(
       visualDensity: VisualDensity.compact,
-      elevation: isSelected ? 4 : 0,
       selected: isSelected,
       onSelected: (value) {
         setState(() {

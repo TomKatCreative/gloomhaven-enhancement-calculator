@@ -243,7 +243,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               hintText: AppLocalizations.of(context).selectClass,
               floatingLabelBehavior: FloatingLabelBehavior.always,
               border: const OutlineInputBorder(),
-              suffixIcon: const Icon(Icons.chevron_right),
+              suffixIcon: const Icon(Icons.open_in_new_rounded),
             ),
             onTap: () async {
               SelectedPlayerClass? selectedPlayerClass =
@@ -269,31 +269,22 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             },
           ),
         ),
-        const SizedBox(width: smallPadding),
-        // Match IconButton's 48x48 touch target size for alignment
-        SizedBox(
-          width: iconSizeHero,
-          height: iconSizeHero,
-          child: Center(
+        if (_selectedClass != null) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
             child: SizedBox(
-              width: iconSizeMedium,
-              height: iconSizeMedium,
-              child: _selectedClass == null
-                  ? ThemedSvg(
-                      assetKey: 'CLASS',
-                      width: iconSizeMedium,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )
-                  : ClassIconSvg(
-                      playerClass: _selectedClass!,
-                      color: ColorUtils.ensureContrast(
-                        Color(_selectedClass!.primaryColor),
-                        theme.colorScheme.surface,
-                      ),
-                    ),
+              width: iconSizeXL,
+              height: iconSizeXL,
+              child: ClassIconSvg(
+                playerClass: _selectedClass!,
+                color: ColorUtils.ensureContrast(
+                  Color(_selectedClass!.primaryColor),
+                  theme.colorScheme.surface,
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ],
     );
   }
