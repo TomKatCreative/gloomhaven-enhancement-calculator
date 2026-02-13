@@ -35,55 +35,57 @@ class ResourceCard extends StatelessWidget {
         ),
       ),
       clipBehavior: Clip.antiAlias,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Stack(
-            children: [
-              // Resource icon — bottom center
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: smallPadding,
-                child: SizedBox(
-                  width: iconSizeLarge,
-                  height: iconSizeLarge,
-                  child: ThemedSvg(
-                    assetKey: resource.icon,
-                    width: iconSizeLarge,
-                    color: iconColor.withValues(alpha: 0.45),
+      child: InkWell(
+        onTap: onTap,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final iconSize = constraints.maxHeight / 2;
+            return Stack(
+              children: [
+                // Resource icon — bottom center
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: smallPadding,
+                  child: SizedBox(
+                    width: iconSize,
+                    height: iconSize,
+                    child: ThemedSvg(
+                      assetKey: resource.icon,
+                      width: iconSize,
+                      color: iconColor.withValues(alpha: 0.45),
+                    ),
                   ),
                 ),
-              ),
-              // Resource name — top center
-              Positioned(
-                top: tinyPadding,
-                left: tinyPadding,
-                right: tinyPadding,
-                child: AutoSizeText(
-                  resource.name,
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
+                // Resource name — top center
+                Positioned(
+                  top: tinyPadding,
+                  left: tinyPadding,
+                  right: tinyPadding,
+                  child: AutoSizeText(
+                    resource.name,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ),
-              ),
-              // Count badge — bottom right
-              Positioned(
-                right: tinyPadding,
-                bottom: tinyPadding,
-                child: Text(
-                  '$count',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+                // Count badge — bottom right
+                Positioned(
+                  right: tinyPadding,
+                  bottom: tinyPadding,
+                  child: Text(
+                    '$count',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.onSurface,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          },
         ),
       ),
     );
