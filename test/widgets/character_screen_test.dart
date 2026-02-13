@@ -292,7 +292,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final battleGoalsTooltip = find.byWidgetPredicate(
-        (w) => w is Tooltip && w.message == 'Battle Goals',
+        (w) => w is Tooltip && w.message == 'Battle goals',
       );
       expect(battleGoalsTooltip, findsOneWidget);
 
@@ -465,7 +465,7 @@ void main() {
       expect(find.text('Previous retirements'), findsOneWidget);
       // Battle Goals appears in both the chip nav bar label and in the
       // checkmarks row — look for it inside the General card content
-      expect(find.text('Battle Goals'), findsWidgets);
+      expect(find.text('Battle goals'), findsWidgets);
     });
 
     testWidgets('section hidden in view mode', (tester) async {
@@ -927,10 +927,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text(kTownSheetEnabled ? 'General & Party' : 'General'),
+        find.text(kTownSheetEnabled ? 'General & party' : 'Stats & resources'),
         findsWidgets,
       );
-      expect(find.text('Quest & Notes'), findsWidgets);
+      expect(find.text('Quest & notes'), findsWidgets);
       // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);
     });

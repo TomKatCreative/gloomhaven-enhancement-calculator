@@ -107,7 +107,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get battleGoals => 'Battle Goals';
+  String get battleGoals => 'Battle goals';
 
   @override
   String get cardLevel => 'Card level';
@@ -312,7 +312,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?';
 
   @override
-  String get errorDuringRestore => 'Error During Restore Operation';
+  String get errorDuringRestore => 'Error during restore operation';
 
   @override
   String restoreErrorMessage(String error) {
@@ -386,7 +386,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectPersonalQuest => 'Select personal quest...';
 
   @override
-  String get selectAPersonalQuest => 'Select a Personal Quest';
+  String get selectAPersonalQuest => 'Select a personal quest';
 
   @override
   String get changePersonalQuest => 'Change personal quest?';
@@ -434,13 +434,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unretire => 'Unretire';
 
   @override
-  String get notYet => 'Not Yet';
+  String get notYet => 'Not yet';
 
   @override
-  String get general => 'General & Party';
+  String get general => 'General & party';
 
   @override
-  String get stats => 'General';
+  String get stats => 'Stats';
+
+  @override
+  String get statsAndResources => 'Stats & resources';
 
   @override
   String get quest => 'Quest';
@@ -452,10 +455,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get masteries => 'Masteries';
 
   @override
-  String get questAndNotes => 'Quest & Notes';
+  String get questAndNotes => 'Quest & notes';
 
   @override
-  String get perksAndMasteries => 'Perks & Masteries';
+  String get perksAndMasteries => 'Perks & masteries';
 
   @override
   String get town => 'TOWN';

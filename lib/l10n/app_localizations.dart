@@ -281,7 +281,7 @@ abstract class AppLocalizations {
   /// No description provided for @battleGoals.
   ///
   /// In en, this message translates to:
-  /// **'Battle Goals'**
+  /// **'Battle goals'**
   String get battleGoals;
 
   /// No description provided for @cardLevel.
@@ -665,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorDuringRestore.
   ///
   /// In en, this message translates to:
-  /// **'Error During Restore Operation'**
+  /// **'Error during restore operation'**
   String get errorDuringRestore;
 
   /// No description provided for @restoreErrorMessage.
@@ -797,7 +797,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectAPersonalQuest.
   ///
   /// In en, this message translates to:
-  /// **'Select a Personal Quest'**
+  /// **'Select a personal quest'**
   String get selectAPersonalQuest;
 
   /// No description provided for @changePersonalQuest.
@@ -881,20 +881,26 @@ abstract class AppLocalizations {
   /// No description provided for @notYet.
   ///
   /// In en, this message translates to:
-  /// **'Not Yet'**
+  /// **'Not yet'**
   String get notYet;
 
   /// No description provided for @general.
   ///
   /// In en, this message translates to:
-  /// **'General & Party'**
+  /// **'General & party'**
   String get general;
 
   /// No description provided for @stats.
   ///
   /// In en, this message translates to:
-  /// **'General'**
+  /// **'Stats'**
   String get stats;
+
+  /// No description provided for @statsAndResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats & resources'**
+  String get statsAndResources;
 
   /// No description provided for @quest.
   ///
@@ -917,13 +923,13 @@ abstract class AppLocalizations {
   /// No description provided for @questAndNotes.
   ///
   /// In en, this message translates to:
-  /// **'Quest & Notes'**
+  /// **'Quest & notes'**
   String get questAndNotes;
 
   /// No description provided for @perksAndMasteries.
   ///
   /// In en, this message translates to:
-  /// **'Perks & Masteries'**
+  /// **'Perks & masteries'**
   String get perksAndMasteries;
 
   /// No description provided for @town.

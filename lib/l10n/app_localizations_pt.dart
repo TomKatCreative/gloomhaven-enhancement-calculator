@@ -386,7 +386,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get selectPersonalQuest => 'Selecionar missão pessoal...';
 
   @override
-  String get selectAPersonalQuest => 'Selecionar uma Missão Pessoal';
+  String get selectAPersonalQuest => 'Selecionar uma missão pessoal';
 
   @override
   String get changePersonalQuest => 'Alterar missão pessoal?';
@@ -434,13 +434,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get unretire => 'Desaposentar';
 
   @override
-  String get notYet => 'Ainda Não';
+  String get notYet => 'Ainda não';
 
   @override
-  String get general => 'Geral e Grupo';
+  String get general => 'Geral e grupo';
 
   @override
-  String get stats => 'Geral';
+  String get stats => 'Estatísticas';
+
+  @override
+  String get statsAndResources => 'Estatísticas e recursos';
 
   @override
   String get quest => 'Missão';
@@ -452,10 +455,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get masteries => 'Maestrias';
 
   @override
-  String get questAndNotes => 'Missão e Notas';
+  String get questAndNotes => 'Missão e notas';
 
   @override
-  String get perksAndMasteries => 'Vantagens e Maestrias';
+  String get perksAndMasteries => 'Vantagens e maestrias';
 
   @override
   String get town => 'CIDADE';

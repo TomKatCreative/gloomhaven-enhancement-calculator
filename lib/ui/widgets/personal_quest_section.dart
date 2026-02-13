@@ -328,7 +328,7 @@ class _RequirementRowState extends State<_RequirementRow> {
             isComplete ? Icons.check_circle : Icons.radio_button_unchecked,
             size: iconSizeSmall,
             color: isComplete
-                ? theme.colorScheme.primary
+                ? theme.extension<AppThemeExtension>()!.contrastedPrimary
                 : widget.isLocked
                 ? theme.disabledColor
                 : theme.colorScheme.onSurfaceVariant,
@@ -337,17 +337,18 @@ class _RequirementRowState extends State<_RequirementRow> {
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
-              child: RichText(
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isDimmed ? theme.disabledColor : null,
-                  ),
-                  children: Utils.generateCheckRowDetails(
-                    context,
-                    widget.requirement.description,
-                    theme.brightness == Brightness.dark,
+              child: Opacity(
+                opacity: isDimmed ? theme.disabledColor.a : 1.0,
+                child: RichText(
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    style: theme.textTheme.bodyMedium,
+                    children: Utils.generateCheckRowDetails(
+                      context,
+                      widget.requirement.description,
+                      theme.brightness == Brightness.dark,
+                    ),
                   ),
                 ),
               ),
@@ -406,7 +407,7 @@ class _RequirementRowState extends State<_RequirementRow> {
                 ).progressOf(widget.progress, widget.requirement.target),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: isComplete
-                      ? theme.colorScheme.primary
+                      ? theme.extension<AppThemeExtension>()!.contrastedPrimary
                       : widget.isLocked
                       ? theme.disabledColor
                       : theme.colorScheme.onSurfaceVariant,
@@ -433,7 +434,9 @@ class _RequirementRowState extends State<_RequirementRow> {
             keyboardType: TextInputType.number,
             textAlign: TextAlign.end,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: isComplete ? theme.colorScheme.primary : null,
+              color: isComplete
+                  ? theme.extension<AppThemeExtension>()!.contrastedPrimary
+                  : null,
             ),
             inputFormatters: [
               FilteringTextInputFormatter.digitsOnly,

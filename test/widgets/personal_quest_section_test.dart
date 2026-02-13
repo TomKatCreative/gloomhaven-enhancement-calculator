@@ -214,7 +214,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should show OutlinedButton with select text
-        expect(find.text('Select a Personal Quest'), findsOneWidget);
+        expect(find.text('Select a personal quest'), findsOneWidget);
         expect(find.byIcon(Icons.add_rounded), findsOneWidget);
         expect(find.byType(OutlinedButton), findsOneWidget);
       });
@@ -234,7 +234,7 @@ void main() {
         await tester.pumpAndSettle();
 
         // Should show same OutlinedButton as view mode
-        expect(find.text('Select a Personal Quest'), findsOneWidget);
+        expect(find.text('Select a personal quest'), findsOneWidget);
         expect(find.byIcon(Icons.add_rounded), findsOneWidget);
         expect(find.byType(OutlinedButton), findsOneWidget);
       });
@@ -253,7 +253,7 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('Select a Personal Quest'), findsNothing);
+        expect(find.text('Select a personal quest'), findsNothing);
         expect(find.byType(OutlinedButton), findsNothing);
       });
     });
@@ -666,11 +666,11 @@ void main() {
         await tester.pumpAndSettle();
 
         // Confirmation dialog should appear with full message
-        expect(find.text('Not Yet'), findsOneWidget);
+        expect(find.text('Not yet'), findsOneWidget);
         expect(find.textContaining('must retire'), findsOneWidget);
       });
 
-      testWidgets('Not Yet in dialog keeps character active', (tester) async {
+      testWidgets('Not yet in dialog keeps character active', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-retire-3');
         character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [19];
@@ -687,8 +687,8 @@ void main() {
         await tester.tap(find.text('Retire'));
         await tester.pumpAndSettle();
 
-        // Tap Not Yet
-        await tester.tap(find.text('Not Yet'));
+        // Tap Not yet
+        await tester.tap(find.text('Not yet'));
         await tester.pumpAndSettle();
 
         expect(model.currentCharacter!.isRetired, isFalse);
