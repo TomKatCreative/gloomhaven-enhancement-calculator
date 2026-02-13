@@ -119,36 +119,29 @@ class AppThemeBuilder {
 
         // Outlined border (default state)
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
 
         // Focused state
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(
             color: ColorUtils.ensureContrast(primaryColor, colorScheme.surface),
-            width: 2.0,
           ),
         ),
 
         // Error states
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.error, width: 2.0),
         ),
 
         // Disabled state
         disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(
             color: colorScheme.outline.withValues(alpha: 0.4),
           ),
@@ -157,7 +150,7 @@ class AppThemeBuilder {
         // Content padding
         contentPadding: const EdgeInsets.symmetric(
           horizontal: largePadding,
-          vertical: mediumPadding,
+          vertical: smallPadding,
         ),
       ),
 

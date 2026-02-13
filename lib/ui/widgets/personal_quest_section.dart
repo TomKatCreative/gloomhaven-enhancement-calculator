@@ -419,9 +419,9 @@ class _RequirementRowState extends State<_RequirementRow> {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.fromLTRB(
                 mediumPadding,
-                mediumPadding,
+                smallPadding,
                 0,
-                mediumPadding,
+                smallPadding,
               ),
               hintText: '0',
               border: const OutlineInputBorder(),

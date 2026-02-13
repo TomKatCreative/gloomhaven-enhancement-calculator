@@ -585,7 +585,7 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
           child: Text(
             character.name,
             maxLines: 1,
-            style: theme.textTheme.headlineMedium,
+            style: theme.textTheme.displayMedium?.copyWith(fontSize: 31),
             overflow: TextOverflow.fade,
             softWrap: false,
           ),
@@ -1267,9 +1267,9 @@ class _StatsSectionState extends State<_StatsSection> {
                         ),
                         contentPadding: const EdgeInsets.fromLTRB(
                           mediumPadding,
-                          mediumPadding,
+                          smallPadding,
                           0,
-                          mediumPadding,
+                          smallPadding,
                         ),
                         floatingLabelBehavior: FloatingLabelBehavior.always,
                         border: const OutlineInputBorder(),
