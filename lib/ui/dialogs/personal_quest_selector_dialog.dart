@@ -3,7 +3,8 @@
 /// Displays a scrollable list of quests filtered by edition, showing the
 /// quest number, title, and unlock reward (class icon or envelope).
 ///
-/// Returns the selected [PersonalQuest] or null if cancelled.
+/// Returns a [PQSelectorResult] indicating the user's choice, or null if
+/// dismissed.
 library;
 
 import 'package:flutter/material.dart';
@@ -15,27 +16,51 @@ import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 
-/// Shows the personal quest selector dialog and returns the selected quest.
-Future<PersonalQuest?> showPersonalQuestSelectorDialog({
+/// Result type for the personal quest selector dialog.
+sealed class PQSelectorResult {}
+
+/// A quest was selected.
+class PQSelected extends PQSelectorResult {
+  PQSelected(this.quest);
+  final PersonalQuest quest;
+}
+
+/// The user chose to remove the current quest.
+class PQRemoved extends PQSelectorResult {}
+
+/// Shows the personal quest selector dialog and returns the result.
+///
+/// When [currentQuest] is provided, the sheet title displays the current quest
+/// name with a remove button instead of the generic "Personal Quest" heading.
+Future<PQSelectorResult?> showPersonalQuestSelectorDialog({
   required BuildContext context,
   required GameEdition edition,
+  PersonalQuest? currentQuest,
 }) {
   final quests = PersonalQuestsRepository.getByEdition(edition);
-  return showModalBottomSheet<PersonalQuest>(
+  return showModalBottomSheet<PQSelectorResult>(
     context: context,
     isScrollControlled: true,
     useSafeArea: true,
-    builder: (context) => _PersonalQuestSelectorSheet(quests: quests),
+    builder: (context) =>
+        _PersonalQuestSelectorSheet(quests: quests, currentQuest: currentQuest),
   );
 }
 
 class _PersonalQuestSelectorSheet extends StatelessWidget {
-  const _PersonalQuestSelectorSheet({required this.quests});
+  const _PersonalQuestSelectorSheet({
+    required this.quests,
+    required this.currentQuest,
+  });
   final List<PersonalQuest> quests;
+  final PersonalQuest? currentQuest;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final filteredQuests = currentQuest != null
+        ? quests.where((q) => q.id != currentQuest!.id).toList()
+        : quests;
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.4,
@@ -45,19 +70,36 @@ class _PersonalQuestSelectorSheet extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(largePadding),
-            child: Text(
-              AppLocalizations.of(context).personalQuest,
-              style: theme.textTheme.headlineSmall,
-            ),
+            child: currentQuest != null
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          currentQuest!.displayName,
+                          style: theme.textTheme.bodyLarge,
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.remove_circle_outline,
+                          color: theme.colorScheme.error,
+                        ),
+                        onPressed: () => Navigator.pop(context, PQRemoved()),
+                      ),
+                    ],
+                  )
+                : Text(
+                    AppLocalizations.of(context).personalQuest,
+                    style: theme.textTheme.headlineSmall,
+                  ),
           ),
           const Divider(height: dividerThickness),
           Expanded(
             child: ListView.builder(
               controller: scrollController,
-              itemCount: quests.length,
+              itemCount: filteredQuests.length,
               itemBuilder: (context, index) {
-                final quest = quests[index];
-                return _PersonalQuestTile(quest: quest);
+                return _PersonalQuestTile(quest: filteredQuests[index]);
               },
             ),
           ),
@@ -77,7 +119,7 @@ class _PersonalQuestTile extends StatelessWidget {
     return ListTile(
       title: Text(quest.displayName, style: theme.textTheme.bodyLarge),
       trailing: _buildUnlockIcon(context),
-      onTap: () => Navigator.pop(context, quest),
+      onTap: () => Navigator.pop(context, PQSelected(quest)),
     );
   }
 

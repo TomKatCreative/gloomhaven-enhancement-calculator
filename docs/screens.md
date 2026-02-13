@@ -18,7 +18,7 @@ await CreateCharacterScreen.show(context, charactersModel);
 1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
 2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
 3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected (no form validator needed). Create button uses `theme.contrastedPrimary` for contrast-aware coloring.
-4. **Personal Quest** — *(gated by `kPersonalQuestsEnabled`)* Read-only field that opens PQ selector dialog. Only enabled for Gloomhaven edition; dimmed with "Coming soon" hint for other editions.
+4. **Personal Quest** — Read-only field that opens PQ selector dialog. Only enabled for Gloomhaven edition; dimmed with "Coming soon" hint for other editions.
 5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
 6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
 7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition.
@@ -406,7 +406,7 @@ The chip nav bar groups multiple sections under single chips:
 | Notes / Quest & Notes | `questAndNotes` | Personal Quest + Notes | `_sectionKeys[questAndNotes]` + `_notesKey` |
 | Perks / Perks & Masteries | `perksAndMasteries` | Perks + Masteries | `_sectionKeys[perksAndMasteries]` + `_masteriesKey` |
 
-The `questAndNotes` chip is **conditional** — hidden when no quest is assigned AND notes are empty AND not in edit mode. Label is "Notes" when `kPersonalQuestsEnabled` is `false`, "Quest & Notes" when `true`. First chip label is "Stats" when `kTownSheetEnabled` is `false`, "General" when `true`.
+The `questAndNotes` chip is **conditional** — hidden for retired characters with no quest and no notes. Label is always "Quest & Notes". First chip label is "Stats" when `kTownSheetEnabled` is `false`, "General" when `true`.
 
 ### Pinned Header
 

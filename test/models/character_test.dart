@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
@@ -518,19 +517,15 @@ void main() {
       expect(quest!.title, 'Seeker of Xorn');
     });
 
-    test(
-      'toMap includes personalQuestId and progress',
-      skip: !kPersonalQuestsEnabled ? 'PQ feature flag disabled' : null,
-      () {
-        final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_515';
-        character.personalQuestProgress = [5];
+    test('toMap includes personalQuestId and progress', () {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'gh_515';
+      character.personalQuestProgress = [5];
 
-        final map = character.toMap();
-        expect(map[columnCharacterPersonalQuestId], 'gh_515');
-        expect(map[columnCharacterPersonalQuestProgress], '[5]');
-      },
-    );
+      final map = character.toMap();
+      expect(map[columnCharacterPersonalQuestId], 'gh_515');
+      expect(map[columnCharacterPersonalQuestProgress], '[5]');
+    });
 
     test('fromMap parses personalQuestId and progress', () {
       final map = _createCharacterMap(
@@ -552,23 +547,19 @@ void main() {
       expect(character.personalQuestProgress, isEmpty);
     });
 
-    test(
-      'toMap/fromMap round-trip preserves PQ data',
-      skip: !kPersonalQuestsEnabled ? 'PQ feature flag disabled' : null,
-      () {
-        final original = TestData.createCharacter();
-        original.id = 1; // id is required for round-trip (DB provides it)
-        original.personalQuestId = 'gh_523';
-        original.personalQuestProgress = [1, 0, 1, 0, 1, 0];
+    test('toMap/fromMap round-trip preserves PQ data', () {
+      final original = TestData.createCharacter();
+      original.id = 1; // id is required for round-trip (DB provides it)
+      original.personalQuestId = 'gh_523';
+      original.personalQuestProgress = [1, 0, 1, 0, 1, 0];
 
-        final roundTripped = Character.fromMap(original.toMap());
-        expect(roundTripped.personalQuestId, original.personalQuestId);
-        expect(
-          roundTripped.personalQuestProgress,
-          original.personalQuestProgress,
-        );
-      },
-    );
+      final roundTripped = Character.fromMap(original.toMap());
+      expect(roundTripped.personalQuestId, original.personalQuestId);
+      expect(
+        roundTripped.personalQuestProgress,
+        original.personalQuestProgress,
+      );
+    });
   });
 }
 

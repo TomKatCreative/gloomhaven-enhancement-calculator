@@ -1,8 +1,6 @@
 # Personal Quests
 
-> **Feature flag**: `kPersonalQuestsEnabled` in `lib/data/constants.dart` — currently `false`
-
-## Status: Phase 1 Implemented
+## Status: Phase 1 Released
 
 Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)

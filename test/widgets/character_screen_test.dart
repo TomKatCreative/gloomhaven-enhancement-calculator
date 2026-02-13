@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_stepper_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
@@ -725,7 +726,7 @@ void main() {
       await tester.tap(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.add_rounded), findsNothing);
+      expect(find.byType(ResourceStepperSheet), findsNothing);
     });
 
     testWidgets('resource cards not tappable for retired character', (
@@ -746,7 +747,7 @@ void main() {
       await tester.tap(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.add_rounded), findsNothing);
+      expect(find.byType(ResourceStepperSheet), findsNothing);
     });
 
     testWidgets('resource increment calls updateCharacter', (tester) async {
@@ -766,7 +767,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the add button in the stepper sheet
-      final addIcon = find.byIcon(Icons.add_rounded);
+      final addIcon = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byIcon(Icons.add_rounded),
+      );
       expect(addIcon, findsOneWidget);
       await tester.tap(addIcon);
       await tester.pumpAndSettle();
@@ -926,10 +930,7 @@ void main() {
         find.text(kTownSheetEnabled ? 'General & Party' : 'General'),
         findsWidgets,
       );
-      expect(
-        find.text(kPersonalQuestsEnabled ? 'Quest & Notes' : 'Notes'),
-        findsWidgets,
-      );
+      expect(find.text('Quest & Notes'), findsWidgets);
       // Default test character has no masteries
       expect(find.text('Perks'), findsWidgets);
     });
@@ -1076,7 +1077,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the add button in the stepper sheet
-      await tester.tap(find.byIcon(Icons.add_rounded));
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byIcon(Icons.add_rounded),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Dismiss the sheet

@@ -334,7 +334,8 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Retire 2 other characters',
+          description:
+              'Experience 2 other characters achieving their personal quests',
           target: 2,
         ),
       ],

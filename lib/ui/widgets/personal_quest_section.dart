@@ -117,12 +117,12 @@ class _SelectQuestButton extends StatelessWidget {
   }
 
   Future<void> _selectQuest(BuildContext context) async {
-    final quest = await showPersonalQuestSelectorDialog(
+    final result = await showPersonalQuestSelectorDialog(
       context: context,
       edition: GameEdition.gloomhaven,
     );
-    if (quest != null && context.mounted) {
-      await model.updatePersonalQuest(character, quest.id);
+    if (result is PQSelected && context.mounted) {
+      await model.updatePersonalQuest(character, result.quest.id);
     }
   }
 }
@@ -236,12 +236,19 @@ class _QuestContent extends StatelessWidget {
     );
     if (confirmed != true || !context.mounted) return;
 
-    final newQuest = await showPersonalQuestSelectorDialog(
+    final result = await showPersonalQuestSelectorDialog(
       context: context,
       edition: GameEdition.gloomhaven,
+      currentQuest: quest,
     );
-    if (newQuest != null && context.mounted) {
-      await model.updatePersonalQuest(character, newQuest.id);
+    if (!context.mounted) return;
+    switch (result) {
+      case PQSelected(:final quest):
+        await model.updatePersonalQuest(character, quest.id);
+      case PQRemoved():
+        await model.updatePersonalQuest(character, null);
+      case null:
+        break;
     }
   }
 }
@@ -384,7 +391,7 @@ class _RequirementRowState extends State<_RequirementRow> {
                 AppLocalizations.of(
                   context,
                 ).progressOf(widget.progress, widget.requirement.target),
-                style: theme.textTheme.bodySmall?.copyWith(
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: isComplete
                       ? theme.colorScheme.primary
                       : theme.colorScheme.onSurfaceVariant,

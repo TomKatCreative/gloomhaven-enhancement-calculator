@@ -118,4 +118,3 @@ class ResponsiveLayout {
 
 // Feature flags — set to `true` to enable unreleased features.
 const bool kTownSheetEnabled = false;
-const bool kPersonalQuestsEnabled = false;

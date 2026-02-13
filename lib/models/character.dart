@@ -194,11 +194,8 @@ class Character {
     columnResourceSnowthistle: resourceSnowthistle,
     columnIsRetired: isRetired ? 1 : 0,
     columnVariant: variant.name,
-    if (kPersonalQuestsEnabled) columnCharacterPersonalQuestId: personalQuestId,
-    if (kPersonalQuestsEnabled)
-      columnCharacterPersonalQuestProgress: encodeProgress(
-        personalQuestProgress,
-      ),
+    columnCharacterPersonalQuestId: personalQuestId,
+    columnCharacterPersonalQuestProgress: encodeProgress(personalQuestProgress),
     if (kTownSheetEnabled) columnCharacterPartyId: partyId,
   };
 

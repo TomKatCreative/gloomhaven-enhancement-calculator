@@ -180,9 +180,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
 
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
     final hasQuestOrNotes =
-        kPersonalQuestsEnabled ||
-        widget.character.notes.isNotEmpty ||
-        (model.isEditMode && !widget.character.isRetired);
+        !widget.character.isRetired ||
+        widget.character.personalQuest != null ||
+        widget.character.notes.isNotEmpty;
     final theme = Theme.of(context);
 
     return Stack(
@@ -645,11 +645,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
     final sections = [
       (_Section.general, kTownSheetEnabled ? l10n.general : l10n.stats),
-      if (hasQuestOrNotes)
-        (
-          _Section.questAndNotes,
-          kPersonalQuestsEnabled ? l10n.questAndNotes : l10n.notes,
-        ),
+      if (hasQuestOrNotes) (_Section.questAndNotes, l10n.questAndNotes),
       (
         _Section.perksAndMasteries,
         hasMasteries ? l10n.perksAndMasteries : l10n.perks,
@@ -842,10 +838,8 @@ class _QuestAndNotesCollapsibleCardState
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,
-      title: kPersonalQuestsEnabled
-          ? (_isExpanded ? l10n.personalQuest : l10n.questAndNotes)
-          : l10n.notes,
-      icon: kPersonalQuestsEnabled ? Icons.map_rounded : Icons.book_rounded,
+      title: _isExpanded ? l10n.personalQuest : l10n.questAndNotes,
+      icon: Icons.map_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
         SharedPrefs().questAndNotesExpanded = value;
@@ -857,47 +851,44 @@ class _QuestAndNotesCollapsibleCardState
           mainAxisSize: MainAxisSize.min,
           children: [
             // Quest section
-            if (kPersonalQuestsEnabled && showQuestSection)
+            if (showQuestSection)
               PersonalQuestSection(character: widget.character, embedded: true),
             // Notes section
             if (hasNotes) ...[
-              if (kPersonalQuestsEnabled && showQuestSection)
-                const GHCDivider(indent: true),
+              if (showQuestSection) const GHCDivider(indent: true),
               // Notes header (only when PQ section is visible above)
-              if (kPersonalQuestsEnabled)
-                Padding(
-                  key: widget.notesKey,
-                  padding: const EdgeInsets.fromLTRB(
-                    largePadding,
-                    mediumPadding,
-                    mediumPadding,
-                    smallPadding,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.book_rounded,
-                        size: iconSizeSmall,
-                        color: primaryColor,
-                      ),
-                      const SizedBox(width: smallPadding),
-                      Expanded(
-                        child: Text(
-                          l10n.notes,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: primaryColor,
-                          ),
+              Padding(
+                key: widget.notesKey,
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  mediumPadding,
+                  mediumPadding,
+                  smallPadding,
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.book_rounded,
+                      size: iconSizeSmall,
+                      color: primaryColor,
+                    ),
+                    const SizedBox(width: smallPadding),
+                    Expanded(
+                      child: Text(
+                        l10n.notes,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: primaryColor,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
               // Notes content
               Padding(
-                key: kPersonalQuestsEnabled ? null : widget.notesKey,
-                padding: EdgeInsets.fromLTRB(
+                padding: const EdgeInsets.fromLTRB(
                   largePadding,
-                  kPersonalQuestsEnabled ? 0 : mediumPadding,
+                  0,
                   largePadding,
                   largePadding,
                 ),

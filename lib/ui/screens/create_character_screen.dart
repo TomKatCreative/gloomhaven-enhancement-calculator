@@ -123,10 +123,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             _buildNameField(context, theme),
             const SizedBox(height: formFieldSpacing),
             _buildClassSelector(context, theme),
-            if (kPersonalQuestsEnabled) ...[
-              const SizedBox(height: formFieldSpacing),
-              _buildPersonalQuestSelector(context, theme),
-            ],
+            const SizedBox(height: formFieldSpacing),
+            _buildPersonalQuestSelector(context, theme),
             if (kTownSheetEnabled) ...[
               const SizedBox(height: formFieldSpacing),
               _buildPartySelector(context, theme),
@@ -318,14 +316,15 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         ),
         onTap: isEnabled
             ? () async {
-                final quest = await showPersonalQuestSelectorDialog(
+                final result = await showPersonalQuestSelectorDialog(
                   context: context,
                   edition: GameEdition.gloomhaven,
                 );
-                if (quest != null) {
+                if (result is PQSelected) {
                   setState(() {
-                    _selectedPersonalQuestId = quest.id;
-                    _personalQuestTextFieldController.text = quest.displayName;
+                    _selectedPersonalQuestId = result.quest.id;
+                    _personalQuestTextFieldController.text =
+                        result.quest.displayName;
                   });
                 }
               }
@@ -629,9 +628,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         edition: _selectedEdition,
         prosperityLevel: _selectedProsperityLevel,
         variant: _variant,
-        personalQuestId: kPersonalQuestsEnabled
-            ? _selectedPersonalQuestId
-            : null,
+        personalQuestId: _selectedPersonalQuestId,
         partyId: kTownSheetEnabled ? _selectedPartyId : null,
       );
       if (!mounted) return;

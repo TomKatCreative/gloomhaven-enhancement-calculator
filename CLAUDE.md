@@ -139,21 +139,19 @@ test/
 
 ### Feature Flags
 
-Two compile-time constants in `lib/data/constants.dart` gate unreleased features:
+One compile-time constant in `lib/data/constants.dart` gates unreleased features:
 
 ```dart
 const bool kTownSheetEnabled = false;
-const bool kPersonalQuestsEnabled = false;
 ```
 
 | Flag | What it gates |
 |------|---------------|
 | `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page index mapping (characters=0→1, calculator=1→2) |
-| `kPersonalQuestsEnabled` | PersonalQuests DB table, PQ columns on Characters table, PQ section on character screen, "Quest" chip in nav bar (label changes from "Notes" to "Quest & Notes") |
 
-**Conditional DB version**: When both flags are `false` (production), the database stays at schema version 17. When either flag is `true`, migration v18 runs to create the additional tables/columns.
+**Database versioning**: Production schema is v18 (includes Personal Quests). When `kTownSheetEnabled` is `true`, migration v19 runs to create Campaign/Party tables and add `PartyId` column to Characters.
 
-**Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helpers.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `ui/screens/character_screen.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
+**Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helpers.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
 **Affected files** (test): `helpers/fake_database_helper.dart`, `viewmodels/characters_model_test.dart`, `viewmodels/app_model_test.dart`
 
 ## Key Domain Concepts

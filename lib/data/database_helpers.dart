@@ -31,9 +31,7 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = (kTownSheetEnabled || kPersonalQuestsEnabled)
-      ? 18
-      : 17;
+  static const _databaseVersion = 18;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -94,7 +92,7 @@ class DatabaseHelper implements IDatabaseHelper {
       if (kTownSheetEnabled) await _createCampaignPartyTables(txn);
       await _seedPerks(txn);
       await _seedMasteries(txn);
-      if (kPersonalQuestsEnabled) await _seedPersonalQuests(txn);
+      await _seedPersonalQuests(txn);
     });
   }
 
@@ -122,10 +120,8 @@ class DatabaseHelper implements IDatabaseHelper {
       '$columnResourceCorpsecap $integerType',
       '$columnResourceSnowthistle $integerType',
       '$columnVariant $textType',
-      if (kPersonalQuestsEnabled)
-        "$columnCharacterPersonalQuestId $textType DEFAULT ''",
-      if (kPersonalQuestsEnabled)
-        "$columnCharacterPersonalQuestProgress $textType DEFAULT '[]'",
+      "$columnCharacterPersonalQuestId $textType DEFAULT ''",
+      "$columnCharacterPersonalQuestProgress $textType DEFAULT '[]'",
       if (kTownSheetEnabled) '$columnCharacterPartyId TEXT DEFAULT NULL',
     ];
     await txn.execute(
@@ -163,15 +159,13 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnCharacterMasteryAchieved $boolType
       )''');
 
-    if (kPersonalQuestsEnabled) {
-      await txn.execute('''
-        $createTable $tablePersonalQuests (
-          $columnPersonalQuestId $idTextPrimaryType,
-          $columnPersonalQuestNumber $textType,
-          $columnPersonalQuestTitle $textType,
-          $columnPersonalQuestEdition $textType
-        )''');
-    }
+    await txn.execute('''
+      $createTable $tablePersonalQuests (
+        $columnPersonalQuestId $idTextPrimaryType,
+        $columnPersonalQuestNumber $textType,
+        $columnPersonalQuestTitle $textType,
+        $columnPersonalQuestEdition $textType
+      )''');
   }
 
   /// Seeds the Perks table from PerksRepository.
@@ -324,13 +318,10 @@ class DatabaseHelper implements IDatabaseHelper {
       15: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
       // v17: Rename item_minus_one to ITEM_MINUS_ONE
       16: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
-      // v18: Add Personal Quests + Campaigns/Parties tables + PartyId column
+      // v18: Personal Quests
       17: () async {
         await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
         await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
-        await DatabaseMigrations.createCampaignPartyTablesAndAddPartyIdToCharacters(
-          txn,
-        );
       },
     };
 
@@ -392,14 +383,8 @@ class DatabaseHelper implements IDatabaseHelper {
           json[1][i][k][columnResourceFlamefruit] ??= 0;
           json[1][i][k][columnResourceCorpsecap] ??= 0;
           json[1][i][k][columnResourceSnowthistle] ??= 0;
-          if (kPersonalQuestsEnabled) {
-            json[1][i][k][columnCharacterPersonalQuestId] ??= '';
-            json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
-          } else {
-            // Strip columns that don't exist in the current schema
-            json[1][i][k].remove(columnCharacterPersonalQuestId);
-            json[1][i][k].remove(columnCharacterPersonalQuestProgress);
-          }
+          json[1][i][k][columnCharacterPersonalQuestId] ??= '';
+          json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
           if (kTownSheetEnabled) {
             // PartyId is nullable, no default needed — just ensure key exists
             json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
