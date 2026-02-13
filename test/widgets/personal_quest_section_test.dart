@@ -725,6 +725,145 @@ void main() {
       });
     });
 
+    group('"Then" requirement locking', () {
+      testWidgets(
+        'buttons are disabled when predecessor requirement is incomplete',
+        (tester) async {
+          tester.view.physicalSize = const Size(800, 600);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+
+          final character = TestData.createCharacter(uuid: 'test-pq-lock-1');
+          // PQ 510: req 0 = "Complete 3 scenarios..." (target 3),
+          //         req 1 = "Then unlock Noxious Cellar..." (target 1)
+          character.personalQuestId = 'pq_gh_510';
+          character.personalQuestProgress = [1, 0]; // first incomplete
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // There should be 2 pairs of +/- buttons (one per requirement)
+          final addButtons = find.widgetWithIcon(
+            IconButton,
+            Icons.add_circle_outline,
+          );
+          final removeButtons = find.widgetWithIcon(
+            IconButton,
+            Icons.remove_circle_outline,
+          );
+          expect(addButtons, findsNWidgets(2));
+          expect(removeButtons, findsNWidgets(2));
+
+          // First requirement's + button should be enabled
+          final firstAddButton = tester.widget<IconButton>(addButtons.at(0));
+          expect(firstAddButton.onPressed, isNotNull);
+
+          // Second requirement's +/- buttons should be disabled (locked)
+          final secondAddButton = tester.widget<IconButton>(addButtons.at(1));
+          expect(secondAddButton.onPressed, isNull);
+          final secondRemoveButton = tester.widget<IconButton>(
+            removeButtons.at(1),
+          );
+          expect(secondRemoveButton.onPressed, isNull);
+        },
+      );
+
+      testWidgets('buttons become enabled when predecessor reaches target', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 600);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+
+        final character = TestData.createCharacter(uuid: 'test-pq-lock-2');
+        // PQ 510: first req target is 3
+        character.personalQuestId = 'pq_gh_510';
+        character.personalQuestProgress = [3, 0]; // first complete
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Second requirement's + button should now be enabled
+        final addButtons = find.widgetWithIcon(
+          IconButton,
+          Icons.add_circle_outline,
+        );
+        final secondAddButton = tester.widget<IconButton>(addButtons.at(1));
+        expect(secondAddButton.onPressed, isNotNull);
+      });
+
+      testWidgets(
+        'non-"Then" multi-requirement quest is not affected by locking',
+        (tester) async {
+          tester.view.physicalSize = const Size(800, 600);
+          tester.view.devicePixelRatio = 1.0;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+
+          final character = TestData.createCharacter(uuid: 'test-pq-lock-3');
+          // PQ 533 (The Perfect Poison): 3 requirements, none start with "Then"
+          character.personalQuestId = 'pq_gh_533';
+          character.personalQuestProgress = [0, 0, 0]; // all incomplete
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: true,
+          );
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // All 3 requirements should have enabled + buttons
+          final addButtons = find.widgetWithIcon(
+            IconButton,
+            Icons.add_circle_outline,
+          );
+          expect(addButtons, findsNWidgets(3));
+          for (var i = 0; i < 3; i++) {
+            final button = tester.widget<IconButton>(addButtons.at(i));
+            expect(button.onPressed, isNotNull, reason: 'Button $i');
+          }
+        },
+      );
+
+      testWidgets(
+        'locked "Then" requirement shows disabled icon color in view mode',
+        (tester) async {
+          final character = TestData.createCharacter(uuid: 'test-pq-lock-4');
+          character.personalQuestId = 'pq_gh_510';
+          character.personalQuestProgress = [1, 0]; // first incomplete
+
+          final model = await setupModel(
+            character: character,
+            isEditMode: false,
+          );
+          final themeData = testThemeData();
+          await tester.pumpWidget(
+            buildTestWidget(model: model, character: model.characters.first),
+          );
+          await tester.pumpAndSettle();
+
+          // The second requirement's icon should use disabledColor
+          final icons = find.byIcon(Icons.radio_button_unchecked);
+          expect(icons, findsNWidgets(2));
+          final secondIcon = tester.widget<Icon>(icons.at(1));
+          expect(secondIcon.color, themeData.disabledColor);
+        },
+      );
+    });
+
     group('expansion state', () {
       testWidgets('respects SharedPrefs initial expansion state', (
         tester,

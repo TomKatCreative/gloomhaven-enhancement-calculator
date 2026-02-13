@@ -177,7 +177,7 @@ class PersonalQuestsRepository {
         ),
         PersonalQuestRequirement(
           description:
-              'Use it to kill seven Living Bones, Living Corpses, or Living Spirits',
+              'Then use it to kill seven Living Bones, Living Corpses, or Living Spirits',
           target: 7,
         ),
       ],

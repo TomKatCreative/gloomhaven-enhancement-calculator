@@ -211,6 +211,18 @@ class _QuestContent extends StatelessWidget {
             final progress = index < character.personalQuestProgress.length
                 ? character.personalQuestProgress[index]
                 : 0;
+            final isLocked =
+                index > 0 &&
+                req.description.startsWith('Then ') &&
+                quest.requirements
+                    .take(index)
+                    .indexed
+                    .any(
+                      (pair) => pair.$1 < character.personalQuestProgress.length
+                          ? character.personalQuestProgress[pair.$1] <
+                                pair.$2.target
+                          : true,
+                    );
             return _RequirementRow(
               requirement: req,
               progress: progress,
@@ -218,6 +230,7 @@ class _QuestContent extends StatelessWidget {
               character: character,
               model: model,
               isEditMode: isEditMode,
+              isLocked: isLocked,
             );
           }),
         ],
@@ -261,6 +274,7 @@ class _RequirementRow extends StatefulWidget {
     required this.character,
     required this.model,
     required this.isEditMode,
+    this.isLocked = false,
   });
 
   final PersonalQuestRequirement requirement;
@@ -269,6 +283,7 @@ class _RequirementRow extends StatefulWidget {
   final Character character;
   final CharactersModel model;
   final bool isEditMode;
+  final bool isLocked;
 
   @override
   State<_RequirementRow> createState() => _RequirementRowState();
@@ -308,6 +323,7 @@ class _RequirementRowState extends State<_RequirementRow> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isComplete = widget.progress >= widget.requirement.target;
+    final isDimmed = isComplete || widget.isLocked;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: tinyPadding),
@@ -319,6 +335,8 @@ class _RequirementRowState extends State<_RequirementRow> {
             size: iconSizeSmall,
             color: isComplete
                 ? theme.colorScheme.primary
+                : widget.isLocked
+                ? theme.disabledColor
                 : theme.colorScheme.onSurfaceVariant,
           ),
           const SizedBox(width: smallPadding),
@@ -330,7 +348,7 @@ class _RequirementRowState extends State<_RequirementRow> {
                 overflow: TextOverflow.ellipsis,
                 text: TextSpan(
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: isComplete ? theme.disabledColor : null,
+                    color: isDimmed ? theme.disabledColor : null,
                   ),
                   children: Utils.generateCheckRowDetails(
                     context,
@@ -351,7 +369,9 @@ class _RequirementRowState extends State<_RequirementRow> {
                 constraints: const BoxConstraints(),
                 padding: const EdgeInsets.all(tinyPadding),
                 icon: const Icon(Icons.remove_circle_outline),
-                onPressed: widget.progress > 0
+                onPressed: widget.isLocked
+                    ? null
+                    : widget.progress > 0
                     ? () => _updateProgress(context, widget.progress - 1)
                     : null,
               ),
@@ -376,7 +396,9 @@ class _RequirementRowState extends State<_RequirementRow> {
                 constraints: const BoxConstraints(),
                 padding: const EdgeInsets.all(tinyPadding),
                 icon: const Icon(Icons.add_circle_outline),
-                onPressed: widget.progress < widget.requirement.target
+                onPressed: widget.isLocked
+                    ? null
+                    : widget.progress < widget.requirement.target
                     ? () => _updateProgress(context, widget.progress + 1)
                     : null,
               ),
@@ -391,6 +413,8 @@ class _RequirementRowState extends State<_RequirementRow> {
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: isComplete
                       ? theme.colorScheme.primary
+                      : widget.isLocked
+                      ? theme.disabledColor
                       : theme.colorScheme.onSurfaceVariant,
                 ),
               ),
@@ -410,6 +434,7 @@ class _RequirementRowState extends State<_RequirementRow> {
           width: 55,
           child: TextField(
             controller: _textController,
+            enabled: !widget.isLocked,
             enableInteractiveSelection: false,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.end,
