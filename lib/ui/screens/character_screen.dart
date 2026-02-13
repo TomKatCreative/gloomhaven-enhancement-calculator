@@ -57,22 +57,23 @@ class _CharacterScreenState extends State<CharacterScreen> {
   );
 
   late ScrollController _scrollController;
-  final ValueNotifier<double> _scrollOffsetNotifier = ValueNotifier(0.0);
+  late ValueNotifier<double> _scrollOffsetNotifier;
   bool _isScrollSpyEnabled = true;
+  late bool _isGeneralExpanded;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = context
-        .read<CharactersModel>()
-        .charScreenScrollController;
+    _isGeneralExpanded = SharedPrefs().generalExpanded;
+    final model = context.read<CharactersModel>();
+    _scrollController = model.charScreenScrollController;
+    _scrollOffsetNotifier = model.charScrollOffsetNotifier;
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _scrollController.removeListener(_onScroll);
-    _scrollOffsetNotifier.dispose();
     _activeSectionNotifier.dispose();
     super.dispose();
   }
@@ -224,136 +225,150 @@ class _CharacterScreenState extends State<CharacterScreen> {
             },
           ),
         ),
-        CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            // PINNED HEADER: Character name, level, class
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _CharacterHeaderDelegate(
-                character: widget.character,
-                isEditMode: model.isEditMode,
-              ),
-            ),
-            // CHIP NAV BAR
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SectionNavBarDelegate(
-                character: widget.character,
-                activeSectionNotifier: _activeSectionNotifier,
-                onSectionTapped: _scrollToSection,
-                hasMasteries: hasMasteries,
-                hasQuestOrNotes: hasQuestOrNotes,
-                isEditMode: model.isEditMode && !widget.character.isRetired,
-              ),
-            ),
-            // GENERAL CARD (stats + resources)
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    smallPadding,
-                    mediumPadding,
-                    smallPadding,
-                    smallPadding,
-                  ),
-                  child: CollapsibleSectionCard(
-                    sectionKey: _sectionKeys[_Section.general],
-                    title: kTownSheetEnabled
-                        ? AppLocalizations.of(context).general
-                        : AppLocalizations.of(context).stats,
-                    icon: Icons.badge_rounded,
-                    initiallyExpanded: SharedPrefs().generalExpanded,
-                    onExpansionChanged: (value) =>
-                        SharedPrefs().generalExpanded = value,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          largePadding,
-                          0,
-                          largePadding,
-                          largePadding,
-                        ),
-                        child: Column(
-                          children: [
-                            if (kTownSheetEnabled) ...[
-                              _PartyAssignmentRow(character: widget.character),
-                              const Divider(height: largePadding * 2),
-                            ],
-                            _StatsSection(character: widget.character),
-                            if (model.isEditMode &&
-                                !widget.character.isRetired) ...[
-                              SizedBox(height: largePadding),
-                              _CheckmarksAndRetirementsRow(
-                                character: widget.character,
-                              ),
-                            ],
-                            const Divider(height: largePadding * 2),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                bottom: smallPadding,
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.inventory_2_rounded,
-                                    size: iconSizeSmall,
-                                    color: theme.contrastedPrimary,
-                                  ),
-                                  const SizedBox(width: smallPadding),
-                                  Expanded(
-                                    child: Text(
-                                      AppLocalizations.of(context).resources,
-                                      style: theme.textTheme.titleLarge
-                                          ?.copyWith(
-                                            color: theme.contrastedPrimary,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: smallPadding),
-                            _ResourcesContent(character: widget.character),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+        NotificationListener<ScrollMetricsNotification>(
+          onNotification: (notification) {
+            _onScroll();
+            return false;
+          },
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              // PINNED HEADER: Character name, level, class
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _CharacterHeaderDelegate(
+                  character: widget.character,
+                  isEditMode: model.isEditMode,
+                  scrollOffsetNotifier: _scrollOffsetNotifier,
                 ),
               ),
-            ),
-            // QUEST & NOTES CARD
-            if (hasQuestOrNotes)
+              // CHIP NAV BAR
+              SliverPersistentHeader(
+                pinned: true,
+                delegate: _SectionNavBarDelegate(
+                  character: widget.character,
+                  activeSectionNotifier: _activeSectionNotifier,
+                  scrollOffsetNotifier: _scrollOffsetNotifier,
+                  onSectionTapped: _scrollToSection,
+                  hasMasteries: hasMasteries,
+                  hasQuestOrNotes: hasQuestOrNotes,
+                  isEditMode: model.isEditMode && !widget.character.isRetired,
+                ),
+              ),
+              // GENERAL CARD (stats + resources)
               SliverToBoxAdapter(
                 child: Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(smallPadding),
-                    child: _QuestAndNotesCollapsibleCard(
-                      sectionKey: _sectionKeys[_Section.questAndNotes],
-                      notesKey: _notesKey,
-                      character: widget.character,
+                    padding: const EdgeInsets.fromLTRB(
+                      smallPadding,
+                      mediumPadding,
+                      smallPadding,
+                      smallPadding,
+                    ),
+                    child: CollapsibleSectionCard(
+                      sectionKey: _sectionKeys[_Section.general],
+                      title: kTownSheetEnabled
+                          ? AppLocalizations.of(context).general
+                          : _isGeneralExpanded
+                          ? AppLocalizations.of(context).stats
+                          : AppLocalizations.of(context).statsAndResources,
+                      icon: Icons.badge_rounded,
+                      initiallyExpanded: _isGeneralExpanded,
+                      onExpansionChanged: (value) {
+                        SharedPrefs().generalExpanded = value;
+                        setState(() => _isGeneralExpanded = value);
+                      },
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            largePadding,
+                            0,
+                            largePadding,
+                            largePadding,
+                          ),
+                          child: Column(
+                            children: [
+                              if (kTownSheetEnabled) ...[
+                                _PartyAssignmentRow(
+                                  character: widget.character,
+                                ),
+                                const Divider(height: largePadding * 2),
+                              ],
+                              _StatsSection(character: widget.character),
+                              if (model.isEditMode &&
+                                  !widget.character.isRetired) ...[
+                                SizedBox(height: largePadding),
+                                _CheckmarksAndRetirementsRow(
+                                  character: widget.character,
+                                ),
+                              ],
+                              const Divider(height: largePadding * 2),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: smallPadding,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.inventory_2_rounded,
+                                      size: iconSizeSmall,
+                                      color: theme.contrastedPrimary,
+                                    ),
+                                    const SizedBox(width: smallPadding),
+                                    Expanded(
+                                      child: Text(
+                                        AppLocalizations.of(context).resources,
+                                        style: theme.textTheme.titleLarge
+                                            ?.copyWith(
+                                              color: theme.contrastedPrimary,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: smallPadding),
+                              _ResourcesContent(character: widget.character),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-            // PERKS & MASTERIES CARD
-            SliverToBoxAdapter(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(smallPadding),
-                  child: _PerksAndMasteriesCard(
-                    sectionKey: _sectionKeys[_Section.perksAndMasteries],
-                    masteriesKey: _masteriesKey,
-                    character: widget.character,
-                    hasMasteries: hasMasteries,
+              // QUEST & NOTES CARD
+              if (hasQuestOrNotes)
+                SliverToBoxAdapter(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(smallPadding),
+                      child: _QuestAndNotesCollapsibleCard(
+                        sectionKey: _sectionKeys[_Section.questAndNotes],
+                        notesKey: _notesKey,
+                        character: widget.character,
+                      ),
+                    ),
+                  ),
+                ),
+              // PERKS & MASTERIES CARD
+              SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(smallPadding),
+                    child: _PerksAndMasteriesCard(
+                      sectionKey: _sectionKeys[_Section.perksAndMasteries],
+                      masteriesKey: _masteriesKey,
+                      character: widget.character,
+                      hasMasteries: hasMasteries,
+                    ),
                   ),
                 ),
               ),
-            ),
-            // BOTTOM PADDING
-            SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
-          ],
+              // BOTTOM PADDING
+              SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+            ],
+          ),
         ),
       ],
     );
@@ -365,10 +380,15 @@ class _CharacterScreenState extends State<CharacterScreen> {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
-  _CharacterHeaderDelegate({required this.character, required this.isEditMode});
+  _CharacterHeaderDelegate({
+    required this.character,
+    required this.isEditMode,
+    required this.scrollOffsetNotifier,
+  });
 
   final Character character;
   final bool isEditMode;
+  final ValueNotifier<double> scrollOffsetNotifier;
 
   static const double _maxHeight = 180.0;
   static const double _editModeHeight = 90.0;
@@ -402,29 +422,27 @@ class _CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
 
     // Tint only when content is actually scrolling behind the pinned headers,
     // not during the header's collapse animation. The first pinned sliver never
-    // receives overlapsContent, so check the scroll offset directly instead.
-    final controller = Provider.of<CharactersModel>(
-      context,
-      listen: false,
-    ).charScreenScrollController;
-    final scrollOffset =
-        controller.hasClients && controller.positions.length == 1
-        ? controller.offset
-        : 0.0;
-    final isContentBehind = scrollOffset > range;
-
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(character.uuid),
-      tween: Tween<double>(end: isContentBehind ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      builder: (context, tintProgress, child) {
-        return Material(
-          color: Color.lerp(
-            colorScheme.surface,
-            AppBarUtils.getTintedBackground(colorScheme),
-            tintProgress,
-          ),
+    // receives overlapsContent, so we listen to scrollOffsetNotifier instead.
+    // This also fires on metrics-only corrections (e.g. section collapse).
+    return ValueListenableBuilder<double>(
+      valueListenable: scrollOffsetNotifier,
+      builder: (context, scrollOffset, child) {
+        final isContentBehind = scrollOffset > range;
+        return TweenAnimationBuilder<double>(
+          key: ValueKey(character.uuid),
+          tween: Tween<double>(end: isContentBehind ? 1.0 : 0.0),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          builder: (context, tintProgress, child) {
+            return Material(
+              color: Color.lerp(
+                colorScheme.surface,
+                AppBarUtils.getTintedBackground(colorScheme),
+                tintProgress,
+              ),
+              child: child,
+            );
+          },
           child: child,
         );
       },
@@ -612,6 +630,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
   _SectionNavBarDelegate({
     required this.character,
     required this.activeSectionNotifier,
+    required this.scrollOffsetNotifier,
     required this.onSectionTapped,
     required this.hasMasteries,
     required this.hasQuestOrNotes,
@@ -620,6 +639,7 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
   final Character character;
   final ValueNotifier<_Section> activeSectionNotifier;
+  final ValueNotifier<double> scrollOffsetNotifier;
   final ValueChanged<_Section> onSectionTapped;
   final bool hasMasteries;
   final bool hasQuestOrNotes;
@@ -644,7 +664,10 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     final l10n = AppLocalizations.of(context);
 
     final sections = [
-      (_Section.general, kTownSheetEnabled ? l10n.general : l10n.stats),
+      (
+        _Section.general,
+        kTownSheetEnabled ? l10n.general : l10n.statsAndResources,
+      ),
       if (hasQuestOrNotes) (_Section.questAndNotes, l10n.questAndNotes),
       (
         _Section.perksAndMasteries,
@@ -655,34 +678,32 @@ class _SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     // Opacity follows scroll position directly (no animation delay) so the
     // bar goes transparent as soon as the header starts re-expanding.
     // Tint color still fades in smoothly via TweenAnimationBuilder.
-    final controller = Provider.of<CharactersModel>(
-      context,
-      listen: false,
-    ).charScreenScrollController;
-    final scrollOffset =
-        controller.hasClients && controller.positions.length == 1
-        ? controller.offset
-        : 0.0;
     // Header collapse range: 180 − 56 = 124. In edit mode (fixed header) = 0.
     final headerRange = isEditMode ? 0.0 : 124.0;
-    final isOpaque = isEditMode || scrollOffset >= headerRange;
 
-    return TweenAnimationBuilder<double>(
-      key: ValueKey(character.uuid),
-      tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      builder: (context, tintProgress, child) {
-        final color = isOpaque
-            ? Color.lerp(
-                theme.colorScheme.surface,
-                AppBarUtils.getTintedBackground(theme.colorScheme),
-                tintProgress,
-              )
-            : Colors.transparent;
-        return Container(
-          height: chipBarHeight,
-          decoration: BoxDecoration(color: color),
+    return ValueListenableBuilder<double>(
+      valueListenable: scrollOffsetNotifier,
+      builder: (context, scrollOffset, child) {
+        final isOpaque = isEditMode || scrollOffset >= headerRange;
+        return TweenAnimationBuilder<double>(
+          key: ValueKey(character.uuid),
+          tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          builder: (context, tintProgress, child) {
+            final color = isOpaque
+                ? Color.lerp(
+                    theme.colorScheme.surface,
+                    AppBarUtils.getTintedBackground(theme.colorScheme),
+                    tintProgress,
+                  )
+                : Colors.transparent;
+            return Container(
+              height: chipBarHeight,
+              decoration: BoxDecoration(color: color),
+              child: child,
+            );
+          },
           child: child,
         );
       },

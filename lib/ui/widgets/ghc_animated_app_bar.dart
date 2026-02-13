@@ -41,7 +41,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
   String? _currentCharacterUuid;
   int? _currentPage;
   int? _previousPage;
-  late final ScrollController _charScrollController;
+  late final ValueNotifier<double> _charScrollOffsetNotifier;
   late final ScrollController _calcScrollController;
   late final AnimationController _flipController;
   late final Animation<double> _flipAnimation;
@@ -50,9 +50,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
   void initState() {
     super.initState();
     final charactersModel = context.read<CharactersModel>();
-    _charScrollController = charactersModel.charScreenScrollController;
+    _charScrollOffsetNotifier = charactersModel.charScrollOffsetNotifier;
     _calcScrollController = charactersModel.enhancementCalcScrollController;
-    _charScrollController.addListener(_scrollListener);
+    _charScrollOffsetNotifier.addListener(_scrollListener);
     _calcScrollController.addListener(_calcScrollListener);
 
     _flipController = AnimationController(
@@ -76,17 +76,13 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
 
   @override
   void dispose() {
-    _charScrollController.removeListener(_scrollListener);
+    _charScrollOffsetNotifier.removeListener(_scrollListener);
     _calcScrollController.removeListener(_calcScrollListener);
     _flipController.dispose();
     super.dispose();
   }
 
   void _scrollListener() {
-    if (!_charScrollController.hasClients) return;
-    // Guard against brief multi-attachment during character transitions
-    if (_charScrollController.positions.length != 1) return;
-
     // Content only scrolls behind the pinned headers after the character
     // header fully collapses. This matches the chip bar's overlapsContent
     // trigger. Header collapse range: maxHeight(180) − minHeight(56) = 124.
@@ -96,7 +92,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
         model.isEditMode && !(model.currentCharacter?.isRetired ?? true);
     final collapseRange = isFixedHeader ? 0.0 : 124.0;
 
-    final isContentBehind = _charScrollController.offset > collapseRange;
+    final isContentBehind = _charScrollOffsetNotifier.value > collapseRange;
     if (isContentBehind == !_isScrolledToTop) return;
     setState(() => _isScrolledToTop = !isContentBehind);
   }
@@ -308,9 +304,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
             charactersModel.isEditMode &&
             !(charactersModel.currentCharacter?.isRetired ?? true);
         final collapseRange = isFixedHeader ? 0.0 : 124.0;
-        _isScrolledToTop =
-            !_charScrollController.hasClients ||
-            _charScrollController.offset <= collapseRange;
+        _isScrolledToTop = _charScrollOffsetNotifier.value <= collapseRange;
       } else if (appModel.page == calculatorPage) {
         _isCalcScrolledToTop =
             !_calcScrollController.hasClients ||

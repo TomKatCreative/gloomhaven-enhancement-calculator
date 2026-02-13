@@ -84,6 +84,13 @@ class CharactersModel with ChangeNotifier {
   ScrollController charScreenScrollController = ScrollController();
   ScrollController enhancementCalcScrollController = ScrollController();
 
+  /// Notifier for the character screen's current scroll offset.
+  /// Updated by [CharacterScreen] on both user scrolls and metrics corrections
+  /// (e.g. section collapse). Listened to by [GHCAnimatedAppBar] for tint.
+  final ValueNotifier<double> charScrollOffsetNotifier = ValueNotifier<double>(
+    0,
+  );
+
   bool showRetired;
   bool _showAllCharacters;
   bool _isEditMode = false;
@@ -132,6 +139,7 @@ class CharactersModel with ChangeNotifier {
     pageController.dispose();
     charScreenScrollController.dispose();
     enhancementCalcScrollController.dispose();
+    charScrollOffsetNotifier.dispose();
     super.dispose();
   }
 
