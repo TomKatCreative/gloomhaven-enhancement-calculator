@@ -355,24 +355,19 @@ class _RequirementRowState extends State<_RequirementRow> {
               ),
               IntrinsicWidth(
                 child: Stack(
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.center,
                   children: [
-                    // Invisible placeholder reserves width for widest value,
-                    // which is 14
+                    // Invisible placeholder reserves width for widest value
                     Opacity(
                       opacity: 0,
-                      child: Text('20', style: theme.textTheme.bodySmall),
+                      child: Text('20/20', style: theme.textTheme.bodySmall),
                     ),
                     Text(
-                      '${widget.progress}',
+                      '${widget.progress}/${widget.requirement.target}',
                       style: theme.textTheme.bodySmall,
                     ),
                   ],
                 ),
-              ),
-              Text(
-                '/${widget.requirement.target}',
-                style: theme.textTheme.bodySmall,
               ),
               IconButton(
                 iconSize: iconSizeSmall,

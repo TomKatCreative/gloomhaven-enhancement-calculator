@@ -303,14 +303,13 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('5'), findsOneWidget);
-        expect(find.text('/20'), findsOneWidget);
+        expect(find.text('5/20'), findsOneWidget);
 
         // Tap the + button
         await tester.tap(find.byIcon(Icons.add_circle_outline).last);
         await tester.pumpAndSettle();
 
-        expect(find.text('6'), findsOneWidget);
+        expect(find.text('6/20'), findsOneWidget);
       });
 
       testWidgets('- button decrements progress', (tester) async {
@@ -324,12 +323,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.text('5'), findsOneWidget);
+        expect(find.text('5/20'), findsOneWidget);
 
         await tester.tap(find.byIcon(Icons.remove_circle_outline));
         await tester.pumpAndSettle();
 
-        expect(find.text('4'), findsOneWidget);
+        expect(find.text('4/20'), findsOneWidget);
       });
 
       testWidgets('- button is disabled at 0 progress', (tester) async {
@@ -520,8 +519,7 @@ void main() {
 
         // Quest should still be displayed
         expect(find.textContaining('515: Lawbringer'), findsOneWidget);
-        expect(find.text('5'), findsOneWidget);
-        expect(find.text('/20'), findsOneWidget);
+        expect(find.text('5/20'), findsOneWidget);
       });
     });
 
