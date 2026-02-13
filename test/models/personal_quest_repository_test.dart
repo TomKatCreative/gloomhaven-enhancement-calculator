@@ -18,10 +18,7 @@ void main() {
 
     test('quest numbers range from 510 to 533', () {
       final numbers =
-          PersonalQuestsRepository.quests
-              .map((q) => int.parse(q.number))
-              .toList()
-            ..sort();
+          PersonalQuestsRepository.quests.map((q) => q.number).toList()..sort();
       expect(numbers.first, 510);
       expect(numbers.last, 533);
       expect(numbers.length, 24);
@@ -29,7 +26,7 @@ void main() {
 
     test('all quest IDs start with gh_', () {
       for (final quest in PersonalQuestsRepository.quests) {
-        expect(quest.id, startsWith('gh_'));
+        expect(quest.id, startsWith('pq_gh_'));
       }
     });
 
@@ -107,12 +104,12 @@ void main() {
           .where((q) => q.unlockEnvelope == 'X')
           .toList();
       expect(envelopeQuests.length, 2);
-      expect(envelopeQuests.map((q) => q.number), containsAll(['513', '526']));
+      expect(envelopeQuests.map((q) => q.number), containsAll([513, 526]));
     });
 
     group('getById', () {
       test('returns correct quest for valid ID', () {
-        final quest = PersonalQuestsRepository.getById('gh_510');
+        final quest = PersonalQuestsRepository.getById('pq_gh_510');
         expect(quest, isNotNull);
         expect(quest!.title, 'Seeker of Xorn');
         expect(quest.unlockClassCode, ClassCodes.plagueherald);
@@ -144,23 +141,23 @@ void main() {
     });
 
     group('specific quest data', () {
-      test('514 A Study of Anatomy has target 12 (second printing)', () {
-        final quest = PersonalQuestsRepository.getById('gh_514');
-        expect(quest!.requirements.first.target, 12);
+      test('514 A Study of Anatomy has target 15 (second printing)', () {
+        final quest = PersonalQuestsRepository.getById('pq_gh_514');
+        expect(quest!.requirements.first.target, 15);
       });
 
       test('523 Aberrant Slayer has 6 requirements (one per demon type)', () {
-        final quest = PersonalQuestsRepository.getById('gh_523');
+        final quest = PersonalQuestsRepository.getById('pq_gh_523');
         expect(quest!.requirements.length, 6);
       });
 
       test('511 Merchant Class has 5 requirements (item slots)', () {
-        final quest = PersonalQuestsRepository.getById('gh_511');
+        final quest = PersonalQuestsRepository.getById('pq_gh_511');
         expect(quest!.requirements.length, 5);
       });
 
       test('533 The Perfect Poison has 3 requirements', () {
-        final quest = PersonalQuestsRepository.getById('gh_533');
+        final quest = PersonalQuestsRepository.getById('pq_gh_533');
         expect(quest!.requirements.length, 3);
         expect(quest.unlockClassCode, ClassCodes.plagueherald);
       });

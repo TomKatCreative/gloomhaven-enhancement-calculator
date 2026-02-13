@@ -599,7 +599,7 @@ class DatabaseMigrations {
     await txn.execute('''
       ${DatabaseHelper.createTable} $tablePersonalQuests (
         $columnPersonalQuestId ${DatabaseHelper.idTextPrimaryType},
-        $columnPersonalQuestNumber ${DatabaseHelper.textType},
+        $columnPersonalQuestNumber ${DatabaseHelper.integerType},
         $columnPersonalQuestTitle ${DatabaseHelper.textType},
         $columnPersonalQuestEdition ${DatabaseHelper.textType}
       )''');

@@ -66,7 +66,7 @@ Core character data storage.
 
 | Column | Type | Default | Description |
 |--------|------|---------|-------------|
-| `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "gh_510") |
+| `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "pq_gh_510") |
 | `PersonalQuestProgress` | TEXT | `'[]'` | JSON array of ints (progress per requirement) |
 
 **Party Fields** (added v18):
@@ -150,8 +150,8 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
-| `_id` | TEXT | PRIMARY KEY | Quest ID (e.g., "gh_510") |
-| `Number` | TEXT | NOT NULL | Card number (e.g., "510") |
+| `_id` | TEXT | PRIMARY KEY | Quest ID (e.g., "pq_gh_510") |
+| `Number` | INTEGER | NOT NULL | Card number (e.g., 510) |
 | `Title` | TEXT | NOT NULL | Quest title (e.g., "Seeker of Xorn") |
 | `Edition` | TEXT | NOT NULL | Game edition (e.g., "gloomhaven") |
 

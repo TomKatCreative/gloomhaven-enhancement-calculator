@@ -33,7 +33,7 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 ### Data Flow
 
 1. `PersonalQuestsRepository` holds static quest definitions (requirements, unlock rewards)
-2. `Character.personalQuestId` (String, defaults to `''`) references a quest ID like `"gh_510"`
+2. `Character.personalQuestId` (String, defaults to `''`) references a quest ID like `"pq_gh_510"`
 3. `Character.personalQuestProgress` (List<int>) stores progress per requirement as JSON in DB
 4. `Character.personalQuest` getter resolves the full `PersonalQuest` from the repository
 5. `CharactersModel.updatePersonalQuest()` changes quest and resets progress to zeros
@@ -43,8 +43,8 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 ### DB Schema (v18)
 
 **PersonalQuestsTable** - quest definitions (seeded from repository):
-- `_id` TEXT PRIMARY KEY (e.g., "gh_510")
-- `Number` TEXT NOT NULL (e.g., "510")
+- `_id` TEXT PRIMARY KEY (e.g., "pq_gh_510")
+- `Number` INTEGER NOT NULL (e.g., 510)
 - `Title` TEXT NOT NULL (e.g., "Seeker of Xorn")
 - `Edition` TEXT NOT NULL (e.g., "gloomhaven")
 

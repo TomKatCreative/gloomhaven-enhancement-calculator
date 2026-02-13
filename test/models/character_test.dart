@@ -510,7 +510,7 @@ void main() {
 
     test('personalQuest getter resolves quest from repository', () {
       final character = TestData.createCharacter();
-      character.personalQuestId = 'gh_510';
+      character.personalQuestId = 'pq_gh_510';
 
       final quest = character.personalQuest;
       expect(quest, isNotNull);
@@ -519,22 +519,22 @@ void main() {
 
     test('toMap includes personalQuestId and progress', () {
       final character = TestData.createCharacter();
-      character.personalQuestId = 'gh_515';
+      character.personalQuestId = 'pq_gh_515';
       character.personalQuestProgress = [5];
 
       final map = character.toMap();
-      expect(map[columnCharacterPersonalQuestId], 'gh_515');
+      expect(map[columnCharacterPersonalQuestId], 'pq_gh_515');
       expect(map[columnCharacterPersonalQuestProgress], '[5]');
     });
 
     test('fromMap parses personalQuestId and progress', () {
       final map = _createCharacterMap(
-        personalQuestId: 'gh_512',
+        personalQuestId: 'pq_gh_512',
         personalQuestProgress: '[100]',
       );
 
       final character = Character.fromMap(map);
-      expect(character.personalQuestId, 'gh_512');
+      expect(character.personalQuestId, 'pq_gh_512');
       expect(character.personalQuestProgress, [100]);
     });
 
@@ -550,7 +550,7 @@ void main() {
     test('toMap/fromMap round-trip preserves PQ data', () {
       final original = TestData.createCharacter();
       original.id = 1; // id is required for round-trip (DB provides it)
-      original.personalQuestId = 'gh_523';
+      original.personalQuestId = 'pq_gh_523';
       original.personalQuestProgress = [1, 0, 1, 0, 1, 0];
 
       final roundTripped = Character.fromMap(original.toMap());

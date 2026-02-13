@@ -1095,11 +1095,11 @@ void main() {
       await model.createCharacter(
         'Test',
         TestData.brute,
-        personalQuestId: 'gh_510',
+        personalQuestId: 'pq_gh_510',
       );
 
       expect(model.characters.length, 1);
-      expect(model.characters.first.personalQuestId, 'gh_510');
+      expect(model.characters.first.personalQuestId, 'pq_gh_510');
       expect(model.characters.first.personalQuestProgress, [0, 0]);
     });
 
@@ -1114,15 +1114,15 @@ void main() {
 
     test('updatePersonalQuest changes quest and resets progress', () async {
       final character = TestData.createCharacter();
-      character.personalQuestId = 'gh_510';
+      character.personalQuestId = 'pq_gh_510';
       character.personalQuestProgress = [2, 1];
       fakeDb.characters = [character];
       final model = createModel();
       await model.loadCharacters();
 
-      await model.updatePersonalQuest(character, 'gh_515');
+      await model.updatePersonalQuest(character, 'pq_gh_515');
 
-      expect(character.personalQuestId, 'gh_515');
+      expect(character.personalQuestId, 'pq_gh_515');
       // gh_515 has 1 requirement
       expect(character.personalQuestProgress, [0]);
       expect(fakeDb.updateCalls, contains(character.uuid));
@@ -1130,7 +1130,7 @@ void main() {
 
     test('updatePersonalQuest to null clears quest', () async {
       final character = TestData.createCharacter();
-      character.personalQuestId = 'gh_510';
+      character.personalQuestId = 'pq_gh_510';
       character.personalQuestProgress = [2, 1];
       fakeDb.characters = [character];
       final model = createModel();
@@ -1146,7 +1146,7 @@ void main() {
       'updatePersonalQuestProgress updates individual requirement',
       () async {
         final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_510';
+        character.personalQuestId = 'pq_gh_510';
         character.personalQuestProgress = [0, 0];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1168,14 +1168,14 @@ void main() {
       bool notified = false;
       model.addListener(() => notified = true);
 
-      await model.updatePersonalQuest(character, 'gh_510');
+      await model.updatePersonalQuest(character, 'pq_gh_510');
 
       expect(notified, isTrue);
     });
 
     test('updatePersonalQuestProgress notifies listeners', () async {
       final character = TestData.createCharacter();
-      character.personalQuestId = 'gh_523';
+      character.personalQuestId = 'pq_gh_523';
       character.personalQuestProgress = [0, 0, 0, 0, 0, 0];
       fakeDb.characters = [character];
       final model = createModel();
@@ -1194,7 +1194,7 @@ void main() {
       'updatePersonalQuestProgress returns true when quest transitions to complete',
       () async {
         final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_515'; // 1 req: target 20
+        character.personalQuestId = 'pq_gh_515'; // 1 req: target 20
         character.personalQuestProgress = [19];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1214,7 +1214,7 @@ void main() {
       'updatePersonalQuestProgress returns false for non-completing update',
       () async {
         final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1231,7 +1231,7 @@ void main() {
       () async {
         final character = TestData.createCharacter();
         // Quest 523 has 6 binary requirements, all already met
-        character.personalQuestId = 'gh_523';
+        character.personalQuestId = 'pq_gh_523';
         character.personalQuestProgress = [1, 1, 1, 1, 1, 1];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1249,7 +1249,7 @@ void main() {
     group('isPersonalQuestComplete', () {
       test('returns true when all requirements are met', () async {
         final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_515'; // 1 req: target 20
+        character.personalQuestId = 'pq_gh_515'; // 1 req: target 20
         character.personalQuestProgress = [20];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1260,7 +1260,7 @@ void main() {
 
       test('returns false when some requirements are not met', () async {
         final character = TestData.createCharacter();
-        character.personalQuestId = 'gh_523'; // 6 binary reqs
+        character.personalQuestId = 'pq_gh_523'; // 6 binary reqs
         character.personalQuestProgress = [1, 1, 0, 1, 1, 1];
         fakeDb.characters = [character];
         final model = createModel();
@@ -1282,7 +1282,7 @@ void main() {
         'returns false when progress length mismatches requirements',
         () async {
           final character = TestData.createCharacter();
-          character.personalQuestId = 'gh_523'; // 6 reqs
+          character.personalQuestId = 'pq_gh_523'; // 6 reqs
           character.personalQuestProgress = [1, 1]; // only 2 values
           fakeDb.characters = [character];
           final model = createModel();

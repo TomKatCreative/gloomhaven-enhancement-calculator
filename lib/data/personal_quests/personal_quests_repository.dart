@@ -6,7 +6,7 @@
 /// ## Usage
 ///
 /// ```dart
-/// final quest = PersonalQuestsRepository.getById('gh_510');
+/// final quest = PersonalQuestsRepository.getById('pq_gh_510');
 /// final ghQuests = PersonalQuestsRepository.getByEdition(GameEdition.gloomhaven);
 /// ```
 ///
@@ -23,8 +23,8 @@ import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest
 class PersonalQuestsRepository {
   static final List<PersonalQuest> quests = [
     PersonalQuest(
-      id: 'gh_510',
-      number: '510',
+      id: 'pq_gh_510',
+      number: 510,
       title: 'Seeker of Xorn',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.plagueherald,
@@ -41,8 +41,8 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_511',
-      number: '511',
+      id: 'pq_gh_511',
+      number: 511,
       title: 'Merchant Class',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.quartermaster,
@@ -58,8 +58,8 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_512',
-      number: '512',
+      id: 'pq_gh_512',
+      number: 512,
       title: 'Greed is Good',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.quartermaster,
@@ -71,13 +71,16 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_513',
-      number: '513',
+      id: 'pq_gh_513',
+      number: 513,
       title: 'Finding the Cure',
       edition: GameEdition.gloomhaven,
       unlockEnvelope: 'X',
       requirements: const [
-        PersonalQuestRequirement(description: 'Kill 8 Forest Imps', target: 8),
+        PersonalQuestRequirement(
+          description: 'Kill eight Forest Imps',
+          target: 8,
+        ),
         PersonalQuestRequirement(
           description:
               'Then unlock "Forgotten Grove" (Scenario 59) and follow it to a conclusion',
@@ -86,34 +89,35 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_514',
-      number: '514',
+      id: 'pq_gh_514',
+      number: 514,
       title: 'A Study of Anatomy',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.sawbones,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Party members exhausted',
-          target: 12,
+          description:
+              'Experience your party members becoming exhausted fifteen times',
+          target: 15,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_515',
-      number: '515',
+      id: 'pq_gh_515',
+      number: 515,
       title: 'Lawbringer',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 Bandits or Cultists',
+          description: 'Kill twenty Bandits or Cultists',
           target: 20,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_516',
-      number: '516',
+      id: 'pq_gh_516',
+      number: 516,
       title: 'Pounds of Flesh',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.berserker,
@@ -122,21 +126,21 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_517',
-      number: '517',
+      id: 'pq_gh_517',
+      number: 517,
       title: 'Trophy Hunt',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 unique monster types',
+          description: 'Kill twenty different types of monsters',
           target: 20,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_518',
-      number: '518',
+      id: 'pq_gh_518',
+      number: 518,
       title: 'Eternal Wanderer',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.summoner,
@@ -148,62 +152,70 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_519',
-      number: '519',
+      id: 'pq_gh_519',
+      number: 519,
       title: 'Battle Legend',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Earn 15 battle goal checkmarks',
+          description: 'Earn fifteen GOAL from completed battle goals',
           target: 15,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_520',
-      number: '520',
+      id: 'pq_gh_520',
+      number: 520,
       title: 'Implement of Light',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
-        PersonalQuestRequirement(description: 'Own Skullbane Axe', target: 1),
-        PersonalQuestRequirement(description: 'Kill 7 undead', target: 7),
+        PersonalQuestRequirement(
+          description: 'Find the Skullbane Axe in the Necormancer\'s Sanctum',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Use it to kill seven Living Bones, Living Corpses, or Living Spirits',
+          target: 7,
+        ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_521',
-      number: '521',
+      id: 'pq_gh_521',
+      number: 521,
       title: 'Take Back the Trees',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 3 Dagger Forest scenarios',
+          description: 'Complete three scenarios in the Dagger Forest',
           target: 3,
         ),
         PersonalQuestRequirement(
-          description: 'Complete the scenario chain',
+          description:
+              'Then unlock "Foggy Thicket" (Scenario 55) and follow it to a conclusion',
           target: 1,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_522',
-      number: '522',
+      id: 'pq_gh_522',
+      number: 522,
       title: 'The Thin Places',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 6 side scenarios',
+          description: 'Complete six side scenarios (scenario number > 51)',
           target: 6,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_523',
-      number: '523',
+      id: 'pq_gh_523',
+      number: 523,
       title: 'Aberrant Slayer',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.elementalist,
@@ -217,21 +229,21 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_524',
-      number: '524',
+      id: 'pq_gh_524',
+      number: 524,
       title: 'Fearless Stand',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 Elite monsters',
+          description: 'Kill twenty elite monsters',
           target: 20,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_525',
-      number: '525',
+      id: 'pq_gh_525',
+      number: 525,
       title: 'Piety in All Things',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.sawbones,
@@ -243,108 +255,130 @@ class PersonalQuestsRepository {
       ],
     ),
     PersonalQuest(
-      id: 'gh_526',
-      number: '526',
+      id: 'pq_gh_526',
+      number: 526,
       title: 'Vengeance',
       edition: GameEdition.gloomhaven,
       unlockEnvelope: 'X',
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 4 Gloomhaven scenarios',
+          description: 'Complete four scenarios in Gloomhaven',
           target: 4,
         ),
         PersonalQuestRequirement(
-          description: 'Complete the scenario chain',
+          description:
+              'Then unlock "Investigation" (Scenario 57) and follow it to a conclusion',
           target: 1,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_527',
-      number: '527',
+      id: 'pq_gh_527',
+      number: 527,
       title: 'Zealot of the Blood God',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.berserker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Become exhausted 12 times',
+          description: 'Become exhausted twelve times',
           target: 12,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_528',
-      number: '528',
+      id: 'pq_gh_528',
+      number: 528,
       title: 'Goliath Toppler',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 4 boss scenarios',
+          description: 'Complete four boss scenarios',
           target: 4,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_529',
-      number: '529',
+      id: 'pq_gh_529',
+      number: 529,
       title: 'The Fall of Man',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 2 Lingering Swamp scenarios',
+          description: 'Complete two scenarios in the Lingering Swamp',
           target: 2,
         ),
         PersonalQuestRequirement(
-          description: 'Complete the scenario chain',
+          description:
+              'Then unlock "Fading Lighthouse" (Scenario 61) and follow it to a conclusion',
           target: 1,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_530',
-      number: '530',
+      id: 'pq_gh_530',
+      number: 530,
       title: 'Augmented Abilities',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.summoner,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Purchase 4 enhancements',
+          description: 'Purchase four enhancements',
           target: 4,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_531',
-      number: '531',
+      id: 'pq_gh_531',
+      number: 531,
       title: 'Elemental Samples',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.elementalist,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 1 scenario in each of 6 different regions',
-          target: 6,
+          description: 'Complete a scenario in Gloomhaven',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Dagger Forest',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Lingering Swamp',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Watcher Mountains',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Copperneck Mountains',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Misty Sea',
+          target: 1,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_532',
-      number: '532',
+      id: 'pq_gh_532',
+      number: 532,
       title: 'A Helping Hand',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Experience 2 other characters achieving their personal quests',
+              'Experience two other characters achieving their personal quests',
           target: 2,
         ),
       ],
     ),
     PersonalQuest(
-      id: 'gh_533',
-      number: '533',
+      id: 'pq_gh_533',
+      number: 533,
       title: 'The Perfect Poison',
       edition: GameEdition.gloomhaven,
       unlockClassCode: ClassCodes.plagueherald,

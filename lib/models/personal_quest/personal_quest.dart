@@ -28,12 +28,12 @@ const String columnPersonalQuestEdition = 'Edition';
 
 /// A personal quest card with retirement requirements.
 ///
-/// Quests are identified by [id] (e.g., "gh_510") and belong to a specific
+/// Quests are identified by [id] (e.g., "pq_gh_510") and belong to a specific
 /// [edition]. Each quest has one or more [requirements] and may unlock a
 /// class ([unlockClassCode]) or envelope ([unlockEnvelope]) upon completion.
 class PersonalQuest {
   late String id;
-  late String number;
+  late int number;
   late String title;
   late GameEdition edition;
   List<PersonalQuestRequirement> requirements;
@@ -52,7 +52,7 @@ class PersonalQuest {
 
   PersonalQuest.fromMap(Map<String, dynamic> map) : requirements = const [] {
     id = map[columnPersonalQuestId] as String;
-    number = map[columnPersonalQuestNumber] as String;
+    number = map[columnPersonalQuestNumber] as int;
     title = map[columnPersonalQuestTitle] as String;
     edition = GameEdition.values.byName(
       map[columnPersonalQuestEdition] as String,

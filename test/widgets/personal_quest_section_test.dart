@@ -88,7 +88,7 @@ void main() {
       testWidgets('displays quest title', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-1');
         // Assign quest 515 (Lawbringer) - has 1 requirement: "Kill 20 Bandits or Cultists"
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character);
@@ -107,7 +107,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-2');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [12];
 
         final model = await setupModel(character: character);
@@ -121,7 +121,9 @@ void main() {
           find.byWidgetPredicate(
             (w) =>
                 w is RichText &&
-                w.text.toPlainText().contains('Kill 20 Bandits or Cultists'),
+                w.text.toPlainText().contains(
+                  'Kill twenty Bandits or Cultists',
+                ),
           ),
           findsOneWidget,
         );
@@ -133,7 +135,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-3');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [20]; // target is 20, so complete
 
         final model = await setupModel(character: character);
@@ -150,7 +152,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-4');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character);
@@ -166,7 +168,7 @@ void main() {
       testWidgets('displays multiple requirements', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-5');
         // Quest 523 (Aberrant Slayer) has 6 requirements (one per demon type)
-        character.personalQuestId = 'gh_523';
+        character.personalQuestId = 'pq_gh_523';
         character.personalQuestProgress = [1, 0, 1, 0, 0, 1];
 
         final model = await setupModel(character: character);
@@ -186,7 +188,7 @@ void main() {
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-6');
         // Quest 513 unlocks Envelope X
-        character.personalQuestId = 'gh_513';
+        character.personalQuestId = 'pq_gh_513';
         character.personalQuestProgress = [0, 0];
 
         final model = await setupModel(character: character);
@@ -264,7 +266,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final character = TestData.createCharacter(uuid: 'test-pq-9');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -280,7 +282,7 @@ void main() {
 
       testWidgets('shows edit icon next to quest title', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-10');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -294,7 +296,7 @@ void main() {
 
       testWidgets('+ button increments progress', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-11');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -314,7 +316,7 @@ void main() {
 
       testWidgets('- button decrements progress', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-12');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -333,7 +335,7 @@ void main() {
 
       testWidgets('- button is disabled at 0 progress', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-13');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [0];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -351,7 +353,7 @@ void main() {
 
       testWidgets('+ button is disabled at target progress', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-14');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [20]; // target is 20
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -374,7 +376,7 @@ void main() {
           uuid: 'test-pq-15',
           isRetired: true,
         );
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [15];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -399,7 +401,7 @@ void main() {
 
           final character = TestData.createCharacter(uuid: 'test-pq-hi-1');
           // Quest 512 (Greed is Good) - target 200
-          character.personalQuestId = 'gh_512';
+          character.personalQuestId = 'pq_gh_512';
           character.personalQuestProgress = [50];
 
           final model = await setupModel(
@@ -430,7 +432,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final character = TestData.createCharacter(uuid: 'test-pq-hi-2');
-        character.personalQuestId = 'gh_512';
+        character.personalQuestId = 'pq_gh_512';
         character.personalQuestProgress = [50];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -456,7 +458,7 @@ void main() {
         addTearDown(tester.view.resetDevicePixelRatio);
 
         final character = TestData.createCharacter(uuid: 'test-pq-hi-3');
-        character.personalQuestId = 'gh_512';
+        character.personalQuestId = 'pq_gh_512';
         character.personalQuestProgress = [200];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -473,7 +475,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-16');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -500,7 +502,7 @@ void main() {
 
       testWidgets('cancelling confirmation dialog keeps quest', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-17');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -528,7 +530,7 @@ void main() {
         'shows retirement snackbar when quest transitions to complete',
         (tester) async {
           final character = TestData.createCharacter(uuid: 'test-pq-retire-1');
-          character.personalQuestId = 'gh_515'; // 1 req: kill 20
+          character.personalQuestId = 'pq_gh_515'; // 1 req: kill 20
           character.personalQuestProgress = [19]; // one away
 
           final model = await setupModel(
@@ -555,7 +557,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-retire-2');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [19];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -579,7 +581,7 @@ void main() {
 
       testWidgets('Not Yet in dialog keeps character active', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-retire-3');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [19];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -605,7 +607,7 @@ void main() {
         tester,
       ) async {
         final character = TestData.createCharacter(uuid: 'test-pq-retire-4');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [19];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -632,7 +634,7 @@ void main() {
         (tester) async {
           final character = TestData.createCharacter(uuid: 'test-pq-retire-5');
           // Quest 523 has 6 binary requirements
-          character.personalQuestId = 'gh_523';
+          character.personalQuestId = 'pq_gh_523';
           // All complete
           character.personalQuestProgress = [1, 1, 1, 1, 1, 1];
 
@@ -665,7 +667,7 @@ void main() {
         'does not show duplicate snackbar when isRetirementSnackBarVisible is true',
         (tester) async {
           final character = TestData.createCharacter(uuid: 'test-pq-dedup');
-          character.personalQuestId = 'gh_515';
+          character.personalQuestId = 'pq_gh_515';
           character.personalQuestProgress = [19];
 
           final model = await setupModel(
@@ -704,7 +706,7 @@ void main() {
           uuid: 'test-pq-retire-6',
           name: 'TestHero',
         );
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [19];
 
         final model = await setupModel(character: character, isEditMode: true);
@@ -737,7 +739,7 @@ void main() {
         await SharedPrefs().init();
 
         final character = TestData.createCharacter(uuid: 'test-pq-18');
-        character.personalQuestId = 'gh_515';
+        character.personalQuestId = 'pq_gh_515';
         character.personalQuestProgress = [5];
 
         final model = await setupModel(character: character);

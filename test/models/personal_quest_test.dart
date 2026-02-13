@@ -6,8 +6,8 @@ void main() {
   group('PersonalQuest', () {
     test('constructor sets all fields', () {
       final quest = PersonalQuest(
-        id: 'gh_510',
-        number: '510',
+        id: 'pq_gh_510',
+        number: 510,
         title: 'Seeker of Xorn',
         edition: GameEdition.gloomhaven,
         unlockClassCode: 'ph',
@@ -16,8 +16,8 @@ void main() {
         ],
       );
 
-      expect(quest.id, 'gh_510');
-      expect(quest.number, '510');
+      expect(quest.id, 'pq_gh_510');
+      expect(quest.number, 510);
       expect(quest.title, 'Seeker of Xorn');
       expect(quest.edition, GameEdition.gloomhaven);
       expect(quest.unlockClassCode, 'ph');
@@ -27,8 +27,8 @@ void main() {
 
     test('constructor with envelope unlock', () {
       final quest = PersonalQuest(
-        id: 'gh_513',
-        number: '513',
+        id: 'pq_gh_513',
+        number: 513,
         title: 'Finding the Cure',
         edition: GameEdition.gloomhaven,
         unlockEnvelope: 'X',
@@ -40,8 +40,8 @@ void main() {
 
     test('displayName combines number and title', () {
       final quest = PersonalQuest(
-        id: 'gh_510',
-        number: '510',
+        id: 'pq_gh_510',
+        number: 510,
         title: 'Seeker of Xorn',
         edition: GameEdition.gloomhaven,
       );
@@ -51,38 +51,38 @@ void main() {
 
     test('toMap produces correct map', () {
       final quest = PersonalQuest(
-        id: 'gh_510',
-        number: '510',
+        id: 'pq_gh_510',
+        number: 510,
         title: 'Seeker of Xorn',
         edition: GameEdition.gloomhaven,
       );
 
       final map = quest.toMap();
-      expect(map[columnPersonalQuestId], 'gh_510');
-      expect(map[columnPersonalQuestNumber], '510');
+      expect(map[columnPersonalQuestId], 'pq_gh_510');
+      expect(map[columnPersonalQuestNumber], 510);
       expect(map[columnPersonalQuestTitle], 'Seeker of Xorn');
       expect(map[columnPersonalQuestEdition], GameEdition.gloomhaven.name);
     });
 
     test('fromMap reconstructs quest', () {
       final map = {
-        columnPersonalQuestId: 'gh_512',
-        columnPersonalQuestNumber: '512',
+        columnPersonalQuestId: 'pq_gh_512',
+        columnPersonalQuestNumber: 512,
         columnPersonalQuestTitle: 'Greed is Good',
         columnPersonalQuestEdition: 'gloomhaven',
       };
 
       final quest = PersonalQuest.fromMap(map);
-      expect(quest.id, 'gh_512');
-      expect(quest.number, '512');
+      expect(quest.id, 'pq_gh_512');
+      expect(quest.number, 512);
       expect(quest.title, 'Greed is Good');
       expect(quest.edition, GameEdition.gloomhaven);
     });
 
     test('toMap/fromMap round-trip preserves data', () {
       final original = PersonalQuest(
-        id: 'gh_515',
-        number: '515',
+        id: 'pq_gh_515',
+        number: 515,
         title: 'Lawbringer',
         edition: GameEdition.gloomhaven,
       );

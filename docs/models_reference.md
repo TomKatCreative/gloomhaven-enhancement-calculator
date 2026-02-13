@@ -81,7 +81,7 @@ Represents a player's character instance with stats, resources, and progression.
 **Personal Quest Fields:**
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `personalQuestId` | `String` | `''` | References a quest ID (e.g., `"gh_510"`) |
+| `personalQuestId` | `String` | `''` | References a quest ID (e.g., `"pq_gh_510"`) |
 | `personalQuestProgress` | `List<int>` | `[]` | Progress per requirement, stored as JSON in DB |
 
 **Loaded from Database** (not constructor params):
