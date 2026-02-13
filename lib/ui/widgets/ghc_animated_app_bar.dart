@@ -327,7 +327,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
                 message: isRetired ? l10n.unretire : l10n.retire,
                 child: IconButton(
                   icon: Icon(
-                    isRetired ? Icons.directions_walk : Icons.assist_walker,
+                    isRetired ? Icons.work_rounded : Icons.work_off_rounded,
                   ),
                   onPressed: () =>
                       _handleRetire(context, charactersModel, appModel),

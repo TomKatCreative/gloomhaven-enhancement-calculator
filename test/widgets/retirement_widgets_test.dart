@@ -48,7 +48,7 @@ void main() {
   }
 
   group('Retire Button Icon', () {
-    testWidgets('shows retire icon (assist_walker) for active character', (
+    testWidgets('shows retire icon (work_off) for active character', (
       tester,
     ) async {
       final character = TestData.createCharacter(isRetired: false);
@@ -62,11 +62,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.assist_walker), findsOneWidget);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      expect(find.byIcon(Icons.work_off_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_rounded), findsNothing);
     });
 
-    testWidgets('shows unretire icon (directions_walk) for retired character', (
+    testWidgets('shows unretire icon (work) for retired character', (
       tester,
     ) async {
       final character = TestData.createCharacter(isRetired: true);
@@ -80,8 +80,8 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.directions_walk), findsOneWidget);
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
+      expect(find.byIcon(Icons.work_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
     });
 
     testWidgets('retire button not visible when not in edit mode', (
@@ -98,7 +98,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
       expect(find.byIcon(Icons.delete_rounded), findsNothing);
     });
 
@@ -119,7 +119,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.assist_walker));
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
       await tester.pumpAndSettle();
 
       expect(model.currentCharacter!.isRetired, isTrue);
@@ -138,11 +138,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Before retiring: shows assist_walker
-      expect(find.byIcon(Icons.assist_walker), findsOneWidget);
+      // Before retiring: shows work_off
+      expect(find.byIcon(Icons.work_off_rounded), findsOneWidget);
 
       // Tap to retire
-      await tester.tap(find.byIcon(Icons.assist_walker));
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
       await tester.pumpAndSettle();
 
       // After retiring: _handleRetire exits edit mode, so retire/delete
@@ -151,8 +151,8 @@ void main() {
       model.isEditMode = true;
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.directions_walk), findsOneWidget);
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
+      expect(find.byIcon(Icons.work_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
     });
   });
 
