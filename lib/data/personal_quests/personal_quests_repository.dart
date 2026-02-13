@@ -30,7 +30,7 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.plagueherald,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 3 scenarios with "Crypt" in the name',
+          description: 'Complete three scenarios with "Crypt" in the name',
           target: 3,
         ),
         PersonalQuestRequirement(
