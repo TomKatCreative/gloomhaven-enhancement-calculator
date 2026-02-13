@@ -865,23 +865,26 @@ class _QuestAndNotesCollapsibleCardState
                   mediumPadding,
                   smallPadding,
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.book_rounded,
-                      size: iconSizeSmall,
-                      color: primaryColor,
-                    ),
-                    const SizedBox(width: smallPadding),
-                    Expanded(
-                      child: Text(
-                        l10n.notes,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: primaryColor,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: smallPadding),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.book_rounded,
+                        size: iconSizeSmall,
+                        color: primaryColor,
+                      ),
+                      const SizedBox(width: smallPadding),
+                      Expanded(
+                        child: Text(
+                          l10n.notes,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: primaryColor,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               // Notes content

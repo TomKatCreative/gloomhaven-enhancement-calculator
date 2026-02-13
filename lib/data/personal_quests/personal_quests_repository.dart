@@ -34,7 +34,8 @@ class PersonalQuestsRepository {
           target: 3,
         ),
         PersonalQuestRequirement(
-          description: 'Complete the Scenario 52 chain',
+          description:
+              'Then unlock "Noxious Cellar" (Scenario 52) and follow it to a conclusion',
           target: 1,
         ),
       ],
@@ -78,7 +79,8 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 8 Forest Imps', target: 8),
         PersonalQuestRequirement(
-          description: 'Unlock and complete Scenario 59',
+          description:
+              'Then unlock "Forgotten Grove" (Scenario 59) and follow it to a conclusion',
           target: 1,
         ),
       ],
