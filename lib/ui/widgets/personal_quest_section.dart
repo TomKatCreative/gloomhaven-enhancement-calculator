@@ -326,6 +326,8 @@ class _RequirementRowState extends State<_RequirementRow> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: RichText(
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 text: TextSpan(
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: isComplete ? theme.disabledColor : null,
