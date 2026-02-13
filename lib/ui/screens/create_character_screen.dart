@@ -241,7 +241,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               hintText: AppLocalizations.of(context).selectClass,
               floatingLabelBehavior: FloatingLabelBehavior.always,
               border: const OutlineInputBorder(),
-              suffixIcon: const Icon(Icons.open_in_new_rounded),
+              suffixIcon: const Icon(Icons.chevron_right_rounded),
             ),
             onTap: () async {
               SelectedPlayerClass? selectedPlayerClass =
@@ -312,7 +312,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                     });
                   },
                 )
-              : const Icon(Icons.chevron_right),
+              : const Icon(Icons.chevron_right_rounded),
         ),
         onTap: isEnabled
             ? () async {
@@ -357,7 +357,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   });
                 },
               )
-            : const Icon(Icons.chevron_right),
+            : const Icon(Icons.chevron_right_rounded),
       ),
       onTap: () {
         PartyAssignmentSheet.show(

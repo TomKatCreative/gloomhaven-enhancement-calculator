@@ -1627,7 +1627,7 @@ class _PartyAssignmentRow extends StatelessWidget {
             const SizedBox(width: mediumPadding),
             Expanded(child: Text(party.name, style: theme.textTheme.bodyLarge)),
             Icon(
-              Icons.chevron_right,
+              Icons.chevron_right_rounded,
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ],

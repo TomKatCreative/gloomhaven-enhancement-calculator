@@ -159,7 +159,6 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
-    final chevronColor = _isExpanded ? primaryColor : theme.colorScheme.primary;
     final effectiveConstraints =
         widget.constraints ??
         BoxConstraints(maxWidth: ResponsiveLayout.contentMaxWidth(context));
@@ -175,7 +174,6 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
       child: Theme(
         data: theme.copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          iconColor: chevronColor,
           onExpansionChanged: (value) {
             widget.onExpansionChanged(value);
             setState(() => _isExpanded = value);
