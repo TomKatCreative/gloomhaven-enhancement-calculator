@@ -69,7 +69,12 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
     widget.onCountChanged(_count);
   }
 
-  void _increment() => _updateCount(_count + 1);
+  static const _maxCount = 999;
+
+  void _increment() {
+    if (_count >= _maxCount) return;
+    _updateCount(_count + 1);
+  }
 
   void _decrement() {
     if (_count <= 0) return;
@@ -79,7 +84,7 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
   void _onTextChanged(String text) {
     final parsed = int.tryParse(text);
     if (parsed != null && parsed >= 0) {
-      _count = parsed;
+      _count = parsed.clamp(0, _maxCount);
       widget.onCountChanged(_count);
     } else if (text.isEmpty) {
       _count = 0;
@@ -143,6 +148,7 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(3),
                         ],
                         decoration: const InputDecoration(
                           contentPadding: EdgeInsets.zero,
@@ -156,7 +162,7 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
                     ),
                   ),
                   IconButton.filledTonal(
-                    onPressed: _increment,
+                    onPressed: _count < _maxCount ? _increment : null,
                     icon: const Icon(Icons.add_rounded),
                     iconSize: iconSizeLarge,
                   ),

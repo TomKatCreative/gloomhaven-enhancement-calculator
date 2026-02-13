@@ -1309,9 +1309,7 @@ class _StatsSectionState extends State<_StatsSection> {
                         ),
                       );
                       if (value != null) {
-                        final clampedValue = value
-                            .clamp(0, double.infinity)
-                            .toInt();
+                        final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
                           widget.character..xp = clampedValue,
                         );
@@ -1343,7 +1341,7 @@ class _StatsSectionState extends State<_StatsSection> {
                         FilteringTextInputFormatter.deny(
                           RegExp('[\\.|\\,|\\ |\\-]'),
                         ),
-                        LengthLimitingTextInputFormatter(4),
+                        LengthLimitingTextInputFormatter(3),
                       ],
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
@@ -1372,12 +1370,13 @@ class _StatsSectionState extends State<_StatsSection> {
                         ),
                       );
                       if (value != null) {
+                        final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
-                          widget.character..gold = value,
+                          widget.character..gold = clampedValue,
                         );
-                        _goldController.text = value == 0
+                        _goldController.text = clampedValue == 0
                             ? ''
-                            : value.toString();
+                            : clampedValue.toString();
                       }
                     },
                   ),

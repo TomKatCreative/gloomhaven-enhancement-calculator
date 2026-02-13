@@ -38,7 +38,11 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Center(child: Text('Adjust ${widget.labelText}')),
+      title: Center(
+        child: Text(
+          'Adjust ${widget.labelText == widget.labelText.toUpperCase() ? widget.labelText : widget.labelText.toLowerCase()}',
+        ),
+      ),
       content: Container(
         constraints: BoxConstraints(
           maxWidth: ResponsiveLayout.dialogMaxWidth(context),
@@ -47,7 +51,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Enter a value to add or subtract from your current ${widget.labelText.toLowerCase()}',
+              'Enter a value to add or subtract from your current ${widget.labelText == widget.labelText.toUpperCase() ? widget.labelText : widget.labelText.toLowerCase()}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: largePadding),
