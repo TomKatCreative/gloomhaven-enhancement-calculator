@@ -1,3 +1,5 @@
+import 'dart:math' show pi;
+
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
@@ -32,13 +34,17 @@ class GHCAnimatedAppBar extends StatefulWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(58);
 }
 
-class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
+class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
+    with SingleTickerProviderStateMixin {
   bool _isScrolledToTop = true;
   bool _isCalcScrolledToTop = true;
   String? _currentCharacterUuid;
   int? _currentPage;
+  int? _previousPage;
   late final ScrollController _charScrollController;
   late final ScrollController _calcScrollController;
+  late final AnimationController _flipController;
+  late final Animation<double> _flipAnimation;
 
   @override
   void initState() {
@@ -48,12 +54,31 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     _calcScrollController = charactersModel.enhancementCalcScrollController;
     _charScrollController.addListener(_scrollListener);
     _calcScrollController.addListener(_calcScrollListener);
+
+    _flipController = AnimationController(
+      duration: animationDuration,
+      vsync: this,
+    );
+    _flipAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _flipController, curve: Curves.easeInOut),
+    );
+    _flipController.addListener(() {
+      if (_flipController.value >= 0.5 && _previousPage != null) {
+        setState(() => _previousPage = null);
+      }
+    });
+    _flipController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _flipController.reset();
+      }
+    });
   }
 
   @override
   void dispose() {
     _charScrollController.removeListener(_scrollListener);
     _calcScrollController.removeListener(_calcScrollListener);
+    _flipController.dispose();
     super.dispose();
   }
 
@@ -163,12 +188,97 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     }
   }
 
+  Widget _buildTitleContent({
+    required int displayPage,
+    required int charactersPage,
+    required int calculatorPage,
+    required ThemeData theme,
+    required ColorScheme colorScheme,
+    required CharactersModel charactersModel,
+    required TownModel townModel,
+  }) {
+    Widget content;
+    if (kTownSheetEnabled &&
+        displayPage == 0 &&
+        townModel.activeCampaign != null) {
+      content = GestureDetector(
+        onTap: () => CampaignSelector.show(
+          context: context,
+          campaigns: townModel.campaigns,
+          activeCampaign: townModel.activeCampaign,
+          onCampaignSelected: (c) => townModel.setActiveCampaign(c),
+          onCreateCampaign: () => CreateCampaignScreen.show(context, townModel),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '${townModel.activeCampaign!.name} ',
+              maxLines: 1,
+              style: theme.textTheme.headlineMedium,
+              overflow: TextOverflow.fade,
+              softWrap: false,
+            ),
+            Icon(Icons.swap_horiz_rounded),
+          ],
+        ),
+      );
+    } else if (displayPage == charactersPage &&
+        charactersModel.characters.length > 1) {
+      content = SmoothPageIndicator(
+        controller: charactersModel.pageController,
+        count: charactersModel.characters.length,
+        effect: ScrollingDotsEffect(
+          fixedCenter: true,
+          dotHeight: 10,
+          dotWidth: 10,
+          activeDotColor: colorScheme.primary,
+        ),
+      );
+    } else if (displayPage == calculatorPage) {
+      content = SegmentedButton<GameEdition>(
+        style: const ButtonStyle(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+        ),
+        showSelectedIcon: false,
+        segments: const [
+          ButtonSegment<GameEdition>(
+            value: GameEdition.gloomhaven,
+            label: Text('GH'),
+          ),
+          ButtonSegment<GameEdition>(
+            value: GameEdition.gloomhaven2e,
+            label: Text('GH2e'),
+          ),
+          ButtonSegment<GameEdition>(
+            value: GameEdition.frosthaven,
+            label: Text('FH'),
+          ),
+        ],
+        selected: {SharedPrefs().gameEdition},
+        onSelectionChanged: (Set<GameEdition> selection) {
+          SharedPrefs().gameEdition = selection.first;
+          Provider.of<EnhancementCalculatorModel>(
+            context,
+            listen: false,
+          ).gameVersionToggled();
+          setState(() {});
+        },
+      );
+    } else {
+      content = Container();
+    }
+
+    return content;
+  }
+
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
         .read<EnhancementCalculatorModel>();
     final theme = Theme.of(context);
-    final appModel = context.read<AppModel>();
+    final appModel = context.watch<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
     final townModel = context.watch<TownModel>();
     final colorScheme = Theme.of(context).colorScheme;
@@ -188,6 +298,10 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
     // When the page changes, read the target page's scroll position so the
     // tint state is correct immediately (before any scroll events fire).
     if (appModel.page != _currentPage) {
+      if (_currentPage != null) {
+        _previousPage = _currentPage;
+        _flipController.forward(from: 0.0);
+      }
       _currentPage = appModel.page;
       if (appModel.page == charactersPage) {
         final isFixedHeader =
@@ -226,79 +340,31 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar> {
             tintProgress,
           ),
           centerTitle: true,
-          title:
-              kTownSheetEnabled &&
-                  context.watch<AppModel>().page == 0 &&
-                  townModel.activeCampaign != null
-              ? GestureDetector(
-                  onTap: () => CampaignSelector.show(
-                    context: context,
-                    campaigns: townModel.campaigns,
-                    activeCampaign: townModel.activeCampaign,
-                    onCampaignSelected: (c) => townModel.setActiveCampaign(c),
-                    onCreateCampaign: () =>
-                        CreateCampaignScreen.show(context, townModel),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${townModel.activeCampaign!.name} ',
-                        maxLines: 1,
-                        style: theme.textTheme.headlineMedium,
-                        overflow: TextOverflow.fade,
-                        softWrap: false,
-                      ),
-                      Icon(Icons.swap_horiz_rounded),
-                    ],
-                  ),
-                )
-              : context.watch<AppModel>().page == charactersPage &&
-                    charactersModel.characters.length > 1
-              ? SmoothPageIndicator(
-                  controller: charactersModel.pageController,
-                  count: charactersModel.characters.length,
-                  effect: ScrollingDotsEffect(
-                    fixedCenter: true,
-                    dotHeight: 10,
-                    dotWidth: 10,
-                    activeDotColor: colorScheme.primary,
-                  ),
-                )
-              : context.watch<AppModel>().page == calculatorPage
-              ? SegmentedButton<GameEdition>(
-                  style: const ButtonStyle(
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    padding: WidgetStatePropertyAll(
-                      EdgeInsets.symmetric(horizontal: 8),
-                    ),
-                  ),
-                  showSelectedIcon: false,
-                  segments: const [
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.gloomhaven,
-                      label: Text('GH'),
-                    ),
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.gloomhaven2e,
-                      label: Text('GH2e'),
-                    ),
-                    ButtonSegment<GameEdition>(
-                      value: GameEdition.frosthaven,
-                      label: Text('FH'),
-                    ),
-                  ],
-                  selected: {SharedPrefs().gameEdition},
-                  onSelectionChanged: (Set<GameEdition> selection) {
-                    SharedPrefs().gameEdition = selection.first;
-                    Provider.of<EnhancementCalculatorModel>(
-                      context,
-                      listen: false,
-                    ).gameVersionToggled();
-                    setState(() {});
-                  },
-                )
-              : Container(),
+          title: AnimatedBuilder(
+            animation: _flipAnimation,
+            builder: (_, child) {
+              // 0→0.5: rotation ramps 0→pi/2 (old content folds away)
+              // 0.5→1: rotation ramps pi/2→0 (new content folds in)
+              final t = _flipAnimation.value;
+              final rotation = t <= 0.5 ? t * pi : (1.0 - t) * pi;
+              return Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.0012)
+                  ..rotateX(rotation),
+                child: child,
+              );
+            },
+            child: _buildTitleContent(
+              displayPage: _previousPage ?? appModel.page,
+              charactersPage: charactersPage,
+              calculatorPage: calculatorPage,
+              theme: theme,
+              colorScheme: colorScheme,
+              charactersModel: charactersModel,
+              townModel: townModel,
+            ),
+          ),
           actions: <Widget>[
             // Town page edit mode: delete campaign
             if (kTownSheetEnabled && townModel.isEditMode && appModel.page == 0)

@@ -242,10 +242,11 @@ When switching pages:
 
 ### Key Features
 
-- `NeverScrollableScrollPhysics` on PageView (manual nav only via bottom bar)
+- `NeverScrollableScrollPhysics` on PageView (nav bar triggers `animateToPage` for smooth slide transitions)
 - `ScaffoldMessengerKey` for snackbars
 - Watches all four main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`, `TownModel`
 - `AnimatedSwitcher` for smooth FAB icon transitions
+- App bar title uses a card-flip animation (vertical `rotateX`) synced with page slide transitions
 
 ---
 

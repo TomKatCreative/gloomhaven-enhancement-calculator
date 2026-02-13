@@ -18,7 +18,11 @@ class GHCNavigationBar extends StatelessWidget {
       selectedIndex: appModel.page,
       onDestinationSelected: (value) {
         appModel.page = value;
-        appModel.pageController.jumpToPage(value);
+        appModel.pageController.animateToPage(
+          value,
+          duration: animationDuration,
+          curve: Curves.easeInOut,
+        );
         SharedPrefs().initialPage = value;
         final CharactersModel charactersModel = context.read<CharactersModel>();
         charactersModel.isScrolledToTop = true;
