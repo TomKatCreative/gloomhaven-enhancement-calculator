@@ -427,10 +427,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get notYet => 'Ainda Não';
 
   @override
-  String get general => 'Estatísticas e Grupo';
+  String get general => 'Geral e Grupo';
 
   @override
-  String get stats => 'Estatísticas';
+  String get stats => 'Geral';
 
   @override
   String get quest => 'Missão';

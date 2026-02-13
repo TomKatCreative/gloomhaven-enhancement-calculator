@@ -923,7 +923,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text(kTownSheetEnabled ? 'Stats & Party' : 'Stats'),
+        find.text(kTownSheetEnabled ? 'General & Party' : 'General'),
         findsWidgets,
       );
       expect(

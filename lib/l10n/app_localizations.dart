@@ -869,13 +869,13 @@ abstract class AppLocalizations {
   /// No description provided for @general.
   ///
   /// In en, this message translates to:
-  /// **'Stats & Party'**
+  /// **'General & Party'**
   String get general;
 
   /// No description provided for @stats.
   ///
   /// In en, this message translates to:
-  /// **'Stats'**
+  /// **'General'**
   String get stats;
 
   /// No description provided for @quest.

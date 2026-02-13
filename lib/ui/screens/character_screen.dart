@@ -262,7 +262,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                     title: kTownSheetEnabled
                         ? AppLocalizations.of(context).general
                         : AppLocalizations.of(context).stats,
-                    icon: Icons.bar_chart_rounded,
+                    icon: Icons.badge_rounded,
                     initiallyExpanded: SharedPrefs().generalExpanded,
                     onExpansionChanged: (value) =>
                         SharedPrefs().generalExpanded = value,
@@ -289,6 +289,31 @@ class _CharacterScreenState extends State<CharacterScreen> {
                               ),
                             ],
                             const Divider(height: largePadding * 2),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: smallPadding,
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.inventory_2_rounded,
+                                    size: iconSizeSmall,
+                                    color: theme.contrastedPrimary,
+                                  ),
+                                  const SizedBox(width: smallPadding),
+                                  Expanded(
+                                    child: Text(
+                                      AppLocalizations.of(context).resources,
+                                      style: theme.textTheme.titleLarge
+                                          ?.copyWith(
+                                            color: theme.contrastedPrimary,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: smallPadding),
                             _ResourcesContent(character: widget.character),
                           ],
                         ),
@@ -929,7 +954,7 @@ class _PerksAndMasteriesCardState extends State<_PerksAndMasteriesCard> {
           : widget.hasMasteries
           ? l10n.perksAndMasteries
           : l10n.perks,
-      icon: Icons.auto_awesome_rounded,
+      icon: Icons.workspace_premium_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
         SharedPrefs().perksAndMasteriesExpanded = value;

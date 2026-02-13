@@ -626,7 +626,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
 
     return SectionCard(
       title: l10n.discounts,
-      icon: Icons.discount_rounded,
+      icon: Icons.sell_rounded,
       contentPadding: const EdgeInsets.only(bottom: smallPadding),
       child: CalculatorToggleGroupCard(items: items),
     );
