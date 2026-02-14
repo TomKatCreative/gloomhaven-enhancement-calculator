@@ -458,6 +458,8 @@ The backup JSON structure:
 
 **Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Campaigns and Parties tables ARE included in backup since they contain user-created data.
 
+**Minimum supported backup version**: DB schema v8 (app v4.2.0). Backups from older versions are rejected during restore with a descriptive error message.
+
 ---
 
 ## Migration Best Practices

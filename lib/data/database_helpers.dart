@@ -33,6 +33,9 @@ class DatabaseHelper implements IDatabaseHelper {
   // Increment this version when you need to change the schema.
   static const _databaseVersion = 18;
 
+  // Minimum DB schema version accepted for backup restore (DB v8 = app v4.2.0).
+  static const _minimumBackupVersion = 8;
+
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
 
@@ -365,14 +368,26 @@ class DatabaseHelper implements IDatabaseHelper {
       throw ('No Meta Data Table');
     }
 
+    final metaDataIndex = json[0].indexOf('MetaData');
+    final metaData = json[1][metaDataIndex] as List;
+    if (metaData.isEmpty ||
+        (metaData[0][columnDatabaseVersion] ?? 0) < _minimumBackupVersion) {
+      final version = metaData.isNotEmpty
+          ? metaData[0][columnAppVersion] ?? 'unknown'
+          : 'unknown';
+      throw ('This backup was created with app version $version, '
+          'which is no longer supported. '
+          'Only backups from version 4.2.0 or later can be restored.');
+    }
+
     for (var i = 0; i < json[0].length; i++) {
       // Skip tables that don't exist in the current schema
       if (!tables.contains(json[0][i])) continue;
 
       for (var k = 0; k < json[1][i].length; k++) {
-        // This handles the case where a user tries to restore a backup
-        // from a database version before 7 (Resources), 18 (Personal Quests),
-        // or 19 (Party details)
+        // Patch columns for backups from v8+ (app 4.2.0+) that predate later schema changes.
+        // Resource columns (v7) are defaulted for safety, though v8+ backups already have them.
+        // PersonalQuest columns were added in v18.
         if (i < 1) {
           json[1][i][k][columnResourceHide] ??= 0;
           json[1][i][k][columnResourceMetal] ??= 0;
