@@ -30,6 +30,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get delete => 'Excluir';
 
   @override
+  String get switchAction => 'Trocar';
+
+  @override
   String get create => 'Criar';
 
   @override
@@ -88,6 +91,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get previousRetirements => 'Aposentadorias anteriores';
+
+  @override
+  String get retirements => 'Aposentadorias';
 
   @override
   String pocketItemsAllowed(int count) {
@@ -354,10 +360,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startingLevel => 'Nível inicial';
 
   @override
-  String get prosperityLevel => 'Nível de prosperidade';
+  String levelExceedsProsperity(int maxLevel) {
+    return 'Nível inicial máximo nesta prosperidade é $maxLevel';
+  }
 
   @override
-  String get pleaseSelectClass => 'Por favor, selecione uma Classe';
+  String get prosperityLevel => 'Prosperidade';
 
   @override
   String get createCharacter => 'Criar personagem';
@@ -370,4 +378,217 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get addNotes => 'Adicionar notas...';
+
+  @override
+  String get personalQuest => 'Missão pessoal';
+
+  @override
+  String get selectPersonalQuest => 'Selecionar missão pessoal...';
+
+  @override
+  String get selectAPersonalQuest => 'Selecionar uma missão pessoal';
+
+  @override
+  String get changePersonalQuest => 'Alterar missão pessoal?';
+
+  @override
+  String get changePersonalQuestBody =>
+      'Isso substituirá sua missão atual e redefinirá todo o progresso.';
+
+  @override
+  String get removePersonalQuest => 'Remover missão pessoal?';
+
+  @override
+  String get removePersonalQuestBody =>
+      'Isso removerá sua missão atual e redefinirá todo o progresso.';
+
+  @override
+  String get comingSoon => 'Em breve...';
+
+  @override
+  String get noPersonalQuest => 'Nenhuma missão pessoal selecionada';
+
+  @override
+  String get change => 'Alterar';
+
+  @override
+  String get remove => 'Remover';
+
+  @override
+  String progressOf(int current, int target) {
+    return '$current/$target';
+  }
+
+  @override
+  String get personalQuestComplete => 'Missão pessoal completa!';
+
+  @override
+  String personalQuestCompleteBody(String name) {
+    return '$name cumpriu sua missão pessoal e deve se aposentar. Antes de se aposentar, considere gastar ouro em melhorias ou doações — todo ouro e itens são perdidos na aposentadoria. A cidade ganha 1 de prosperidade.';
+  }
+
+  @override
+  String get retire => 'Aposentar';
+
+  @override
+  String get unretire => 'Desaposentar';
+
+  @override
+  String get notYet => 'Ainda não';
+
+  @override
+  String get general => 'Geral e grupo';
+
+  @override
+  String get stats => 'Estatísticas';
+
+  @override
+  String get statsAndResources => 'Estatísticas e recursos';
+
+  @override
+  String get quest => 'Missão';
+
+  @override
+  String get perks => 'Vantagens';
+
+  @override
+  String get masteries => 'Maestrias';
+
+  @override
+  String get questAndNotes => 'Missão e notas';
+
+  @override
+  String get perksAndMasteries => 'Vantagens e maestrias';
+
+  @override
+  String get town => 'CIDADE';
+
+  @override
+  String get characters => 'PERSONAGENS';
+
+  @override
+  String get enhancements => 'MELHORIAS';
+
+  @override
+  String get subtract => 'Subtrair';
+
+  @override
+  String get add => 'Adicionar';
+
+  @override
+  String get campaign => 'Campanha';
+
+  @override
+  String get campaigns => 'Campanhas';
+
+  @override
+  String get party => 'Grupo';
+
+  @override
+  String get parties => 'Grupos';
+
+  @override
+  String get createCampaign => 'Criar campanha';
+
+  @override
+  String get createParty => 'Criar grupo';
+
+  @override
+  String get prosperity => 'Prosperidade';
+
+  @override
+  String prosperityLevelN(int level) {
+    return 'Prosperidade $level';
+  }
+
+  @override
+  String get reputation => 'Reputação';
+
+  @override
+  String get noCampaignsYet => 'Crie uma campanha para rastrear seus grupos';
+
+  @override
+  String get noPartiesYet =>
+      'Crie um grupo para rastrear reputação e atribuir personagens';
+
+  @override
+  String get campaignName => 'Nome da campanha';
+
+  @override
+  String get partyName => 'Nome do grupo';
+
+  @override
+  String get edition => 'Edição';
+
+  @override
+  String get sanctuaryDonations => 'Doações do Santuário do Grande Carvalho';
+
+  @override
+  String get startingProsperity => 'Prosperidade inicial';
+
+  @override
+  String get startingReputation => 'Reputação inicial';
+
+  @override
+  String get deleteCampaign => 'Excluir campanha?';
+
+  @override
+  String get deleteCampaignBody =>
+      'Isso excluirá permanentemente esta campanha e todos os seus grupos. Os personagens serão desvinculados, mas não excluídos.';
+
+  @override
+  String get deleteParty => 'Excluir grupo?';
+
+  @override
+  String get deletePartyBody =>
+      'Isso excluirá permanentemente este grupo. Os personagens serão desvinculados, mas não excluídos.';
+
+  @override
+  String get selectCampaign => 'Selecionar campanha';
+
+  @override
+  String get selectParty => 'Selecionar grupo';
+
+  @override
+  String get switchParty => 'Trocar grupo';
+
+  @override
+  String get renameCampaign => 'Renomear campanha';
+
+  @override
+  String get renameParty => 'Renomear';
+
+  @override
+  String get checkmarks => 'marcas';
+
+  @override
+  String get openEnvelopeB => 'Abra o envelope B';
+
+  @override
+  String get noParty => 'Sem grupo';
+
+  @override
+  String get notAssignedToParty => 'Não atribuído a um grupo';
+
+  @override
+  String get assignToParty => 'Atribuir a um grupo';
+
+  @override
+  String get createCampaignFirst =>
+      'Crie uma campanha primeiro para atribuir um grupo';
+
+  @override
+  String get scenarioLocation => 'Local do cenário';
+
+  @override
+  String get partyNotes => 'Notas do grupo';
+
+  @override
+  String get achievements => 'Conquistas';
+
+  @override
+  String get shopPriceModifier => 'Loja';
+
+  @override
+  String get addPartyNotes => 'Adicionar notas do grupo...';
 }

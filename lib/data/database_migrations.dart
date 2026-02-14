@@ -4,8 +4,12 @@ import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.
 import 'package:gloomhaven_enhancement_calc/data/migrations/masteries_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/data/migrations/perks_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
+import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/legacy_mastery.dart'
     as legacy;
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
@@ -578,32 +582,6 @@ class DatabaseMigrations {
     });
   }
 
-  // static Future<void> _handleRemainingVariantMasteries(
-  //   Transaction txn,
-  //   String tempTableMasteries,
-  // ) async {
-  //   await Future.forEach(CharacterData.masteriesMap.entries, (entry) async {
-  //     final classCode = entry.key;
-  //     final masteryLists =
-  //         entry.value.where((element) => element.variant != Variant.base);
-
-  //     for (Masteries list in masteryLists) {
-  //       for (Mastery mastery in list.masteries) {
-  //         mastery.variant = list.variant;
-  //         mastery.classCode = classCode;
-  //         try {
-  //           await txn.insert(
-  //             tempTableMasteries,
-  //             mastery.toMap('${list.masteries.indexOf(mastery)}'),
-  //           );
-  //         } catch (e) {
-  //           debugPrint('ERROR WITH MASTERIES TABLE: $e');
-  //         }
-  //       }
-  //     }
-  //   });
-  // }
-
   static Future<void> _dropCharacterMasteriesTableAndRenameTemp(
     Transaction txn,
     String tempTableMasteries,
@@ -613,6 +591,71 @@ class DatabaseMigrations {
         ''');
     await txn.rawUpdate(
       'ALTER TABLE $tempTableMasteries RENAME TO $tableMasteries',
+    );
+  }
+
+  /// Creates the PersonalQuests definition table and seeds it from repository.
+  static Future<void> createAndSeedPersonalQuestsTable(Transaction txn) async {
+    await txn.execute('''
+      ${DatabaseHelper.createTable} $tablePersonalQuests (
+        $columnPersonalQuestId ${DatabaseHelper.idTextPrimaryType},
+        $columnPersonalQuestNumber ${DatabaseHelper.integerType},
+        $columnPersonalQuestTitle ${DatabaseHelper.textType},
+        $columnPersonalQuestEdition ${DatabaseHelper.textType}
+      )''');
+    for (final quest in PersonalQuestsRepository.quests) {
+      await txn.insert(tablePersonalQuests, quest.toMap());
+    }
+  }
+
+  /// Adds PersonalQuestId and PersonalQuestProgress columns to Characters table.
+  static Future<void> addPersonalQuestColumnsToCharacters(
+    Transaction txn,
+  ) async {
+    await txn.rawInsert(
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterPersonalQuestId ${DatabaseHelper.textType} DEFAULT \'\'',
+    );
+    await txn.rawInsert(
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterPersonalQuestProgress ${DatabaseHelper.textType} DEFAULT \'[]\'',
+    );
+  }
+
+  /// Drops and recreates the PersonalQuests table from the repository.
+  /// Useful for future updates when adding more editions.
+  static Future<void> regeneratePersonalQuestsTable(Transaction txn) async {
+    await txn.execute('DROP TABLE IF EXISTS $tablePersonalQuests');
+    await createAndSeedPersonalQuestsTable(txn);
+  }
+
+  /// Creates Campaigns and Parties tables, and adds PartyId column to Characters.
+  static Future<void> createCampaignPartyTablesAndAddPartyIdToCharacters(
+    Transaction txn,
+  ) async {
+    await txn.execute('''
+      ${DatabaseHelper.createTable} $tableCampaigns (
+        $columnCampaignId ${DatabaseHelper.idTextPrimaryType},
+        $columnCampaignName ${DatabaseHelper.textType},
+        $columnCampaignEdition ${DatabaseHelper.textType},
+        $columnCampaignProsperityCheckmarks ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnCampaignDonatedGold ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnCampaignCreatedAt ${DatabaseHelper.dateTimeType}
+      )''');
+
+    await txn.execute('''
+      ${DatabaseHelper.createTable} $tableParties (
+        $columnPartyId ${DatabaseHelper.idTextPrimaryType},
+        $columnPartyCampaignId ${DatabaseHelper.textType},
+        $columnPartyName ${DatabaseHelper.textType},
+        $columnPartyReputation ${DatabaseHelper.integerType} DEFAULT 0,
+        $columnPartyCreatedAt ${DatabaseHelper.dateTimeType},
+        $columnPartyLocation ${DatabaseHelper.textType} DEFAULT '',
+        $columnPartyNotes ${DatabaseHelper.textType} DEFAULT '',
+        $columnPartyAchievements ${DatabaseHelper.textType} DEFAULT '[]',
+        FOREIGN KEY ($columnPartyCampaignId) REFERENCES $tableCampaigns($columnCampaignId) ON DELETE CASCADE
+      )''');
+
+    await txn.rawInsert(
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterPartyId TEXT DEFAULT NULL',
     );
   }
 }

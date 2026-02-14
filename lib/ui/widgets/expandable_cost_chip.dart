@@ -44,17 +44,17 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
 
   // Chip dimensions
   static const double _chipHeight = 56.0;
-  static const double _chipBorderRadius = 28.0;
+  static const double _chipBorderRadius = borderRadiusCard;
 
   // Card dimensions
-  static const double _cardTopRadius = 28.0;
-  static const double _cardBottomRadius = 24.0;
+  static const double _cardTopRadius = borderRadiusCard;
+  static const double _cardBottomRadius = borderRadiusPill;
   static const double _cardMaxWidth = 468.0;
-  static const double _cardExpandedFraction = 0.85;
+  static const double _cardExpandedFraction = 0.75;
 
   // Positioning - same as FAB (both are 56dp height)
-  static const double _bottomOffset = 16.0;
-  static const double _horizontalPadding = 16.0;
+  static const double _bottomOffset = largePadding;
+  static const double _horizontalPadding = largePadding;
 
   // Blur fade threshold (pixels scrolled before blur is fully visible)
   static const double _blurFadeThreshold = 100.0;
@@ -138,11 +138,13 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
       0.0,
       _cardMaxWidth,
     );
+    final topInset = MediaQuery.of(context).padding.top;
     final availableHeight =
         screenSize.height -
+        topInset -
         kToolbarHeight -
         kBottomNavigationBarHeight -
-        _bottomOffset;
+        _bottomOffset * 2;
     final cardHeight = availableHeight * _cardExpandedFraction;
 
     return SizedBox.expand(
@@ -260,7 +262,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   );
 
                   final baseChipColor =
-                      theme.bottomNavigationBarTheme.backgroundColor ??
+                      theme.navigationBarTheme.backgroundColor ??
                       colorScheme.surface;
                   // Lighten chip when blur/shadow is present for better visibility
                   final chipColor = Color.lerp(
@@ -290,9 +292,13 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                       child: AnimatedSize(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeOutCubic,
-                        child: SizedBox(
-                          width: isExpanding ? cardWidth : null,
-                          height: isExpanding ? cardHeight : _chipHeight,
+                        child: ConstrainedBox(
+                          constraints: isExpanding
+                              ? BoxConstraints(
+                                  maxWidth: cardWidth,
+                                  maxHeight: cardHeight,
+                                )
+                              : BoxConstraints.tightFor(height: _chipHeight),
                           child: _isExpanded || _expandAnimation.value > 0.5
                               ? GestureDetector(
                                   onTap: _collapse,
@@ -345,8 +351,27 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
 
   Widget _buildExpandedContent(ThemeData theme) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        // Header with close button
+        Flexible(
+          child: ListView.separated(
+            shrinkWrap: true,
+            padding: const EdgeInsets.fromLTRB(
+              largePadding,
+              smallPadding,
+              largePadding,
+              largePadding,
+            ),
+            itemCount: widget.steps.length,
+            separatorBuilder: (context, index) => const GHCDivider(),
+            itemBuilder: (context, index) =>
+                _buildStepRow(theme, widget.steps[index]),
+          ),
+        ),
+
+        const GHCDivider(),
+
+        // Footer with total cost and close button
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
           child: SizedBox(
@@ -384,41 +409,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
             ),
           ),
         ),
-
-        const GHCDivider(),
-
-        // Breakdown content
-        Expanded(
-          child: widget.steps.isEmpty
-              ? _buildEmptyState(theme)
-              : _buildBreakdownList(theme),
-        ),
       ],
-    );
-  }
-
-  Widget _buildEmptyState(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(largePadding),
-        child: Text(
-          'Select options to see cost breakdown',
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBreakdownList(ThemeData theme) {
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      itemCount: widget.steps.length,
-      separatorBuilder: (context, index) => const GHCDivider(),
-      itemBuilder: (context, index) =>
-          _buildStepRow(theme, widget.steps[index]),
     );
   }
 

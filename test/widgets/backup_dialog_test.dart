@@ -98,6 +98,67 @@ void main() {
       expect(text, 'testfilename');
     });
 
+    testWidgets('all buttons are enabled initially', (tester) async {
+      await openDialog(tester);
+
+      final cancelButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Cancel'),
+      );
+      final shareButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Share'),
+      );
+      final saveButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Save'),
+      );
+
+      expect(cancelButton.onPressed, isNotNull);
+      expect(shareButton.onPressed, isNotNull);
+      expect(saveButton.onPressed, isNotNull);
+    });
+
+    testWidgets('no loading indicator is shown initially', (tester) async {
+      await openDialog(tester);
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+    });
+
+    testWidgets('empty filename does not show loading indicator on Save tap', (
+      tester,
+    ) async {
+      await openDialog(tester);
+
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Save'));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      // Buttons should remain enabled since validation failed
+      final saveButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Save'),
+      );
+      expect(saveButton.onPressed, isNotNull);
+    });
+
+    testWidgets('empty filename does not show loading indicator on Share tap', (
+      tester,
+    ) async {
+      await openDialog(tester);
+
+      await tester.enterText(find.byType(TextField), '');
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Share'));
+      await tester.pump();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      final shareButton = tester.widget<TextButton>(
+        find.widgetWithText(TextButton, 'Share'),
+      );
+      expect(shareButton.onPressed, isNotNull);
+    });
+
     testWidgets('Cancel returns BackupAction.cancelled', (tester) async {
       BackupResult? result;
 

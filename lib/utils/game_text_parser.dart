@@ -92,6 +92,7 @@ class IconToken extends GameTextToken {
   @override
   InlineSpan toSpan(BuildContext context, bool darkTheme) {
     final baseSize = iconSizeMedium;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: Tooltip(
@@ -99,7 +100,7 @@ class IconToken extends GameTextToken {
         child: SizedBox(
           height: baseSize,
           width: baseSize * config.widthMultiplier,
-          child: _buildIconContent(darkTheme),
+          child: _buildIconContent(darkTheme, onSurface),
         ),
       ),
     );
@@ -119,7 +120,7 @@ class IconToken extends GameTextToken {
         .join(' ');
   }
 
-  Widget _buildIconContent(bool darkTheme) {
+  Widget _buildIconContent(bool darkTheme, Color onSurface) {
     final assetPath = config.pathForTheme(darkTheme);
 
     // Handle XP icons
@@ -128,7 +129,7 @@ class IconToken extends GameTextToken {
       return Stack(
         alignment: Alignment.center,
         children: [
-          _buildSvgPicture(assetPath, darkTheme),
+          _buildSvgPicture(assetPath, onSurface),
           Positioned(
             bottom: -1,
             child: Text(
@@ -149,7 +150,7 @@ class IconToken extends GameTextToken {
       return Stack(
         fit: StackFit.expand,
         children: [
-          _buildSvgPicture(assetPath, darkTheme),
+          _buildSvgPicture(assetPath, onSurface),
           Positioned(
             bottom: 0,
             right: 0,
@@ -159,9 +160,7 @@ class IconToken extends GameTextToken {
               child: SvgPicture(
                 SvgAssetLoader(
                   'images/${assets['CONSUME']!.path}',
-                  theme: SvgTheme(
-                    currentColor: darkTheme ? Colors.white : Colors.black,
-                  ),
+                  theme: SvgTheme(currentColor: onSurface),
                 ),
               ),
             ),
@@ -175,7 +174,7 @@ class IconToken extends GameTextToken {
       return Stack(
         alignment: const Alignment(1.75, -1.75),
         children: [
-          _buildSvgPicture(assetPath, darkTheme),
+          _buildSvgPicture(assetPath, onSurface),
           SvgPicture.asset(
             'images/ui/plus_one.svg',
             width: iconSizeTiny,
@@ -185,25 +184,20 @@ class IconToken extends GameTextToken {
       );
     }
 
-    return _buildSvgPicture(assetPath, darkTheme);
+    return _buildSvgPicture(assetPath, onSurface);
   }
 
   /// Builds an [SvgPicture] with appropriate color handling based on theme.
   ///
   /// Color behavior is determined by [config.themeMode]:
-  /// - [CurrentColorTheme]: Sets `currentColor` to white/black based on theme
+  /// - [CurrentColorTheme]: Sets `currentColor` to [onSurface] from the theme
   /// - [NoTheme]: Renders SVG as-is with no color modification
-  SvgPicture _buildSvgPicture(String assetPath, bool darkTheme) {
+  SvgPicture _buildSvgPicture(String assetPath, Color onSurface) {
     final fullPath = 'images/$assetPath';
 
     return switch (config.themeMode) {
       CurrentColorTheme() => SvgPicture(
-        SvgAssetLoader(
-          fullPath,
-          theme: SvgTheme(
-            currentColor: darkTheme ? Colors.white : Colors.black,
-          ),
-        ),
+        SvgAssetLoader(fullPath, theme: SvgTheme(currentColor: onSurface)),
       ),
       _ => SvgPicture.asset(fullPath),
     };

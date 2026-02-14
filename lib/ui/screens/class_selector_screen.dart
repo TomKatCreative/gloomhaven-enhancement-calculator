@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
@@ -160,26 +161,27 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     return false;
   }
 
-  /// Returns the section header title if this index starts a new category.
+  /// Groups the filtered classes into sections by [ClassCategory].
   ///
-  /// Used to insert [SearchSectionHeader] widgets between category groups.
-  String? _getSectionHeader(int index) {
+  /// Each section is a `(title, items)` record used to build
+  /// [SliverPersistentHeader] + [SliverList] pairs.
+  List<(String title, List<PlayerClass> items)> get _sections {
     final classes = _filteredClasses;
-    if (index >= classes.length) return null;
+    final sections = <(String, List<PlayerClass>)>[];
+    String? currentTitle;
+    List<PlayerClass> currentItems = [];
 
-    final current = classes[index];
-    final currentSection = _getCategoryTitle(current.category);
-
-    // First item always shows header
-    if (index == 0) return currentSection;
-
-    // Show header if section changed from previous item
-    final previous = classes[index - 1];
-    if (_getCategoryTitle(previous.category) != currentSection) {
-      return currentSection;
+    for (final pc in classes) {
+      final title = _getCategoryTitle(pc.category);
+      if (title != currentTitle) {
+        if (currentTitle != null) sections.add((currentTitle, currentItems));
+        currentTitle = title;
+        currentItems = [];
+      }
+      currentItems.add(pc);
     }
-
-    return null;
+    if (currentTitle != null) sections.add((currentTitle, currentItems));
+    return sections;
   }
 
   /// Maps [ClassCategory] enum to human-readable section title.
@@ -204,7 +206,6 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
         controller: _searchController,
         focusNode: _searchFocusNode,
         searchQuery: _searchQuery,
-        scrollController: _scrollController,
         onChanged: (value) => setState(() => _searchQuery = value),
         onClear: () {
           _searchController.clear();
@@ -275,25 +276,29 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                 ],
               ),
             ),
-            // Class list with section headers
+            // Class list with sticky section headers
             Expanded(
-              child: ListView.builder(
+              child: CustomScrollView(
                 controller: _scrollController,
-                padding: const EdgeInsets.only(bottom: 16),
-                itemCount: _filteredClasses.length,
-                itemBuilder: (context, index) {
-                  final playerClass = _filteredClasses[index];
-                  final sectionHeader = _getSectionHeader(index);
-
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (sectionHeader != null)
-                        SearchSectionHeader(title: sectionHeader),
-                      _buildClassTile(playerClass),
-                    ],
-                  );
-                },
+                slivers: [
+                  for (final (title, items) in _sections)
+                    SliverMainAxisGroup(
+                      slivers: [
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchSectionHeaderDelegate(title: title),
+                        ),
+                        SliverList.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) =>
+                              _buildClassTile(items[index]),
+                        ),
+                      ],
+                    ),
+                  const SliverPadding(
+                    padding: EdgeInsets.only(bottom: largePadding),
+                  ),
+                ],
               ),
             ),
           ],
@@ -307,12 +312,10 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
     required ClassCategory category,
     required String label,
   }) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isSelected = _selectedCategories.contains(category);
 
     return FilterChip(
       visualDensity: VisualDensity.compact,
-      elevation: isSelected ? 4 : 0,
       selected: isSelected,
       onSelected: (value) {
         setState(() {
@@ -323,14 +326,7 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
           }
         });
       },
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isSelected
-              ? colorScheme.onPrimaryContainer
-              : colorScheme.onSurface,
-        ),
-      ),
+      label: Text(label),
     );
   }
 
@@ -354,6 +350,10 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
           playerClass: playerClass,
           width: iconSizeXL,
           height: iconSizeXL,
+          color: ColorUtils.ensureContrast(
+            Color(playerClass.primaryColor),
+            theme.colorScheme.surface,
+          ),
         ),
         title: Text(
           isUnlocked || !playerClass.locked

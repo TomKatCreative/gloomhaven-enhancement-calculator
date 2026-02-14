@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// A text widget with a custom strikethrough line that sits at a configurable
-/// vertical position, unlike the built-in [TextDecoration.lineThrough]
+/// A text widget with a custom strikethrough line that sits at the true
+/// vertical center of the text, unlike the built-in [TextDecoration.lineThrough]
 /// which can sit too high depending on the font.
 class StrikethroughText extends StatelessWidget {
   final String text;
   final TextStyle? style;
   final double lineThickness;
-
-  /// Vertical position of the strikethrough line as a fraction (0.0 = top, 1.0 = bottom).
-  /// Default is 0.6 (slightly below center) which tends to look better across fonts.
   final double verticalPositionFraction;
 
   const StrikethroughText(

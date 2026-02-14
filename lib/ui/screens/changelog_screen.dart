@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class ChangelogScreen extends StatefulWidget {
   const ChangelogScreen({super.key});
@@ -29,45 +27,34 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
       top: false,
       bottom: Platform.isAndroid,
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (context, snapshot) {
-              final versionText = snapshot.hasData
-                  ? (kDebugMode
-                        ? 'v${snapshot.data!.version}+${snapshot.data!.buildNumber}'
-                        : 'v${snapshot.data!.version}')
-                  : null;
-              return GHCAppBar(
-                title: AppLocalizations.of(context).changelog,
-                centerTitle: true,
-                scrollController: _scrollController,
-                subtitle: versionText != null
-                    ? Text(
-                        versionText,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      )
-                    : null,
-              );
-            },
-          ),
+        appBar: GHCAppBar(
+          title: AppLocalizations.of(context).changelog,
+          scrollController: _scrollController,
         ),
         body: ListView(
           controller: _scrollController,
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.5.0',
+              date: '2026-02-13',
+              changes: [
+                'Added Gloomhaven personal quests. Gloomhaven 2nd Edition, Frosthaven, and Crimson Scales coming soon.',
+                'More UI refinements and improvements.',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.4.0',
               date: '2026-02-06',
               changes: [
-                'UI overhaul of Enhancement Calculator and Character screen.',
-                'Added cost breakdown to Enhancement cost chip.',
+                'UI overhaul of Enhancement Calculator and Character screens.',
+                'Added cost breakdown dialog to Enhancement cost chip.',
                 'Added all data (theme, unlocked characters, enhancement calculator) to backup.',
+                'Backup now generates a .json file (to better reflect the actual JSON content).',
                 'Replaced variant selector dialog with inline popup menu.',
                 'Improved app performance.',
-                'Fixed numeric display shifting on character screen.',
-                'Various UI polish and fixes.',
+                'Various UI polishes and behind-the-scenes fixes and improvements.',
               ],
             ),
             SizedBox(height: extraLargePadding),
@@ -82,7 +69,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
               date: '2026-01-17',
               changes: [
                 'Added Gloomhaven 2nd Edition mode to the Enhancement Calculator.',
-                'Move "Scenario 114 Reward" and "Building 44" toggles to Enhancement Calculator page.',
+                'Moved "Scenario 114 Reward" and "Building 44" toggles to Enhancement Calculator page.',
                 'Added device information to email feedback pre-populated body text.',
               ],
             ),

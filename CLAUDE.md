@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Gloomhaven Enhancement Calculator** - A Flutter mobile app (iOS/Android) for the Gloomhaven board game series. It provides:
+**Gloomhaven Enhancement Calculator** - A Flutter mobile app (iOS/Android/Web) for the Gloomhaven board game series. It provides:
 - Character sheet management (create, track, retire characters)
 - Enhancement cost calculator
 - Perk and mastery tracking
@@ -84,12 +84,13 @@ git log main..HEAD --oneline
 
 ### State Management: Provider + ChangeNotifier
 
-The app uses Provider with four main models set up in `main.dart`:
+The app uses Provider with five main models set up in `main.dart`:
 
 ```
 ThemeProvider          → Theme colors, dark mode, font preferences
 AppModel               → Page navigation, app-level UI state
 EnhancementCalculatorModel → Calculator page state
+TownModel              → Campaign/party CRUD, prosperity, reputation
 CharactersModel        → Character CRUD, perk/mastery state (uses ProxyProvider)
 ```
 
@@ -115,7 +116,8 @@ lib/
 │   ├── screens/             # Full-page views
 │   ├── widgets/             # Reusable components
 │   │   ├── calculator/      # Enhancement calculator card components
-│   │   └── settings/        # Settings screen section widgets
+│   │   ├── settings/        # Settings screen section widgets
+│   │   └── town/            # Town screen section widgets
 │   └── dialogs/             # Modal dialogs
 ├── theme/                   # Theme system (ThemeProvider, extensions)
 ├── utils/                   # Helpers, text parsing
@@ -132,8 +134,25 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries (schema version 17)
+- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (schema version 18 when feature flags disabled, 19 when enabled — see Feature Flags)
 - **SharedPreferences** - App settings, theme, calculator state
+
+### Feature Flags
+
+One compile-time constant in `lib/data/constants.dart` gates unreleased features:
+
+```dart
+const bool kTownSheetEnabled = false;
+```
+
+| Flag | What it gates |
+|------|---------------|
+| `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page index mapping (characters=0→1, calculator=1→2) |
+
+**Database versioning**: Production schema is v18 (includes Personal Quests). When `kTownSheetEnabled` is `true`, migration v19 runs to create Campaign/Party tables and add `PartyId` column to Characters.
+
+**Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helpers.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
+**Affected files** (test): `helpers/fake_database_helper.dart`, `viewmodels/characters_model_test.dart`, `viewmodels/app_model_test.dart`
 
 ## Key Domain Concepts
 
@@ -193,6 +212,31 @@ Where L = starting level, P = prosperity level.
 - One-time reads use `context.read<Model>()`
 - Complex widgets are StatefulWidget with local controllers
 
+### Popup Menus
+
+All `PopupMenuButton` items use `ListTile` with **text on the left** (`title`) and **icon on the right** (`trailing`). This keeps menu text aligned to the start for readability.
+
+```dart
+// ✅ Correct - text left, icon right
+PopupMenuItem(
+  value: MyAction.doSomething,
+  child: ListTile(
+    title: Text(l10n.doSomething),
+    trailing: const Icon(Icons.arrow_forward),
+    contentPadding: EdgeInsets.zero,
+  ),
+),
+
+// ❌ Wrong - icon left, text right
+PopupMenuItem(
+  child: ListTile(
+    leading: const Icon(Icons.arrow_forward),
+    title: Text(l10n.doSomething),
+    ...
+  ),
+),
+```
+
 ### Design Constants (IMPORTANT)
 
 **NEVER hardcode pixel values for padding, icon sizes, border radii, or animation durations.** Always use the constants defined in `lib/data/constants.dart`. This ensures visual consistency and makes future adjustments easy.
@@ -241,7 +285,6 @@ See `docs/theme_system.md` for the full type scale reference and usage guideline
 | `hairlineThickness` | 0.5 | Thin dividers |
 | `dividerThickness` | 1.0 | Standard divider line |
 | `animationDuration` | 250ms | Standard animation duration |
-| `navBarIconContainerHeight` | 35 | Navigation bar item height |
 | `blurBarHeight` | 100 | Blur bar at bottom of calculator |
 | `formFieldSpacing` | 28 | Vertical spacing between form fields |
 
@@ -448,3 +491,4 @@ gh workflow run deploy-internal.yml -f version_name=4.3.3
 12. **Code formatting** - Always run `dart format .` after making changes to ensure consistent code style.
 13. **Widget documentation** - For detailed widget docs, check the `/docs` directory (element_tracker.md, screens.md, dialogs.md, calculator_widgets.md, theme_system.md).
 14. **Run tests after changes** - After modifying code in `lib/`, always run relevant tests with `flutter test` (or a specific test file if the scope is narrow). Ensure all tests pass before considering the work complete. If a change touches models or viewmodels, run the corresponding tests in `test/models/` or `test/viewmodels/`. If a change touches widgets (perk_row, perks_section, mastery_row, masteries_section, conditional_checkbox), also run `test/widgets/`.
+15. **Pre-push doc & test audit** - Before pushing to `dev` (or when asked to commit and push), audit relevant documentation and tests for staleness. Check that modified models/methods are reflected in `docs/models_reference.md` and `docs/viewmodels_reference.md`. Check that UI changes are reflected in `docs/screens.md` and related widget docs. Verify tests exist and pass for new/changed methods. Flag any gaps before pushing.

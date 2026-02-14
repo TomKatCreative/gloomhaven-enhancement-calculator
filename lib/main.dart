@@ -13,6 +13,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/home.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,6 +56,9 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider(create: (_) => AppModel()),
         ChangeNotifierProvider(create: (_) => EnhancementCalculatorModel()),
+        ChangeNotifierProvider(
+          create: (_) => TownModel(databaseHelper: DatabaseHelper.instance),
+        ),
         ChangeNotifierProxyProvider<ThemeProvider, CharactersModel>(
           create: (context) => CharactersModel(
             showRetired: SharedPrefs().showRetiredCharacters,

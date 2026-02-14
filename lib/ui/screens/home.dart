@@ -6,15 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_440_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_450_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_bottom_navigation_bar.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/town_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_navigation_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -31,11 +32,12 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     future = context.read<CharactersModel>().loadCharacters();
-    if (SharedPrefs().showUpdate440Dialog) {
+    if (kTownSheetEnabled) context.read<TownModel>().loadCampaigns();
+    if (SharedPrefs().showUpdate450Dialog) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
         showDialog<void>(
           context: context,
-          builder: (context) => const Update440Dialog(),
+          builder: (context) => const Update450Dialog(),
         );
       });
     }
@@ -46,14 +48,26 @@ class _HomeState extends State<Home> {
     final appModel = context.watch<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
     final enhancementModel = context.watch<EnhancementCalculatorModel>();
+    final townModel = context.watch<TownModel>();
+
+    const charactersPage = kTownSheetEnabled ? 1 : 0;
+    const calculatorPage = kTownSheetEnabled ? 2 : 1;
 
     // Hide FAB when:
-    // - On enhancement calculator page (1) when cost chip is expanded or nothing to clear
-    // - On characters page (0) when element sheet is fully expanded
+    // - On town page (0) with no campaigns
+    // - On characters page with no characters (empty state has inline button)
+    // - On characters page when element sheet is fully expanded
+    // - On enhancement calculator page when cost chip is expanded or nothing to clear
     final hideFab =
-        (appModel.page == 1 &&
-            (enhancementModel.isSheetExpanded || !enhancementModel.showCost)) ||
-        (appModel.page == 0 && charactersModel.isElementSheetFullExpanded);
+        (kTownSheetEnabled &&
+            appModel.page == 0 &&
+            townModel.campaigns.isEmpty) ||
+        (appModel.page == charactersPage &&
+            charactersModel.characters.isEmpty) ||
+        (appModel.page == charactersPage &&
+            charactersModel.isElementSheetFullExpanded) ||
+        (appModel.page == calculatorPage &&
+            (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
 
     return Scaffold(
       // this is necessary to make notched FAB background transparent, effectively
@@ -65,6 +79,7 @@ class _HomeState extends State<Home> {
         controller: context.read<AppModel>().pageController,
         onPageChanged: (index) {
           charactersModel.isEditMode = false;
+          if (kTownSheetEnabled) townModel.isEditMode = false;
           context.read<AppModel>().page = index;
           // Reset sheet expanded states when navigating between pages
           context.read<EnhancementCalculatorModel>().isSheetExpanded = false;
@@ -72,6 +87,7 @@ class _HomeState extends State<Home> {
           setState(() {});
         },
         children: [
+          if (kTownSheetEnabled) const TownScreen(),
           FutureBuilder<List<Character>>(
             future: future,
             builder: (context, snapshot) {
@@ -100,45 +116,62 @@ class _HomeState extends State<Home> {
           const EnhancementCalculatorScreen(),
         ],
       ),
-      floatingActionButton: hideFab
-          ? null
-          : FloatingActionButton(
-              heroTag: null,
-              onPressed: appModel.page == 1
-                  ? () => enhancementModel.resetCost()
-                  : charactersModel.characters.isEmpty
-                  ? () => CreateCharacterScreen.show(context, charactersModel)
-                  : () => charactersModel.isEditMode =
-                        !charactersModel.isEditMode,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, animation) {
-                  return ScaleTransition(
-                    scale: animation,
-                    child: FadeTransition(opacity: animation, child: child),
-                  );
-                },
-                child: Icon(
-                  appModel.page == 1
-                      ? Icons.clear_rounded
-                      : charactersModel.characters.isEmpty
-                      ? Icons.add
-                      : charactersModel.isEditMode
-                      ? Icons.edit_off_rounded
-                      : Icons.edit_rounded,
-                  key: ValueKey<int>(
-                    appModel.page == 1
-                        ? 0
-                        : charactersModel.characters.isEmpty
-                        ? 1
-                        : charactersModel.isEditMode
-                        ? 2
-                        : 3,
-                  ),
-                ),
-              ),
-            ),
-      bottomNavigationBar: const GHCBottomNavigationBar(),
+      floatingActionButton: IgnorePointer(
+        ignoring: hideFab,
+        child: AnimatedScale(
+          scale: hideFab ? 0.0 : 1.0,
+          duration: animationDuration,
+          child: _buildFab(
+            appModel,
+            charactersModel,
+            enhancementModel,
+            townModel,
+          ),
+        ),
+      ),
+      bottomNavigationBar: const GHCNavigationBar(),
+    );
+  }
+
+  Widget _buildFab(
+    AppModel appModel,
+    CharactersModel charactersModel,
+    EnhancementCalculatorModel enhancementModel,
+    TownModel townModel,
+  ) {
+    const calculatorPage = kTownSheetEnabled ? 2 : 1;
+
+    // Town page: edit mode toggle FAB
+    if (kTownSheetEnabled &&
+        appModel.page == 0 &&
+        townModel.campaigns.isNotEmpty) {
+      return FloatingActionButton(
+        heroTag: null,
+        onPressed: () => townModel.isEditMode = !townModel.isEditMode,
+        child: Icon(
+          townModel.isEditMode ? Icons.edit_off_rounded : Icons.edit_rounded,
+        ),
+      );
+    }
+
+    // Calculator page: clear FAB
+    if (appModel.page == calculatorPage) {
+      return FloatingActionButton(
+        heroTag: null,
+        onPressed: () => enhancementModel.resetCost(),
+        child: const Icon(Icons.clear_rounded),
+      );
+    }
+
+    // Characters page: edit mode toggle FAB
+    return FloatingActionButton(
+      heroTag: null,
+      onPressed: () => charactersModel.isEditMode = !charactersModel.isEditMode,
+      child: Icon(
+        charactersModel.isEditMode
+            ? Icons.edit_off_rounded
+            : Icons.edit_rounded,
+      ),
     );
   }
 }

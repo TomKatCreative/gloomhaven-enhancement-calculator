@@ -1,3 +1,4 @@
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -99,15 +100,51 @@ class SharedPrefs {
 
   set envelopeV(bool value) => _sharedPrefs.setBool('envelopeV', value);
 
-  int get initialPage => _sharedPrefs.getInt('initialPage') ?? 0;
+  int get initialPage =>
+      _sharedPrefs.getInt('initialPage') ?? (kTownSheetEnabled ? 1 : 0);
 
   set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
 
-  bool get resourcesExpanded =>
-      _sharedPrefs.getBool('resourcesExpanded') ?? false;
+  int get currentCharacterIndex =>
+      _sharedPrefs.getInt('currentCharacterIndex') ?? 0;
 
-  set resourcesExpanded(bool value) =>
-      _sharedPrefs.setBool('resourcesExpanded', value);
+  set currentCharacterIndex(int value) =>
+      _sharedPrefs.setInt('currentCharacterIndex', value);
+
+  bool get generalExpanded => _sharedPrefs.getBool('generalExpanded') ?? true;
+
+  set generalExpanded(bool value) =>
+      _sharedPrefs.setBool('generalExpanded', value);
+
+  bool get personalQuestExpanded =>
+      _sharedPrefs.getBool('personalQuestExpanded') ?? false;
+
+  set personalQuestExpanded(bool value) =>
+      _sharedPrefs.setBool('personalQuestExpanded', value);
+
+  bool get questAndNotesExpanded =>
+      _sharedPrefs.getBool('questAndNotesExpanded') ?? true;
+
+  set questAndNotesExpanded(bool value) =>
+      _sharedPrefs.setBool('questAndNotesExpanded', value);
+
+  bool get perksAndMasteriesExpanded =>
+      _sharedPrefs.getBool('perksAndMasteriesExpanded') ?? true;
+
+  set perksAndMasteriesExpanded(bool value) =>
+      _sharedPrefs.setBool('perksAndMasteriesExpanded', value);
+
+  bool get townDetailsExpanded =>
+      _sharedPrefs.getBool('townDetailsExpanded') ?? true;
+
+  set townDetailsExpanded(bool value) =>
+      _sharedPrefs.setBool('townDetailsExpanded', value);
+
+  bool get partyDetailsExpanded =>
+      _sharedPrefs.getBool('partyDetailsExpanded') ?? true;
+
+  set partyDetailsExpanded(bool value) =>
+      _sharedPrefs.setBool('partyDetailsExpanded', value);
 
   int get targetCardLvl => _sharedPrefs.getInt('targetCardLvl') ?? 0;
 
@@ -186,11 +223,11 @@ class SharedPrefs {
   set hideCustomClassesWarningMessage(bool value) =>
       _sharedPrefs.setBool('hideCustomClassesWarningMessage', value);
 
-  bool get showUpdate440Dialog =>
-      _sharedPrefs.getBool('showUpdate440Dialog') ?? true;
+  bool get showUpdate450Dialog =>
+      _sharedPrefs.getBool('showUpdate450Dialog') ?? true;
 
-  set showUpdate440Dialog(bool value) =>
-      _sharedPrefs.setBool('showUpdate440Dialog', value);
+  set showUpdate450Dialog(bool value) =>
+      _sharedPrefs.setBool('showUpdate450Dialog', value);
 
   bool getPlayerClassIsUnlocked(String classCode) =>
       _sharedPrefs.getBool(classCode) ?? false;
@@ -211,6 +248,36 @@ class SharedPrefs {
   bool get isUSRegion => _sharedPrefs.getBool('isUSRegion') ?? false;
 
   set isUSRegion(bool value) => _sharedPrefs.setBool('isUSRegion', value);
+
+  // ===========================================================================
+  // Town / Campaign / Party State
+  // ===========================================================================
+
+  String? get activeCampaignId => _sharedPrefs.getString('activeCampaignId');
+
+  set activeCampaignId(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('activeCampaignId');
+    } else {
+      _sharedPrefs.setString('activeCampaignId', value);
+    }
+  }
+
+  String? get activePartyId => _sharedPrefs.getString('activePartyId');
+
+  set activePartyId(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('activePartyId');
+    } else {
+      _sharedPrefs.setString('activePartyId', value);
+    }
+  }
+
+  bool get showAllCharacters =>
+      _sharedPrefs.getBool('showAllCharacters') ?? true;
+
+  set showAllCharacters(bool value) =>
+      _sharedPrefs.setBool('showAllCharacters', value);
 
   // ===========================================================================
   // Element Tracker States
@@ -241,7 +308,7 @@ class SharedPrefs {
 
   /// Exports a categorized map of SharedPreferences for inclusion in backups.
   ///
-  /// Excluded: clearOldPrefs, initialPage, resourcesExpanded,
+  /// Excluded: clearOldPrefs, initialPage, generalExpanded,
   /// showUpdate*Dialog, isUSRegion, gloomhavenMode (legacy), element tracker.
   Map<String, dynamic> exportForBackup() {
     final classUnlocks = <String, dynamic>{};
@@ -261,7 +328,13 @@ class SharedPrefs {
         'hideCustomClassesWarningMessage': hideCustomClassesWarningMessage,
         'envelopeX': envelopeX,
         'envelopeV': envelopeV,
+        'showAllCharacters': showAllCharacters,
       },
+      if (kTownSheetEnabled)
+        'town': {
+          if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
+          if (activePartyId != null) 'activePartyId': activePartyId,
+        },
       'calculator': {
         'gameEdition': gameEdition.index,
         'enhancementType': enhancementTypeIndex,
@@ -313,6 +386,20 @@ class SharedPrefs {
       }
       if (s.containsKey('envelopeX')) envelopeX = s['envelopeX'] as bool;
       if (s.containsKey('envelopeV')) envelopeV = s['envelopeV'] as bool;
+      if (s.containsKey('showAllCharacters')) {
+        showAllCharacters = s['showAllCharacters'] as bool;
+      }
+    }
+
+    // Town state (only when town sheet feature is enabled)
+    if (kTownSheetEnabled && data['town'] is Map) {
+      final t = Map<String, dynamic>.from(data['town'] as Map);
+      if (t.containsKey('activeCampaignId')) {
+        activeCampaignId = t['activeCampaignId'] as String?;
+      }
+      if (t.containsKey('activePartyId')) {
+        activePartyId = t['activePartyId'] as String?;
+      }
     }
 
     // Calculator

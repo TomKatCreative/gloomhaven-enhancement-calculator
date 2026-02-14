@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -35,45 +35,44 @@ class _CharactersScreenState extends State<CharactersScreen>
 
   Widget _buildContent(BuildContext context, CharactersModel charactersModel) {
     if (context.watch<CharactersModel>().characters.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 80),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.only(
-              left: largePadding,
-              right: largePadding,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  AppLocalizations.of(context).createCharacterPrompt(
-                    charactersModel.retiredCharactersAreHidden
-                        ? AppLocalizations.of(context).articleA
-                        : AppLocalizations.of(context).articleYourFirst,
-                  ),
-                  textAlign: TextAlign.center,
+      final l10n = AppLocalizations.of(context);
+      final textTheme = Theme.of(context).textTheme;
+
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(extraLargePadding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                l10n.createCharacterPrompt(
+                  charactersModel.retiredCharactersAreHidden
+                      ? l10n.articleA
+                      : l10n.articleYourFirst,
                 ),
-                if (charactersModel.retiredCharactersAreHidden) ...[
-                  const SizedBox(height: smallPadding),
-                  const Padding(
-                    padding: EdgeInsets.only(top: smallPadding),
-                    child: Divider(),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      charactersModel.toggleShowRetired();
-                    },
-                    child: Text(
-                      AppLocalizations.of(context).showRetiredCharacters,
-                      style: TextStyle(
-                        color: Theme.of(context).contrastedPrimary,
-                      ),
+                style: textTheme.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: extraLargePadding),
+              FilledButton.icon(
+                onPressed: () =>
+                    CreateCharacterScreen.show(context, charactersModel),
+                icon: const Icon(Icons.add),
+                label: Text(l10n.createCharacter),
+              ),
+              if (charactersModel.retiredCharactersAreHidden) ...[
+                const SizedBox(height: largePadding),
+                TextButton(
+                  onPressed: () => charactersModel.toggleShowRetired(),
+                  child: Text(
+                    l10n.showRetiredCharacters,
+                    style: TextStyle(
+                      color: Theme.of(context).contrastedPrimary,
                     ),
                   ),
-                ],
+                ),
               ],
-            ),
+            ],
           ),
         ),
       );
@@ -89,38 +88,17 @@ class _CharactersScreenState extends State<CharactersScreen>
         controller: charactersModel.pageController,
         onPageChanged: (index) {
           charactersModel.onPageChanged(index);
+          ScaffoldMessenger.of(context).removeCurrentSnackBar();
         },
         itemCount: charactersModel.characters.length,
         itemBuilder: (context, int index) {
           final character = charactersModel.characters[index];
 
-          return Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              // RepaintBoundary isolates repaints of the expensive background SVG
-              RepaintBoundary(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 80),
-                    child: Container(
-                      width: 500,
-                      height: 500,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: ClassIconSvg(
-                        playerClass: character.playerClass,
-                        color: character
-                            .getEffectiveColor(Theme.of(context).brightness)
-                            .withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                constraints: const BoxConstraints(maxWidth: 700),
-                child: CharacterScreen(character: character),
-              ),
-            ],
+          return Container(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.characterMaxWidth(context),
+            ),
+            child: CharacterScreen(character: character),
           );
         },
       );

@@ -21,6 +21,36 @@ enum GameEdition {
   /// (GH applies to all, GH2E/FH excludes target, hex, and elements)
   bool get multiTargetAppliesToAll => this == GameEdition.gloomhaven;
 
+  /// Maximum starting level allowed for a given prosperity level.
+  ///
+  /// - Gloomhaven: prosperity level
+  /// - Gloomhaven 2e / Frosthaven: prosperity / 2 (rounded up)
+  int maxStartingLevel(int prosperityLevel) {
+    switch (this) {
+      case GameEdition.gloomhaven:
+        return prosperityLevel;
+      case GameEdition.gloomhaven2e:
+      case GameEdition.frosthaven:
+        return (prosperityLevel / 2).ceil();
+    }
+  }
+
+  /// Calculate starting gold based on edition rules.
+  ///
+  /// - Gloomhaven: 15 × (L + 1), where L is starting level
+  /// - Gloomhaven 2e: 10 × P + 15, where P is prosperity level
+  /// - Frosthaven: 10 × P + 20, where P is prosperity level
+  int startingGold({int level = 1, int prosperityLevel = 0}) {
+    switch (this) {
+      case GameEdition.gloomhaven:
+        return 15 * (level + 1);
+      case GameEdition.gloomhaven2e:
+        return 10 * prosperityLevel + 15;
+      case GameEdition.frosthaven:
+        return 10 * prosperityLevel + 20;
+    }
+  }
+
   String get displayName {
     switch (this) {
       case GameEdition.gloomhaven:

@@ -2,20 +2,26 @@ import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 import 'database_migrations.dart';
 
@@ -25,7 +31,10 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 17;
+  static const _databaseVersion = 18;
+
+  // Minimum DB schema version accepted for backup restore (DB v8 = app v4.2.0).
+  static const _minimumBackupVersion = 8;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -40,6 +49,8 @@ class DatabaseHelper implements IDatabaseHelper {
     tableCharacterPerks,
     tableCharacterMasteries,
     tableMetaData,
+    if (kTownSheetEnabled) tableCampaigns,
+    if (kTownSheetEnabled) tableParties,
   ];
 
   Future<Database> get database async => _database ??= await _initDatabase();
@@ -63,6 +74,7 @@ class DatabaseHelper implements IDatabaseHelper {
       version: _databaseVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
+      onDowngrade: onDatabaseDowngradeDelete,
     );
   }
 
@@ -80,37 +92,44 @@ class DatabaseHelper implements IDatabaseHelper {
     await db.transaction((txn) async {
       await DatabaseMigrations.createMetaDataTable(txn, version);
       await _createTables(txn);
+      if (kTownSheetEnabled) await _createCampaignPartyTables(txn);
       await _seedPerks(txn);
       await _seedMasteries(txn);
+      await _seedPersonalQuests(txn);
     });
   }
 
   /// Creates all database tables (Characters, Perks, CharacterPerks,
   /// Masteries, CharacterMasteries).
   Future<void> _createTables(Transaction txn) async {
-    await txn.execute('''
-      $createTable $tableCharacters (
-        $columnCharacterId $idType,
-        $columnCharacterUuid $textType,
-        $columnCharacterName $textType,
-        $columnCharacterClassCode $textType,
-        $columnPreviousRetirements $integerType,
-        $columnCharacterXp $integerType,
-        $columnCharacterGold $integerType,
-        $columnCharacterNotes $textType,
-        $columnCharacterCheckMarks $integerType,
-        $columnIsRetired $boolType,
-        $columnResourceHide $integerType,
-        $columnResourceMetal $integerType,
-        $columnResourceLumber $integerType,
-        $columnResourceArrowvine $integerType,
-        $columnResourceAxenut $integerType,
-        $columnResourceRockroot $integerType,
-        $columnResourceFlamefruit $integerType,
-        $columnResourceCorpsecap $integerType,
-        $columnResourceSnowthistle $integerType,
-        $columnVariant $textType
-      )''');
+    final characterColumns = [
+      '$columnCharacterId $idType',
+      '$columnCharacterUuid $textType',
+      '$columnCharacterName $textType',
+      '$columnCharacterClassCode $textType',
+      '$columnPreviousRetirements $integerType',
+      '$columnCharacterXp $integerType',
+      '$columnCharacterGold $integerType',
+      '$columnCharacterNotes $textType',
+      '$columnCharacterCheckMarks $integerType',
+      '$columnIsRetired $boolType',
+      '$columnResourceHide $integerType',
+      '$columnResourceMetal $integerType',
+      '$columnResourceLumber $integerType',
+      '$columnResourceArrowvine $integerType',
+      '$columnResourceAxenut $integerType',
+      '$columnResourceRockroot $integerType',
+      '$columnResourceFlamefruit $integerType',
+      '$columnResourceCorpsecap $integerType',
+      '$columnResourceSnowthistle $integerType',
+      '$columnVariant $textType',
+      "$columnCharacterPersonalQuestId $textType DEFAULT ''",
+      "$columnCharacterPersonalQuestProgress $textType DEFAULT '[]'",
+      if (kTownSheetEnabled) '$columnCharacterPartyId TEXT DEFAULT NULL',
+    ];
+    await txn.execute(
+      '$createTable $tableCharacters (${characterColumns.join(', ')})',
+    );
 
     await txn.execute('''
       $createTable $tablePerks (
@@ -141,6 +160,14 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnAssociatedCharacterUuid $textType,
         $columnAssociatedMasteryId $textType,
         $columnCharacterMasteryAchieved $boolType
+      )''');
+
+    await txn.execute('''
+      $createTable $tablePersonalQuests (
+        $columnPersonalQuestId $idTextPrimaryType,
+        $columnPersonalQuestNumber $integerType,
+        $columnPersonalQuestTitle $textType,
+        $columnPersonalQuestEdition $textType
       )''');
   }
 
@@ -184,6 +211,39 @@ class DatabaseHelper implements IDatabaseHelper {
         }
       }
     }
+  }
+
+  /// Seeds the PersonalQuests table from PersonalQuestsRepository.
+  Future<void> _seedPersonalQuests(Transaction txn) async {
+    for (final quest in PersonalQuestsRepository.quests) {
+      await txn.insert(tablePersonalQuests, quest.toMap());
+    }
+  }
+
+  /// Creates Campaigns and Parties tables (for fresh installs).
+  Future<void> _createCampaignPartyTables(Transaction txn) async {
+    await txn.execute('''
+      $createTable $tableCampaigns (
+        $columnCampaignId $idTextPrimaryType,
+        $columnCampaignName $textType,
+        $columnCampaignEdition $textType,
+        $columnCampaignProsperityCheckmarks $integerType DEFAULT 0,
+        $columnCampaignDonatedGold $integerType DEFAULT 0,
+        $columnCampaignCreatedAt $dateTimeType
+      )''');
+
+    await txn.execute('''
+      $createTable $tableParties (
+        $columnPartyId $idTextPrimaryType,
+        $columnPartyCampaignId $textType,
+        $columnPartyName $textType,
+        $columnPartyReputation $integerType DEFAULT 0,
+        $columnPartyCreatedAt $dateTimeType,
+        $columnPartyLocation $textType DEFAULT '',
+        $columnPartyNotes $textType DEFAULT '',
+        $columnPartyAchievements $textType DEFAULT '[]',
+        FOREIGN KEY ($columnPartyCampaignId) REFERENCES $tableCampaigns($columnCampaignId) ON DELETE CASCADE
+      )''');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -261,6 +321,11 @@ class DatabaseHelper implements IDatabaseHelper {
       15: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
       // v17: Rename item_minus_one to ITEM_MINUS_ONE
       16: () => DatabaseMigrations.regeneratePerksAndMasteriesTables(txn),
+      // v18: Personal Quests
+      17: () async {
+        await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
+        await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
+      },
     };
 
     // Run migrations in order for versions > oldVersion
@@ -303,10 +368,26 @@ class DatabaseHelper implements IDatabaseHelper {
       throw ('No Meta Data Table');
     }
 
+    final metaDataIndex = json[0].indexOf('MetaData');
+    final metaData = json[1][metaDataIndex] as List;
+    if (metaData.isEmpty ||
+        (metaData[0][columnDatabaseVersion] ?? 0) < _minimumBackupVersion) {
+      final version = metaData.isNotEmpty
+          ? metaData[0][columnAppVersion] ?? 'unknown'
+          : 'unknown';
+      throw ('This backup was created with app version $version, '
+          'which is no longer supported. '
+          'Only backups from version 4.2.0 or later can be restored.');
+    }
+
     for (var i = 0; i < json[0].length; i++) {
+      // Skip tables that don't exist in the current schema
+      if (!tables.contains(json[0][i])) continue;
+
       for (var k = 0; k < json[1][i].length; k++) {
-        // This handles the case where a user tries to restore a backup
-        // from a database version before 7 (Resources)
+        // Patch columns for backups from v8+ (app 4.2.0+) that predate later schema changes.
+        // Resource columns (v7) are defaulted for safety, though v8+ backups already have them.
+        // PersonalQuest columns were added in v18.
         if (i < 1) {
           json[1][i][k][columnResourceHide] ??= 0;
           json[1][i][k][columnResourceMetal] ??= 0;
@@ -317,6 +398,21 @@ class DatabaseHelper implements IDatabaseHelper {
           json[1][i][k][columnResourceFlamefruit] ??= 0;
           json[1][i][k][columnResourceCorpsecap] ??= 0;
           json[1][i][k][columnResourceSnowthistle] ??= 0;
+          json[1][i][k][columnCharacterPersonalQuestId] ??= '';
+          json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
+          if (kTownSheetEnabled) {
+            // PartyId is nullable, no default needed — just ensure key exists
+            json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
+          } else {
+            json[1][i][k].remove(columnCharacterPartyId);
+          }
+        }
+
+        // Default missing party detail columns (added in v19)
+        if (json[0][i] == tableParties) {
+          json[1][i][k][columnPartyLocation] ??= '';
+          json[1][i][k][columnPartyNotes] ??= '';
+          json[1][i][k][columnPartyAchievements] ??= '[]';
         }
 
         batch.insert(json[0][i], json[1][i][k]);
@@ -477,6 +573,21 @@ class DatabaseHelper implements IDatabaseHelper {
   }
 
   @override
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  }) async {
+    Database db = await database;
+    if (edition != null) {
+      return await db.query(
+        tablePersonalQuests,
+        where: '$columnPersonalQuestEdition = ?',
+        whereArgs: [edition.name],
+      );
+    }
+    return await db.query(tablePersonalQuests);
+  }
+
+  @override
   Future<List<Character>> queryAllCharacters() async {
     Database db = await database;
     List<Character> list = [];
@@ -508,6 +619,141 @@ class DatabaseHelper implements IDatabaseHelper {
         whereArgs: [character.uuid],
       );
     });
+  }
+
+  // ── Campaign CRUD ──
+
+  @override
+  Future<List<Campaign>> queryAllCampaigns() async {
+    Database db = await database;
+    final maps = await db.query(tableCampaigns);
+    return maps.map((m) => Campaign.fromMap(m)).toList();
+  }
+
+  @override
+  Future<void> insertCampaign(Campaign campaign) async {
+    Database db = await database;
+    await db.insert(tableCampaigns, campaign.toMap());
+  }
+
+  @override
+  Future<void> updateCampaign(Campaign campaign) async {
+    Database db = await database;
+    await db.update(
+      tableCampaigns,
+      campaign.toMap(),
+      where: '$columnCampaignId = ?',
+      whereArgs: [campaign.id],
+    );
+  }
+
+  @override
+  Future<void> deleteCampaign(String campaignId) async {
+    Database db = await database;
+    await db.transaction((txn) async {
+      // Unlink characters from parties in this campaign
+      final parties = await txn.query(
+        tableParties,
+        where: '$columnPartyCampaignId = ?',
+        whereArgs: [campaignId],
+      );
+      for (final party in parties) {
+        final partyId = party[columnPartyId] as String;
+        await txn.update(
+          tableCharacters,
+          {columnCharacterPartyId: null},
+          where: '$columnCharacterPartyId = ?',
+          whereArgs: [partyId],
+        );
+      }
+      // Delete parties (CASCADE would handle this but being explicit)
+      await txn.delete(
+        tableParties,
+        where: '$columnPartyCampaignId = ?',
+        whereArgs: [campaignId],
+      );
+      await txn.delete(
+        tableCampaigns,
+        where: '$columnCampaignId = ?',
+        whereArgs: [campaignId],
+      );
+    });
+  }
+
+  // ── Party CRUD ──
+
+  @override
+  Future<List<Party>> queryParties(String campaignId) async {
+    Database db = await database;
+    final maps = await db.query(
+      tableParties,
+      where: '$columnPartyCampaignId = ?',
+      whereArgs: [campaignId],
+    );
+    return maps.map((m) => Party.fromMap(m)).toList();
+  }
+
+  @override
+  Future<void> insertParty(Party party) async {
+    Database db = await database;
+    await db.insert(tableParties, party.toMap());
+  }
+
+  @override
+  Future<void> updateParty(Party party) async {
+    Database db = await database;
+    await db.update(
+      tableParties,
+      party.toMap(),
+      where: '$columnPartyId = ?',
+      whereArgs: [party.id],
+    );
+  }
+
+  @override
+  Future<void> deleteParty(String partyId) async {
+    Database db = await database;
+    await db.transaction((txn) async {
+      // Unlink characters from this party
+      await txn.update(
+        tableCharacters,
+        {columnCharacterPartyId: null},
+        where: '$columnCharacterPartyId = ?',
+        whereArgs: [partyId],
+      );
+      await txn.delete(
+        tableParties,
+        where: '$columnPartyId = ?',
+        whereArgs: [partyId],
+      );
+    });
+  }
+
+  // ── Character-Party linking ──
+
+  @override
+  Future<void> assignCharacterToParty(
+    String characterUuid,
+    String? partyId,
+  ) async {
+    Database db = await database;
+    await db.update(
+      tableCharacters,
+      {columnCharacterPartyId: partyId},
+      where: '$columnCharacterUuid = ?',
+      whereArgs: [characterUuid],
+    );
+  }
+
+  @override
+  Future<List<Character>> queryCharactersByParty(String partyId) async {
+    Database db = await database;
+    final maps = await db.query(
+      tableCharacters,
+      where: '$columnCharacterPartyId = ?',
+      whereArgs: [partyId],
+    );
+    return maps.map((m) => Character.fromMap(m)).toList();
   }
 }
 

@@ -30,7 +30,9 @@ class _EnhancerDialogState extends State<EnhancerDialog> {
         child: Text(l10n.enhancer, style: theme.textTheme.headlineMedium),
       ),
       content: Container(
-        constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+        constraints: BoxConstraints(
+          maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+        ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

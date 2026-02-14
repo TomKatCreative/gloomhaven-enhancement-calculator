@@ -6,7 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 import 'fake_database_helper.dart';
 
@@ -104,17 +106,23 @@ Widget wrapWithProviders({
   required Widget child,
   CharactersModel? charactersModel,
   ThemeProvider? themeProvider,
+  AppModel? appModel,
+  TownModel? townModel,
   bool withLocalization = false,
   ThemeData? themeData,
 }) {
   final theme = themeProvider ?? MockThemeProvider();
   final characters =
       charactersModel ?? createTestCharactersModel(themeProvider: theme);
+  final app = appModel ?? AppModel();
+  final town = townModel ?? TownModel(databaseHelper: FakeDatabaseHelper());
 
   return MultiProvider(
     providers: [
       ChangeNotifierProvider<ThemeProvider>.value(value: theme),
       ChangeNotifierProvider<CharactersModel>.value(value: characters),
+      ChangeNotifierProvider<AppModel>.value(value: app),
+      ChangeNotifierProvider<TownModel>.value(value: town),
     ],
     child: MaterialApp(
       theme: themeData,

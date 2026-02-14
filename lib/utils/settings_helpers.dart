@@ -36,7 +36,9 @@ void showLoaderDialog(BuildContext context) {
           children: [
             const CircularProgressIndicator(),
             Container(
-              constraints: const BoxConstraints(maxWidth: maxDialogWidth),
+              constraints: BoxConstraints(
+                maxWidth: ResponsiveLayout.dialogMaxWidth(context),
+              ),
               margin: const EdgeInsets.only(left: smallPadding),
               child: Text(AppLocalizations.of(context).restoring),
             ),

@@ -7,9 +7,11 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 17
+- **Current Schema Version**: 18 (production) / 19 (with `kTownSheetEnabled`)
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
+
+> **Conditional schema**: Production schema is v18 (includes Personal Quests table and PQ columns on Characters). When `kTownSheetEnabled` is `true`, migration v19 runs to create Campaigns and Parties tables plus `PartyId` column on Characters.
 
 ## Tables
 
@@ -42,7 +44,7 @@ Core character data storage.
 | `CharacterXp` | INTEGER | NOT NULL | Experience points |
 | `CharacterGold` | INTEGER | NOT NULL | Gold amount |
 | `CharacterNotes` | TEXT | NOT NULL | User notes |
-| `CharacterCheckMarks` | INTEGER | NOT NULL | Check marks (0-18) |
+| `CharacterCheckMarks` | INTEGER | NOT NULL | Check marks (0-18, every 3 = 1 perk) |
 | `IsRetired` | BOOL | NOT NULL | Retirement status |
 | `Variant` | TEXT | NOT NULL | Class variant name |
 
@@ -59,6 +61,19 @@ Core character data storage.
 | `ResourceFlamefruit` | INTEGER | 0 | Flamefruit herb |
 | `ResourceCorpsecap` | INTEGER | 0 | Corpsecap herb |
 | `ResourceSnowthistle` | INTEGER | 0 | Snowthistle herb |
+
+**Personal Quest Fields** (added v18):
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `PersonalQuestId` | TEXT | `''` | FK to PersonalQuestsTable._id (e.g., "pq_gh_510") |
+| `PersonalQuestProgress` | TEXT | `'[]'` | JSON array of ints (progress per requirement) |
+
+**Party Fields** (added v18):
+
+| Column | Type | Default | Description |
+|--------|------|---------|-------------|
+| `PartyId` | TEXT | NULL | FK to Parties._id (nullable — unassigned characters have NULL) |
 
 ---
 
@@ -129,6 +144,63 @@ Join table linking characters to their mastery achievements.
 
 ---
 
+### PersonalQuestsTable
+
+Personal quest definitions seeded from `PersonalQuestsRepository`.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | Quest ID (e.g., "pq_gh_510") |
+| `Number` | INTEGER | NOT NULL | Card number (e.g., 510) |
+| `Title` | TEXT | NOT NULL | Quest title (e.g., "Seeker of Xorn") |
+| `Edition` | TEXT | NOT NULL | Game edition (e.g., "gloomhaven") |
+
+**Note**: Requirements, unlock class, and unlock envelope are stored in `PersonalQuestsRepository` (not in DB), similar to how perk details are stored. The DB table holds the basic quest reference data only.
+
+**Added in**: v18
+
+---
+
+> **Gated by** `kTownSheetEnabled` — these tables only exist when the feature flag is enabled.
+
+### Campaigns
+
+Tracks game campaigns with edition-specific prosperity.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | UUID |
+| `Name` | TEXT | NOT NULL | Campaign name |
+| `Edition` | TEXT | NOT NULL | GameEdition.name (e.g., "gloomhaven") |
+| `ProsperityCheckmarks` | INTEGER | NOT NULL DEFAULT 0 | Raw checkmark count |
+| `DonatedGold` | INTEGER | NOT NULL DEFAULT 0 | Sanctuary donations |
+| `CreatedAt` | DATETIME | | Creation timestamp |
+
+**Added in**: v19 (conditional)
+
+---
+
+### Parties
+
+Tracks parties within a campaign.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `_id` | TEXT | PRIMARY KEY | UUID |
+| `CampaignId` | TEXT | NOT NULL | FK to Campaigns._id |
+| `Name` | TEXT | NOT NULL | Party name |
+| `Reputation` | INTEGER | NOT NULL DEFAULT 0 | Party reputation (-20 to +20) |
+| `CreatedAt` | DATETIME | | Creation timestamp |
+| `Location` | TEXT | DEFAULT '' | Current scenario location |
+| `Notes` | TEXT | DEFAULT '' | Party notes |
+| `Achievements` | TEXT | DEFAULT '[]' | JSON array of achievement strings |
+
+**Foreign Key**: `CampaignId REFERENCES Campaigns(_id) ON DELETE CASCADE`
+
+**Added in**: v19 (conditional)
+
+---
+
 ## Key Operations
 
 ### Character Operations
@@ -155,6 +227,37 @@ Join table linking characters to their mastery achievements.
 | `queryMasteries(Character)` | Fetch masteries matching class + variant |
 | `queryCharacterMasteries(String uuid)` | Fetch mastery achievements |
 | `updateCharacterMastery(CharacterMastery, bool)` | Update achievement state |
+
+### Personal Quest Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryPersonalQuests({String? edition})` | Fetch quest definitions, optionally filtered by edition |
+
+### Campaign Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryAllCampaigns()` | Fetch all campaigns |
+| `insertCampaign(Campaign)` | Create a new campaign |
+| `updateCampaign(Campaign)` | Update campaign data (name, prosperity, etc.) |
+| `deleteCampaign(String campaignId)` | Cascading delete (campaign + parties + unlink characters) |
+
+### Party Operations
+
+| Method | Description |
+|--------|-------------|
+| `queryParties(String campaignId)` | Fetch parties for a campaign |
+| `insertParty(Party)` | Create a new party |
+| `updateParty(Party)` | Update party data |
+| `deleteParty(String partyId)` | Delete party and unlink characters |
+
+### Character-Party Linking
+
+| Method | Description |
+|--------|-------------|
+| `assignCharacterToParty(String uuid, String? partyId)` | Link/unlink a character to a party |
+| `queryCharactersByParty(String partyId)` | Fetch characters in a party |
 
 ### Backup Operations
 
@@ -184,6 +287,8 @@ Join table linking characters to their mastery achievements.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
+| v18 | Personal Quests table, PQ columns on Characters |
+| v19 | Campaigns/Parties tables, PartyId on Characters (**conditional** — only when `kTownSheetEnabled`) |
 
 ### Critical Migrations
 
@@ -325,11 +430,35 @@ The backup JSON structure:
       "AssociatedMasteryId": "bn_base_0",
       "CharacterMasteryAchieved": 0
     }
+  ],
+  "Campaigns": [
+    {
+      "_id": "uuid-string",
+      "Name": "My Campaign",
+      "Edition": "gloomhaven",
+      "ProsperityCheckmarks": 12,
+      "DonatedGold": 50,
+      "CreatedAt": "2025-01-15T10:30:00.000"
+    }
+  ],
+  "Parties": [
+    {
+      "_id": "uuid-string",
+      "CampaignId": "uuid-string",
+      "Name": "Party One",
+      "Reputation": 3,
+      "CreatedAt": "2025-01-15T10:30:00.000",
+      "Location": "Gloomhaven",
+      "Notes": "",
+      "Achievements": "[\"First Steps\"]"
+    }
   ]
 }
 ```
 
-**Note**: Perks and Masteries tables are NOT included in backup since they're seeded from repositories on database creation.
+**Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Campaigns and Parties tables ARE included in backup since they contain user-created data.
+
+**Minimum supported backup version**: DB schema v8 (app v4.2.0). Backups from older versions are rejected during restore with a descriptive error message.
 
 ---
 

@@ -1,8 +1,12 @@
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 
 /// Fake implementation of [IDatabaseHelper] for testing.
@@ -55,6 +59,12 @@ class FakeDatabaseHelper implements IDatabaseHelper {
   /// Raw mastery definition data (returned by [queryMasteries]).
   /// If null, auto-generates from MasteriesRepository for the character's class.
   List<Map<String, Object?>>? masteriesData;
+
+  /// In-memory campaign storage.
+  List<Campaign> campaigns = [];
+
+  /// In-memory party storage keyed by campaign ID.
+  Map<String, List<Party>> partiesMap = {};
 
   /// Next ID to assign when inserting a character.
   int _nextId = 1;
@@ -119,6 +129,16 @@ class FakeDatabaseHelper implements IDatabaseHelper {
 
     // Auto-generate from MasteriesRepository
     return _generateMasteryMaps(character);
+  }
+
+  @override
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  }) async {
+    final quests = edition != null
+        ? PersonalQuestsRepository.getByEdition(edition)
+        : PersonalQuestsRepository.quests;
+    return quests.map((q) => q.toMap()).toList();
   }
 
   @override
@@ -240,6 +260,96 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     return maps;
   }
 
+  // ── Campaign CRUD ──
+
+  @override
+  Future<List<Campaign>> queryAllCampaigns() async {
+    return List.from(campaigns);
+  }
+
+  @override
+  Future<void> insertCampaign(Campaign campaign) async {
+    campaigns.add(campaign);
+  }
+
+  @override
+  Future<void> updateCampaign(Campaign campaign) async {
+    final idx = campaigns.indexWhere((c) => c.id == campaign.id);
+    if (idx >= 0) {
+      campaigns[idx] = campaign;
+    }
+  }
+
+  @override
+  Future<void> deleteCampaign(String campaignId) async {
+    // Unlink characters from parties in this campaign
+    final parties = partiesMap[campaignId] ?? [];
+    for (final party in parties) {
+      for (final character in characters) {
+        if (character.partyId == party.id) {
+          character.partyId = null;
+        }
+      }
+    }
+    partiesMap.remove(campaignId);
+    campaigns.removeWhere((c) => c.id == campaignId);
+  }
+
+  // ── Party CRUD ──
+
+  @override
+  Future<List<Party>> queryParties(String campaignId) async {
+    return List.from(partiesMap[campaignId] ?? []);
+  }
+
+  @override
+  Future<void> insertParty(Party party) async {
+    partiesMap.putIfAbsent(party.campaignId, () => []);
+    partiesMap[party.campaignId]!.add(party);
+  }
+
+  @override
+  Future<void> updateParty(Party party) async {
+    final parties = partiesMap[party.campaignId];
+    if (parties != null) {
+      final idx = parties.indexWhere((p) => p.id == party.id);
+      if (idx >= 0) {
+        parties[idx] = party;
+      }
+    }
+  }
+
+  @override
+  Future<void> deleteParty(String partyId) async {
+    // Unlink characters from this party
+    for (final character in characters) {
+      if (character.partyId == partyId) {
+        character.partyId = null;
+      }
+    }
+    for (final parties in partiesMap.values) {
+      parties.removeWhere((p) => p.id == partyId);
+    }
+  }
+
+  // ── Character-Party linking ──
+
+  @override
+  Future<void> assignCharacterToParty(
+    String characterUuid,
+    String? partyId,
+  ) async {
+    final idx = characters.indexWhere((c) => c.uuid == characterUuid);
+    if (idx >= 0) {
+      characters[idx].partyId = partyId;
+    }
+  }
+
+  @override
+  Future<List<Character>> queryCharactersByParty(String partyId) async {
+    return characters.where((c) => c.partyId == partyId).toList();
+  }
+
   /// Resets all state for test isolation.
   void reset() {
     characters = [];
@@ -251,6 +361,8 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     characterMasteriesMap = {};
     perksData = null;
     masteriesData = null;
+    campaigns = [];
+    partiesMap = {};
     _nextId = 1;
   }
 }

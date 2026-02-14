@@ -809,6 +809,10 @@ const Map<String, AssetConfig> assets = {
     'equipment_slots/body.svg',
     themeMode: CurrentColorTheme(),
   ),
+  'Feet': AssetConfig(
+    'equipment_slots/feet.svg',
+    themeMode: CurrentColorTheme(),
+  ),
   'Head': AssetConfig(
     'equipment_slots/head.svg',
     themeMode: CurrentColorTheme(),
@@ -877,6 +881,10 @@ const Map<String, AssetConfig> assets = {
   'TRAIT': AssetConfig('ui/trait.svg', themeMode: CurrentColorTheme()),
   'DAMAGE': AssetConfig('ui/damage.svg', lightPath: 'ui/damage_light.svg'),
   'GOLD': AssetConfig('ui/gold.svg', themeMode: CurrentColorTheme()),
+  'PROSPERITY': AssetConfig(
+    'ui/prosperity.svg',
+    themeMode: CurrentColorTheme(),
+  ),
   'hex': AssetConfig('ui/hex.svg'),
   'HP': AssetConfig('ui/hp.svg', themeMode: CurrentColorTheme()),
   'LEVEL': AssetConfig('ui/level.svg', themeMode: CurrentColorTheme()),

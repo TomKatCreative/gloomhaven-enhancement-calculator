@@ -932,7 +932,7 @@ void main() {
 
       model.onPageChanged(1);
 
-      expect(SharedPrefs().initialPage, equals(1));
+      expect(SharedPrefs().currentCharacterIndex, equals(1));
     });
 
     test('sets isScrolledToTop to true', () async {
@@ -1012,22 +1012,25 @@ void main() {
       expect(model.currentCharacter!.characterPerks, isNotEmpty);
     });
 
-    test('sets currentCharacter from SharedPrefs initialPage', () async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 1,
-        'primaryClassColor': 0xff4e7ec1,
-      });
-      await SharedPrefs().init();
+    test(
+      'sets currentCharacter from SharedPrefs currentCharacterIndex',
+      () async {
+        SharedPreferences.setMockInitialValues({
+          'showRetiredCharacters': true,
+          'darkTheme': false,
+          'currentCharacterIndex': 1,
+          'primaryClassColor': 0xff4e7ec1,
+        });
+        await SharedPrefs().init();
 
-      fakeDb.characters = TestData.createAllActiveCharacters();
-      final model = createModel();
+        fakeDb.characters = TestData.createAllActiveCharacters();
+        final model = createModel();
 
-      await model.loadCharacters();
+        await model.loadCharacters();
 
-      expect(model.currentCharacter?.uuid, equals('test-2'));
-    });
+        expect(model.currentCharacter?.uuid, equals('test-2'));
+      },
+    );
 
     test('handles empty database gracefully', () async {
       fakeDb.characters = [];
@@ -1082,6 +1085,212 @@ void main() {
 
       expect(model.isEditMode, isFalse);
       expect(notified, isTrue);
+    });
+  });
+
+  group('Personal Quest', () {
+    test('createCharacter with personalQuestId stores it', () async {
+      final model = createModel();
+
+      await model.createCharacter(
+        'Test',
+        TestData.brute,
+        personalQuestId: 'pq_gh_510',
+      );
+
+      expect(model.characters.length, 1);
+      expect(model.characters.first.personalQuestId, 'pq_gh_510');
+      expect(model.characters.first.personalQuestProgress, [0, 0]);
+    });
+
+    test('createCharacter without personalQuestId defaults to empty', () async {
+      final model = createModel();
+
+      await model.createCharacter('Test', TestData.brute);
+
+      expect(model.characters.first.personalQuestId, '');
+      expect(model.characters.first.personalQuestProgress, isEmpty);
+    });
+
+    test('updatePersonalQuest changes quest and resets progress', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'pq_gh_510';
+      character.personalQuestProgress = [2, 1];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      await model.updatePersonalQuest(character, 'pq_gh_515');
+
+      expect(character.personalQuestId, 'pq_gh_515');
+      // gh_515 has 1 requirement
+      expect(character.personalQuestProgress, [0]);
+      expect(fakeDb.updateCalls, contains(character.uuid));
+    });
+
+    test('updatePersonalQuest to null clears quest', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'pq_gh_510';
+      character.personalQuestProgress = [2, 1];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      await model.updatePersonalQuest(character, null);
+
+      expect(character.personalQuestId, '');
+      expect(character.personalQuestProgress, isEmpty);
+    });
+
+    test(
+      'updatePersonalQuestProgress updates individual requirement',
+      () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh_510';
+        character.personalQuestProgress = [0, 0];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        await model.updatePersonalQuestProgress(character, 0, 3);
+
+        expect(character.personalQuestProgress, [3, 0]);
+        expect(fakeDb.updateCalls, contains(character.uuid));
+      },
+    );
+
+    test('updatePersonalQuest notifies listeners', () async {
+      final character = TestData.createCharacter();
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      bool notified = false;
+      model.addListener(() => notified = true);
+
+      await model.updatePersonalQuest(character, 'pq_gh_510');
+
+      expect(notified, isTrue);
+    });
+
+    test('updatePersonalQuestProgress notifies listeners', () async {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'pq_gh_523';
+      character.personalQuestProgress = [0, 0, 0, 0, 0, 0];
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+
+      bool notified = false;
+      model.addListener(() => notified = true);
+
+      await model.updatePersonalQuestProgress(character, 2, 1);
+
+      expect(notified, isTrue);
+      expect(character.personalQuestProgress[2], 1);
+    });
+
+    test(
+      'updatePersonalQuestProgress returns true when quest transitions to complete',
+      () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh_515'; // 1 req: target 20
+        character.personalQuestProgress = [19];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        final result = await model.updatePersonalQuestProgress(
+          character,
+          0,
+          20,
+        );
+
+        expect(result, isTrue);
+      },
+    );
+
+    test(
+      'updatePersonalQuestProgress returns false for non-completing update',
+      () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh_515';
+        character.personalQuestProgress = [5];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        final result = await model.updatePersonalQuestProgress(character, 0, 6);
+
+        expect(result, isFalse);
+      },
+    );
+
+    test(
+      'updatePersonalQuestProgress returns false when already complete',
+      () async {
+        final character = TestData.createCharacter();
+        // Quest 523 has 6 binary requirements, all already met
+        character.personalQuestId = 'pq_gh_523';
+        character.personalQuestProgress = [1, 1, 1, 1, 1, 1];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        // Decrement one to make incomplete, then increment back
+        await model.updatePersonalQuestProgress(character, 0, 0);
+        final result = await model.updatePersonalQuestProgress(character, 0, 1);
+
+        // Should return true because it went from incomplete → complete
+        expect(result, isTrue);
+      },
+    );
+
+    group('isPersonalQuestComplete', () {
+      test('returns true when all requirements are met', () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh_515'; // 1 req: target 20
+        character.personalQuestProgress = [20];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        expect(model.isPersonalQuestComplete(character), isTrue);
+      });
+
+      test('returns false when some requirements are not met', () async {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh_523'; // 6 binary reqs
+        character.personalQuestProgress = [1, 1, 0, 1, 1, 1];
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        expect(model.isPersonalQuestComplete(character), isFalse);
+      });
+
+      test('returns false when no quest assigned', () async {
+        final character = TestData.createCharacter();
+        fakeDb.characters = [character];
+        final model = createModel();
+        await model.loadCharacters();
+
+        expect(model.isPersonalQuestComplete(character), isFalse);
+      });
+
+      test(
+        'returns false when progress length mismatches requirements',
+        () async {
+          final character = TestData.createCharacter();
+          character.personalQuestId = 'pq_gh_523'; // 6 reqs
+          character.personalQuestProgress = [1, 1]; // only 2 values
+          fakeDb.characters = [character];
+          final model = createModel();
+          await model.loadCharacters();
+
+          expect(model.isPersonalQuestComplete(character), isFalse);
+        },
+      );
     });
   });
 }

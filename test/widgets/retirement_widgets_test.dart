@@ -3,10 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 import '../helpers/fake_database_helper.dart';
 import '../helpers/test_data.dart';
@@ -44,7 +48,7 @@ void main() {
   }
 
   group('Retire Button Icon', () {
-    testWidgets('shows retire icon (assist_walker) for active character', (
+    testWidgets('shows retire icon (work_off) for active character', (
       tester,
     ) async {
       final character = TestData.createCharacter(isRetired: false);
@@ -56,13 +60,13 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
-      // Find the retire button by its icon
-      expect(find.byIcon(Icons.assist_walker), findsOneWidget);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      expect(find.byIcon(Icons.work_off_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_rounded), findsNothing);
     });
 
-    testWidgets('shows unretire icon (directions_walk) for retired character', (
+    testWidgets('shows unretire icon (work) for retired character', (
       tester,
     ) async {
       final character = TestData.createCharacter(isRetired: true);
@@ -74,9 +78,10 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.directions_walk), findsOneWidget);
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
+      expect(find.byIcon(Icons.work_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
     });
 
     testWidgets('retire button not visible when not in edit mode', (
@@ -91,9 +96,10 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
+      expect(find.byIcon(Icons.delete_rounded), findsNothing);
     });
 
     testWidgets('tapping retire button calls retireCurrentCharacter', (
@@ -111,12 +117,11 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
-
-      // Tap the retire button
-      await tester.tap(find.byIcon(Icons.assist_walker));
       await tester.pumpAndSettle();
 
-      // Verify the character was retired
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
+      await tester.pumpAndSettle();
+
       expect(model.currentCharacter!.isRetired, isTrue);
       expect(fakeDb.updateCalls, contains('tap-test'));
     });
@@ -131,18 +136,23 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
-
-      // Before retiring: shows assist_walker
-      expect(find.byIcon(Icons.assist_walker), findsOneWidget);
-
-      // Tap to retire
-      await tester.tap(find.byIcon(Icons.assist_walker));
       await tester.pumpAndSettle();
 
-      // After retiring: edit mode is turned off, so button is hidden
-      // This is expected behavior - retiring turns off edit mode
-      expect(find.byIcon(Icons.assist_walker), findsNothing);
-      expect(find.byIcon(Icons.directions_walk), findsNothing);
+      // Before retiring: shows work_off
+      expect(find.byIcon(Icons.work_off_rounded), findsOneWidget);
+
+      // Tap to retire
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
+      await tester.pumpAndSettle();
+
+      // After retiring: _handleRetire exits edit mode, so retire/delete
+      // buttons are no longer in the app bar.
+      // Re-enter edit mode to see the updated icon.
+      model.isEditMode = true;
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.work_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.work_off_rounded), findsNothing);
     });
   });
 
@@ -157,8 +167,8 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
-      // Find the Tooltip with 'Retire' message
       final tooltip = find.byWidgetPredicate(
         (widget) => widget is Tooltip && widget.message == 'Retire',
       );
@@ -177,6 +187,7 @@ void main() {
       await tester.pumpWidget(
         _buildTestApp(model: model, themeProvider: mockTheme),
       );
+      await tester.pumpAndSettle();
 
       final tooltip = find.byWidgetPredicate(
         (widget) => widget is Tooltip && widget.message == 'Unretire',
@@ -186,54 +197,29 @@ void main() {
   });
 }
 
-/// Builds a minimal test app with the AppBar containing retire button.
+/// Builds a minimal test app with GHCAnimatedAppBar in a Scaffold.
+/// Sets appModel.page to the characters page so retire/delete actions appear.
 Widget _buildTestApp({
   required CharactersModel model,
   required MockThemeProvider themeProvider,
 }) {
+  final appModel = AppModel();
+  appModel.page = kTownSheetEnabled ? 1 : 0;
+
   return MultiProvider(
     providers: [
       ChangeNotifierProvider.value(value: themeProvider),
       ChangeNotifierProvider.value(value: model),
-      ChangeNotifierProvider(create: (_) => AppModel()),
+      ChangeNotifierProvider.value(value: appModel),
       ChangeNotifierProvider(create: (_) => EnhancementCalculatorModel()),
+      ChangeNotifierProvider(
+        create: (_) => TownModel(databaseHelper: FakeDatabaseHelper()),
+      ),
     ],
-    child: MaterialApp(home: Scaffold(appBar: _TestAppBar())),
+    child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      home: const Scaffold(appBar: GHCAnimatedAppBar()),
+    ),
   );
-}
-
-/// A simplified version of the AppBar that contains just the retire button.
-/// This isolates the retirement functionality for testing.
-class _TestAppBar extends StatelessWidget implements PreferredSizeWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isEditMode = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
-    );
-    final currentCharacter = context.watch<CharactersModel>().currentCharacter;
-    final charactersModel = context.read<CharactersModel>();
-
-    return AppBar(
-      title: const Text('Test'),
-      actions: [
-        if (isEditMode && currentCharacter != null)
-          Tooltip(
-            message: currentCharacter.isRetired ? 'Unretire' : 'Retire',
-            child: IconButton(
-              icon: Icon(
-                currentCharacter.isRetired
-                    ? Icons.directions_walk
-                    : Icons.assist_walker,
-              ),
-              onPressed: () async {
-                await charactersModel.retireCurrentCharacter();
-              },
-            ),
-          ),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

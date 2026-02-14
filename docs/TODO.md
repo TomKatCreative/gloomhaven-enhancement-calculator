@@ -1,241 +1,128 @@
-# Personal Quests Implementation Plan
+# Personal Quests
 
-## Overview
+## Status: Phase 1 Released
 
-Add Personal Quests feature to track character retirement goals. Data sourced from [gloomhavensecretariat](https://github.com/Lurkars/gloomhavensecretariat) repository, bundled statically like perks/masteries.
+Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
+- `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
+- DB migration v18 (PersonalQuestsTable + PQ columns on Characters)
+- PQ selection on character creation screen (GH only; GH2E/FH show "Coming soon")
+- PQ section on character screen with progress tracking (+/- buttons in edit mode)
+- Change quest flow with confirmation dialog
+- Retirement prompt: snackbar with confetti pop on PQ completion → confirmation dialog → retire
+- `CollapsibleSectionCard` for PQ section; `SectionCard` for static sections
+- Class unlock icon / envelope icon in ExpansionTile header row
+- `TextFormField` selector when no quest assigned (edit mode)
+- Strikethrough gold display for retired characters (gold forfeited on retirement)
+- Full test coverage (model, repository, viewmodel, widget tests — 25 PQ widget tests)
 
-## Scope
+### Architecture & File Locations
 
-- **Editions**: Gloomhaven (24 quests), GH 2E, Frosthaven (Jaws of the Lion has no personal quests)
-- **Per Character**: Each character has ONE assigned quest
-- **Progress Tracking**: Counter-based requirements (e.g., "Kill 15 bandits: 7/15")
-- **Retirement**: Quest completion enables retirement
-
----
-
-## Data Models
-
-### PersonalQuest (static game data)
-**File**: `lib/models/personal_quest.dart`
-
-```dart
-class PersonalQuest {
-  String questId;           // "gh_510", "fh_581"
-  String edition;           // "gh", "gh2e", "fh"
-  String cardId;            // "510" (original card number)
-  String title;             // "Seeker of Xorn"
-  List<QuestRequirement> requirements;
-  QuestReward reward;       // unlockCharacter or openEnvelope
-}
-
-class QuestRequirement {
-  String description;       // "Crypt scenarios completed"
-  int targetCount;          // 3
-}
-
-class QuestReward {
-  QuestRewardType type;     // character | envelope
-  String value;             // "squidface" | "X"
-}
-```
-
-### CharacterPersonalQuest (character progress)
-**File**: `lib/models/character_personal_quest.dart`
-
-```dart
-class CharacterPersonalQuest {
-  String characterUuid;
-  String questId;
-  List<int> progress;       // [2, 0] for 2-requirement quest
-  bool isCompleted;
-}
-```
-
----
-
-## Repository
-
-**File**: `lib/data/personal_quests/personal_quests_repository.dart`
-
-Static data converted from gloomhavensecretariat JSON:
-
-```dart
-class PersonalQuestsRepository {
-  static final Map<String, List<PersonalQuest>> questsByEdition = {
-    'gh': [...],    // 24 quests (510-533)
-    'gh2e': [...],  // GH 2E quests
-    'fh': [...],    // Frosthaven quests (581+)
-  };
-
-  static List<PersonalQuest>? getQuestsForEdition(String edition) =>
-      questsByEdition[edition];
-}
-```
-
----
-
-## Database Changes
-
-### New Tables
-
-**PersonalQuestsTable** (regenerated from repository):
-```sql
-CREATE TABLE PersonalQuestsTable (
-  _id TEXT PRIMARY KEY,        -- "gh_510"
-  Edition TEXT NOT NULL,
-  Title TEXT NOT NULL,
-  Requirements TEXT NOT NULL,  -- JSON
-  RewardType TEXT NOT NULL,
-  RewardValue TEXT NOT NULL
-)
-```
-
-**CharacterPersonalQuests** (persisted):
-```sql
-CREATE TABLE CharacterPersonalQuests (
-  CharacterUuid TEXT NOT NULL,
-  QuestID TEXT NOT NULL,
-  Progress TEXT NOT NULL,      -- JSON array [2, 0]
-  IsCompleted BOOL NOT NULL,
-  PRIMARY KEY (CharacterUuid, QuestID)
-)
-```
-
-### Character Table Update
-```sql
-ALTER TABLE Characters ADD COLUMN PersonalQuestId TEXT
-```
-
-### Migration
-- Increment to version 17
-- Add migration in `database_migrations.dart`
-
----
-
-## Character Model Updates
-
-**File**: `lib/models/character.dart`
-
-Add fields:
-```dart
-String? personalQuestId;
-CharacterPersonalQuest? characterPersonalQuest;
-```
-
-Add helpers:
-```dart
-bool supportsPersonalQuests() => category != ClassCategory.jawsOfTheLion;
-bool isQuestComplete() => characterPersonalQuest?.isCompleted ?? false;
-```
-
----
-
-## State Management
-
-**File**: `lib/viewmodels/characters_model.dart`
-
-Add methods:
-- `assignPersonalQuest(character, questId)` - Assign quest, create progress record
-- `updateQuestProgress(character, requirementIndex, newValue)` - Update counter
-- `_loadPersonalQuest(character)` - Load quest progress on character load
-
----
-
-## UI Components
-
-### PersonalQuestSection
-**File**: `lib/ui/widgets/personal_quest_section.dart`
-
-Location: Character screen, after Stats row, before Resources
-
-```
-+------------------------------------------+
-| Personal Quest                      [v]  |
-|------------------------------------------|
-| #510 - Seeker of Xorn                    |
-|                                          |
-| [ ] Crypt scenarios          [2] / 3     |
-| [ ] Follow Noxious Cellar    [0] / 1     |
-|                                          |
-| Reward: [eye icon to reveal]             |
-+------------------------------------------+
-```
-
-- `ExpansionTile` like Resources section
-- Shows quest card ID + title
-- Requirement rows with counter widgets
-- Edit mode: +/- buttons on counters
-- Spoiler toggle for reward
-
-### SelectPersonalQuestDialog
-**File**: `lib/ui/dialogs/select_personal_quest_dialog.dart`
-
-- Lists quests for character's edition
-- Shows card ID + title (reward hidden)
-- "Random" selection option
-
----
-
-## Localization
-
-Add to ARB files:
-```json
-"personalQuest": "Personal Quest",
-"assignPersonalQuest": "Assign Personal Quest",
-"questComplete": "Quest Complete!",
-"readyToRetire": "Ready to Retire",
-"noQuestAssigned": "No quest assigned"
-```
-
----
-
-## Implementation Phases
-
-### Phase 1: Data Layer
-1. Create `PersonalQuest` and `CharacterPersonalQuest` models
-2. Create `PersonalQuestsRepository` with converted static data
-3. Add database tables and migration (v17)
-4. Update `Character` model
-5. Add `DatabaseHelper` query methods
-
-### Phase 2: State Management
-1. Add quest methods to `CharactersModel`
-2. Integrate quest loading into character load flow
-
-### Phase 3: UI
-1. Create `PersonalQuestSection` widget
-2. Add to `CharacterScreen`
-3. Create `SelectPersonalQuestDialog`
-
-### Phase 4: Polish
-1. Add spoiler handling for rewards
-2. Add localization strings
-3. Update backup/restore to include quest tables
-
----
-
-## Key Files to Modify
-
-| File | Changes |
+| File | Purpose |
 |------|---------|
-| `lib/models/character.dart` | Add `personalQuestId` field |
-| `lib/data/database_helpers.dart` | Add tables, queries |
-| `lib/data/database_migrations.dart` | Add v17 migration |
-| `lib/viewmodels/characters_model.dart` | Add quest methods |
-| `lib/ui/screens/character_screen.dart` | Add PersonalQuestSection |
-| `lib/l10n/app_en.arb` | Add localization strings |
-| `lib/l10n/app_pt.arb` | Add Portuguese translations |
+| `lib/models/personal_quest/personal_quest.dart` | `PersonalQuest` model, `PersonalQuestRequirement`, progress encode/decode, DB column constants |
+| `lib/data/personal_quests/personal_quests_repository.dart` | Static list of all 24 GH quests with `getById()` and `getByEdition()` |
+| `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection`, `_QuestSelectorField`, `_QuestContent`, `_RequirementRow` |
+| `lib/ui/widgets/blurred_expansion_container.dart` | Reusable animated backdrop blur + bordered `ExpansionTile` |
+| `lib/ui/screens/personal_quest_selector_screen.dart` | Full-screen PQ selector with search, `PersonalQuestSelectorScreen.show()` |
+| `lib/data/database_helpers.dart` | v18 migration, `_seedPersonalQuests()`, `queryPersonalQuests()` |
+| `lib/data/database_migrations.dart` | v18 migration entry in `runMigrations()` |
+| `test/widgets/personal_quest_section_test.dart` | 25 widget tests for the PQ section |
+| `test/models/personal_quest_test.dart` | Model unit tests (constructor, toMap/fromMap, progress encoding) |
+| `test/models/personal_quest_repository_test.dart` | Repository tests (quest data integrity, getById, getByEdition) |
+
+### Data Flow
+
+1. `PersonalQuestsRepository` holds static quest definitions (requirements, unlock rewards)
+2. `Character.personalQuestId` (String, defaults to `''`) references a quest ID like `"pq_gh_510"`
+3. `Character.personalQuestProgress` (List<int>) stores progress per requirement as JSON in DB
+4. `Character.personalQuest` getter resolves the full `PersonalQuest` from the repository
+5. `CharactersModel.updatePersonalQuest()` changes quest and resets progress to zeros
+6. `CharactersModel.updatePersonalQuestProgress()` updates a single requirement's count, returns `bool` (true if quest just transitioned to complete)
+7. `CharactersModel.isPersonalQuestComplete()` checks if all progress values meet their targets
+
+### DB Schema (v18)
+
+**PersonalQuestsTable** - quest definitions (seeded from repository):
+- `_id` TEXT PRIMARY KEY (e.g., "pq_gh_510")
+- `Number` INTEGER NOT NULL (e.g., 510)
+- `Title` TEXT NOT NULL (e.g., "Seeker of Xorn")
+- `Edition` TEXT NOT NULL (e.g., "gloomhaven")
+
+**Characters table** - two new columns:
+- `PersonalQuestId` TEXT NOT NULL DEFAULT '' (references PersonalQuestsTable._id)
+- `PersonalQuestProgress` TEXT NOT NULL DEFAULT '[]' (JSON-encoded List<int>)
+
+### Design Decisions & Lessons Learned
+
+- **`edition` uses `GameEdition` enum**, not String. Initially implemented as String but refactored. The enum is serialized to/from DB via `.name` and `GameEdition.values.byName()`. Type safety prevents invalid editions at compile time.
+- **Second printing values** used for quest targets (e.g., quest 514 target is 12, not 15).
+- **Quests unlock either a class OR an envelope**, never both. Enforced in repository test.
+- **ExpansionTile state** persisted via `SharedPrefs().personalQuestExpanded`.
+- **"Coming soon"** shown for GH2E/FH editions - the selector dialog is disabled, not hidden.
+- **Confirmation dialog** appears when changing an existing quest (resets progress).
+- **Retirement flow** uses two-step UX: snackbar ("Personal quest complete!" with confetti pop) → tap "Retire" → confirmation dialog with full details → retire. `updatePersonalQuestProgress` returns `bool` to detect completion transitions.
+- **`BlurredExpansionContainer`** centralizes animated backdrop blur (`TweenAnimationBuilder<double>` from 0→`expansionBlurSigma`) used by both Resources and PQ sections. Blur fades in on expand, out on collapse.
+- **No-quest selector** shows a read-only `TextFormField` (matching create character screen pattern) instead of an `ExpansionTile` when no quest is assigned in edit mode.
+- **Gold strikethrough** for retired characters uses `StrikethroughText` widget with `onSurfaceVariant` color.
+
+### Known Gotchas
+
+- **`Character.fromMap` id bug**: `id = map[columnCharacterId] ?? ''` assigns String to int? when id is null. This is a pre-existing bug (not from PQ work). Tests that do toMap/fromMap round-trips must set `character.id = 1` first.
+- **PQ section visibility**: Shows when quest is assigned OR in edit mode. If neither, it's hidden entirely.
+- **ThemedSvg/ClassIconSvg in tests**: SVG widgets fail silently in tests (no real asset files). PQ section tests that render class icons can't verify them visually - use model-level assertions instead.
+- **Widget test viewport**: Some PQ tests need `tester.view.physicalSize = const Size(800, 600)` to avoid overflow in +/- button layouts. Remember to reset in `addTearDown`.
+- **Progress encoding**: `encodeProgress([1,0,3])` → `"[1,0,3]"`. `decodeProgress('')` → `[]`. The JSON format is simple but watch for empty-string edge cases.
+
+## Remaining Work
+
+- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Will need to add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
+- **Frosthaven quest data** - Same pattern as GH2E but with `edition: GameEdition.frosthaven`.
+- **Adaptive widgets** - Replace basic +/- counters with segmented buttons, sliders, etc. for specific requirement types (e.g., binary yes/no for scenario completion, counter for kill counts).
+- **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---
 
-## Verification
+## Town Sheet — Foundation
 
-1. **Create character** - Verify quest can be assigned
-2. **Update progress** - Increment/decrement counters, verify persistence
-3. **Complete quest** - Mark all requirements complete, verify `isCompleted` flag
-4. **Reload app** - Verify quest data persists correctly
-5. **Backup/restore** - Verify quest progress included in backup
-6. **Edition switching** - Verify correct quests shown per edition
+> **Feature flag**: `kTownSheetEnabled` in `lib/data/constants.dart` — currently `false`
+
+## Status: Implemented
+
+Campaign/party management for tracking persistent game state across play groups.
+
+### What's Implemented
+
+- **Campaign model** (`lib/models/campaign.dart`): Edition-specific prosperity tracking with level computation from checkmark thresholds
+- **Party model** (`lib/models/party.dart`): Party reputation tracking with bounds (-20 to +20)
+- **Character-Party linking**: Nullable `partyId` FK on Characters (existing characters unassigned)
+- **TownModel** (`lib/viewmodels/town_model.dart`): ChangeNotifier for campaign/party CRUD, prosperity/reputation management, active selection persistence via SharedPrefs
+- **Party filtering** on CharactersModel: `showAllCharacters` toggle filters character list by active party
+- **DB migration v19** (conditional): Campaigns/Parties tables + PartyId column on Characters (separate from Personal Quests v18 migration; only runs when `kTownSheetEnabled` is `true`)
+- **Town screen** (`lib/ui/screens/town_screen.dart`): Empty state → campaign card (prosperity + sanctuary) → party section
+- **Party switching**: Swap icon in PartySection header opens bottom sheet (2+ parties); add icon opens CreatePartyScreen (1 party)
+- **Create Campaign/Party screens**: Pushed-route forms following CreateCharacterScreen pattern
+- **Section widgets**: `TownEmptyState`, `ProsperitySection`, `PartySection`, `CampaignSelector`
+- **App bar integration**: Campaign name title, create/delete actions in edit mode
+- **FAB edit mode**: Same toggle pattern as Characters page
+- **Localization**: EN + PT strings for all town UI
+- **Backup/restore**: Campaigns and Parties tables included in backup, SharedPrefs town state included
+- **Full test coverage**: Campaign model tests (36), Party model tests, TownModel tests (28), 714 total tests passing
+
+### Architecture
+
+| Level | What it tracks | Scope |
+|-------|---------------|-------|
+| **Campaign** | Prosperity, donated gold | Persistent across all parties |
+| **Party** | Party name, reputation | Per party group |
+| **Character** | XP, gold, perks, etc. | Per character (optionally linked to party) |
+
+### Remaining Work
+
+- **Achievement/scenario tracking** — Complex, needs scenario data repository (deferred)
+- **Frosthaven extensions** — Buildings, morale, seasons (future sprint)
+- **GH2E prosperity thresholds** — May differ from GH, needs research
+- **Character assignment UI** — UI for assigning characters to parties from the Characters tab
+- **Party filter toggle** — UI toggle on Characters tab to filter by active party
 
 ---
 
@@ -278,41 +165,17 @@ Consider changing fonts to use **Tinos** for body text and **Germania One** for 
 ## Enhanced Backup System
 
 **Added:** 2026-02-04
-**Status:** Pending
-
-Currently, backup only exports SQLite database (characters, perks, masteries). SharedPreferences (39 keys including theme, calculator state, unlocked classes, element tracker) are NOT backed up.
+**Status:** Partially Done
 
 ### Improvements
 
-#### 1. Include SharedPreferences in Backup (High Priority)
+#### ~~1. Include SharedPreferences in Backup (High Priority)~~ — **Done**
 
-**Files to modify:**
-- `lib/shared_prefs.dart` - Add `toJson()` and `fromJson()` methods
-- `lib/data/database_helpers.dart` - Include SharedPrefs in `generateBackup()` output
-- `lib/ui/dialogs/restore_dialog.dart` - Restore SharedPrefs from backup
+SharedPreferences are now included as an optional third element in the backup JSON array. See `docs/shared_prefs_keys.md` "Backup Integration" section for details.
 
-**Backup JSON structure:**
-```json
-{
-  "version": 2,
-  "database": [...current backup format...],
-  "settings": {
-    "darkTheme": true,
-    "gameEdition": 0,
-    "primaryClassColor": 0xff4e7ec1,
-    ...
-  }
-}
-```
+#### ~~2. One-Tap Backup Sharing~~ — **Done**
 
-**Exclude from backup:** Transient keys like `showUpdate4Dialog`, `clearOldPrefs`
-
-#### 2. One-Tap Backup Sharing
-
-Currently: Backup → Save to Downloads → User must find file to share
-Improved: Backup → Immediate share sheet option (keep save option too)
-
-**File:** `lib/ui/dialogs/backup_dialog.dart`
+Share sheet implemented via `share_plus` in `backup_dialog.dart`. Both "Save" and "Share" buttons available.
 
 #### 3. Auto-Backup to App Documents
 
@@ -335,9 +198,69 @@ Improved: Backup → Immediate share sheet option (keep save option too)
 - `lib/ui/widgets/settings/backup_settings_section.dart` - Show last backup indicator
 - `lib/ui/dialogs/backup_dialog.dart` - Update timestamp on successful backup
 
-### Implementation Order
+### Remaining Implementation Order
 
-1. SharedPrefs in backup (most value, lowest effort)
-2. Backup age reminder (quick win)
-3. One-tap sharing (UX improvement)
-4. Auto-backup (nice-to-have)
+1. Backup age reminder (quick win)
+2. Auto-backup (nice-to-have)
+
+---
+
+## Character PageView Swiping Performance
+
+**Added:** 2026-02-09
+**Status:** Pending investigation
+**File:** `lib/ui/screens/characters_screen.dart:80-86`
+
+If swiping between character pages is still not smooth, investigate:
+1. Add `allowImplicitScrolling: true` to `PageView.builder` to preload adjacent pages
+2. Change `context.watch<CharactersModel>()` to more targeted selectors or move to child widgets to reduce unnecessary rebuilds
+3. Consider wrapping entire `CharacterScreen` in `RepaintBoundary` if needed
+4. Profile with Flutter DevTools Performance overlay to identify actual jank
+5. Consider caching the rasterized class icon background image
+
+---
+
+## Code Audit — Future Refactors
+
+**Added:** 2026-02-09
+**Status:** Pending
+
+Larger refactoring opportunities identified during codebase audit. These are non-urgent structural improvements that would reduce complexity and improve maintainability.
+
+### CharactersModel Decomposition
+**File:** `lib/viewmodels/characters_model.dart` (~590 lines)
+
+Extract element sheet state, scroll controllers, and navigation logic into smaller focused classes. Currently a god class managing too many concerns.
+
+### EnhancementCalculatorModel Cost Calculation Extraction
+**File:** `lib/viewmodels/enhancement_calculator_model.dart`
+
+Extract `calculateCost()` and `getCalculationBreakdown()` into a pure `CostCalculator` class, separate from state management.
+
+### SharedPrefs Enhancer Level Cascade
+**File:** `lib/shared_prefs.dart`
+
+Move the cascade validation logic (setting lvl4 triggers lvl3/2/1) out of property setters into a dedicated validator.
+
+### DatabaseHelper Decomposition
+**File:** `lib/data/database_helpers.dart`
+
+Extract backup/restore into `DatabaseBackupService`, separate from query logic.
+
+### SectionCard / CollapsibleSectionCard Deduplication
+**File:** `lib/ui/widgets/section_card.dart`
+
+Extract shared title row composition.
+
+### Database Query Boilerplate
+**File:** `lib/data/database_helpers.dart`
+
+Create generic `queryAndMap<T>()` method to replace 4 identical query patterns.
+
+### InfoDialog Simplification
+**File:** `lib/ui/dialogs/info_dialog.dart`
+
+Replace per-category `_configure*` methods with data-driven configuration.
+
+### Import Style Standardization
+Some files use relative imports, most use `package:` — standardize on `package:` imports throughout the codebase.

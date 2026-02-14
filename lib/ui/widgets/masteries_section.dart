@@ -2,33 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/mastery_row.dart';
-import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
-class MasteriesSection extends StatefulWidget {
-  final CharactersModel charactersModel;
+class MasteriesSection extends StatelessWidget {
   final Character character;
 
-  const MasteriesSection({
-    super.key,
-    required this.charactersModel,
-    required this.character,
-  });
-  @override
-  State<StatefulWidget> createState() => MasteriesSectionState();
-}
+  const MasteriesSection({super.key, required this.character});
 
-class MasteriesSectionState extends State<MasteriesSection> {
   @override
   Widget build(BuildContext context) {
+    final masteries = character.masteries;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Masteries', style: Theme.of(context).textTheme.headlineMedium),
-        const SizedBox(height: mediumPadding),
-        ...widget.character.masteries.map(
+        ...masteries.map(
           (mastery) => Padding(
             padding: const EdgeInsets.symmetric(vertical: tinyPadding),
-            child: MasteryRow(character: widget.character, mastery: mastery),
+            child: MasteryRow(character: character, mastery: mastery),
           ),
         ),
       ],

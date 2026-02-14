@@ -54,7 +54,9 @@ class SettingsScreenState extends State<SettingsScreen> {
         ),
         body: Center(
           child: Container(
-            constraints: const BoxConstraints(maxWidth: maxWidth),
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveLayout.contentMaxWidth(context),
+            ),
             child: ListView(
               controller: scrollController,
               children: <Widget>[
@@ -103,7 +105,7 @@ class _SettingsBottomSheet extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color:
-            theme.bottomNavigationBarTheme.backgroundColor ??
+            theme.navigationBarTheme.backgroundColor ??
             theme.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(borderRadiusLarge),

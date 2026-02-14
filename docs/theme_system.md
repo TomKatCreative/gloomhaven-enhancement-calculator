@@ -69,7 +69,7 @@ TextStyle(fontSize: fontSizeBodyMedium, fontFamily: pirataOne)
 The app uses a centralized contrast system to ensure text and UI elements meet WCAG AA accessibility standards (4.5:1 contrast ratio).
 
 **Implementation:**
-- **`ColorUtils.ensureTextContrast()`** - Calculates and adjusts colors for proper contrast
+- **`ColorUtils.ensureContrast()`** - Calculates and adjusts colors for proper contrast
 - **`theme.contrastedPrimary`** - Pre-calculated contrasted primary color available throughout the app
 - **Theme extension** - Contrast calculated once at theme build time for performance
 
@@ -78,6 +78,7 @@ The app uses a centralized contrast system to ensure text and UI elements meet W
 - Bottom navigation bar selected items
 - Dialog action buttons
 - Section headers and primary-colored text
+- Create button in CreateCharacterScreen
 - Any text using `theme.contrastedPrimary`
 
 **Adding contrast to new components:**
@@ -92,7 +93,7 @@ Text(
 Text(
   'My Text',
   style: TextStyle(
-    color: ColorUtils.ensureTextContrast(
+    color: ColorUtils.ensureContrast(
       primaryColor,
       backgroundColor,
     ),
@@ -104,6 +105,62 @@ Text(
 - `lib/utils/color_utils.dart` - Contrast calculation utilities
 - `lib/theme/theme_extensions.dart` - `AppThemeExtension` with `contrastedPrimary`
 - `lib/theme/app_theme_builder.dart` - Theme-level contrast application
+
+---
+
+## ColorScheme & Component Themes
+
+The app's `ColorScheme` maps `secondaryContainer`/`onSecondaryContainer` to match `primaryContainer`/`onPrimaryContainer`. This ensures M3 components that use secondary container colors (FilterChip selected state, SegmentedButton selected state) automatically get correct contrast with the character's primary color — no per-widget overrides needed.
+
+### Component Theme Overrides
+
+| Component | Override | Reason |
+|-----------|----------|--------|
+| `ChipThemeData` | `showCheckmark: false` | Hides checkmark on selected FilterChips |
+| `PopupMenuThemeData` | `labelTextStyle: bodySmall` | Consistent popup menu text size |
+| `SegmentedButtonThemeData` | None (M3 defaults) | Uses `secondaryContainer`/`onSecondaryContainer` from colorScheme |
+
+---
+
+## Scroll-Aware Tint
+
+Pinned headers throughout the app use an M3-inspired scroll-aware tint to indicate when content is scrolling behind them. The tint is an 8% primary color overlay on the surface color.
+
+### Implementation
+
+**`AppBarUtils.getTintedBackground(colorScheme)`** (`lib/ui/widgets/app_bar_utils.dart`) returns `Color.alphaBlend(primary.withAlpha(0.08), surface)`. This is the single source of truth for the tinted background color.
+
+### Where It's Applied
+
+| Component | File | Behavior |
+|-----------|------|----------|
+| Character header (`_CharacterHeaderDelegate`) | `character_screen.dart` | Transparent when expanded; tints when content scrolls behind pinned header |
+| Chip nav bar (`_SectionNavBarDelegate`) | `character_screen.dart` | Same — transparent when header expanding, tints when content overlaps |
+| Calculator page app bar | `enhancement_calculator_screen.dart` | Tints when `CustomScrollView` content scrolls behind pinned app bar |
+| Main app bar (`GHCAnimatedAppBar`) | `ghc_animated_app_bar.dart` | Tints in sync with character header on characters page; title flips vertically on page transitions |
+
+### Animation Pattern
+
+All tinted headers use the same `TweenAnimationBuilder<double>` pattern:
+
+```dart
+TweenAnimationBuilder<double>(
+  key: ValueKey(character.uuid),  // resets on character switch
+  tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
+  duration: const Duration(milliseconds: 300),
+  curve: Curves.easeInOut,
+  builder: (context, tintProgress, child) {
+    final tinted = AppBarUtils.getTintedBackground(colorScheme);
+    final color = Color.lerp(surface, tinted, tintProgress)!;
+    // ...
+  },
+)
+```
+
+### Edit Mode Behavior
+
+- **View mode** (and retired edit mode): Background opacity follows scroll position directly (transparent as long as header is expanding). Tint color fades in/out smoothly via the 300ms animation.
+- **Edit mode** (non-retired): Always opaque. Tint animates in/out based on `overlapsContent` only.
 
 ---
 
@@ -123,7 +180,7 @@ The Android system navigation bar (soft buttons at bottom of screen) color is ma
    });
    ```
 
-3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the bottom navigation bar:
+3. **Colors used**: Uses `surfaceContainer` from the cached theme to match the navigation bar:
    ```dart
    final navBarColor = _config.useDarkMode
        ? _cachedDarkTheme!.colorScheme.surfaceContainer

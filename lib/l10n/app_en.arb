@@ -7,6 +7,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "delete": "Delete",
+  "switchAction": "Switch",
   "create": "Create",
   "continue_": "Continue",
   "copy": "Copy",
@@ -27,6 +28,7 @@
   "notes": "Notes",
   "retired": "(retired)",
   "previousRetirements": "Previous retirements",
+  "retirements": "Retirements",
   "pocketItemsAllowed": "{count} pocket item{count, plural, =1{} other{s}} allowed",
   "@pocketItemsAllowed": {
     "placeholders": {
@@ -106,7 +108,7 @@
   "backupIncludes": "Your backup will include all characters, perks, masteries, and app settings (theme, calculator state, class unlocks).",
   "backupError": "Failed to create backup. Please try again.",
   "restoreWarning": "Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?",
-  "errorDuringRestore": "Error During Restore Operation",
+  "errorDuringRestore": "Error during restore operation",
   "restoreErrorMessage": "There was an error during the restoration process. Your existing data was saved and your backup hasn't been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}",
   "@restoreErrorMessage": {
     "placeholders": {
@@ -141,10 +143,108 @@
     }
   },
   "startingLevel": "Starting level",
-  "prosperityLevel": "Prosperity level",
-  "pleaseSelectClass": "Please select a Class",
+  "levelExceedsProsperity": "Max starting level at this prosperity is {maxLevel}",
+  "@levelExceedsProsperity": {
+    "placeholders": {
+      "maxLevel": {
+        "type": "int"
+      }
+    }
+  },
+  "prosperityLevel": "Prosperity",
   "createCharacter": "Create character",
   "gameEdition": "Game edition",
   "selectClass": "Select class...",
-  "addNotes": "Add notes..."
+  "addNotes": "Add notes...",
+  "personalQuest": "Personal quest",
+  "selectPersonalQuest": "Select personal quest...",
+  "selectAPersonalQuest": "Select a personal quest",
+  "changePersonalQuest": "Change personal quest?",
+  "changePersonalQuestBody": "This will replace your current quest and reset all progress.",
+  "removePersonalQuest": "Remove personal quest?",
+  "removePersonalQuestBody": "This will remove your current quest and reset all progress.",
+  "comingSoon": "Coming soon...",
+  "noPersonalQuest": "No personal quest selected",
+  "change": "Change",
+  "remove": "Remove",
+  "progressOf": "{current}/{target}",
+  "@progressOf": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "personalQuestComplete": "Personal quest complete!",
+  "personalQuestCompleteBody": "{name} has fulfilled their personal quest and must retire. Before retiring, consider spending gold on enhancements or donations — all gold and items are lost upon retirement. The city gains 1 prosperity.",
+  "@personalQuestCompleteBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "retire": "Retire",
+  "unretire": "Unretire",
+  "notYet": "Not yet",
+  "general": "General & party",
+  "stats": "Stats",
+  "statsAndResources": "Stats & resources",
+  "quest": "Quest",
+  "perks": "Perks",
+  "masteries": "Masteries",
+  "questAndNotes": "Quest & notes",
+  "perksAndMasteries": "Perks & masteries",
+  "town": "TOWN",
+  "characters": "CHARACTERS",
+  "enhancements": "ENHANCEMENTS",
+  "subtract": "Subtract",
+  "add": "Add",
+  "campaign": "Campaign",
+  "campaigns": "Campaigns",
+  "party": "Party",
+  "parties": "Parties",
+  "createCampaign": "Create campaign",
+  "createParty": "Create party",
+  "prosperity": "Prosperity",
+  "prosperityLevelN": "Prosperity {level}",
+  "@prosperityLevelN": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "reputation": "Reputation",
+  "noCampaignsYet": "Create a campaign to track your parties",
+  "noPartiesYet": "Create a party to track reputation and assign characters",
+  "campaignName": "Campaign name",
+  "partyName": "Party name",
+  "edition": "Edition",
+  "sanctuaryDonations": "Sanctuary of the Great Oak donations",
+  "startingProsperity": "Starting prosperity",
+  "startingReputation": "Starting reputation",
+  "deleteCampaign": "Delete campaign?",
+  "deleteCampaignBody": "This will permanently delete this campaign and all its parties. Characters will be unlinked but not deleted.",
+  "deleteParty": "Delete party?",
+  "deletePartyBody": "This will permanently delete this party. Characters will be unlinked but not deleted.",
+  "selectCampaign": "Select campaign",
+  "selectParty": "Select party",
+  "switchParty": "Switch party",
+  "renameCampaign": "Rename campaign",
+  "renameParty": "Rename",
+  "checkmarks": "checkmarks",
+  "openEnvelopeB": "Open envelope B",
+  "noParty": "No party",
+  "notAssignedToParty": "Not assigned to a party",
+  "assignToParty": "Assign to a party",
+  "createCampaignFirst": "Create a campaign first to assign a party",
+  "scenarioLocation": "Scenario location",
+  "partyNotes": "Party notes",
+  "achievements": "Achievements",
+  "shopPriceModifier": "Shop",
+  "addPartyNotes": "Add party notes..."
 }

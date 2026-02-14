@@ -81,6 +81,8 @@ class AppThemeBuilder {
       // Also set secondary to match for consistency
       secondary: primaryColor,
       onSecondary: onPrimary,
+      secondaryContainer: primaryContainer,
+      onSecondaryContainer: onPrimaryContainer,
     );
 
     final textTheme = config.useDefaultFonts
@@ -111,42 +113,35 @@ class AppThemeBuilder {
           color: colorScheme.onSurfaceVariant,
         ),
         floatingLabelStyle: textTheme.bodySmall?.copyWith(
-          color: ColorUtils.ensureTextContrast(
-            primaryColor,
-            colorScheme.surface,
-          ),
+          color: ColorUtils.ensureContrast(primaryColor, colorScheme.surface),
           fontWeight: FontWeight.w500,
         ),
 
         // Outlined border (default state)
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.outline),
         ),
 
         // Focused state
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: BorderSide(color: primaryColor, width: 2.0),
+          borderSide: BorderSide(
+            color: ColorUtils.ensureContrast(primaryColor, colorScheme.surface),
+          ),
         ),
 
         // Error states
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(color: colorScheme.error, width: 2.0),
         ),
 
         // Disabled state
         disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(
             color: colorScheme.outline.withValues(alpha: 0.4),
           ),
@@ -155,14 +150,14 @@ class AppThemeBuilder {
         // Content padding
         contentPadding: const EdgeInsets.symmetric(
           horizontal: largePadding,
-          vertical: mediumPadding,
+          vertical: smallPadding,
         ),
       ),
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           textStyle: textTheme.bodyMedium,
-          foregroundColor: ColorUtils.ensureTextContrast(
+          foregroundColor: ColorUtils.ensureContrast(
             primaryColor,
             colorScheme.surface,
           ),
@@ -203,31 +198,43 @@ class AppThemeBuilder {
         thickness: hairlineThickness,
       ),
 
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surfaceContainer,
         elevation: 0,
-        selectedItemColor: ColorUtils.ensureTextContrast(
+        indicatorColor: ColorUtils.ensureContrast(
           primaryColor,
           colorScheme.surfaceContainer,
-        ),
+        ).withValues(alpha: 0.12),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return IconThemeData(
+              color: ColorUtils.ensureContrast(
+                primaryColor,
+                colorScheme.surfaceContainer,
+              ),
+            );
+          }
+          return IconThemeData(color: colorScheme.onSurfaceVariant);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              fontSize: fontSizeLabelSmall,
+              fontWeight: FontWeight.w600,
+              color: ColorUtils.ensureContrast(
+                primaryColor,
+                colorScheme.surfaceContainer,
+              ),
+            );
+          }
+          return TextStyle(
+            fontSize: fontSizeLabelSmall,
+            color: colorScheme.onSurfaceVariant,
+          );
+        }),
       ),
 
-      segmentedButtonTheme: SegmentedButtonThemeData(
-        style: ButtonStyle(
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colorScheme.onPrimaryContainer;
-            }
-            return colorScheme.onSurface;
-          }),
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return colorScheme.primaryContainer;
-            }
-            return null;
-          }),
-        ),
-      ),
+      segmentedButtonTheme: const SegmentedButtonThemeData(),
 
       cardTheme: CardThemeData(
         elevation: brightness == Brightness.dark ? 4 : 1,
@@ -236,10 +243,11 @@ class AppThemeBuilder {
             : colorScheme.surfaceContainerLow,
       ),
 
-      chipTheme: ChipThemeData(
-        showCheckmark: false,
-        selectedColor: colorScheme.primaryContainer,
+      popupMenuTheme: PopupMenuThemeData(
+        labelTextStyle: WidgetStatePropertyAll(textTheme.bodySmall),
       ),
+
+      chipTheme: ChipThemeData(showCheckmark: false),
 
       // Add custom extension with exact character color
       extensions: [
@@ -247,7 +255,7 @@ class AppThemeBuilder {
           characterPrimary: primaryColor,
           characterSecondary: primaryColor,
           characterAccent: _adjustColor(primaryColor, brightness),
-          contrastedPrimary: ColorUtils.ensureTextContrast(
+          contrastedPrimary: ColorUtils.ensureContrast(
             primaryColor,
             colorScheme.surface,
           ),

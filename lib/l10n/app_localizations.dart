@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @switchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get switchAction;
+
   /// No description provided for @create.
   ///
   /// In en, this message translates to:
@@ -259,6 +265,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Previous retirements'**
   String get previousRetirements;
+
+  /// No description provided for @retirements.
+  ///
+  /// In en, this message translates to:
+  /// **'Retirements'**
+  String get retirements;
 
   /// No description provided for @pocketItemsAllowed.
   ///
@@ -653,7 +665,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorDuringRestore.
   ///
   /// In en, this message translates to:
-  /// **'Error During Restore Operation'**
+  /// **'Error during restore operation'**
   String get errorDuringRestore;
 
   /// No description provided for @restoreErrorMessage.
@@ -734,17 +746,17 @@ abstract class AppLocalizations {
   /// **'Starting level'**
   String get startingLevel;
 
+  /// No description provided for @levelExceedsProsperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Max starting level at this prosperity is {maxLevel}'**
+  String levelExceedsProsperity(int maxLevel);
+
   /// No description provided for @prosperityLevel.
   ///
   /// In en, this message translates to:
-  /// **'Prosperity level'**
+  /// **'Prosperity'**
   String get prosperityLevel;
-
-  /// No description provided for @pleaseSelectClass.
-  ///
-  /// In en, this message translates to:
-  /// **'Please select a Class'**
-  String get pleaseSelectClass;
 
   /// No description provided for @createCharacter.
   ///
@@ -769,6 +781,408 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add notes...'**
   String get addNotes;
+
+  /// No description provided for @personalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal quest'**
+  String get personalQuest;
+
+  /// No description provided for @selectPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Select personal quest...'**
+  String get selectPersonalQuest;
+
+  /// No description provided for @selectAPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a personal quest'**
+  String get selectAPersonalQuest;
+
+  /// No description provided for @changePersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Change personal quest?'**
+  String get changePersonalQuest;
+
+  /// No description provided for @changePersonalQuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace your current quest and reset all progress.'**
+  String get changePersonalQuestBody;
+
+  /// No description provided for @removePersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove personal quest?'**
+  String get removePersonalQuest;
+
+  /// No description provided for @removePersonalQuestBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will remove your current quest and reset all progress.'**
+  String get removePersonalQuestBody;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon...'**
+  String get comingSoon;
+
+  /// No description provided for @noPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'No personal quest selected'**
+  String get noPersonalQuest;
+
+  /// No description provided for @change.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get change;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @progressOf.
+  ///
+  /// In en, this message translates to:
+  /// **'{current}/{target}'**
+  String progressOf(int current, int target);
+
+  /// No description provided for @personalQuestComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal quest complete!'**
+  String get personalQuestComplete;
+
+  /// No description provided for @personalQuestCompleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has fulfilled their personal quest and must retire. Before retiring, consider spending gold on enhancements or donations — all gold and items are lost upon retirement. The city gains 1 prosperity.'**
+  String personalQuestCompleteBody(String name);
+
+  /// No description provided for @retire.
+  ///
+  /// In en, this message translates to:
+  /// **'Retire'**
+  String get retire;
+
+  /// No description provided for @unretire.
+  ///
+  /// In en, this message translates to:
+  /// **'Unretire'**
+  String get unretire;
+
+  /// No description provided for @notYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet'**
+  String get notYet;
+
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General & party'**
+  String get general;
+
+  /// No description provided for @stats.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats'**
+  String get stats;
+
+  /// No description provided for @statsAndResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Stats & resources'**
+  String get statsAndResources;
+
+  /// No description provided for @quest.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest'**
+  String get quest;
+
+  /// No description provided for @perks.
+  ///
+  /// In en, this message translates to:
+  /// **'Perks'**
+  String get perks;
+
+  /// No description provided for @masteries.
+  ///
+  /// In en, this message translates to:
+  /// **'Masteries'**
+  String get masteries;
+
+  /// No description provided for @questAndNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Quest & notes'**
+  String get questAndNotes;
+
+  /// No description provided for @perksAndMasteries.
+  ///
+  /// In en, this message translates to:
+  /// **'Perks & masteries'**
+  String get perksAndMasteries;
+
+  /// No description provided for @town.
+  ///
+  /// In en, this message translates to:
+  /// **'TOWN'**
+  String get town;
+
+  /// No description provided for @characters.
+  ///
+  /// In en, this message translates to:
+  /// **'CHARACTERS'**
+  String get characters;
+
+  /// No description provided for @enhancements.
+  ///
+  /// In en, this message translates to:
+  /// **'ENHANCEMENTS'**
+  String get enhancements;
+
+  /// No description provided for @subtract.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtract'**
+  String get subtract;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @campaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign'**
+  String get campaign;
+
+  /// No description provided for @campaigns.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaigns'**
+  String get campaigns;
+
+  /// No description provided for @party.
+  ///
+  /// In en, this message translates to:
+  /// **'Party'**
+  String get party;
+
+  /// No description provided for @parties.
+  ///
+  /// In en, this message translates to:
+  /// **'Parties'**
+  String get parties;
+
+  /// No description provided for @createCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Create campaign'**
+  String get createCampaign;
+
+  /// No description provided for @createParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Create party'**
+  String get createParty;
+
+  /// No description provided for @prosperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Prosperity'**
+  String get prosperity;
+
+  /// No description provided for @prosperityLevelN.
+  ///
+  /// In en, this message translates to:
+  /// **'Prosperity {level}'**
+  String prosperityLevelN(int level);
+
+  /// No description provided for @reputation.
+  ///
+  /// In en, this message translates to:
+  /// **'Reputation'**
+  String get reputation;
+
+  /// No description provided for @noCampaignsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a campaign to track your parties'**
+  String get noCampaignsYet;
+
+  /// No description provided for @noPartiesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a party to track reputation and assign characters'**
+  String get noPartiesYet;
+
+  /// No description provided for @campaignName.
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign name'**
+  String get campaignName;
+
+  /// No description provided for @partyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Party name'**
+  String get partyName;
+
+  /// No description provided for @edition.
+  ///
+  /// In en, this message translates to:
+  /// **'Edition'**
+  String get edition;
+
+  /// No description provided for @sanctuaryDonations.
+  ///
+  /// In en, this message translates to:
+  /// **'Sanctuary of the Great Oak donations'**
+  String get sanctuaryDonations;
+
+  /// No description provided for @startingProsperity.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting prosperity'**
+  String get startingProsperity;
+
+  /// No description provided for @startingReputation.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting reputation'**
+  String get startingReputation;
+
+  /// No description provided for @deleteCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete campaign?'**
+  String get deleteCampaign;
+
+  /// No description provided for @deleteCampaignBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this campaign and all its parties. Characters will be unlinked but not deleted.'**
+  String get deleteCampaignBody;
+
+  /// No description provided for @deleteParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete party?'**
+  String get deleteParty;
+
+  /// No description provided for @deletePartyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete this party. Characters will be unlinked but not deleted.'**
+  String get deletePartyBody;
+
+  /// No description provided for @selectCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Select campaign'**
+  String get selectCampaign;
+
+  /// No description provided for @selectParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Select party'**
+  String get selectParty;
+
+  /// No description provided for @switchParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch party'**
+  String get switchParty;
+
+  /// No description provided for @renameCampaign.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename campaign'**
+  String get renameCampaign;
+
+  /// No description provided for @renameParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameParty;
+
+  /// No description provided for @checkmarks.
+  ///
+  /// In en, this message translates to:
+  /// **'checkmarks'**
+  String get checkmarks;
+
+  /// No description provided for @openEnvelopeB.
+  ///
+  /// In en, this message translates to:
+  /// **'Open envelope B'**
+  String get openEnvelopeB;
+
+  /// No description provided for @noParty.
+  ///
+  /// In en, this message translates to:
+  /// **'No party'**
+  String get noParty;
+
+  /// No description provided for @notAssignedToParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Not assigned to a party'**
+  String get notAssignedToParty;
+
+  /// No description provided for @assignToParty.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign to a party'**
+  String get assignToParty;
+
+  /// No description provided for @createCampaignFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a campaign first to assign a party'**
+  String get createCampaignFirst;
+
+  /// No description provided for @scenarioLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Scenario location'**
+  String get scenarioLocation;
+
+  /// No description provided for @partyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Party notes'**
+  String get partyNotes;
+
+  /// No description provided for @achievements.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievements'**
+  String get achievements;
+
+  /// No description provided for @shopPriceModifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop'**
+  String get shopPriceModifier;
+
+  /// No description provided for @addPartyNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Add party notes...'**
+  String get addPartyNotes;
 }
 
 class _AppLocalizationsDelegate

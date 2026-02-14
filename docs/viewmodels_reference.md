@@ -6,7 +6,7 @@ This document provides a comprehensive reference for the app's ChangeNotifier-ba
 
 ## Provider Dependency Tree
 
-The app uses Provider with four main models set up in `main.dart`:
+The app uses Provider with five main models set up in `main.dart`:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -22,6 +22,10 @@ The app uses Provider with four main models set up in `main.dart`:
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
 │  │ EnhancementCalculatorModel   │  ← Uses SharedPrefs       │
+│  └────────┬─────────────────────┘                           │
+│           │                                                 │
+│  ┌────────▼─────────────────────┐                           │
+│  │      TownModel               │  ← Uses DatabaseHelper    │
 │  └────────┬─────────────────────┘                           │
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
@@ -90,7 +94,7 @@ Handles app-level navigation state and page management.
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `pageController` | `PageController` | created | Controls PageView navigation |
-| `page` | `int` | 0 | Current page index (0=Characters, 1=Calculator) |
+| `page` | `int` | from SharedPrefs | Current page index (0=Town, 1=Characters, 2=Enhancements) |
 | `themeMode` | `ThemeMode` | from SharedPrefs (light/dark) | Theme mode (delegated to ThemeProvider) |
 | `useDefaultFonts` | `bool` | false | Font preference (delegated to ThemeProvider) |
 
@@ -258,18 +262,21 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `pageController` | `PageController` | created | Character PageView control |
 | `charScreenScrollController` | `ScrollController` | created | Character sheet scroll |
 | `enhancementCalcScrollController` | `ScrollController` | created | Calculator scroll |
+| `charScrollOffsetNotifier` | `ValueNotifier<double>` | 0 | Character screen scroll offset (drives app bar & header tint) |
 | `showRetired` | `bool` | from prefs | Show/hide retired characters |
 | `_isEditMode` | `bool` | false | Edit mode state |
 | `_isElementSheetExpanded` | `bool` | false | Element tracker partial expansion |
 | `_isElementSheetFullExpanded` | `bool` | false | Element tracker full expansion |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
 | `collapseElementSheetNotifier` | `ValueNotifier<int>` | 0 | Signal to collapse element sheet |
+| `_showAllCharacters` | `bool` | from prefs | Filter characters by active party |
 
 ### Getters
 
 | Getter | Returns | Description |
 |--------|---------|-------------|
-| `characters` | `List<Character>` | Filtered list (respects showRetired) |
+| `characters` | `List<Character>` | Filtered list (respects showRetired and party filter) |
+| `showAllCharacters` | `bool` | Whether to show all characters or filter by party |
 | `isEditMode` | `bool` | Current edit mode state |
 | `isElementSheetExpanded` | `bool` | Partial expansion state |
 | `isElementSheetFullExpanded` | `bool` | Full expansion state |
@@ -280,7 +287,7 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | Method | Description |
 |--------|-------------|
 | `loadCharacters()` | Load all characters from database with perks/masteries |
-| `createCharacter(name, class, variant, level, retirements, prosperity, edition)` | Create new character with edition-specific gold |
+| `createCharacter(name, class, {initialLevel, previousRetirements, edition, prosperityLevel, variant, personalQuestId, partyId})` | Create new character with gold calculated via `edition.startingGold()` |
 | `updateCharacter(Character)` | Save character changes to database |
 | `deleteCurrentCharacter()` | Delete current character and navigate |
 | `retireCurrentCharacter()` | Toggle retirement status |
@@ -292,6 +299,20 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `onPageChanged(int)` | Handle page swipe navigation |
 | `jumpToPage(int)` | Instant page jump |
 | `toggleShowRetired()` | Toggle retired visibility with smart navigation |
+
+### Personal Quest Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `updatePersonalQuest(Character, String questId)` | `Future<void>` | Change quest and reset progress to zeros |
+| `updatePersonalQuestProgress(Character, int index, int value)` | `Future<bool>` | Update a single requirement's progress. Returns `true` if quest just transitioned from incomplete → complete |
+| `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets |
+
+### Party Methods
+
+| Method | Description |
+|--------|-------------|
+| `assignCharacterToParty(Character, String? partyId)` | Link or unlink a character to a party |
 
 ### Perk/Mastery Methods
 
@@ -321,16 +342,6 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `setElementSheetExpanded(bool)` | Set partial expansion |
 | `setElementSheetFullExpanded(bool)` | Set full expansion |
 
-### Starting Gold Calculation
-
-The `_calculateStartingGold` method implements edition-specific formulas:
-
-```dart
-// Gloomhaven: 15 × (level + 1)
-// GH2E: 10 × prosperity + 15
-// Frosthaven: 10 × prosperity + 20
-```
-
 ### Toggle Retired Visibility Logic
 
 When toggling `showRetired`, the model calculates the correct navigation target:
@@ -345,6 +356,87 @@ When toggling `showRetired`, the model calculates the correct navigation target:
 ### State Persistence
 
 - `showRetiredCharacters` key in SharedPrefs
+- `showAllCharacters` key in SharedPrefs
+
+---
+
+## TownModel
+
+> **File**: `lib/viewmodels/town_model.dart`
+
+Manages campaign and party CRUD operations, prosperity/reputation state, and active selection persistence.
+
+### Responsibilities
+
+- Campaign list management (load, create, rename, delete)
+- Party management within active campaign
+- Active campaign/party selection (persisted to SharedPrefs)
+- Prosperity checkmark increment/decrement
+- Reputation increment/decrement with bounds (-20 to +20)
+- Edit mode toggling
+
+### Dependencies
+
+- `DatabaseHelper` (injected) - for persistence
+- `SharedPrefs` - for active campaign/party ID persistence
+
+### Key Properties
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| `campaigns` | `List<Campaign>` | [] | All campaigns loaded from database |
+| `parties` | `List<Party>` | [] | Parties for active campaign |
+| `activeCampaign` | `Campaign?` | null | Currently selected campaign |
+| `activeParty` | `Party?` | null | Currently selected party |
+| `isEditMode` | `bool` | false | Edit mode state |
+
+### Campaign Methods
+
+| Method | Description |
+|--------|-------------|
+| `loadCampaigns()` | Load all campaigns from database, restore active selection from SharedPrefs |
+| `createCampaign(name, edition, startingProsperity)` | Create campaign and set as active |
+| `setActiveCampaign(Campaign)` | Switch active campaign, load its parties |
+| `renameCampaign(String name)` | Rename the active campaign |
+| `deleteActiveCampaign()` | Delete active campaign and its parties |
+
+### Prosperity Methods
+
+| Method | Description |
+|--------|-------------|
+| `setProsperityLevel(int level)` | Set checkmarks to the threshold for the given level (1–9) |
+| `incrementProsperity()` | Add one checkmark (up to max threshold) |
+| `decrementProsperity()` | Remove one checkmark (min 1) |
+
+### Donated Gold Methods
+
+| Method | Description |
+|--------|-------------|
+| `setDonatedGold(int value)` | Set donated gold directly (clamped 0–100); returns `true` when just reaching 100 |
+| `incrementDonatedGold({int amount})` | Add gold (default 10, capped at 100); returns `true` when just reaching 100 |
+| `decrementDonatedGold({int amount})` | Remove gold (default 10, min 0) |
+
+### Party Methods
+
+| Method | Description |
+|--------|-------------|
+| `createParty(name, startingReputation)` | Create party in active campaign, set as active |
+| `setActiveParty(Party)` | Switch active party |
+| `renameParty(String name)` | Rename the active party |
+| `deleteActiveParty()` | Delete active party and unlink characters |
+
+### Reputation Methods
+
+| Method | Description |
+|--------|-------------|
+| `setReputation(int value)` | Set reputation to exact value, clamped to -20..+20 |
+| `incrementReputation()` | Increase reputation by 1 (max +20) |
+| `decrementReputation()` | Decrease reputation by 1 (min -20) |
+
+### State Persistence
+
+- `activeCampaignId` key in SharedPrefs (nullable String)
+- `activePartyId` key in SharedPrefs (nullable String)
 
 ---
 
@@ -385,4 +477,4 @@ ProxyProvider<ThemeProvider, CharactersModel>(
 
 ### Scroll Controller Sharing
 
-Both scroll controllers (`charScreenScrollController`, `enhancementCalcScrollController`) are owned by `CharactersModel` and passed to child widgets for coordinated scroll behavior and app bar animations.
+Both scroll controllers (`charScreenScrollController`, `enhancementCalcScrollController`) are owned by `CharactersModel` and passed to child widgets for coordinated scroll behavior and app bar animations. `charScrollOffsetNotifier` is a `ValueNotifier<double>` updated by `CharacterScreen._onScroll()` (which fires on both user scrolls and `ScrollMetricsNotification` from section collapse). `GHCAnimatedAppBar` and the character header/chip bar delegates listen to it for tint updates — this ensures tint clears even when Flutter's `correctPixels()` clamps the offset without firing `ScrollController` listeners.

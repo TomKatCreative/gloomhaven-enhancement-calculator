@@ -4,19 +4,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
-class Update440Dialog extends StatefulWidget {
-  const Update440Dialog({super.key});
+class Update450Dialog extends StatefulWidget {
+  const Update450Dialog({super.key});
 
   @override
-  State<Update440Dialog> createState() => _Update440DialogState();
+  State<Update450Dialog> createState() => _Update450DialogState();
 }
 
-class _Update440DialogState extends State<Update440Dialog> {
+class _Update450DialogState extends State<Update450Dialog> {
   @override
   void initState() {
     super.initState();
     // Mark the dialog as shown so it won't appear again
-    SharedPrefs().showUpdate440Dialog = false;
+    SharedPrefs().showUpdate450Dialog = false;
   }
 
   @override
@@ -26,7 +26,7 @@ class _Update440DialogState extends State<Update440Dialog> {
 
     return AlertDialog(
       title: Text(
-        'Version 4.4.0',
+        'Version 4.5.0',
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.headlineMedium,
       ),
@@ -36,17 +36,19 @@ class _Update440DialogState extends State<Update440Dialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'The backup system now includes all app data. Creating a new backup now is strongly recommended. Note that backups created before version 4.2.0 can no longer be restored.',
+              '• You can now assign Gloomhaven personal quests to new and existing characters. Currently only Gloomhaven, but Frosthaven, Gloomhaven 2nd Edition, and Crimson Scales coming soon!',
             ),
             const SizedBox(height: 12),
             const Text(
-              'Many UI, quality of life, and performance improvements.',
+              '• As of v4.4.0, the backup system includes all app data. Note that backups created before version 4.2.0 can no longer be restored.',
             ),
+            const SizedBox(height: 12),
+            const Text('• UI overhaul of the whole app.'),
             const SizedBox(height: 12),
             Text(
               showBuyMeACoffee
-                  ? "If you enjoy using this app, please consider supporting it through the 'Buy Me a Coffee' link in the Settings screen or by leaving a review!"
-                  : 'If you enjoy using this app, please consider leaving a review!',
+                  ? "• If you enjoy using this app, please consider supporting its development through the 'Buy Me a Coffee' link in the Settings screen, or by leaving a review! ✨"
+                  : '• If you enjoy using this app, please consider leaving a review! ✨',
             ),
           ],
         ),

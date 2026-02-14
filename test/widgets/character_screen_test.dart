@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,8 +10,11 @@ import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/character_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_stepper_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
 
 import '../helpers/fake_database_helper.dart';
 import '../helpers/test_helpers.dart';
@@ -27,7 +31,9 @@ void main() {
       'initialPage': 0,
       'primaryClassColor': 0xff4e7ec1,
       'gameEdition': 0,
-      'resourcesExpanded': false,
+      'generalExpanded': true,
+      'personalQuestExpanded': false,
+      'questAndNotesExpanded': true,
     });
     await SharedPrefs().init();
 
@@ -72,7 +78,7 @@ void main() {
   }
 
   /// Builds the CharacterScreen wrapped with providers, localization, and
-  /// correct theme data.
+  /// correct theme data. Uses a wider viewport to avoid overflow issues.
   Widget buildTestWidget({
     required CharactersModel model,
     required Character character,
@@ -81,6 +87,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<MockThemeProvider>.value(value: mockTheme),
         ChangeNotifierProvider<CharactersModel>.value(value: model),
+        ChangeNotifierProvider<TownModel>(
+          create: (_) => TownModel(databaseHelper: fakeDb),
+        ),
       ],
       child: MaterialApp(
         theme: testThemeData(),
@@ -92,10 +101,10 @@ void main() {
   }
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 1: _NameAndClassSection
+  // Group 1: Character Header (pinned)
   // ────────────────────────────────────────────────────────────────────────
 
-  group('_NameAndClassSection', () {
+  group('Character Header', () {
     testWidgets('view mode shows character name as AutoSizeText', (
       tester,
     ) async {
@@ -160,8 +169,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Level 1 text in the level badge area
-      // Find the level text near the class subtitle row
       expect(find.text('1'), findsWidgets);
     });
 
@@ -180,7 +187,6 @@ void main() {
     });
 
     testWidgets('class subtitle displays correctly', (tester) async {
-      // Brute is "Inox Brute"
       final character = TestData.createCharacter();
       final model = await setupModel(character: character);
 
@@ -195,7 +201,6 @@ void main() {
     testWidgets('traits shown in view mode for Frosthaven class', (
       tester,
     ) async {
-      // Drifter is Frosthaven, traits: Outcast, Resourceful, Strong
       final character = TestData.createCharacter(playerClass: TestData.drifter);
       final model = await setupModel(character: character, isEditMode: false);
 
@@ -218,7 +223,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The traits row containing all three traits should not be present
       expect(
         find.textContaining('Outcast · Resourceful · Strong'),
         findsNothing,
@@ -234,7 +238,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('(retired)'), findsOneWidget);
+      expect(find.text('(retired)'), findsWidgets);
     });
 
     testWidgets('retired label hidden for active character', (tester) async {
@@ -251,7 +255,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 2: _StatsSection
+  // Group 2: _StatsSection (inside General card)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_StatsSection', () {
@@ -264,7 +268,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find Tooltips with XP and Gold messages
       final xpTooltip = find.byWidgetPredicate(
         (w) => w is Tooltip && w.message == 'XP',
       );
@@ -275,7 +278,6 @@ void main() {
       );
       expect(goldTooltip, findsOneWidget);
 
-      // Check the actual values are displayed
       expect(find.text('50'), findsWidgets);
       expect(find.text('30'), findsWidgets);
     });
@@ -294,12 +296,10 @@ void main() {
       );
       expect(battleGoalsTooltip, findsOneWidget);
 
-      // checkMarkProgress for 5 checkmarks = 5 % 3 = 2, shown as "2/3"
       expect(find.text('2/3'), findsOneWidget);
     });
 
     testWidgets('view mode shows pocket items tooltip', (tester) async {
-      // Level 1 (xp=0): pocketItemsAllowed = (1/2).round() = 1
       final character = TestData.createCharacter(xp: 0);
       final model = await setupModel(character: character, isEditMode: false);
 
@@ -308,7 +308,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // pocketItemsAllowed(1) = 1 → "1 pocket item allowed"
       final pocketTooltip = find.byWidgetPredicate(
         (w) => w is Tooltip && w.message == '1 pocket item allowed',
       );
@@ -353,7 +352,6 @@ void main() {
           .where((tf) => tf.keyboardType == TextInputType.number)
           .toList();
 
-      // Gold is the second numeric TextField
       expect(numericFields[1].controller?.text, '75');
     });
 
@@ -394,7 +392,6 @@ void main() {
     });
 
     testWidgets('XP suffix shows next level threshold', (tester) async {
-      // Level 1 (xp=0), next level XP = 45
       final character = TestData.createCharacter(xp: 0);
       final model = await setupModel(character: character, isEditMode: true);
 
@@ -403,7 +400,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('/45'), findsOneWidget);
+      expect(find.text('45'), findsOneWidget);
     });
 
     testWidgets('edit mode shows exposure (add/subtract) buttons', (
@@ -432,7 +429,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Even in edit mode, retired character shows Tooltips (view mode)
       final xpTooltip = find.byWidgetPredicate(
         (w) => w is Tooltip && w.message == 'XP',
       );
@@ -444,7 +440,7 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 3: _CheckmarksAndRetirementsRow
+  // Group 3: _CheckmarksAndRetirementsRow (inside General card in edit mode)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_CheckmarksAndRetirementsRow', () {
@@ -462,8 +458,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // Scroll down to find the checkmarks section inside the General card
+      await tester.ensureVisible(find.text('Previous retirements'));
+      await tester.pumpAndSettle();
+
       expect(find.text('Previous retirements'), findsOneWidget);
-      expect(find.text('Battle goals'), findsOneWidget);
+      // Battle Goals appears in both the chip nav bar label and in the
+      // checkmarks row — look for it inside the General card content
+      expect(find.text('Battle goals'), findsWidgets);
     });
 
     testWidgets('section hidden in view mode', (tester) async {
@@ -504,12 +506,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // The retirement count is in the left column
-      final previousRetLabel = find.text('Previous retirements');
-      expect(previousRetLabel, findsOneWidget);
+      await tester.ensureVisible(find.text('Previous retirements'));
+      await tester.pumpAndSettle();
 
-      // Find '3' as a descendant of the row that contains 'Previous retirements'
-      // The retirements column is an Expanded widget containing the count
+      expect(find.text('Previous retirements'), findsOneWidget);
       expect(find.text('3'), findsWidgets);
     });
 
@@ -520,6 +520,9 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(model: model, character: character),
       );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('/18'));
       await tester.pumpAndSettle();
 
       expect(find.text('/18'), findsOneWidget);
@@ -534,6 +537,9 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(model: model, character: character),
       );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.text('/3)'));
       await tester.pumpAndSettle();
 
       expect(find.text('/3)'), findsOneWidget);
@@ -553,13 +559,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find the add button in the retirements section (left column)
-      // The left column has "Previous retirements" label
-      // Find the add_box_rounded icons - there are 2 (retirements + checkmarks)
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
       expect(addButtons, findsNWidgets(2));
 
-      // First add button is for retirements
+      await tester.ensureVisible(addButtons.first);
+      await tester.pumpAndSettle();
       await tester.tap(addButtons.first);
       await tester.pumpAndSettle();
 
@@ -576,11 +580,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Find the subtract button - first one is for retirements
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
       expect(subtractButtons, findsNWidgets(2));
+
+      await tester.ensureVisible(subtractButtons.first);
+      await tester.pumpAndSettle();
 
       final retirementSubtractButton = tester.widget<IconButton>(
         find
@@ -605,10 +609,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Second add button is for checkmarks
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
+      await tester.ensureVisible(addButtons.last);
+      await tester.pumpAndSettle();
       await tester.tap(addButtons.last);
-      // increaseCheckmark doesn't await updateCharacter
       await Future.microtask(() {});
       await tester.pumpAndSettle();
 
@@ -628,10 +632,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Second subtract button is for checkmarks
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
+      await tester.ensureVisible(subtractButtons.last);
+      await tester.pumpAndSettle();
       await tester.tap(subtractButtons.last);
       await Future.microtask(() {});
       await tester.pumpAndSettle();
@@ -649,8 +652,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Last add button is for checkmarks
-      final addButtons = find.byIcon(Icons.add_box_rounded);
+      final addButtons = find.byIcon(Icons.add_circle_outline);
+      await tester.ensureVisible(addButtons.last);
+      await tester.pumpAndSettle();
+
       final checkmarkAddButton = tester.widget<IconButton>(
         find
             .ancestor(of: addButtons.last, matching: find.byType(IconButton))
@@ -668,10 +673,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Last subtract button is for checkmarks
-      final subtractButtons = find.byIcon(
-        Icons.indeterminate_check_box_rounded,
-      );
+      final subtractButtons = find.byIcon(Icons.remove_circle_outline);
+      await tester.ensureVisible(subtractButtons.last);
+      await tester.pumpAndSettle();
+
       final checkmarkSubtractButton = tester.widget<IconButton>(
         find
             .ancestor(
@@ -685,11 +690,11 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 4: _ResourcesSection
+  // Group 4: _ResourcesContent (inside General card)
   // ────────────────────────────────────────────────────────────────────────
 
-  group('_ResourcesSection', () {
-    testWidgets('resources header visible', (tester) async {
+  group('_ResourcesContent', () {
+    testWidgets('shows 9 ResourceCard widgets in General card', (tester) async {
       final character = TestData.createCharacter();
       final model = await setupModel(character: character);
 
@@ -698,104 +703,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Resources'), findsOneWidget);
-    });
-
-    testWidgets('resources collapsed by default', (tester) async {
-      // resourcesExpanded defaults to false in setUp
-      final character = TestData.createCharacter();
-      final model = await setupModel(character: character);
-
-      await tester.pumpWidget(
-        buildTestWidget(model: model, character: character),
-      );
-      await tester.pumpAndSettle();
-
-      // ResourceCard widgets should not be visible when collapsed
-      expect(find.byType(ResourceCard), findsNothing);
-    });
-
-    testWidgets('resources expanded when resourcesExpanded is true', (
-      tester,
-    ) async {
-      // Set resourcesExpanded before building
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 0,
-        'primaryClassColor': 0xff4e7ec1,
-        'gameEdition': 0,
-        'resourcesExpanded': true,
-      });
-      await SharedPrefs().init();
-
-      final character = TestData.createCharacter();
-      final model = await setupModel(character: character);
-
-      await tester.pumpWidget(
-        buildTestWidget(model: model, character: character),
-      );
-      await tester.pumpAndSettle();
-
-      // Should show 9 ResourceCard widgets
-      expect(find.byType(ResourceCard), findsNWidgets(9));
-    });
-
-    testWidgets('tapping ExpansionTile toggles resource visibility', (
-      tester,
-    ) async {
-      final character = TestData.createCharacter();
-      final model = await setupModel(character: character);
-
-      await tester.pumpWidget(
-        buildTestWidget(model: model, character: character),
-      );
-      await tester.pumpAndSettle();
-
-      // Initially collapsed
-      expect(find.byType(ResourceCard), findsNothing);
-
-      // Tap the ExpansionTile header to expand
-      await tester.tap(find.text('Resources'));
-      await tester.pumpAndSettle();
-
-      // Now expanded
-      expect(find.byType(ResourceCard), findsNWidgets(9));
-    });
-
-    testWidgets('shows 9 ResourceCard widgets when expanded', (tester) async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 0,
-        'primaryClassColor': 0xff4e7ec1,
-        'gameEdition': 0,
-        'resourcesExpanded': true,
-      });
-      await SharedPrefs().init();
-
-      final character = TestData.createCharacter();
-      final model = await setupModel(character: character);
-
-      await tester.pumpWidget(
-        buildTestWidget(model: model, character: character),
-      );
+      // Resources are always visible in the General card (scroll to them)
+      await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
       expect(find.byType(ResourceCard), findsNWidgets(9));
     });
 
-    testWidgets('resource buttons hidden in view mode', (tester) async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 0,
-        'primaryClassColor': 0xff4e7ec1,
-        'gameEdition': 0,
-        'resourcesExpanded': true,
-      });
-      await SharedPrefs().init();
-
+    testWidgets('resource cards not tappable in view mode', (tester) async {
       final character = TestData.createCharacter();
       final model = await setupModel(character: character, isEditMode: false);
 
@@ -804,29 +719,19 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll to make resource cards visible
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      // In view mode, ResourceCard should NOT have InkWell buttons (canEdit=false)
-      // The remove_rounded / add_rounded icons are only in _ResourceButtonBar
-      expect(find.byIcon(Icons.remove_rounded), findsNothing);
-      expect(find.byIcon(Icons.add_rounded), findsNothing);
+      // Tap a resource card — should not open a stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ResourceStepperSheet), findsNothing);
     });
 
-    testWidgets('resource buttons hidden for retired character', (
+    testWidgets('resource cards not tappable for retired character', (
       tester,
     ) async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 0,
-        'primaryClassColor': 0xff4e7ec1,
-        'gameEdition': 0,
-        'resourcesExpanded': true,
-      });
-      await SharedPrefs().init();
-
       final character = TestData.createRetiredCharacter();
       final model = await setupModel(character: character, isEditMode: true);
 
@@ -838,22 +743,14 @@ void main() {
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      // canEdit is false for retired characters
-      expect(find.byIcon(Icons.remove_rounded), findsNothing);
-      expect(find.byIcon(Icons.add_rounded), findsNothing);
+      // Tap a resource card — should not open a stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ResourceStepperSheet), findsNothing);
     });
 
     testWidgets('resource increment calls updateCharacter', (tester) async {
-      SharedPreferences.setMockInitialValues({
-        'showRetiredCharacters': true,
-        'darkTheme': false,
-        'initialPage': 0,
-        'primaryClassColor': 0xff4e7ec1,
-        'gameEdition': 0,
-        'resourcesExpanded': true,
-      });
-      await SharedPrefs().init();
-
       final character = TestData.createCharacter(uuid: 'res-test');
       final model = await setupModel(character: character, isEditMode: true);
 
@@ -862,15 +759,20 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll to a resource card and tap the increment button
       await tester.ensureVisible(find.byType(ResourceCard).first);
       await tester.pumpAndSettle();
 
-      // Find add_rounded icons (one per resource card in edit mode)
-      final addIcons = find.byIcon(Icons.add_rounded);
-      expect(addIcons, findsWidgets);
+      // Tap the resource card to open the stepper sheet
+      await tester.tap(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
 
-      await tester.tap(addIcons.first);
+      // Tap the add button in the stepper sheet
+      final addIcon = find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.byIcon(Icons.add_rounded),
+      );
+      expect(addIcon, findsOneWidget);
+      await tester.tap(addIcon);
       await tester.pumpAndSettle();
 
       expect(fakeDb.updateCalls, contains('res-test'));
@@ -878,11 +780,11 @@ void main() {
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 5: _NotesSection
+  // Group 5: _NotesSection (inside Notes card)
   // ────────────────────────────────────────────────────────────────────────
 
   group('_NotesSection', () {
-    testWidgets('notes section hidden when notes empty and not in edit mode', (
+    testWidgets('notes card hidden when notes empty and not in edit mode', (
       tester,
     ) async {
       final character = TestData.createCharacter(notes: '');
@@ -893,9 +795,17 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // "Notes" heading should not appear
-      expect(find.text('Notes'), findsNothing);
+      // The notes icon should not appear when notes are empty and not editing
+      expect(find.byIcon(Icons.book_rounded), findsNothing);
     });
+
+    /// Scrolls the CustomScrollView down enough to bring below-fold
+    /// slivers (like Notes) into the viewport so they get built.
+    Future<void> scrollToNotes(WidgetTester tester) async {
+      final scrollable = find.byType(CustomScrollView);
+      await tester.drag(scrollable, const Offset(0, -600));
+      await tester.pumpAndSettle();
+    }
 
     testWidgets('notes visible in view mode when notes non-empty', (
       tester,
@@ -910,14 +820,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll down to find the notes section
-      await tester.ensureVisible(find.text('Remember to buy boots'));
-      await tester.pumpAndSettle();
+      await scrollToNotes(tester);
 
       expect(find.text('Remember to buy boots'), findsOneWidget);
     });
 
-    testWidgets('notes header shown in view mode', (tester) async {
+    testWidgets('notes card shown in view mode when notes non-empty', (
+      tester,
+    ) async {
       final character = TestData.createCharacter(notes: 'Some notes here');
       final model = await setupModel(character: character, isEditMode: false);
 
@@ -926,11 +836,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Scroll to find "Notes" header
-      await tester.ensureVisible(find.text('Notes'));
-      await tester.pumpAndSettle();
+      await scrollToNotes(tester);
 
-      expect(find.text('Notes'), findsOneWidget);
+      // Notes card title (and chip label when PQ disabled) both say "Notes"
+      expect(find.text('Notes'), findsWidgets);
+      expect(find.byIcon(Icons.book_rounded), findsOneWidget);
     });
 
     testWidgets('edit mode shows TextFormField even with empty notes', (
@@ -944,12 +854,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      await scrollToNotes(tester);
+
       final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-
-      // Scroll to make the field visible
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
-
       expect(notesField, findsOneWidget);
     });
 
@@ -962,10 +869,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
+      await scrollToNotes(tester);
 
+      final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
       final field = tester.widget<TextFormField>(notesField);
       expect(field.initialValue, 'My important notes');
     });
@@ -979,10 +885,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
-      await tester.ensureVisible(notesField);
-      await tester.pumpAndSettle();
+      await scrollToNotes(tester);
 
+      final notesField = find.byKey(ValueKey('notes_${character.uuid}'));
       await tester.enterText(notesField, 'New note');
       await tester.pumpAndSettle();
 
@@ -1000,18 +905,240 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should show plain Text, not TextFormField
-      await tester.ensureVisible(find.text('Old notes'));
-      await tester.pumpAndSettle();
-      expect(find.text('Old notes'), findsOneWidget);
+      await scrollToNotes(tester);
 
-      // Notes TextFormField should not be present
+      expect(find.text('Old notes'), findsOneWidget);
       expect(find.byKey(ValueKey('notes_${character.uuid}')), findsNothing);
     });
   });
 
   // ────────────────────────────────────────────────────────────────────────
-  // Group 6: Integration
+  // Group 6: Section Navigation Chip Bar
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('Section Navigation', () {
+    testWidgets('chip bar shows all section labels', (tester) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(kTownSheetEnabled ? 'General & party' : 'Stats & resources'),
+        findsWidgets,
+      );
+      expect(find.text('Quest & notes'), findsWidgets);
+      // Default test character has no masteries
+      expect(find.text('Perks'), findsWidgets);
+    });
+
+    /// Finds the chip bar [Container] — the one rendered by
+    /// `_SectionNavBarDelegate.build()` with a [BoxDecoration].
+    /// It is the ancestor of a [ChoiceChip] that has a `BoxDecoration`.
+    Finder findChipBarContainer() {
+      return find.ancestor(
+        of: find.byType(ChoiceChip).first,
+        matching: find.byWidgetPredicate(
+          (w) => w is Container && w.decoration is BoxDecoration,
+        ),
+      );
+    }
+
+    testWidgets('chip bar is opaque in edit mode (non-retired)', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final chipBar = findChipBarContainer();
+      expect(chipBar, findsOneWidget);
+
+      final container = tester.widget<Container>(chipBar);
+      final decoration = container.decoration! as BoxDecoration;
+      // In edit mode, the bar should be opaque (surface color, not transparent)
+      // even before any scrolling occurs
+      expect(decoration.color, isNot(Colors.transparent));
+    });
+
+    testWidgets('chip bar is transparent in view mode (initial state)', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final chipBar = findChipBarContainer();
+      expect(chipBar, findsOneWidget);
+
+      final container = tester.widget<Container>(chipBar);
+      final decoration = container.decoration! as BoxDecoration;
+      // In view mode before scrolling, the bar should be transparent
+      expect(decoration.color, Colors.transparent);
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Group 7: UI updates after mutation (Provider rebuild regression tests)
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('UI updates after mutation', () {
+    testWidgets('incrementing previous retirements updates displayed text', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(
+        uuid: 'ret-ui',
+        previousRetirements: 1,
+      );
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // Scroll to the checkmarks section
+      final addButtons = find.byIcon(Icons.add_circle_outline);
+      await tester.ensureVisible(addButtons.first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(addButtons.first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('2'), findsWidgets);
+    });
+
+    testWidgets('incrementing checkmarks updates displayed text', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(uuid: 'chk-ui', checkMarks: 5);
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final addButtons = find.byIcon(Icons.add_circle_outline);
+      await tester.ensureVisible(addButtons.last);
+      await tester.pumpAndSettle();
+
+      await tester.tap(addButtons.last);
+      await Future.microtask(() {});
+      await tester.pumpAndSettle();
+
+      expect(find.text('6'), findsWidgets);
+    });
+
+    testWidgets('resource increment updates displayed count', (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'showRetiredCharacters': true,
+        'darkTheme': false,
+        'initialPage': 0,
+        'primaryClassColor': 0xff4e7ec1,
+        'gameEdition': 0,
+        'generalExpanded': true,
+        'personalQuestExpanded': false,
+        'questAndNotesExpanded': true,
+      });
+      await SharedPrefs().init();
+
+      final character = TestData.createCharacter(uuid: 'res-ui');
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.ensureVisible(find.byType(ResourceCard).first);
+      await tester.pumpAndSettle();
+
+      final firstCard = find.byType(ResourceCard).first;
+      final initialCountText = find.descendant(
+        of: firstCard,
+        matching: find.text('0'),
+      );
+      expect(initialCountText, findsOneWidget);
+
+      // Tap the resource card to open the stepper sheet
+      await tester.tap(firstCard);
+      await tester.pumpAndSettle();
+
+      // Tap the add button in the stepper sheet
+      await tester.tap(
+        find.descendant(
+          of: find.byType(BottomSheet),
+          matching: find.byIcon(Icons.add_rounded),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Dismiss the sheet
+      await tester.tapAt(Offset.zero);
+      await tester.pumpAndSettle();
+
+      final updatedCountText = find.descendant(
+        of: find.byType(ResourceCard).first,
+        matching: find.text('1'),
+      );
+      expect(updatedCountText, findsOneWidget);
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Group 8: General section collapse
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('General section collapse', () {
+    testWidgets('generalExpanded: false hides General card content', (
+      tester,
+    ) async {
+      SharedPreferences.setMockInitialValues({
+        'showRetiredCharacters': true,
+        'darkTheme': false,
+        'initialPage': 0,
+        'primaryClassColor': 0xff4e7ec1,
+        'gameEdition': 0,
+        'generalExpanded': false,
+        'personalQuestExpanded': false,
+        'questAndNotesExpanded': true,
+      });
+      await SharedPrefs().init();
+
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      // General card should exist
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is CollapsibleSectionCard && w.icon == Icons.badge_rounded,
+        ),
+        findsOneWidget,
+      );
+      // But ResourceCards should not be visible (collapsed)
+      expect(find.byType(ResourceCard), findsNothing);
+    });
+  });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Group 9: Integration
   // ────────────────────────────────────────────────────────────────────────
 
   group('Integration', () {
@@ -1044,8 +1171,13 @@ void main() {
         find.byWidgetPredicate((w) => w is Tooltip && w.message == 'Gold'),
         findsOneWidget,
       );
-      // Resources header
-      expect(find.text('Resources'), findsOneWidget);
+      // General card present
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is CollapsibleSectionCard && w.icon == Icons.badge_rounded,
+        ),
+        findsOneWidget,
+      );
       // Checkmarks should NOT be visible in view mode
       expect(find.text('Previous retirements'), findsNothing);
     });
@@ -1071,7 +1203,7 @@ void main() {
       expect(find.text('Previous retirements'), findsNothing);
 
       // Retired label is shown
-      expect(find.text('(retired)'), findsOneWidget);
+      expect(find.text('(retired)'), findsWidgets);
     });
   });
 }

@@ -1,5 +1,8 @@
+import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
+import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 
 /// Abstract interface for database operations.
@@ -48,4 +51,45 @@ abstract class IDatabaseHelper {
 
   /// Updates a character's mastery achievement status.
   Future<void> updateCharacterMastery(CharacterMastery mastery, bool value);
+
+  /// Queries available personal quests, optionally filtered by edition.
+  Future<List<Map<String, Object?>>> queryPersonalQuests({
+    GameEdition? edition,
+  });
+
+  // ── Campaign CRUD ──
+
+  /// Queries all campaigns from the database.
+  Future<List<Campaign>> queryAllCampaigns();
+
+  /// Inserts a new campaign into the database.
+  Future<void> insertCampaign(Campaign campaign);
+
+  /// Updates an existing campaign in the database.
+  Future<void> updateCampaign(Campaign campaign);
+
+  /// Deletes a campaign and all associated parties.
+  Future<void> deleteCampaign(String campaignId);
+
+  // ── Party CRUD ──
+
+  /// Queries all parties for a given campaign.
+  Future<List<Party>> queryParties(String campaignId);
+
+  /// Inserts a new party into the database.
+  Future<void> insertParty(Party party);
+
+  /// Updates an existing party in the database.
+  Future<void> updateParty(Party party);
+
+  /// Deletes a party and unlinks associated characters.
+  Future<void> deleteParty(String partyId);
+
+  // ── Character-Party linking ──
+
+  /// Assigns a character to a party (or null to unassign).
+  Future<void> assignCharacterToParty(String characterUuid, String? partyId);
+
+  /// Queries characters assigned to a specific party.
+  Future<List<Character>> queryCharactersByParty(String partyId);
 }

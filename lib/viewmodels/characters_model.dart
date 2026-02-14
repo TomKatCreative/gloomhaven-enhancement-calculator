@@ -42,6 +42,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -69,20 +70,29 @@ class CharactersModel with ChangeNotifier {
     required this.databaseHelper,
     required this.themeProvider,
     required this.showRetired,
-  });
+    bool showAllCharacters = true,
+  }) : _showAllCharacters = showAllCharacters;
 
   List<Character> _characters = [];
   Character? currentCharacter;
   IDatabaseHelper databaseHelper;
   ThemeProvider themeProvider;
   PageController pageController = PageController(
-    initialPage: SharedPrefs().initialPage,
+    initialPage: SharedPrefs().currentCharacterIndex,
   );
   bool isScrolledToTop = true;
   ScrollController charScreenScrollController = ScrollController();
   ScrollController enhancementCalcScrollController = ScrollController();
 
+  /// Notifier for the character screen's current scroll offset.
+  /// Updated by [CharacterScreen] on both user scrolls and metrics corrections
+  /// (e.g. section collapse). Listened to by [GHCAnimatedAppBar] for tint.
+  final ValueNotifier<double> charScrollOffsetNotifier = ValueNotifier<double>(
+    0,
+  );
+
   bool showRetired;
+  bool _showAllCharacters;
   bool _isEditMode = false;
   bool _isElementSheetExpanded = false;
   bool _isElementSheetFullExpanded = false;
@@ -90,6 +100,14 @@ class CharactersModel with ChangeNotifier {
   /// Notifier to trigger element sheet collapse from outside the widget.
   /// Increment the value to signal collapse.
   final ValueNotifier<int> collapseElementSheetNotifier = ValueNotifier<int>(0);
+
+  bool get showAllCharacters => _showAllCharacters;
+
+  set showAllCharacters(bool value) {
+    _showAllCharacters = value;
+    SharedPrefs().showAllCharacters = value;
+    notifyListeners();
+  }
 
   bool get isEditMode => _isEditMode;
 
@@ -121,6 +139,7 @@ class CharactersModel with ChangeNotifier {
     pageController.dispose();
     charScreenScrollController.dispose();
     enhancementCalcScrollController.dispose();
+    charScrollOffsetNotifier.dispose();
     super.dispose();
   }
 
@@ -209,9 +228,23 @@ class CharactersModel with ChangeNotifier {
     return !showRetired && _characters.isNotEmpty;
   }
 
-  List<Character> get characters => showRetired
-      ? _characters
-      : _characters.where((character) => !character.isRetired).toList();
+  List<Character> get characters {
+    var filtered = showRetired
+        ? _characters
+        : _characters.where((character) => !character.isRetired).toList();
+
+    // Apply party filter
+    if (!_showAllCharacters) {
+      final partyId = SharedPrefs().activePartyId;
+      if (partyId != null) {
+        filtered = filtered
+            .where((c) => c.partyId == partyId || c.partyId == null)
+            .toList();
+      }
+    }
+
+    return filtered;
+  }
 
   set characters(List<Character> characters) {
     _characters = characters;
@@ -227,7 +260,7 @@ class CharactersModel with ChangeNotifier {
       characters = loadedCharacters;
     }
 
-    _setCurrentCharacter(index: SharedPrefs().initialPage);
+    _setCurrentCharacter(index: SharedPrefs().currentCharacterIndex);
     notifyListeners();
     return characters;
   }
@@ -305,7 +338,7 @@ class CharactersModel with ChangeNotifier {
   }
 
   void onPageChanged(int index) {
-    SharedPrefs().initialPage = index;
+    SharedPrefs().currentCharacterIndex = index;
     isScrolledToTop = true;
     _setCurrentCharacter(index: index);
     _isEditMode = false;
@@ -320,15 +353,33 @@ class CharactersModel with ChangeNotifier {
     GameEdition edition = GameEdition.gloomhaven,
     int prosperityLevel = 0,
     Variant variant = Variant.base,
+    String? personalQuestId,
+    String? partyId,
   }) async {
+    final pqId = personalQuestId ?? '';
+    final pqProgress = personalQuestId != null
+        ? List.filled(
+            PersonalQuestsRepository.getById(
+                  personalQuestId,
+                )?.requirements.length ??
+                0,
+            0,
+          )
+        : <int>[];
     Character character = Character(
       uuid: const Uuid().v1(),
       name: name,
       playerClass: selectedClass,
       previousRetirements: previousRetirements,
       xp: PlayerClasses.xpByLevel(initialLevel),
-      gold: _calculateStartingGold(edition, initialLevel, prosperityLevel),
+      gold: edition.startingGold(
+        level: initialLevel,
+        prosperityLevel: prosperityLevel,
+      ),
       variant: variant,
+      personalQuestId: pqId,
+      personalQuestProgress: pqProgress,
+      partyId: partyId,
     );
     character.id = await databaseHelper.insertCharacter(character);
     character.characterPerks = await _loadPerks(character);
@@ -343,26 +394,6 @@ class CharactersModel with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Calculate starting gold based on game edition rules.
-  ///
-  /// - Gloomhaven: 15 × (L + 1), where L is starting level
-  /// - Gloomhaven 2e: 10 × P + 15, where P is prosperity level
-  /// - Frosthaven: 10 × P + 20, where P is prosperity level
-  int _calculateStartingGold(
-    GameEdition edition,
-    int startingLevel,
-    int prosperityLevel,
-  ) {
-    switch (edition) {
-      case GameEdition.gloomhaven:
-        return 15 * (startingLevel + 1);
-      case GameEdition.gloomhaven2e:
-        return 10 * prosperityLevel + 15;
-      case GameEdition.frosthaven:
-        return 10 * prosperityLevel + 20;
-    }
-  }
-
   Future<void> deleteCurrentCharacter() async {
     _isEditMode = false;
     int index = characters.indexOf(currentCharacter!);
@@ -375,14 +406,14 @@ class CharactersModel with ChangeNotifier {
   void _setCurrentCharacter({required int index}) {
     if (characters.isEmpty) {
       currentCharacter = null;
-      SharedPrefs().initialPage = 0;
+      SharedPrefs().currentCharacterIndex = 0;
     } else {
       if (index < 0 || index >= characters.length) {
         currentCharacter = characters.last;
-        SharedPrefs().initialPage = characters.length - 1;
+        SharedPrefs().currentCharacterIndex = characters.length - 1;
       } else {
         currentCharacter = characters[index];
-        SharedPrefs().initialPage = index;
+        SharedPrefs().currentCharacterIndex = index;
       }
     }
     updateThemeForCharacter(themeProvider);
@@ -507,6 +538,61 @@ class CharactersModel with ChangeNotifier {
       }
     }
     await databaseHelper.updateCharacterMastery(mastery, value);
+    notifyListeners();
+  }
+
+  /// Updates the personal quest for a character, resetting progress.
+  Future<void> updatePersonalQuest(Character character, String? questId) async {
+    character.personalQuestId = questId ?? '';
+    character.personalQuestProgress = questId != null
+        ? List.filled(
+            PersonalQuestsRepository.getById(questId)?.requirements.length ?? 0,
+            0,
+          )
+        : [];
+    await databaseHelper.updateCharacter(character);
+    notifyListeners();
+  }
+
+  /// Updates progress for a single requirement of the personal quest.
+  ///
+  /// Returns `true` if this update caused the quest to become fully complete
+  /// (i.e., it was not complete before but is now). Returns `false` otherwise.
+  Future<bool> updatePersonalQuestProgress(
+    Character character,
+    int requirementIndex,
+    int value,
+  ) async {
+    final wasComplete = isPersonalQuestComplete(character);
+    character.personalQuestProgress[requirementIndex] = value;
+    await databaseHelper.updateCharacter(character);
+    notifyListeners();
+    final isNowComplete = isPersonalQuestComplete(character);
+    return !wasComplete && isNowComplete;
+  }
+
+  /// Whether all personal quest requirements are met for the given character.
+  bool isPersonalQuestComplete(Character character) {
+    final quest = character.personalQuest;
+    if (quest == null) return false;
+    if (character.personalQuestProgress.length != quest.requirements.length) {
+      return false;
+    }
+    for (int i = 0; i < quest.requirements.length; i++) {
+      if (character.personalQuestProgress[i] < quest.requirements[i].target) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /// Assigns a character to a party (or null to unassign).
+  Future<void> assignCharacterToParty(
+    Character character,
+    String? partyId,
+  ) async {
+    character.partyId = partyId;
+    await databaseHelper.assignCharacterToParty(character.uuid, partyId);
     notifyListeners();
   }
 }

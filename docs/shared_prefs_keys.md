@@ -55,6 +55,16 @@ prefs.setPlayerClassIsUnlocked('br', true);
 
 ---
 
+## Town State
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| `activeCampaignId` | String? | null | UUID of the currently active campaign |
+| `activePartyId` | String? | null | UUID of the currently active party |
+| `showAllCharacters` | bool | true | Show all characters vs filter by active party |
+
+---
+
 ## Enhancement Calculator State
 
 ### Core State
@@ -157,7 +167,13 @@ This ensures users can only have contiguous levels (can't have L3 without L1-L2)
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `initialPage` | int | 0 | Home screen tab on app launch |
-| `resourcesExpanded` | bool | false | Resources section expansion |
+| `currentCharacterIndex` | int | 0 | Selected character page index |
+| `generalExpanded` | bool | true | General section expansion |
+| `personalQuestExpanded` | bool | false | Personal Quest section expansion |
+| `questAndNotesExpanded` | bool | true | Quest & Notes section expansion |
+| `perksAndMasteriesExpanded` | bool | true | Perks & Masteries section expansion |
+| `townDetailsExpanded` | bool | true | Town details section expansion |
+| `partyDetailsExpanded` | bool | true | Party details section expansion |
 
 ---
 
@@ -186,7 +202,7 @@ One-time flags to show update dialogs on first launch after update.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `showUpdate440Dialog` | bool | true | Show v4.4.0 update dialog |
+| `showUpdate450Dialog` | bool | true | Show v4.5.0 update dialog |
 
 ---
 
@@ -297,7 +313,7 @@ SharedPreferences data is included as an optional third element in the JSON back
 ### Backup Format
 
 ```json
-[tableNames, tableData, { "settings": {...}, "calculator": {...}, "enhancerLevels": {...}, "classUnlocks": {...} }]
+[tableNames, tableData, { "settings": {...}, "calculator": {...}, "enhancerLevels": {...}, "classUnlocks": {...}, "town": {...} }]
 ```
 
 Old backups (2 elements) are fully supported — the third element is simply absent and SharedPrefs are left unchanged on restore.
@@ -306,10 +322,11 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 
 | Category | Keys |
 |----------|------|
-| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
+| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, showAllCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
 | `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
 | `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
 | `classUnlocks` | Dynamic keys (class codes) for locked classes only |
+| `town` | activeCampaignId, activePartyId |
 
 ### Excluded Keys
 
@@ -317,7 +334,13 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 |-----|--------|
 | `clearOldPrefs` | Legacy cleanup flag, not user state |
 | `initialPage` | Transient navigation state |
-| `resourcesExpanded` | Transient UI state |
+| `generalExpanded` | Transient UI state |
+| `personalQuestExpanded` | Transient UI state |
+| `questAndNotesExpanded` | Transient UI state |
+| `perksAndMasteriesExpanded` | Transient UI state |
+| `townDetailsExpanded` | Transient UI state |
+| `partyDetailsExpanded` | Transient UI state |
+| `currentCharacterIndex` | Transient navigation state |
 | `showUpdate*Dialog` | One-time dialog flags |
 | `isUSRegion` | Device-specific locale detection |
 | `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |

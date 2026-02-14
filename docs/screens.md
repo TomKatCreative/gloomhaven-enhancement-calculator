@@ -13,23 +13,25 @@ Use the static `show()` method:
 await CreateCharacterScreen.show(context, charactersModel);
 ```
 
-### Form Fields
+### Form Fields (top to bottom)
 
-1. **Name** - Text field with random name generator (faker)
-2. **Class** - Opens `ClassSelectorScreen` for class selection
-3. **Starting Level** - SfSlider (1-9)
-4. **Previous Retirements / Prosperity Level** - Two numeric fields in a row
-5. **Game Edition** - 3-way SegmentedButton (GH / GH2E / FH)
+1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
+2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
+3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected (no form validator needed). Create button uses `theme.contrastedPrimary` for contrast-aware coloring.
+4. **Personal Quest** — Read-only field that opens `PersonalQuestSelectorScreen`. Clear button appears when a quest is selected.
+5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
+6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
+7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition.
 
-### Edition-Specific Behavior
+### Gold Calculation Display
 
-The prosperity level field is disabled when Gloomhaven is selected (original GH uses level-based gold, not prosperity). See CLAUDE.md "Game Editions (GameEdition)" section for the gold/level formulas.
+A real-time gold display (GOLD SVG icon + calculated amount) appears inline with either the level slider (GH) or prosperity slider (GH2E/FH), depending on which parameter drives gold for that edition. Uses `GameEdition.startingGold(level:, prosperityLevel:)` and updates reactively as sliders change.
 
 ---
 
 ## Selector Screens
 
-The app uses two full-page selector screens with consistent styling for searching and selecting items.
+The app uses full-page selector screens with consistent styling for searching and selecting items.
 
 ### Shared Components
 
@@ -38,6 +40,8 @@ A reusable section divider with optional icon:
 ```
 ─────────── [Icon] Title ───────────
 ```
+
+**SearchSectionHeaderDelegate** (same file): A `SliverPersistentHeaderDelegate` that wraps `SearchSectionHeader` with a solid surface background for use as a sticky/pinned header in `CustomScrollView`. Both selector screens use this delegate with `SliverPersistentHeader(pinned: true)` to keep the current section header visible at the top of the scroll view.
 
 ### ClassSelectorScreen
 
@@ -65,7 +69,7 @@ Full-page screen for selecting a player class during character creation.
 - Search filters by class name or variant names (e.g., "Bruiser" finds Brute)
 - Category filter chips for game editions
 - "Hide locked classes" toggle
-- Section headers group classes by `ClassCategory`
+- Sticky section headers group classes by `ClassCategory` (pinned via `SliverPersistentHeader`)
 - Variant selection dialog for multi-edition classes
 - Custom class warning dialog for community content
 
@@ -100,7 +104,7 @@ Full-page screen for selecting enhancement types in the calculator.
 
 **Features:**
 - Search filters by enhancement name
-- Section headers with category icons group by `EnhancementCategory`
+- Sticky section headers with category icons group by `EnhancementCategory` (pinned via `SliverPersistentHeader`)
 - Cost display shows base cost and discounted cost (with strikethrough)
 - Edition-aware: only shows enhancements available in selected `GameEdition`
 - Highlights currently selected enhancement
@@ -115,13 +119,49 @@ await EnhancementTypeSelector.show(
 );
 ```
 
+### PersonalQuestSelectorScreen
+
+> **File**: `lib/ui/screens/personal_quest_selector_screen.dart`
+
+Full-page screen for selecting a personal quest for a character.
+
+**Layout:**
+```
+┌─────────────────────────────────────┐
+│ [←]  [🔍 Search...]                 │  ← AppBar with search
+├─────────────────────────────────────┤
+│ ──────── Gloomhaven ────────        │  ← Section header
+│ Seeker of Xorn           [PH] [⊖]  │  ← selected quest with remove
+│ 510                                 │  ← subtitle
+│ Merchant Class                [QM]  │
+│ 511                                 │
+│ ...                                 │
+└─────────────────────────────────────┘
+```
+
+**Features:**
+- Search filters by quest title or number
+- Sticky section headers group quests by `GameEdition.displayName` (pinned via `SliverPersistentHeader`)
+- Highlights currently assigned quest with `selectedTileColor`
+- Remove button (error-colored circle) on the selected quest's tile
+- Confirmation dialog when changing or removing an existing quest
+- Returns `PQSelectorResult` sealed class (`PQSelected` or `PQRemoved`)
+
+**Invocation:**
+```dart
+final result = await PersonalQuestSelectorScreen.show(
+  context,
+  currentQuest: character.personalQuest,
+);
+```
+
 ### Design Patterns
 
-Both selectors follow these conventions:
+All selectors follow these conventions:
 - **AppBar search**: Search field in AppBar title with transparent background
 - **SafeArea**: Bottom-only SafeArea for device navigation buttons
 - **Static show()**: Invoked via static method returning `Future<T?>`
-- **Section headers**: Use `SearchSectionHeader` widget for category grouping
+- **Sticky section headers**: `CustomScrollView` with `SliverPersistentHeader(pinned: true)` + `SliverList` pairs per section, using `SearchSectionHeaderDelegate` for pinned category headers
 
 ---
 
@@ -185,7 +225,7 @@ The settings screen includes a persistent bottom sheet with:
 
 > **File**: `lib/ui/screens/home.dart`
 
-The main container/shell for the app, managing navigation between Characters and Enhancement Calculator pages.
+The main container/shell for the app, managing navigation between Town, Characters, and Enhancement Calculator pages.
 
 ### Structure
 
@@ -196,19 +236,23 @@ The main container/shell for the app, managing navigation between Characters and
 │                                     │
 │       PageView (swipe disabled)     │
 │                                     │
-│   Page 0: CharactersScreen          │
-│   Page 1: EnhancementCalculatorScreen│
+│   Page 0: TownScreen                │
+│   Page 1: CharactersScreen          │
+│   Page 2: EnhancementCalculatorScreen│
 │                                     │
 ├─────────────────────────────────────┤
-│      [Characters]  [Calculator]     │  ← GHCBottomNavigationBar
+│   [Town]  [Characters]  [Calculator]│  ← GHCNavigationBar (M3)
 └─────────────────────────────────────┘
                               [FAB] ←── Dynamic action button
 ```
 
+> **Feature flag**: The Town page (Page 0) and its "Town" nav destination are gated by `kTownSheetEnabled`. When disabled, the PageView only has two pages: Characters (index 0) and Calculator (index 1). Page indices and navigation destinations shift accordingly.
+
 ### Initialization
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
-- Shows update dialogs (v4.3.0) if flag set in SharedPrefs
+- Loads campaigns on init via `TownModel.loadCampaigns()` (only when `kTownSheetEnabled`)
+- Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
 
 ### FAB Logic
@@ -217,25 +261,134 @@ The FAB visibility and action changes based on context:
 
 | Page | Condition | Visible? | Action |
 |------|-----------|----------|--------|
-| Calculator (1) | Cost sheet expanded OR no cost | Hidden | - |
-| Calculator (1) | Has cost to clear | Visible | Reset cost |
-| Characters (0) | Element sheet fully expanded | Hidden | - |
-| Characters (0) | No characters exist | Visible | Create character |
-| Characters (0) | Characters exist | Visible | Toggle edit mode |
+| Town (0) | No campaigns exist | Hidden | - |
+| Town (0) | Campaigns exist | Visible | Toggle edit mode |
+| Characters (1) | Element sheet fully expanded | Hidden | - |
+| Characters (1) | No characters exist | Visible | Create character |
+| Characters (1) | Characters exist | Visible | Toggle edit mode |
+| Calculator (2) | Cost sheet expanded OR no cost | Hidden | - |
+| Calculator (2) | Has cost to clear | Visible | Reset cost |
 
 ### State Reset on Navigation
 
 When switching pages:
-- Edit mode is disabled
+- Edit mode is disabled (both Characters and Town)
 - Element sheet expansion states are reset
 - Prevents stale UI state between pages
 
 ### Key Features
 
-- `NeverScrollableScrollPhysics` on PageView (manual nav only via bottom bar)
+- `NeverScrollableScrollPhysics` on PageView (nav bar triggers `animateToPage` for smooth slide transitions)
 - `ScaffoldMessengerKey` for snackbars
-- Watches all three main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`
+- Watches all four main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`, `TownModel`
 - `AnimatedSwitcher` for smooth FAB icon transitions
+- App bar title uses a card-flip animation (vertical `rotateX`) synced with page slide transitions
+
+---
+
+## Town Screen
+
+> **File**: `lib/ui/screens/town_screen.dart`
+>
+> **Gated by** `kTownSheetEnabled` — the entire Town tab is hidden from navigation when this flag is `false`.
+
+The Town tab for managing game campaigns and parties.
+
+### Structure
+
+```
+┌─────────────────────────────────────┐
+│   [PROSPERITY] Campaign Name (Ed.)  │  ← CollapsibleSectionCard (svgAssetKey: 'PROSPERITY')
+├─────────────────────────────────────┤
+│  ┌─────────────────────────────┐    │
+│  │ Prosperity    Level 3       │    │
+│  │ ████████░░░░  10/16         │    │  ← ProsperitySection
+│  │         [-]          [+]    │    │     (+/- in edit mode)
+│  └─────────────────────────────┘    │
+│                                     │
+│  ┌─────────────────────────────┐    │
+│  │ 👥 Adventure Party     [⇄] │    │  ← PartySection (trailing icon)
+│  │ Reputation: +5              │    │     ⇄ = swap (2+ parties)
+│  │         [-]          [+]    │    │     ➕ = add (1 party)
+│  └─────────────────────────────┘    │
+└─────────────────────────────────────┘
+```
+
+### Display States
+
+| State | Display |
+|-------|---------|
+| No campaigns | `TownEmptyState` — castle icon + "Create a campaign" prompt + button |
+| Campaign, no parties | Campaign selector + prosperity section + "Create a party" prompt |
+| Campaign + 1 party | Campaign selector + prosperity + party section (trailing: add-party icon) |
+| Campaign + 2+ parties | Campaign selector + prosperity + party section (trailing: swap icon → bottom sheet) |
+
+### Edit Mode
+
+Controlled by `townModel.isEditMode` (toggled via FAB):
+
+| Feature | View Mode | Edit Mode |
+|---------|-----------|-----------|
+| Prosperity | Level + progress bar | + checkmark/- steppers |
+| Reputation | Numeric display | +/- steppers |
+| Party trailing icon | Swap (2+ parties) or Add (1 party) | Same |
+| App bar actions | — | Delete party, delete campaign buttons |
+
+### Section Widgets
+
+| Widget | File | Purpose |
+|--------|------|---------|
+| `TownEmptyState` | `lib/ui/widgets/town/town_empty_state.dart` | Empty state with create button |
+| `ProsperitySection` | `lib/ui/widgets/town/prosperity_section.dart` | Level display + progress bar + edit steppers |
+| `PartySection` | `lib/ui/widgets/town/party_section.dart` | Reputation display + edit steppers; optional `trailing` widget (forwarded to `SectionCard`) |
+| `CampaignSelector` | `lib/ui/widgets/town/campaign_selector.dart` | Bottom sheet for switching/creating campaigns |
+
+### Party Switching
+
+Party switching uses an inline bottom sheet built in `_showPartySwitcher()` (in `town_screen.dart`), triggered by the swap icon in the `PartySection` header:
+
+- **1 party**: Trailing icon is `group_add_rounded` → opens `CreatePartyScreen`
+- **2+ parties**: Trailing icon is `swap_horiz_rounded` → opens bottom sheet with party list + "Create new" button
+- **Bottom sheet pattern**: Title row ("Switch party" + "Create" button), divider, `ListTile` per party (active highlighted)
+
+---
+
+## Create Campaign Screen
+
+> **File**: `lib/ui/screens/create_campaign_screen.dart`
+
+Pushed route for creating a new game campaign.
+
+### Invocation
+
+```dart
+await CreateCampaignScreen.show(context, townModel);
+```
+
+### Form Fields
+
+1. **Name** — Text field for campaign name
+2. **Edition** — SegmentedButton (GH / GH2E / FH)
+3. **Starting Prosperity** — Numeric input (0-65, defaults to 0)
+
+---
+
+## Create Party Screen
+
+> **File**: `lib/ui/screens/create_party_screen.dart`
+
+Pushed route for creating a new party within the active campaign.
+
+### Invocation
+
+```dart
+await CreatePartyScreen.show(context, townModel);
+```
+
+### Form Fields
+
+1. **Party Name** — Text field for party name
+2. **Starting Reputation** — Numeric input (-20 to +20, defaults to 0)
 
 ---
 
@@ -245,33 +398,80 @@ When switching pages:
 
 Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child.
 
-### Layout
+### Architecture
+
+Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with slivers for efficient scrolling and pinned headers. The background icon extends through both the header and chip nav bar, fading as the header collapses. A `ListenableBuilder` with a `ValueNotifier<double>` isolates icon opacity rebuilds from the rest of the widget tree.
 
 ```
 ┌─────────────────────────────────────┐
-│ Character Name          [Lvl Badge] │
-│ Class Name • Subtitle               │
-│ Traits: Tank, Healer, ...           │
+│ Character Name    [class icon bg]   │  ← SliverPersistentHeader (pinned)
+│ Class Name • (retired)              │     Collapses from 180px → 56px
 ├─────────────────────────────────────┤
-│ XP: 45/95    Gold: 120              │  ← Stats Section
-│ Battle Goals: ○○● (1/3)             │
-│ Pocket Items: 3                     │
+│ [Stats] [Notes] [Perks & Masteries] │  ← SliverPersistentHeader (pinned)
+│             [class icon extends ↓]  │     Transparent → opaque on scroll
+│                                     │     (always opaque in edit mode)
 ├─────────────────────────────────────┤
-│ ▶ Resources (expandable)            │  ← Frosthaven only
-│   Hide: 5  Metal: 3  Lumber: 8      │
+│ ▼ General (collapsible)             │  ← CollapsibleSectionCard
+│   XP: 45/95    Gold: 120            │
+│   Resources: Hide 5, Metal 3, ...   │
 ├─────────────────────────────────────┤
-│ Notes                               │  ← Optional section
-│ "Remember to buy boots..."          │
+│ ▼ Personal Quest (collapsible)      │  ← PersonalQuestSection
+│   515 - Lawbringer         [swap]   │     (CollapsibleSectionCard internally)
+│   ● Kill 20 Bandits...    12/20    │
 ├─────────────────────────────────────┤
-│ Perks                               │
+│ Notes                               │  ← CollapsibleSectionCard
+│ "Remember to buy boots..."          │     (entire sliver + chip hidden when
+│                                     │      empty + view mode)
+├─────────────────────────────────────┤
+│ Perks                     (3/9)     │  ← SectionCard + badge
 │ [✓] Remove two -1 cards             │
-│ [✓] Add one +2 card                 │
 │ [ ] Add one rolling PUSH 2          │
 ├─────────────────────────────────────┤
-│ Masteries (Frosthaven only)         │
-│ [✓] Complete 3 scenarios without... │
+│ Masteries                           │  ← SectionCard
+│ [✓] Complete 3 scenarios without... │     (conditional: FH/CS only)
 └─────────────────────────────────────┘
 ```
+
+### Section-to-Chip Mapping
+
+The chip nav bar groups multiple sections under single chips:
+
+| Chip | Enum value | Sections | Scroll-spy keys |
+|------|------------|----------|-----------------|
+| Stats / General | `general` | General (resources, XP, gold) | `_sectionKeys[general]` |
+| Notes / Quest & Notes | `questAndNotes` | Personal Quest + Notes | `_sectionKeys[questAndNotes]` + `_notesKey` |
+| Perks / Perks & Masteries | `perksAndMasteries` | Perks + Masteries | `_sectionKeys[perksAndMasteries]` + `_masteriesKey` |
+
+The `questAndNotes` chip is **conditional** — hidden for retired characters with no quest and no notes. Label is always "Quest & Notes". First chip label is "Stats" when `kTownSheetEnabled` is `false`, "General" when `true`.
+
+### Pinned Header
+
+`_CharacterHeaderDelegate` — a `SliverPersistentHeaderDelegate` that:
+- Expands to 180px (name, class info, traits, level badge, faded class icon background)
+- Collapses to 56px (name only) on scroll
+- In edit mode with non-retired character: stays at 90px (name `TextFormField`)
+- Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
+- **Background tint**: Once content scrolls behind the pinned headers (scroll offset > collapse range), the `Material` background transitions from `surface` to an 8% primary tint via `TweenAnimationBuilder` (300ms). Resets instantly on character switch via `ValueKey(character.uuid)`.
+
+### Chip Nav Bar
+
+`_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets (2–3 chips, see Section-to-Chip Mapping above):
+- Labels vary by feature flags and context: Stats/General, Notes/Quest & Notes, Perks/Perks & Masteries. The third chip label is "Perks" when the class has no masteries, "Perks & Masteries" when it does.
+- **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
+- **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
+- Pinned below the character header
+- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `TweenAnimationBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`_CharacterHeaderDelegate`) also tint in sync using the same pattern.
+
+### Section Cards
+
+Two card widgets from `lib/ui/widgets/section_card.dart`:
+
+- **`SectionCard`** — static card with title row (icon + text) and child content. Used for Notes, Perks, Masteries on the character screen, and all three sections on the calculator screen.
+- **`CollapsibleSectionCard`** — card with `ExpansionTile` for collapsible sections. Used for General section. Expansion state persisted via `SharedPrefs().generalExpanded`.
+
+Both accept either a Material `icon` (IconData) or an `svgAssetKey` (String) for the title row icon. When `svgAssetKey` is provided (and `icon` is null), a `ThemedSvg` widget renders the SVG icon at `iconSizeSmall` in `contrastedPrimary` color. Both also support an optional `titleWidget` to replace the default `Text` title, and an optional `trailing` widget.
+
+Both use `surfaceContainerLow` background, `outlineVariant` border, `borderRadiusMedium` corners, `contrastedPrimary` title color, and responsive max-width via `ResponsiveLayout.contentMaxWidth(context)` (phones: unconstrained, medium tablets: 560, large tablets: 700).
 
 ### Edit Mode vs View Mode
 
@@ -279,29 +479,50 @@ Controlled by `charactersModel.isEditMode`:
 
 | Section | View Mode | Edit Mode |
 |---------|-----------|-----------|
-| Name | Display only | Editable text field |
+| Name | AutoSizeText | Editable TextFormField |
 | Traits | Visible | Hidden |
-| XP/Gold | Inline display | Text fields + add/subtract buttons |
+| XP/Gold | Inline display (gold struck through if retired) | Text fields + add/subtract buttons |
 | Checkmarks/Retirements | Hidden | Visible with +/- controls |
+| Personal Quest | Progress text (e.g., "12/20") | +/- buttons per requirement, swap quest |
 | Resources | Read-only cards | Cards with +/- callbacks |
 | Notes | Plain text | Multiline text field |
+| Chip Nav Bar | Transparent → opaque on scroll | Always opaque (fixed-height header) |
 | Retired badge | Shows if retired | Hidden |
 
-### Sections (Private Widgets)
+### Content Widgets
 
-- `_NameAndClassSection` - Name, level badge, class info, traits
-- `_StatsSection` - XP, gold, battle goals, pocket items
-- `_ResourcesSection` - Expandable Frosthaven resources (hide, metal, lumber, etc.)
-- `PerksSection` - Perk checkboxes with parsed game text
-- `MasteriesSection` - Mastery checkboxes (conditional display)
+- `_StatsSection` — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- `_CheckmarksAndRetirementsRow` — edit-mode only row with +/- controls
+- `_ResourcesContent` — 9 `ResourceCard` inventory-slot cells with a "Resources" header; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
+- `PersonalQuestSection` — PQ progress with retirement prompt (see below)
+- `_NotesSection` — User notes (hidden when empty and not editing)
+- `PerksSection` — Perk checkboxes with parsed game text
+- `MasteriesSection` — Mastery checkboxes (conditional display)
+- `_PerksCountBadge` — Shows checked/total perk count in Perks card title
+
+### Personal Quest Section
+
+> **File**: `lib/ui/widgets/personal_quest_section.dart`
+
+Three display states:
+1. **Quest assigned** — `CollapsibleSectionCard` with quest title, unlock icon in header row, requirements list with progress
+2. **No quest + not retired** — `OutlinedButton` "Select a Personal Quest" prompt
+3. **No quest + retired** — `SizedBox.shrink()` (hidden)
+
+**Retirement flow** (on PQ completion):
+1. `updatePersonalQuestProgress` returns `true` when quest transitions from incomplete → complete
+2. Confetti pop via `ConfettiWidget` overlay from bottom-center
+3. SnackBar: "Personal quest complete!" with "Retire" action (deduplicated via `isRetirementSnackBarVisible` flag)
+4. Tapping "Retire" opens `ConfirmationDialog` with full details
+5. Confirming retires the character and updates the theme
 
 ### Key Features
 
 - Uses `context.watch<CharactersModel>()` for reactive rebuilds
-- Retired characters have disabled edit controls
+- Retired characters have disabled edit controls and strikethrough gold
 - Bottom padding adjusts for element sheet expansion state
 - `ValueKey` on form fields keyed to character UUID
-- Max-width constraints (400-468px) for responsive design
+- Responsive max-width constraints via `ResponsiveLayout` (phones: fills screen, tablets: capped)
 - Scroll controller from `CharactersModel` for app bar animations
 
 ---

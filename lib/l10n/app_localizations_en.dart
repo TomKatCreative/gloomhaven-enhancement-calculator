@@ -30,6 +30,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
+  String get switchAction => 'Switch';
+
+  @override
   String get create => 'Create';
 
   @override
@@ -88,6 +91,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get previousRetirements => 'Previous retirements';
+
+  @override
+  String get retirements => 'Retirements';
 
   @override
   String pocketItemsAllowed(int count) {
@@ -306,7 +312,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?';
 
   @override
-  String get errorDuringRestore => 'Error During Restore Operation';
+  String get errorDuringRestore => 'Error during restore operation';
 
   @override
   String restoreErrorMessage(String error) {
@@ -354,10 +360,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get startingLevel => 'Starting level';
 
   @override
-  String get prosperityLevel => 'Prosperity level';
+  String levelExceedsProsperity(int maxLevel) {
+    return 'Max starting level at this prosperity is $maxLevel';
+  }
 
   @override
-  String get pleaseSelectClass => 'Please select a Class';
+  String get prosperityLevel => 'Prosperity';
 
   @override
   String get createCharacter => 'Create character';
@@ -370,4 +378,216 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addNotes => 'Add notes...';
+
+  @override
+  String get personalQuest => 'Personal quest';
+
+  @override
+  String get selectPersonalQuest => 'Select personal quest...';
+
+  @override
+  String get selectAPersonalQuest => 'Select a personal quest';
+
+  @override
+  String get changePersonalQuest => 'Change personal quest?';
+
+  @override
+  String get changePersonalQuestBody =>
+      'This will replace your current quest and reset all progress.';
+
+  @override
+  String get removePersonalQuest => 'Remove personal quest?';
+
+  @override
+  String get removePersonalQuestBody =>
+      'This will remove your current quest and reset all progress.';
+
+  @override
+  String get comingSoon => 'Coming soon...';
+
+  @override
+  String get noPersonalQuest => 'No personal quest selected';
+
+  @override
+  String get change => 'Change';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String progressOf(int current, int target) {
+    return '$current/$target';
+  }
+
+  @override
+  String get personalQuestComplete => 'Personal quest complete!';
+
+  @override
+  String personalQuestCompleteBody(String name) {
+    return '$name has fulfilled their personal quest and must retire. Before retiring, consider spending gold on enhancements or donations — all gold and items are lost upon retirement. The city gains 1 prosperity.';
+  }
+
+  @override
+  String get retire => 'Retire';
+
+  @override
+  String get unretire => 'Unretire';
+
+  @override
+  String get notYet => 'Not yet';
+
+  @override
+  String get general => 'General & party';
+
+  @override
+  String get stats => 'Stats';
+
+  @override
+  String get statsAndResources => 'Stats & resources';
+
+  @override
+  String get quest => 'Quest';
+
+  @override
+  String get perks => 'Perks';
+
+  @override
+  String get masteries => 'Masteries';
+
+  @override
+  String get questAndNotes => 'Quest & notes';
+
+  @override
+  String get perksAndMasteries => 'Perks & masteries';
+
+  @override
+  String get town => 'TOWN';
+
+  @override
+  String get characters => 'CHARACTERS';
+
+  @override
+  String get enhancements => 'ENHANCEMENTS';
+
+  @override
+  String get subtract => 'Subtract';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get campaign => 'Campaign';
+
+  @override
+  String get campaigns => 'Campaigns';
+
+  @override
+  String get party => 'Party';
+
+  @override
+  String get parties => 'Parties';
+
+  @override
+  String get createCampaign => 'Create campaign';
+
+  @override
+  String get createParty => 'Create party';
+
+  @override
+  String get prosperity => 'Prosperity';
+
+  @override
+  String prosperityLevelN(int level) {
+    return 'Prosperity $level';
+  }
+
+  @override
+  String get reputation => 'Reputation';
+
+  @override
+  String get noCampaignsYet => 'Create a campaign to track your parties';
+
+  @override
+  String get noPartiesYet =>
+      'Create a party to track reputation and assign characters';
+
+  @override
+  String get campaignName => 'Campaign name';
+
+  @override
+  String get partyName => 'Party name';
+
+  @override
+  String get edition => 'Edition';
+
+  @override
+  String get sanctuaryDonations => 'Sanctuary of the Great Oak donations';
+
+  @override
+  String get startingProsperity => 'Starting prosperity';
+
+  @override
+  String get startingReputation => 'Starting reputation';
+
+  @override
+  String get deleteCampaign => 'Delete campaign?';
+
+  @override
+  String get deleteCampaignBody =>
+      'This will permanently delete this campaign and all its parties. Characters will be unlinked but not deleted.';
+
+  @override
+  String get deleteParty => 'Delete party?';
+
+  @override
+  String get deletePartyBody =>
+      'This will permanently delete this party. Characters will be unlinked but not deleted.';
+
+  @override
+  String get selectCampaign => 'Select campaign';
+
+  @override
+  String get selectParty => 'Select party';
+
+  @override
+  String get switchParty => 'Switch party';
+
+  @override
+  String get renameCampaign => 'Rename campaign';
+
+  @override
+  String get renameParty => 'Rename';
+
+  @override
+  String get checkmarks => 'checkmarks';
+
+  @override
+  String get openEnvelopeB => 'Open envelope B';
+
+  @override
+  String get noParty => 'No party';
+
+  @override
+  String get notAssignedToParty => 'Not assigned to a party';
+
+  @override
+  String get assignToParty => 'Assign to a party';
+
+  @override
+  String get createCampaignFirst => 'Create a campaign first to assign a party';
+
+  @override
+  String get scenarioLocation => 'Scenario location';
+
+  @override
+  String get partyNotes => 'Party notes';
+
+  @override
+  String get achievements => 'Achievements';
+
+  @override
+  String get shopPriceModifier => 'Shop';
+
+  @override
+  String get addPartyNotes => 'Add party notes...';
 }

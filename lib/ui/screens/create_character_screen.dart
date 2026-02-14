@@ -1,20 +1,26 @@
 import 'package:faker/faker.dart' as faker;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/personal_quest_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/town/party_assignment_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 /// A full-page screen for creating new characters.
@@ -42,9 +48,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       TextEditingController();
   final TextEditingController _classTextFieldController =
       TextEditingController();
-  final TextEditingController _previousRetirementsTextFieldController =
+  final TextEditingController _personalQuestTextFieldController =
       TextEditingController();
-  final TextEditingController _prosperityLevelTextFieldController =
+  final TextEditingController _partyTextFieldController =
       TextEditingController();
 
   GameEdition _selectedEdition = GameEdition.gloomhaven;
@@ -55,6 +61,10 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   final ScrollController _scrollController = ScrollController();
   Variant _variant = Variant.base;
   int _selectedLevel = 1;
+  int _selectedProsperityLevel = 1;
+  int _previousRetirements = 0;
+  String? _selectedPersonalQuestId;
+  String? _selectedPartyId;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -69,8 +79,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   void dispose() {
     _nameTextFieldController.dispose();
     _classTextFieldController.dispose();
-    _previousRetirementsTextFieldController.dispose();
-    _prosperityLevelTextFieldController.dispose();
+    _personalQuestTextFieldController.dispose();
+    _partyTextFieldController.dispose();
     _nameFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -94,7 +104,10 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             child: TextButton.icon(
               icon: const Icon(Icons.how_to_reg_rounded),
               label: Text(AppLocalizations.of(context).create),
-              onPressed: _onCreatePressed,
+              style: TextButton.styleFrom(
+                foregroundColor: theme.contrastedPrimary,
+              ),
+              onPressed: _selectedClass != null ? _onCreatePressed : null,
             ),
           ),
         ],
@@ -105,16 +118,22 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           controller: _scrollController,
           padding: const EdgeInsets.all(extraLargePadding),
           children: [
-            _buildNameField(context, theme),
-            const SizedBox(height: 28),
-            _buildClassSelector(context, theme),
-            const SizedBox(height: 28),
-            _buildLevelSelector(context, theme, colorScheme),
-            const SizedBox(height: 28),
-            _buildRetirementsAndProsperityRow(context, theme),
-            const SizedBox(height: 28),
             _buildEditionToggle(context, theme),
-            const SizedBox(height: 28),
+            const SizedBox(height: formFieldSpacing),
+            _buildNameField(context, theme),
+            const SizedBox(height: formFieldSpacing),
+            _buildClassSelector(context, theme),
+            const SizedBox(height: formFieldSpacing),
+            _buildPersonalQuestSelector(context, theme),
+            if (kTownSheetEnabled) ...[
+              const SizedBox(height: formFieldSpacing),
+              _buildPartySelector(context, theme),
+            ],
+            const SizedBox(height: formFieldSpacing),
+            _buildProsperitySelector(context, theme, colorScheme),
+            const SizedBox(height: formFieldSpacing),
+            _buildLevelSelector(context, theme, colorScheme),
+            const SizedBox(height: formFieldSpacing),
           ],
         ),
       ),
@@ -122,16 +141,17 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   }
 
   Widget _buildNameField(BuildContext context, ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: TextFormField(
-            autofocus: true,
             textCapitalization: TextCapitalization.words,
             autocorrect: false,
             focusNode: _nameFocusNode,
             decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).name,
+              labelText: l10n.name,
               hintText: _placeholderName,
               floatingLabelBehavior: FloatingLabelBehavior.always,
               border: const OutlineInputBorder(),
@@ -157,6 +177,52 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             });
           },
         ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  iconSize: iconSizeSmall,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(tinyPadding),
+                  icon: const Icon(Icons.remove_circle_outline),
+                  onPressed: _previousRetirements > 0
+                      ? () => setState(() => _previousRetirements--)
+                      : null,
+                ),
+                IntrinsicWidth(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Opacity(opacity: 0, child: Text('66')),
+                      Text(
+                        '$_previousRetirements',
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  iconSize: iconSizeSmall,
+                  constraints: const BoxConstraints(),
+                  padding: const EdgeInsets.all(tinyPadding),
+                  icon: const Icon(Icons.add_circle_outline),
+                  onPressed: _previousRetirements < 99
+                      ? () => setState(() => _previousRetirements++)
+                      : null,
+                ),
+              ],
+            ),
+            Text(
+              l10n.retirements,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -166,9 +232,6 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
       children: [
         Expanded(
           child: TextFormField(
-            validator: (value) => _selectedClass == null
-                ? AppLocalizations.of(context).pleaseSelectClass
-                : null,
             readOnly: true,
             controller: _classTextFieldController,
             decoration: InputDecoration(
@@ -178,7 +241,7 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               hintText: AppLocalizations.of(context).selectClass,
               floatingLabelBehavior: FloatingLabelBehavior.always,
               border: const OutlineInputBorder(),
-              suffixIcon: const Icon(Icons.chevron_right),
+              suffixIcon: const Icon(Icons.chevron_right_rounded),
             ),
             onTap: () async {
               SelectedPlayerClass? selectedPlayerClass =
@@ -200,31 +263,118 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                       .getDisplayName(_variant);
                   _selectedClass = selectedPlayerClass.playerClass;
                 });
-                _formKey.currentState?.validate();
               }
             },
           ),
         ),
-        const SizedBox(width: smallPadding),
-        // Match IconButton's 48x48 touch target size for alignment
-        SizedBox(
-          width: 48,
-          height: 48,
-          child: Center(
+        if (_selectedClass != null) ...[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
             child: SizedBox(
-              width: iconSizeMedium,
-              height: iconSizeMedium,
-              child: _selectedClass == null
-                  ? ThemedSvg(
-                      assetKey: 'CLASS',
-                      width: iconSizeMedium,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )
-                  : ClassIconSvg(playerClass: _selectedClass!),
+              width: iconSizeXL,
+              height: iconSizeXL,
+              child: ClassIconSvg(
+                playerClass: _selectedClass!,
+                color: ColorUtils.ensureContrast(
+                  Color(_selectedClass!.primaryColor),
+                  theme.colorScheme.surface,
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ],
+    );
+  }
+
+  Widget _buildPersonalQuestSelector(BuildContext context, ThemeData theme) {
+    return TextFormField(
+      readOnly: true,
+      controller: _personalQuestTextFieldController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context).personalQuest,
+        hintText: AppLocalizations.of(context).selectPersonalQuest,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        border: const OutlineInputBorder(),
+        suffixIcon: _selectedPersonalQuestId != null
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    _selectedPersonalQuestId = null;
+                    _personalQuestTextFieldController.clear();
+                  });
+                },
+              )
+            : const Icon(Icons.chevron_right_rounded),
+      ),
+      onTap: () async {
+        final result = await PersonalQuestSelectorScreen.show(context);
+        if (result is PQSelected) {
+          setState(() {
+            _selectedPersonalQuestId = result.quest.id;
+            _personalQuestTextFieldController.text = result.quest.displayName;
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildPartySelector(BuildContext context, ThemeData theme) {
+    final townModel = context.read<TownModel>();
+    final hasCampaign = townModel.activeCampaign != null;
+
+    if (!hasCampaign) return const SizedBox.shrink();
+
+    return TextFormField(
+      readOnly: true,
+      controller: _partyTextFieldController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context).party,
+        hintText: AppLocalizations.of(context).selectParty,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        border: const OutlineInputBorder(),
+        suffixIcon: _selectedPartyId != null
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  setState(() {
+                    _selectedPartyId = null;
+                    _partyTextFieldController.clear();
+                  });
+                },
+              )
+            : const Icon(Icons.chevron_right_rounded),
+      ),
+      onTap: () {
+        PartyAssignmentSheet.show(
+          context: context,
+          parties: townModel.parties,
+          currentPartyId: _selectedPartyId,
+          onPartySelected: (partyId) {
+            setState(() {
+              _selectedPartyId = partyId;
+              if (partyId == null) {
+                _partyTextFieldController.clear();
+              } else {
+                final party = townModel.parties.firstWhere(
+                  (p) => p.id == partyId,
+                );
+                _partyTextFieldController.text = party.name;
+              }
+            });
+          },
+          onCreateParty: () async {
+            final created = await CreatePartySheet.show(context, townModel);
+            if (created == true && townModel.activeParty != null) {
+              setState(() {
+                _selectedPartyId = townModel.activeParty!.id;
+                _partyTextFieldController.text = townModel.activeParty!.name;
+              });
+            }
+          },
+        );
+      },
     );
   }
 
@@ -233,17 +383,57 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     ThemeData theme,
     ColorScheme colorScheme,
   ) {
+    final l10n = AppLocalizations.of(context);
+    final maxLevel = _selectedEdition.maxStartingLevel(
+      _selectedProsperityLevel,
+    );
+    final exceedsProsperity = _selectedLevel > maxLevel;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SectionLabel(
-          label:
-              '${AppLocalizations.of(context).startingLevel}: $_selectedLevel',
-          svgAssetKey: 'LEVEL',
-          iconSize: iconSizeMedium,
-          textStyle: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+        Row(
+          children: [
+            ThemedSvg(
+              assetKey: 'LEVEL',
+              width: iconSizeMedium,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: smallPadding),
+            IntrinsicWidth(
+              child: Stack(
+                alignment: Alignment.centerLeft,
+                children: [
+                  Opacity(
+                    opacity: 0,
+                    child: Text(
+                      '${l10n.startingLevel}: 9',
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  Text(
+                    '${l10n.startingLevel}: $_selectedLevel',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (exceedsProsperity) ...[
+              const SizedBox(width: smallPadding),
+              Tooltip(
+                message: l10n.levelExceedsProsperity(maxLevel),
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                  size: iconSizeSmall,
+                  color: Colors.amber,
+                ),
+              ),
+            ],
+            if (_selectedEdition == GameEdition.gloomhaven)
+              ..._buildGoldDisplay(theme),
+          ],
         ),
         const SizedBox(height: smallPadding),
         SfSlider(
@@ -263,48 +453,77 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
     );
   }
 
-  Widget _buildRetirementsAndProsperityRow(
+  Widget _buildProsperitySelector(
     BuildContext context,
     ThemeData theme,
+    ColorScheme colorScheme,
   ) {
-    return Row(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Previous Retirements
-        Expanded(
-          child: LabeledTextField(
-            label: AppLocalizations.of(context).previousRetirements,
-            icon: Icons.elderly,
-            hintText: '0',
-            controller: _previousRetirementsTextFieldController,
-            enableInteractiveSelection: false,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
-            ],
-          ),
-        ),
-        const SizedBox(width: largePadding),
-        // Prosperity Level (used by GH2E and Frosthaven)
-        Expanded(
-          child: Opacity(
-            opacity: _selectedEdition == GameEdition.gloomhaven ? 0.4 : 1.0,
-            child: LabeledTextField(
-              label: AppLocalizations.of(context).prosperityLevel,
-              icon: Icons.location_city,
-              hintText: '0',
-              controller: _prosperityLevelTextFieldController,
-              enabled: _selectedEdition != GameEdition.gloomhaven,
-              enableInteractiveSelection: false,
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp('[\\.|\\,|\\ |\\-]')),
-              ],
+        Row(
+          children: [
+            SectionLabel(
+              label:
+                  '${AppLocalizations.of(context).prosperityLevel}: $_selectedProsperityLevel',
+              svgAssetKey: 'PROSPERITY',
+              iconSize: iconSizeMedium,
+              textStyle: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
             ),
-          ),
+            if (_selectedEdition != GameEdition.gloomhaven)
+              ..._buildGoldDisplay(theme),
+          ],
+        ),
+        const SizedBox(height: smallPadding),
+        SfSlider(
+          min: 1.0,
+          max: 9.0,
+          value: _selectedProsperityLevel.toDouble(),
+          interval: 1,
+          stepSize: 1,
+          showLabels: true,
+          activeColor: colorScheme.primary,
+          inactiveColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+          onChanged: (dynamic value) {
+            setState(
+              () => _selectedProsperityLevel = (value as double).round(),
+            );
+          },
         ),
       ],
     );
+  }
+
+  List<Widget> _buildGoldDisplay(ThemeData theme) {
+    return [
+      const Spacer(),
+      ThemedSvg(
+        assetKey: 'GOLD',
+        width: iconSizeSmall,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
+      const SizedBox(width: tinyPadding),
+      IntrinsicWidth(
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            Opacity(
+              opacity: 0,
+              child: Text('150', style: theme.textTheme.bodyMedium),
+            ),
+            Text(
+              '${_selectedEdition.startingGold(level: _selectedLevel, prosperityLevel: _selectedProsperityLevel)}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(width: smallPadding),
+    ];
   }
 
   Widget _buildEditionToggle(BuildContext context, ThemeData theme) {
@@ -370,10 +589,6 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             onSelectionChanged: (Set<GameEdition> selection) {
               setState(() {
                 final newEdition = selection.first;
-                // Clear prosperity when switching to original GH
-                if (newEdition == GameEdition.gloomhaven) {
-                  _prosperityLevelTextFieldController.clear();
-                }
                 _selectedEdition = newEdition;
               });
             },
@@ -391,15 +606,12 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             : _nameTextFieldController.text,
         _selectedClass!,
         initialLevel: _selectedLevel,
-        previousRetirements:
-            _previousRetirementsTextFieldController.text.isEmpty
-            ? 0
-            : int.parse(_previousRetirementsTextFieldController.text),
+        previousRetirements: _previousRetirements,
         edition: _selectedEdition,
-        prosperityLevel: _prosperityLevelTextFieldController.text != ''
-            ? int.parse(_prosperityLevelTextFieldController.text)
-            : 0,
+        prosperityLevel: _selectedProsperityLevel,
         variant: _variant,
+        personalQuestId: _selectedPersonalQuestId,
+        partyId: kTownSheetEnabled ? _selectedPartyId : null,
       );
       if (!mounted) return;
       Navigator.pop(context, true);
