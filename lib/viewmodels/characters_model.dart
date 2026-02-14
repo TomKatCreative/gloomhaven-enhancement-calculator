@@ -340,6 +340,7 @@ class CharactersModel with ChangeNotifier {
   void onPageChanged(int index) {
     SharedPrefs().currentCharacterIndex = index;
     isScrolledToTop = true;
+    charScrollOffsetNotifier.value = 0.0;
     _setCurrentCharacter(index: index);
     _isEditMode = false;
     notifyListeners();
