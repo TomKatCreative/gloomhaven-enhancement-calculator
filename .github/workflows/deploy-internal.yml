@@ -15,8 +15,8 @@ on:
         type: string
 
 env:
-  FLUTTER_VERSION: "3.38.6"
-  JAVA_VERSION: "17"
+  FLUTTER_VERSION: "3.41.1"
+  JAVA_VERSION: "21"
   BUILD_NUMBER_OFFSET: 370  # After repo transfer: run 1 + 370 = 371 (previous max was 368)
 
 jobs:
