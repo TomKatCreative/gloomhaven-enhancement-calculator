@@ -162,7 +162,7 @@ class DatabaseHelper implements IDatabaseHelper {
     await txn.execute('''
       $createTable $tablePersonalQuests (
         $columnPersonalQuestId $idTextPrimaryType,
-        $columnPersonalQuestNumber $textType,
+        $columnPersonalQuestNumber $integerType,
         $columnPersonalQuestTitle $textType,
         $columnPersonalQuestEdition $textType
       )''');

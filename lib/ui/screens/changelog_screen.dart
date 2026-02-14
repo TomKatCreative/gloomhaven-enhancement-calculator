@@ -36,6 +36,20 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.5.0',
+              date: '2026-02-13',
+              changes: [
+                'Added Personal Quests — assign quests to Gloomhaven characters and track progress toward retirement.',
+                'UI overhaul of Enhancement Calculator and Character screens.',
+                'Added cost breakdown dialog to Enhancement cost chip.',
+                'Improved backup system to include all app data (theme, unlocked characters, calculator state).',
+                'Backup now generates a .json file.',
+                'Replaced variant selector dialog with inline popup menu.',
+                'Various UI polishes and performance improvements.',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.4.0',
               date: '2026-02-06',
               changes: [

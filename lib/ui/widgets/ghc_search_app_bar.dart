@@ -41,6 +41,9 @@ class GHCSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// Callback when clear button is pressed.
   final VoidCallback onClear;
 
+  /// Optional action widgets displayed after the search bar.
+  final List<Widget>? actions;
+
   const GHCSearchAppBar({
     super.key,
     required this.controller,
@@ -49,6 +52,7 @@ class GHCSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.hintText,
     required this.onChanged,
     required this.onClear,
+    this.actions,
   });
 
   @override
@@ -67,8 +71,9 @@ class GHCSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
           Platform.isIOS ? Icons.arrow_back_ios_new : Icons.arrow_back,
         ),
       ),
+      actions: actions,
       title: Padding(
-        padding: const EdgeInsets.only(right: 16),
+        padding: EdgeInsets.only(right: actions != null ? 0 : 16),
         child: SearchBar(
           controller: controller,
           focusNode: focusNode,

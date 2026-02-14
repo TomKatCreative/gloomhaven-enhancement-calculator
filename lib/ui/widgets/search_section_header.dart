@@ -51,9 +51,12 @@ class SearchSectionHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    return ColoredBox(
-      color: Theme.of(context).colorScheme.surface,
-      child: SearchSectionHeader(title: title, assetKey: assetKey),
+    return SizedBox(
+      height: _height,
+      child: ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: SearchSectionHeader(title: title, assetKey: assetKey),
+      ),
     );
   }
 

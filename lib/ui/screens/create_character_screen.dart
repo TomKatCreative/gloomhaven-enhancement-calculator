@@ -10,7 +10,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/personal_quest_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/class_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
@@ -288,48 +288,35 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   }
 
   Widget _buildPersonalQuestSelector(BuildContext context, ThemeData theme) {
-    final isEnabled = _selectedEdition == GameEdition.gloomhaven;
-    return Opacity(
-      opacity: isEnabled ? 1.0 : 0.4,
-      child: TextFormField(
-        readOnly: true,
-        enabled: isEnabled,
-        controller: _personalQuestTextFieldController,
-        decoration: InputDecoration(
-          labelText: AppLocalizations.of(context).personalQuest,
-          hintText: isEnabled
-              ? AppLocalizations.of(context).selectPersonalQuest
-              : AppLocalizations.of(context).comingSoon,
-          floatingLabelBehavior: FloatingLabelBehavior.always,
-          border: const OutlineInputBorder(),
-          suffixIcon: _selectedPersonalQuestId != null
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    setState(() {
-                      _selectedPersonalQuestId = null;
-                      _personalQuestTextFieldController.clear();
-                    });
-                  },
-                )
-              : const Icon(Icons.chevron_right_rounded),
-        ),
-        onTap: isEnabled
-            ? () async {
-                final result = await showPersonalQuestSelectorDialog(
-                  context: context,
-                  edition: GameEdition.gloomhaven,
-                );
-                if (result is PQSelected) {
+    return TextFormField(
+      readOnly: true,
+      controller: _personalQuestTextFieldController,
+      decoration: InputDecoration(
+        labelText: AppLocalizations.of(context).personalQuest,
+        hintText: AppLocalizations.of(context).selectPersonalQuest,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        border: const OutlineInputBorder(),
+        suffixIcon: _selectedPersonalQuestId != null
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
                   setState(() {
-                    _selectedPersonalQuestId = result.quest.id;
-                    _personalQuestTextFieldController.text =
-                        result.quest.displayName;
+                    _selectedPersonalQuestId = null;
+                    _personalQuestTextFieldController.clear();
                   });
-                }
-              }
-            : null,
+                },
+              )
+            : const Icon(Icons.chevron_right_rounded),
       ),
+      onTap: () async {
+        final result = await PersonalQuestSelectorScreen.show(context);
+        if (result is PQSelected) {
+          setState(() {
+            _selectedPersonalQuestId = result.quest.id;
+            _personalQuestTextFieldController.text = result.quest.displayName;
+          });
+        }
+      },
     );
   }
 
@@ -602,11 +589,6 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             onSelectionChanged: (Set<GameEdition> selection) {
               setState(() {
                 final newEdition = selection.first;
-                // Clear PQ when switching away from GH
-                if (newEdition != GameEdition.gloomhaven) {
-                  _selectedPersonalQuestId = null;
-                  _personalQuestTextFieldController.clear();
-                }
                 _selectedEdition = newEdition;
               });
             },

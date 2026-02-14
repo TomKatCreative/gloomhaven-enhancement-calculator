@@ -179,6 +179,7 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
             setState(() => _isExpanded = value);
           },
           initiallyExpanded: _isExpanded,
+          iconColor: primaryColor,
           trailing: widget.trailing != null
               ? Row(
                   mainAxisSize: MainAxisSize.min,
@@ -187,7 +188,10 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
                     AnimatedRotation(
                       turns: _isExpanded ? 0.5 : 0,
                       duration: animationDuration,
-                      child: Icon(Icons.expand_more),
+                      child: Icon(
+                        Icons.expand_more,
+                        color: _isExpanded ? primaryColor : null,
+                      ),
                     ),
                   ],
                 )

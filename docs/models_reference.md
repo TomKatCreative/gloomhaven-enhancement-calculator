@@ -35,6 +35,11 @@ This document provides a comprehensive reference for the app's data models, thei
                         └─────────────────┘
 
 ┌─────────────────┐
+│ PersonalQuest   │──────▶ Character.personalQuestId
+│  (definition)   │
+└─────────────────┘
+
+┌─────────────────┐
 │   Enhancement   │  (standalone - calculator only)
 │    (option)     │
 └─────────────────┘
@@ -464,11 +469,68 @@ Represents a persistent game campaign with edition-specific prosperity tracking.
 
 ---
 
+## PersonalQuest
+
+> **File**: `lib/models/personal_quest/personal_quest.dart`
+
+Represents a personal quest card with retirement requirements.
+
+### Fields
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `id` | `String` | required | Quest ID (e.g., `"pq_gh_510"`) |
+| `number` | `int` | required | Card number (e.g., 510) |
+| `title` | `String` | required | Quest title (e.g., "Seeker of Xorn") |
+| `edition` | `GameEdition` | required | Game edition |
+| `requirements` | `List<PersonalQuestRequirement>` | `[]` | Retirement requirements (from repository, not DB) |
+| `unlockClassCode` | `String?` | null | Class unlocked upon completion |
+| `unlockEnvelope` | `String?` | null | Envelope unlocked upon completion |
+
+### Computed Properties
+
+| Getter | Type | Description |
+|--------|------|-------------|
+| `displayName` | `String` | `"510 - Seeker of Xorn"` format |
+
+### Serialization
+
+- `toMap()` / `fromMap()` for SQLite persistence
+- Requirements, unlock class, and unlock envelope stored in `PersonalQuestsRepository`, not in DB
+
+---
+
+## PersonalQuestRequirement
+
+> **File**: `lib/models/personal_quest/personal_quest.dart`
+
+A single requirement within a personal quest.
+
+### Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `description` | `String` | Requirement text |
+| `target` | `int` | Numeric target count (1 for binary requirements) |
+
+---
+
+## Progress Encoding Utilities
+
+> **File**: `lib/models/personal_quest/personal_quest.dart`
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `encodeProgress(List<int>)` | `String` | JSON-encode progress for DB storage |
+| `decodeProgress(String)` | `List<int>` | Decode JSON progress; empty string → `[]` |
+
+---
+
 ## Party
 
 > **File**: `lib/models/party.dart`
 
-Represents a party within a campaign, tracking reputation.
+Represents a party within a campaign, tracking reputation, location, notes, and achievements.
 
 ### Fields
 
@@ -478,7 +540,16 @@ Represents a party within a campaign, tracking reputation.
 | `campaignId` | `String` | required | FK to Campaign |
 | `name` | `String` | required | Party name |
 | `reputation` | `int` | 0 | Party reputation (-20 to +20) |
+| `location` | `String` | `''` | Current scenario location |
+| `notes` | `String` | `''` | Party notes |
+| `achievements` | `List<String>` | `[]` | Party achievements (JSON-encoded in DB) |
 | `createdAt` | `DateTime?` | null | Creation timestamp |
+
+### Computed Properties
+
+| Getter | Type | Description |
+|--------|------|-------------|
+| `shopPriceModifier` | `int` | Shop price modifier derived from reputation (-5 to +5) |
 
 ### Constants
 
@@ -490,6 +561,7 @@ Represents a party within a campaign, tracking reputation.
 ### Serialization
 
 - `toMap()` / `fromMap()` for SQLite persistence
+- `achievements` stored as JSON string in DB
 
 ---
 

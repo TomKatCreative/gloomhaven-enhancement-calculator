@@ -18,7 +18,7 @@ await CreateCharacterScreen.show(context, charactersModel);
 1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
 2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
 3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected (no form validator needed). Create button uses `theme.contrastedPrimary` for contrast-aware coloring.
-4. **Personal Quest** — Read-only field that opens PQ selector dialog. Only enabled for Gloomhaven edition; dimmed with "Coming soon" hint for other editions.
+4. **Personal Quest** — Read-only field that opens `PersonalQuestSelectorScreen`. Clear button appears when a quest is selected.
 5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
 6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
 7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition.
@@ -31,7 +31,7 @@ A real-time gold display (GOLD SVG icon + calculated amount) appears inline with
 
 ## Selector Screens
 
-The app uses two full-page selector screens with consistent styling for searching and selecting items.
+The app uses full-page selector screens with consistent styling for searching and selecting items.
 
 ### Shared Components
 
@@ -119,9 +119,45 @@ await EnhancementTypeSelector.show(
 );
 ```
 
+### PersonalQuestSelectorScreen
+
+> **File**: `lib/ui/screens/personal_quest_selector_screen.dart`
+
+Full-page screen for selecting a personal quest for a character.
+
+**Layout:**
+```
+┌─────────────────────────────────────┐
+│ [←]  [🔍 Search...]                 │  ← AppBar with search
+├─────────────────────────────────────┤
+│ ──────── Gloomhaven ────────        │  ← Section header
+│ Seeker of Xorn           [PH] [⊖]  │  ← selected quest with remove
+│ 510                                 │  ← subtitle
+│ Merchant Class                [QM]  │
+│ 511                                 │
+│ ...                                 │
+└─────────────────────────────────────┘
+```
+
+**Features:**
+- Search filters by quest title or number
+- Sticky section headers group quests by `GameEdition.displayName` (pinned via `SliverPersistentHeader`)
+- Highlights currently assigned quest with `selectedTileColor`
+- Remove button (error-colored circle) on the selected quest's tile
+- Confirmation dialog when changing or removing an existing quest
+- Returns `PQSelectorResult` sealed class (`PQSelected` or `PQRemoved`)
+
+**Invocation:**
+```dart
+final result = await PersonalQuestSelectorScreen.show(
+  context,
+  currentQuest: character.personalQuest,
+);
+```
+
 ### Design Patterns
 
-Both selectors follow these conventions:
+All selectors follow these conventions:
 - **AppBar search**: Search field in AppBar title with transparent background
 - **SafeArea**: Bottom-only SafeArea for device navigation buttons
 - **Static show()**: Invoked via static method returning `Future<T?>`

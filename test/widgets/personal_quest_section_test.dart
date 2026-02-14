@@ -493,10 +493,11 @@ void main() {
         await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
 
-        // Should open the selector bottom sheet directly (no confirmation first)
-        // displayName format is "515 - Lawbringer"
-        expect(find.text('515 - Lawbringer'), findsOneWidget);
-        // The remove button in the sheet header
+        // Should open the full-screen selector directly (no confirmation first)
+        // Title and number are separate (title + subtitle)
+        expect(find.text('Lawbringer'), findsOneWidget);
+        expect(find.text('515'), findsOneWidget);
+        // The remove button on the selected quest's tile
         expect(find.byIcon(Icons.remove_circle_outline), findsWidgets);
       });
 
@@ -521,12 +522,12 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          // Tap swap to open selector
+          // Tap swap to open full-screen selector
           await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
           await tester.pumpAndSettle();
 
           // Pick a different quest from the list
-          await tester.tap(find.textContaining('510 -').last);
+          await tester.tap(find.text('Seeker of Xorn'));
           await tester.pumpAndSettle();
 
           // Should show the Change confirmation dialog
@@ -563,9 +564,14 @@ void main() {
         // Open selector → pick a quest → Cancel
         await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
         await tester.pumpAndSettle();
-        await tester.tap(find.textContaining('510 -').last);
+        await tester.tap(find.text('Seeker of Xorn'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('Cancel'));
+        await tester.pumpAndSettle();
+
+        // Should still be on the selector screen (Cancel just closes the dialog)
+        // Navigate back to the original screen via the back arrow
+        await tester.tap(find.byIcon(Icons.arrow_back));
         await tester.pumpAndSettle();
 
         // Quest should still be the original
@@ -573,47 +579,43 @@ void main() {
         expect(find.text('5/20'), findsOneWidget);
       });
 
-      testWidgets(
-        'removing quest in selector shows Remove confirmation dialog',
-        (tester) async {
-          tester.view.physicalSize = const Size(800, 1200);
-          tester.view.devicePixelRatio = 1.0;
-          addTearDown(tester.view.resetPhysicalSize);
-          addTearDown(tester.view.resetDevicePixelRatio);
+      testWidgets('removing quest in selector shows Remove confirmation dialog', (
+        tester,
+      ) async {
+        tester.view.physicalSize = const Size(800, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-          final character = TestData.createCharacter(uuid: 'test-pq-17c');
-          character.personalQuestId = 'pq_gh_515';
-          character.personalQuestProgress = [5];
+        final character = TestData.createCharacter(uuid: 'test-pq-17c');
+        character.personalQuestId = 'pq_gh_515';
+        character.personalQuestProgress = [5];
 
-          final model = await setupModel(
-            character: character,
-            isEditMode: true,
-          );
-          await tester.pumpWidget(
-            buildTestWidget(model: model, character: model.characters.first),
-          );
-          await tester.pumpAndSettle();
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
 
-          // Open selector → tap remove (red X) in the sheet header
-          await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
-          await tester.pumpAndSettle();
-          // .last finds the remove icon in the sheet header (not the -/+
-          // control behind the sheet)
-          await tester.tap(find.byIcon(Icons.remove_circle_outline).last);
-          await tester.pumpAndSettle();
+        // Open selector → tap remove button on the selected quest tile
+        await tester.tap(find.byIcon(Icons.swap_horiz_rounded));
+        await tester.pumpAndSettle();
+        // Find the remove_circle_outline in the selector screen's selected tile
+        // (not the -/+ controls from the underlying screen)
+        await tester.tap(find.byIcon(Icons.remove_circle_outline).last);
+        await tester.pumpAndSettle();
 
-          // Should show the Remove confirmation dialog
-          expect(find.text('Remove personal quest?'), findsOneWidget);
-          expect(
-            find.text(
-              'This will remove your current quest and reset all progress.',
-            ),
-            findsOneWidget,
-          );
-          expect(find.text('Remove'), findsOneWidget);
-          expect(find.text('Cancel'), findsOneWidget);
-        },
-      );
+        // Should show the Remove confirmation dialog
+        expect(find.text('Remove personal quest?'), findsOneWidget);
+        expect(
+          find.text(
+            'This will remove your current quest and reset all progress.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('Remove'), findsOneWidget);
+        expect(find.text('Cancel'), findsOneWidget);
+      });
     });
 
     group('retirement prompt', () {

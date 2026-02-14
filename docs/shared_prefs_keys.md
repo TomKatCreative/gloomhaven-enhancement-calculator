@@ -167,8 +167,13 @@ This ensures users can only have contiguous levels (can't have L3 without L1-L2)
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `initialPage` | int | 0 | Home screen tab on app launch |
+| `currentCharacterIndex` | int | 0 | Selected character page index |
 | `generalExpanded` | bool | true | General section expansion |
 | `personalQuestExpanded` | bool | false | Personal Quest section expansion |
+| `questAndNotesExpanded` | bool | true | Quest & Notes section expansion |
+| `perksAndMasteriesExpanded` | bool | true | Perks & Masteries section expansion |
+| `townDetailsExpanded` | bool | true | Town details section expansion |
+| `partyDetailsExpanded` | bool | true | Party details section expansion |
 
 ---
 
@@ -197,7 +202,7 @@ One-time flags to show update dialogs on first launch after update.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `showUpdate440Dialog` | bool | true | Show v4.4.0 update dialog |
+| `showUpdate450Dialog` | bool | true | Show v4.5.0 update dialog |
 
 ---
 
@@ -331,6 +336,11 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `initialPage` | Transient navigation state |
 | `generalExpanded` | Transient UI state |
 | `personalQuestExpanded` | Transient UI state |
+| `questAndNotesExpanded` | Transient UI state |
+| `perksAndMasteriesExpanded` | Transient UI state |
+| `townDetailsExpanded` | Transient UI state |
+| `partyDetailsExpanded` | Transient UI state |
+| `currentCharacterIndex` | Transient navigation state |
 | `showUpdate*Dialog` | One-time dialog flags |
 | `isUSRegion` | Device-specific locale detection |
 | `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |

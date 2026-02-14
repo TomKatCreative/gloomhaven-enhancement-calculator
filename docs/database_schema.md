@@ -161,7 +161,7 @@ Personal quest definitions seeded from `PersonalQuestsRepository`.
 
 ---
 
-> **Gated by** `kTownSheetEnabled` — this table only exists when the feature flag is enabled.
+> **Gated by** `kTownSheetEnabled` — these tables only exist when the feature flag is enabled.
 
 ### Campaigns
 
@@ -176,11 +176,9 @@ Tracks game campaigns with edition-specific prosperity.
 | `DonatedGold` | INTEGER | NOT NULL DEFAULT 0 | Sanctuary donations |
 | `CreatedAt` | DATETIME | | Creation timestamp |
 
-**Added in**: v18
+**Added in**: v19 (conditional)
 
 ---
-
-> **Gated by** `kTownSheetEnabled` — this table only exists when the feature flag is enabled.
 
 ### Parties
 
@@ -193,10 +191,13 @@ Tracks parties within a campaign.
 | `Name` | TEXT | NOT NULL | Party name |
 | `Reputation` | INTEGER | NOT NULL DEFAULT 0 | Party reputation (-20 to +20) |
 | `CreatedAt` | DATETIME | | Creation timestamp |
+| `Location` | TEXT | DEFAULT '' | Current scenario location |
+| `Notes` | TEXT | DEFAULT '' | Party notes |
+| `Achievements` | TEXT | DEFAULT '[]' | JSON array of achievement strings |
 
 **Foreign Key**: `CampaignId REFERENCES Campaigns(_id) ON DELETE CASCADE`
 
-**Added in**: v18
+**Added in**: v19 (conditional)
 
 ---
 
@@ -446,7 +447,10 @@ The backup JSON structure:
       "CampaignId": "uuid-string",
       "Name": "Party One",
       "Reputation": 3,
-      "CreatedAt": "2025-01-15T10:30:00.000"
+      "CreatedAt": "2025-01-15T10:30:00.000",
+      "Location": "Gloomhaven",
+      "Notes": "",
+      "Achievements": "[\"First Steps\"]"
     }
   ]
 }

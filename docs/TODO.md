@@ -23,7 +23,7 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
 | `lib/data/personal_quests/personal_quests_repository.dart` | Static list of all 24 GH quests with `getById()` and `getByEdition()` |
 | `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection`, `_QuestSelectorField`, `_QuestContent`, `_RequirementRow` |
 | `lib/ui/widgets/blurred_expansion_container.dart` | Reusable animated backdrop blur + bordered `ExpansionTile` |
-| `lib/ui/dialogs/personal_quest_selector_dialog.dart` | Bottom sheet for PQ selection, `PersonalQuestSelectorDialog.show()` |
+| `lib/ui/screens/personal_quest_selector_screen.dart` | Full-screen PQ selector with search, `PersonalQuestSelectorScreen.show()` |
 | `lib/data/database_helpers.dart` | v18 migration, `_seedPersonalQuests()`, `queryPersonalQuests()` |
 | `lib/data/database_migrations.dart` | v18 migration entry in `runMigrations()` |
 | `test/widgets/personal_quest_section_test.dart` | 25 widget tests for the PQ section |
@@ -97,7 +97,7 @@ Campaign/party management for tracking persistent game state across play groups.
 - **Character-Party linking**: Nullable `partyId` FK on Characters (existing characters unassigned)
 - **TownModel** (`lib/viewmodels/town_model.dart`): ChangeNotifier for campaign/party CRUD, prosperity/reputation management, active selection persistence via SharedPrefs
 - **Party filtering** on CharactersModel: `showAllCharacters` toggle filters character list by active party
-- **DB migration v18**: Campaigns/Parties tables + PartyId column (bundled with Personal Quests migration)
+- **DB migration v19** (conditional): Campaigns/Parties tables + PartyId column on Characters (separate from Personal Quests v18 migration; only runs when `kTownSheetEnabled` is `true`)
 - **Town screen** (`lib/ui/screens/town_screen.dart`): Empty state → campaign card (prosperity + sanctuary) → party section
 - **Party switching**: Swap icon in PartySection header opens bottom sheet (2+ parties); add icon opens CreatePartyScreen (1 party)
 - **Create Campaign/Party screens**: Pushed-route forms following CreateCharacterScreen pattern

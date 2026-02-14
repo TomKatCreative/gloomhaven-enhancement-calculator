@@ -287,7 +287,7 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | Method | Description |
 |--------|-------------|
 | `loadCharacters()` | Load all characters from database with perks/masteries |
-| `createCharacter(name, class, variant, level, retirements, prosperity, edition)` | Create new character with gold calculated via `edition.startingGold()` |
+| `createCharacter(name, class, {initialLevel, previousRetirements, edition, prosperityLevel, variant, personalQuestId, partyId})` | Create new character with gold calculated via `edition.startingGold()` |
 | `updateCharacter(Character)` | Save character changes to database |
 | `deleteCurrentCharacter()` | Delete current character and navigate |
 | `retireCurrentCharacter()` | Toggle retirement status |

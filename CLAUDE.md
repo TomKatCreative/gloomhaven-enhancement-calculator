@@ -134,7 +134,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (schema version 17 when feature flags disabled, 18 when enabled — see Feature Flags. Do not bump past 18 until after the next release)
+- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (schema version 18 when feature flags disabled, 19 when enabled — see Feature Flags)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ### Feature Flags

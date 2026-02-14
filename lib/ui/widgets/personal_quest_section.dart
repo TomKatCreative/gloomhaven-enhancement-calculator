@@ -24,14 +24,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/dialogs/personal_quest_selector_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/personal_quest_selector_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
@@ -117,10 +116,7 @@ class _SelectQuestButton extends StatelessWidget {
   }
 
   Future<void> _selectQuest(BuildContext context) async {
-    final result = await showPersonalQuestSelectorDialog(
-      context: context,
-      edition: GameEdition.gloomhaven,
-    );
+    final result = await PersonalQuestSelectorScreen.show(context);
     if (result is PQSelected && context.mounted) {
       await model.updatePersonalQuest(character, result.quest.id);
     }
@@ -243,9 +239,8 @@ class _QuestContent extends StatelessWidget {
   }
 
   Future<void> _changeQuest(BuildContext context) async {
-    final result = await showPersonalQuestSelectorDialog(
-      context: context,
-      edition: GameEdition.gloomhaven,
+    final result = await PersonalQuestSelectorScreen.show(
+      context,
       currentQuest: quest,
     );
     if (!context.mounted) return;

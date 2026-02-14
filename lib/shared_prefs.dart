@@ -223,11 +223,11 @@ class SharedPrefs {
   set hideCustomClassesWarningMessage(bool value) =>
       _sharedPrefs.setBool('hideCustomClassesWarningMessage', value);
 
-  bool get showUpdate440Dialog =>
-      _sharedPrefs.getBool('showUpdate440Dialog') ?? true;
+  bool get showUpdate450Dialog =>
+      _sharedPrefs.getBool('showUpdate450Dialog') ?? true;
 
-  set showUpdate440Dialog(bool value) =>
-      _sharedPrefs.setBool('showUpdate440Dialog', value);
+  set showUpdate450Dialog(bool value) =>
+      _sharedPrefs.setBool('showUpdate450Dialog', value);
 
   bool getPlayerClassIsUnlocked(String classCode) =>
       _sharedPrefs.getBool(classCode) ?? false;
