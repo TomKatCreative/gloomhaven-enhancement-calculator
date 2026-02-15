@@ -155,7 +155,7 @@ class _QuestContent extends StatelessWidget {
                   TextSpan(
                     style: theme.textTheme.titleMedium,
                     children: [
-                      TextSpan(text: '${quest.number}: ${quest.title}'),
+                      TextSpan(text: '${quest.displayNumber}: ${quest.title}'),
                       if (quest.unlockClassCode != null) ...[
                         const TextSpan(text: ' · '),
                         WidgetSpan(
@@ -177,7 +177,7 @@ class _QuestContent extends StatelessWidget {
                         WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
                           child: Text(
-                            'X',
+                            quest.unlockEnvelope!,
                             style: TextStyle(
                               fontFamily: 'PirataOne',
                               fontWeight: FontWeight.normal,
@@ -319,16 +319,6 @@ class _RequirementRowState extends State<_RequirementRow> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(
-            isComplete ? Icons.check_circle : Icons.radio_button_unchecked,
-            size: iconSizeSmall,
-            color: isComplete
-                ? theme.extension<AppThemeExtension>()!.contrastedPrimary
-                : widget.isLocked
-                ? theme.disabledColor
-                : theme.colorScheme.onSurfaceVariant,
-          ),
-          const SizedBox(width: smallPadding),
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
@@ -351,7 +341,18 @@ class _RequirementRowState extends State<_RequirementRow> {
           ),
           const SizedBox(width: smallPadding),
           if (widget.isEditMode) ...[
-            if (widget.requirement.target > 20)
+            if (widget.requirement.target == 1)
+              Checkbox(
+                value: widget.progress >= 1,
+                activeColor: theme
+                    .extension<AppThemeExtension>()!
+                    .contrastedPrimary,
+                onChanged: widget.isLocked
+                    ? null
+                    : (value) =>
+                          _updateProgress(context, value == true ? 1 : 0),
+              )
+            else if (widget.requirement.target > 20)
               _buildTextField(theme)
             else ...[
               IconButton(

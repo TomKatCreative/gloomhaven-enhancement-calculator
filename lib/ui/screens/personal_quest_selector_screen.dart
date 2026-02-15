@@ -209,7 +209,7 @@ class _PersonalQuestSelectorScreenState
         alpha: 0.3,
       ),
       title: Text(quest.title, style: theme.textTheme.bodyLarge),
-      subtitle: Text(quest.number.toString()),
+      subtitle: Text(quest.displayNumber),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
