@@ -65,16 +65,9 @@ Uses `playerClass.classCode` as the asset key automatically.
 
 ### 4. Updated Resource Icon References
 
-**File modified:** `lib/data/player_classes/resources_repository.dart`
-
-Changed from full paths to asset keys:
-```dart
-// Before
-Resource('Lumber', 'images/resources/lumber.svg'),
-
-// After
-Resource('Lumber', 'lumber'),
-```
+Resource data is defined in `lib/models/resource_field.dart` as a `List<ResourceFieldData>`.
+Each entry has a `name` (e.g., `'Lumber'`) and a derived `assetKey` getter (`name.toUpperCase()` → `'LUMBER'`).
+Asset keys use UPPERCASE convention to match the standard icon token pattern (e.g., `ATTACK`, `MOVE`).
 
 ### 5. Updated UI Files
 
@@ -114,15 +107,19 @@ Resource('Lumber', 'lumber'),
 
 ## How to Add a New Resource Icon
 
-1. Add the SVG file to `images/resources/`
-2. Add entry to `asset_config.dart`:
+1. Add the SVG file to `images/resources/` with `fill="currentColor"`
+2. Add entry to `asset_config.dart` (UPPERCASE key):
    ```dart
-   'resourcename': AssetConfig(
+   'RESOURCENAME': AssetConfig(
      'resources/resource_name.svg',
      themeMode: CurrentColorTheme(),
    ),
    ```
-3. Add to `ResourcesRepository.resources`:
+3. Add a `ResourceFieldData` entry in `resource_field.dart`:
    ```dart
-   Resource('ResourceName', 'resourcename'),
+   ResourceFieldData(
+     name: 'Resourcename',
+     getter: (character) => character.resourceName,
+     setter: (character, value) => character.resourceName = value,
+   ),
    ```

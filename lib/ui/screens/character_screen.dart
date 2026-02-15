@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
-import 'package:gloomhaven_enhancement_calc/data/player_classes/resources_repository.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
@@ -1546,17 +1545,17 @@ class _ResourcesContent extends StatelessWidget {
     required Color iconColor,
     required bool canEdit,
   }) {
-    return resourceFields.entries.map((entry) {
-      final ResourceFieldData fieldData = entry.value;
-      final resource = ResourcesRepository.resources[fieldData.resourceIndex];
+    return resourceFields.map((fieldData) {
       return ResourceCard(
-        resource: resource,
+        name: fieldData.name,
+        assetKey: fieldData.assetKey,
         iconColor: iconColor,
         count: fieldData.getter(character),
         onTap: canEdit
             ? () => ResourceStepperSheet.show(
                 context: context,
-                resource: resource,
+                name: fieldData.name,
+                assetKey: fieldData.assetKey,
                 iconColor: iconColor,
                 initialCount: fieldData.getter(character),
                 onCountChanged: (newCount) {

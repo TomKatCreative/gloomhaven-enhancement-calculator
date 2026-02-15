@@ -1,63 +1,64 @@
-// Create a map of resource fields to their corresponding properties
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 
-// Helper class to store resource field data
 class ResourceFieldData {
-  final int resourceIndex;
+  final String name;
   final int Function(Character) getter;
   final void Function(Character, int) setter;
 
+  /// Asset key is derived from [name] by uppercasing.
+  String get assetKey => name.toUpperCase();
+
   ResourceFieldData({
-    required this.resourceIndex,
+    required this.name,
     required this.getter,
     required this.setter,
   });
 }
 
-final Map<String, ResourceFieldData> resourceFields = {
-  'resourceLumber': ResourceFieldData(
-    resourceIndex: 0,
+final List<ResourceFieldData> resourceFields = [
+  ResourceFieldData(
+    name: 'Lumber',
     getter: (character) => character.resourceLumber,
     setter: (character, value) => character.resourceLumber = value,
   ),
-  'resourceMetal': ResourceFieldData(
-    resourceIndex: 1,
+  ResourceFieldData(
+    name: 'Metal',
     getter: (character) => character.resourceMetal,
     setter: (character, value) => character.resourceMetal = value,
   ),
-  'resourceHide': ResourceFieldData(
-    resourceIndex: 2,
+  ResourceFieldData(
+    name: 'Hide',
     getter: (character) => character.resourceHide,
     setter: (character, value) => character.resourceHide = value,
   ),
-  'resourceArrowvine': ResourceFieldData(
-    resourceIndex: 3,
+  ResourceFieldData(
+    name: 'Arrowvine',
     getter: (character) => character.resourceArrowvine,
     setter: (character, value) => character.resourceArrowvine = value,
   ),
-  'resourceAxenut': ResourceFieldData(
-    resourceIndex: 4,
+  ResourceFieldData(
+    name: 'Axenut',
     getter: (character) => character.resourceAxenut,
     setter: (character, value) => character.resourceAxenut = value,
   ),
-  'resourceCorpsecap': ResourceFieldData(
-    resourceIndex: 5,
+  ResourceFieldData(
+    name: 'Corpsecap',
     getter: (character) => character.resourceCorpsecap,
     setter: (character, value) => character.resourceCorpsecap = value,
   ),
-  'resourceFlamefruit': ResourceFieldData(
-    resourceIndex: 6,
+  ResourceFieldData(
+    name: 'Flamefruit',
     getter: (character) => character.resourceFlamefruit,
     setter: (character, value) => character.resourceFlamefruit = value,
   ),
-  'resourceRockroot': ResourceFieldData(
-    resourceIndex: 7,
+  ResourceFieldData(
+    name: 'Rockroot',
     getter: (character) => character.resourceRockroot,
     setter: (character, value) => character.resourceRockroot = value,
   ),
-  'resourceSnowthistle': ResourceFieldData(
-    resourceIndex: 8,
+  ResourceFieldData(
+    name: 'Snowthistle',
     getter: (character) => character.resourceSnowthistle,
     setter: (character, value) => character.resourceSnowthistle = value,
   ),
-};
+];

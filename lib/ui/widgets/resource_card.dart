@@ -1,18 +1,19 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 class ResourceCard extends StatelessWidget {
-  final Resource resource;
+  final String name;
+  final String assetKey;
   final Color iconColor;
   final int count;
   final VoidCallback? onTap;
 
   const ResourceCard({
     super.key,
-    required this.resource,
+    required this.name,
+    required this.assetKey,
     required this.iconColor,
     required this.count,
     this.onTap,
@@ -51,7 +52,7 @@ class ResourceCard extends StatelessWidget {
                     width: iconSize,
                     height: iconSize,
                     child: ThemedSvg(
-                      assetKey: resource.icon,
+                      assetKey: assetKey,
                       width: iconSize,
                       color: iconColor.withValues(alpha: 0.45),
                     ),
@@ -63,7 +64,7 @@ class ResourceCard extends StatelessWidget {
                   left: tinyPadding,
                   right: tinyPadding,
                   child: AutoSizeText(
-                    resource.name,
+                    name,
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelMedium?.copyWith(

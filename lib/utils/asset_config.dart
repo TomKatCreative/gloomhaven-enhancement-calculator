@@ -599,30 +599,30 @@ const Map<String, AssetConfig> assets = {
   // ===========================================================================
   // resources/ - Frosthaven crafting resources
   // ===========================================================================
-  'lumber': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
-  'metal': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
-  'hide': AssetConfig('resources/hide.svg', themeMode: CurrentColorTheme()),
-  'arrowvine': AssetConfig(
+  'LUMBER': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
+  'METAL': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
+  'HIDE': AssetConfig('resources/hide.svg', themeMode: CurrentColorTheme()),
+  'ARROWVINE': AssetConfig(
     'resources/arrow_vine.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'axenut': AssetConfig(
+  'AXENUT': AssetConfig(
     'resources/axe_nut.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'corpsecap': AssetConfig(
+  'CORPSECAP': AssetConfig(
     'resources/corpse_cap.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'flamefruit': AssetConfig(
+  'FLAMEFRUIT': AssetConfig(
     'resources/flame_fruit.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'rockroot': AssetConfig(
+  'ROCKROOT': AssetConfig(
     'resources/rock_root.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'snowthistle': AssetConfig(
+  'SNOWTHISTLE': AssetConfig(
     'resources/snow_thistle.svg',
     themeMode: CurrentColorTheme(),
   ),
@@ -907,7 +907,12 @@ const Map<String, AssetConfig> assets = {
     'ui/plus_one.svg',
     lightPath: 'ui/plus_one_light.svg',
   ),
+  'ENHANCEMENTS': AssetConfig(
+    'ui/enhancements.svg',
+    themeMode: CurrentColorTheme(),
+  ),
   'ENVELOPE': AssetConfig('ui/envelope.svg', themeMode: CurrentColorTheme()),
+  'HAND_SIZE': AssetConfig('ui/hand_size.svg', themeMode: CurrentColorTheme()),
   'SECTION': AssetConfig('ui/section.svg', themeMode: CurrentColorTheme()),
   'XP': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
   'xp': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),

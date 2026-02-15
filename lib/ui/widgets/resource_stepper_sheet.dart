@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 /// Bottom sheet with a stepper for adjusting a resource count.
 class ResourceStepperSheet extends StatefulWidget {
   const ResourceStepperSheet({
     super.key,
-    required this.resource,
+    required this.name,
+    required this.assetKey,
     required this.iconColor,
     required this.initialCount,
     required this.onCountChanged,
   });
 
-  final Resource resource;
+  final String name;
+  final String assetKey;
   final Color iconColor;
   final int initialCount;
   final ValueChanged<int> onCountChanged;
@@ -22,7 +23,8 @@ class ResourceStepperSheet extends StatefulWidget {
   /// Shows the resource stepper sheet as a modal bottom sheet.
   static Future<void> show({
     required BuildContext context,
-    required Resource resource,
+    required String name,
+    required String assetKey,
     required Color iconColor,
     required int initialCount,
     required ValueChanged<int> onCountChanged,
@@ -31,7 +33,8 @@ class ResourceStepperSheet extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => ResourceStepperSheet(
-        resource: resource,
+        name: name,
+        assetKey: assetKey,
         iconColor: iconColor,
         initialCount: initialCount,
         onCountChanged: onCountChanged,
@@ -115,12 +118,12 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ThemedSvg(
-                    assetKey: widget.resource.icon,
+                    assetKey: widget.assetKey,
                     width: iconSizeXL,
                     color: widget.iconColor,
                   ),
                   const SizedBox(width: mediumPadding),
-                  Text(widget.resource.name, style: theme.textTheme.titleLarge),
+                  Text(widget.name, style: theme.textTheme.titleLarge),
                 ],
               ),
             ),
