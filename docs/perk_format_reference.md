@@ -6,12 +6,14 @@ This document describes the format for defining perks in `perks_repository.dart`
 
 ```dart
 Perk(
+  1,                // Stable identity number (1-based, required)
   'perk text with KEYWORDS for icons',
   quantity: 1,      // Number of checkboxes (default: 1)
   grouped: false,   // If true, grouped with previous perk (default: false)
 )
 ```
 
+- **number** (first positional param): A stable 1-based identity number unique within each class+variant group. Used to generate the perk ID (`{classCode}_{variant}_{paddedNumber}{letter}`). Numbers must be unique within a `Perks([...])` block — a debug assertion validates this at runtime. Numbering restarts at 1 for each variant group. **Important:** Never reuse or change existing numbers, as they map to stored `CharacterPerk` records in user databases.
 - **quantity**: How many checkboxes appear next to this perk (usually 1-3)
 - **grouped**: When `true`, this perk shares checkboxes with the previous perk (both must be checked together). Used for multi-part perks like "Take 2 of these 3 options"
 
@@ -19,8 +21,9 @@ Perk(
 
 ```dart
 Perks([
-  Perk(...),
-  Perk(...),
+  Perk(1, ...),
+  Perk(2, ...),
+  Perk(3, ..., quantity: 2),
 ], variant: Variant.base)
 ```
 

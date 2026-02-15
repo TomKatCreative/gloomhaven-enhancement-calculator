@@ -83,9 +83,9 @@ Core character data storage.
 
 **Perk ID Format** (still used by `CharacterPerks` and `PerksRepository`):
 ```
-{classCode}_{variant}_{paddedIndex}{letter}
+{classCode}_{variant}_{paddedNumber}{letter}
 ```
-- `paddedIndex`: 1-based, zero-padded (01, 02, ..., 15)
+- `paddedNumber`: Derived from the perk's explicit `number` field (1-based, zero-padded: 01, 02, ..., 15). This is a stable identity number declared on each `Perk(N, ...)` definition, not the list position.
 - `letter`: a, b, c... for multiple copies (quantity > 1)
 
 Examples:
@@ -102,7 +102,7 @@ Join table linking characters to their perk selections.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `AssociatedCharacterUuid` | TEXT | NOT NULL | FK to Characters.CharacterUUID |
-| `AssociatedPerkId` | TEXT | NOT NULL | Perk ID (format: `{classCode}_{variant}_{index}{letter}`) |
+| `AssociatedPerkId` | TEXT | NOT NULL | Perk ID (format: `{classCode}_{variant}_{paddedNumber}{letter}`, where `paddedNumber` is 1-based from the perk's explicit `number` field) |
 | `CharacterPerkIsSelected` | BOOL | NOT NULL | Selection state |
 
 **Auto-created**: When a character is inserted, rows are created for all matching perks (IDs from `PerksRepository.getPerkIds()`) with `isSelected = 0`.
@@ -122,7 +122,7 @@ Join table linking characters to their mastery achievements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `AssociatedCharacterUuid` | TEXT | NOT NULL | FK to Characters.CharacterUUID |
-| `AssociatedMasteryId` | TEXT | NOT NULL | Mastery ID (format: `{classCode}_{variant}_{index}`) |
+| `AssociatedMasteryId` | TEXT | NOT NULL | Mastery ID (format: `{classCode}_{variant}_{number}`, where `number` is 0-based from the mastery's explicit `number` field) |
 | `CharacterMasteryAchieved` | BOOL | NOT NULL | Achievement state |
 
 **Conditional creation**: Only created when `character.shouldShowMasteries == true`.

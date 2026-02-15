@@ -271,7 +271,8 @@ Defines a class perk that modifies the attack modifier deck.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `perkId` | `String` | required | Composite ID: `{classCode}_{variant}_{index}` |
+| `number` | `int` | required | Stable identity number (1-based). First positional param. Used to generate `perkId`. |
+| `perkId` | `String` | generated | Composite ID: `{classCode}_{variant}_{paddedNumber}{letter}` |
 | `classCode` | `String` | required | Reference to PlayerClass |
 | `quantity` | `int` | 1 | Number of this perk available |
 | `perkDetails` | `String` | required | Game text with icon placeholders |
@@ -281,8 +282,12 @@ Defines a class perk that modifies the attack modifier deck.
 ### Perk ID Format
 
 ```
-{classCode}_{variant}_{index}{letter}
+{classCode}_{variant}_{paddedNumber}{letter}
 ```
+
+The `paddedNumber` is derived from the perk's explicit `number` field (zero-padded to 2 digits), not from its position in the list. This makes IDs stable even if definitions are reordered.
+
+**Note:** Perk numbers are **1-based** (first perk in a group is `number: 1`). This differs from masteries which are 0-based — see [Mastery](#mastery) below.
 
 Examples:
 - `br_base_01a` - Brute, base variant, perk 1, first copy
@@ -340,7 +345,7 @@ Links a character to a perk with selection state.
 
 ## Mastery
 
-> **File**: `lib/models/mastery.dart`
+> **File**: `lib/models/mastery/mastery.dart`
 
 Defines a class mastery (Frosthaven feature).
 
@@ -348,10 +353,13 @@ Defines a class mastery (Frosthaven feature).
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `masteryId` | `String` | Composite ID: `{classCode}_{variant}_{index}` |
+| `number` | `int` | Stable identity number (0-based). First positional param. Used to generate `id`. |
+| `id` | `String` | Composite ID: `{classCode}_{variant}_{number}` |
 | `classCode` | `String` | Reference to PlayerClass |
 | `masteryDetails` | `String` | Game text with icon placeholders |
 | `variant` | `Variant` | Class variant |
+
+**Note:** Mastery numbers are **0-based** (first mastery in a group is `number: 0`). This differs from perks which are 1-based — a legacy inconsistency preserved for backward compatibility with existing database records.
 
 ### Mastery Availability
 
