@@ -200,7 +200,7 @@ class GameplaySettingsSection extends StatelessWidget {
     AppLocalizations l10n,
   ) {
     return ListTile(
-      leading: const Icon(Icons.auto_awesome_rounded),
+      leading: const ThemedSvg(assetKey: 'ENHANCEMENTS'),
       title: Text(l10n.enhancementGuidelines),
       trailing: SizedBox(
         width: 60, // Match Switch width for alignment

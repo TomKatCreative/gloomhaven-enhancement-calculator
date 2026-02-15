@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
@@ -42,8 +43,7 @@ class GHCNavigationBar extends StatelessWidget {
           label: l10n.characters,
         ),
         NavigationDestination(
-          icon: const Icon(Icons.auto_awesome_outlined),
-          selectedIcon: const Icon(Icons.auto_awesome),
+          icon: const ThemedSvg(assetKey: 'ENHANCEMENTS'),
           label: l10n.enhancements,
         ),
       ],

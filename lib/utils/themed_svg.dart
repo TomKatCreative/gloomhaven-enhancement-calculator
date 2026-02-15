@@ -56,12 +56,12 @@ class ThemedSvg extends StatelessWidget {
         ? width! * config.widthMultiplier
         : null;
 
-    final icon = _buildThemedIcon(
-      fullPath,
-      effectiveWidth,
-      theme.colorScheme.onSurface,
-      config,
-    );
+    // Respect IconTheme so ThemedSvg adapts to context (e.g. NavigationBar
+    // selected/unselected states). Falls back to onSurface.
+    final iconColor =
+        IconTheme.of(context).color ?? theme.colorScheme.onSurface;
+
+    final icon = _buildThemedIcon(fullPath, effectiveWidth, iconColor, config);
 
     if (showPlusOneOverlay) {
       final size = width ?? height ?? 24.0;

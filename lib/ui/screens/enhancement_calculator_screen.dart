@@ -485,7 +485,7 @@ class _EnhancementTypeCard extends StatelessWidget {
 
     return SectionCard(
       title: l10n.actionDetails,
-      icon: Icons.auto_awesome_rounded,
+      svgAssetKey: 'ENHANCEMENTS',
       contentPadding: const EdgeInsets.only(
         left: largePadding,
         bottom: largePadding,
