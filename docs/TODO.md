@@ -231,3 +231,7 @@ Some files use relative imports, most use `package:` — standardize on `package
 ### ~~Eliminate Definition Tables~~ — Done (v19)
 
 All three definition tables (Perks, Masteries, PersonalQuests) were removed in v19. Definitions now load directly from `PerksRepository`, `MasteriesRepository`, and `PersonalQuestsRepository` at runtime. Only the join tables (`CharacterPerks`, `CharacterMasteries`) remain for storing user state.
+
+### ~~Stable Perk/Mastery IDs~~ — Done
+
+Perk and mastery IDs were previously derived from list position, creating silent data corruption risk if definitions were reordered. Now each `Perk` and `Mastery` carries an explicit `number` field used for ID generation. Numbers match the original positional order so existing DB records are unaffected (zero migration cost). Perks are 1-based, masteries are 0-based (legacy inconsistency preserved for DB compatibility). Debug assertions validate uniqueness at runtime; `test/models/repository_id_stability_test.dart` validates all IDs across all classes in CI.
