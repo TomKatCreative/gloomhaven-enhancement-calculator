@@ -1,9 +1,11 @@
 /// Full-page screen for selecting a Personal Quest.
 ///
-/// Displays all available quests grouped by [GameEdition], with search
-/// functionality. Each quest shows its number, title, and unlock reward.
+/// Displays all available quests grouped by [GameEdition], with edition
+/// filter chips and search functionality. Each quest shows its number,
+/// title, and unlock reward.
 ///
 /// ## Features
+/// - **Edition filter chips**: Narrow results by Gloomhaven or Frosthaven
 /// - **Search**: Filters quests by title or number
 /// - **Section headers**: Groups quests by [GameEdition.displayName]
 /// - **Current quest highlight**: Shows selected quest with highlight styling
@@ -13,6 +15,8 @@
 /// ```
 /// ┌─────────────────────────────────────┐
 /// │ [←]  [🔍 Search...]                 │  ← AppBar with search
+/// ├─────────────────────────────────────┤
+/// │ [Gloomhaven] [Frosthaven]          │  ← Edition filter chips
 /// ├─────────────────────────────────────┤
 /// │ ──────── Gloomhaven ────────        │  ← Section header
 /// │ Seeker of Xorn           [PH] [⊖]  │  ← selected quest with remove
@@ -62,14 +66,7 @@ class PersonalQuestSelectorScreen extends StatefulWidget {
   /// The currently assigned quest, if any. Used for highlight styling.
   final PersonalQuest? currentQuest;
 
-  /// Optional edition filter. If null, shows all quests.
-  final GameEdition? edition;
-
-  const PersonalQuestSelectorScreen({
-    super.key,
-    this.currentQuest,
-    this.edition,
-  });
+  const PersonalQuestSelectorScreen({super.key, this.currentQuest});
 
   /// Shows the personal quest selector as a full page route.
   ///
@@ -77,15 +74,12 @@ class PersonalQuestSelectorScreen extends StatefulWidget {
   static Future<PQSelectorResult?> show(
     BuildContext context, {
     PersonalQuest? currentQuest,
-    GameEdition? edition,
   }) {
     return Navigator.push<PQSelectorResult>(
       context,
       MaterialPageRoute(
-        builder: (context) => PersonalQuestSelectorScreen(
-          currentQuest: currentQuest,
-          edition: edition,
-        ),
+        builder: (context) =>
+            PersonalQuestSelectorScreen(currentQuest: currentQuest),
       ),
     );
   }
@@ -101,12 +95,17 @@ class _PersonalQuestSelectorScreenState
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
+  final Set<GameEdition> _selectedEditions = {};
 
   /// Returns quests filtered by edition and search query.
   List<PersonalQuest> get _filteredQuests {
-    final available = widget.edition != null
-        ? PersonalQuestsRepository.getByEdition(widget.edition!)
-        : PersonalQuestsRepository.quests;
+    var available = PersonalQuestsRepository.quests;
+
+    if (_selectedEditions.isNotEmpty) {
+      available = available
+          .where((q) => _selectedEditions.contains(q.edition))
+          .toList();
+    }
 
     if (_searchQuery.isEmpty) return available;
 
@@ -167,34 +166,78 @@ class _PersonalQuestSelectorScreenState
       ),
       body: SafeArea(
         top: false,
-        child: CustomScrollView(
-          controller: _scrollController,
-          slivers: [
-            for (final (title, items) in _sections)
-              SliverMainAxisGroup(
+        child: Column(
+          children: [
+            Container(
+              color: Theme.of(context).colorScheme.surface,
+              alignment: AlignmentDirectional.centerStart,
+              padding: const EdgeInsets.only(
+                left: smallPadding,
+                top: smallPadding,
+                bottom: smallPadding,
+              ),
+              child: Wrap(
+                spacing: smallPadding,
+                runSpacing: smallPadding,
+                children: [
+                  _buildEditionFilterChip(edition: GameEdition.gloomhaven),
+                  _buildEditionFilterChip(edition: GameEdition.frosthaven),
+                ],
+              ),
+            ),
+            Expanded(
+              child: CustomScrollView(
+                controller: _scrollController,
                 slivers: [
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: SearchSectionHeaderDelegate(title: title),
-                  ),
-                  SliverList.builder(
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final quest = items[index];
-                      final isSelected = widget.currentQuest?.id == quest.id;
-                      return _buildQuestTile(
-                        context,
-                        quest,
-                        isSelected: isSelected,
-                      );
-                    },
+                  for (final (title, items) in _sections)
+                    SliverMainAxisGroup(
+                      slivers: [
+                        SliverPersistentHeader(
+                          pinned: true,
+                          delegate: SearchSectionHeaderDelegate(title: title),
+                        ),
+                        SliverList.builder(
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final quest = items[index];
+                            final isSelected =
+                                widget.currentQuest?.id == quest.id;
+                            return _buildQuestTile(
+                              context,
+                              quest,
+                              isSelected: isSelected,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  const SliverPadding(
+                    padding: EdgeInsets.only(bottom: largePadding),
                   ),
                 ],
               ),
-            const SliverPadding(padding: EdgeInsets.only(bottom: largePadding)),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEditionFilterChip({required GameEdition edition}) {
+    final isSelected = _selectedEditions.contains(edition);
+    return FilterChip(
+      visualDensity: VisualDensity.compact,
+      selected: isSelected,
+      onSelected: (value) {
+        setState(() {
+          if (value) {
+            _selectedEditions.add(edition);
+          } else {
+            _selectedEditions.remove(edition);
+          }
+        });
+      },
+      label: Text(edition.displayName),
     );
   }
 

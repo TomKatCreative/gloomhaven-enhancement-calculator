@@ -130,6 +130,8 @@ Full-page screen for selecting a personal quest for a character.
 ┌─────────────────────────────────────┐
 │ [←]  [🔍 Search...]                 │  ← AppBar with search
 ├─────────────────────────────────────┤
+│ [Gloomhaven] [Frosthaven]          │  ← Edition filter chips
+├─────────────────────────────────────┤
 │ ──────── Gloomhaven ────────        │  ← Section header
 │ Seeker of Xorn           [PH] [⊖]  │  ← selected quest with remove
 │ 510                                 │  ← subtitle
@@ -140,6 +142,7 @@ Full-page screen for selecting a personal quest for a character.
 ```
 
 **Features:**
+- Edition filter chips (Gloomhaven, Frosthaven) narrow results by game edition
 - Search filters by quest title or display number (including padded and alt numbers)
 - Sticky section headers group quests by `GameEdition.displayName` (pinned via `SliverPersistentHeader`)
 - Highlights currently assigned quest with `selectedTileColor`
