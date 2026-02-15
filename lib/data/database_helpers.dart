@@ -31,7 +31,7 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 18;
+  static const _databaseVersion = 19;
 
   // Minimum DB schema version accepted for backup restore (DB v8 = app v4.2.0).
   static const _minimumBackupVersion = 8;
@@ -326,6 +326,8 @@ class DatabaseHelper implements IDatabaseHelper {
         await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
         await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
       },
+      // v19: Frosthaven Personal Quests
+      18: () => DatabaseMigrations.regeneratePersonalQuestsTable(txn),
     };
 
     // Run migrations in order for versions > oldVersion

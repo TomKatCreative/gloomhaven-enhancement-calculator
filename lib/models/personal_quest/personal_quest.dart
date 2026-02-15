@@ -40,6 +40,11 @@ class PersonalQuest {
   String? unlockClassCode;
   String? unlockEnvelope;
 
+  /// Secondary card number for editions with dual numbering (e.g., Frosthaven
+  /// cards have both an edition-specific number 1-23 and an asset number).
+  /// Repository-only — not stored in the database.
+  int? altNumber;
+
   PersonalQuest({
     required this.id,
     required this.number,
@@ -48,6 +53,7 @@ class PersonalQuest {
     this.requirements = const [],
     this.unlockClassCode,
     this.unlockEnvelope,
+    this.altNumber,
   });
 
   PersonalQuest.fromMap(Map<String, dynamic> map) : requirements = const [] {
@@ -66,8 +72,17 @@ class PersonalQuest {
     columnPersonalQuestEdition: edition.name,
   };
 
-  /// Display string combining number and title, e.g., "510 - Seeker of Xorn".
-  String get displayName => '$number - $title';
+  /// Display string for the card number(s).
+  ///
+  /// Shows both numbers when [altNumber] is set (e.g., "04 (584)"),
+  /// otherwise just the primary number (e.g., "510").
+  String get displayNumber => altNumber != null
+      ? '${number.toString().padLeft(2, '0')} ($altNumber)'
+      : '$number';
+
+  /// Display string combining number(s) and title, e.g., "510 - Seeker of Xorn"
+  /// or "01/581 - The Study of Plants".
+  String get displayName => '$displayNumber - $title';
 }
 
 /// A single requirement within a personal quest.
