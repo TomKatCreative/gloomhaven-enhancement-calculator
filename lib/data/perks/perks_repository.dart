@@ -38,19 +38,32 @@ class PerksRepository {
     final result = <Perk>[];
     for (final perksGroup in perksList) {
       if (perksGroup.variant != variant) continue;
-      for (
-        int perkIndex = 0;
-        perkIndex < perksGroup.perks.length;
-        perkIndex++
-      ) {
-        final perk = perksGroup.perks[perkIndex];
+
+      // Validate that all perk numbers are unique within this group
+      assert(() {
+        final numbers = perksGroup.perks.map((p) => p.number).toList();
+        final unique = numbers.toSet();
+        if (unique.length != numbers.length) {
+          final duplicates = numbers.where(
+            (n) => numbers.where((m) => m == n).length > 1,
+          );
+          throw StateError(
+            'Duplicate perk numbers for $classCode/${perksGroup.variant.name}: '
+            '${duplicates.toSet()}',
+          );
+        }
+        return true;
+      }());
+
+      for (final perk in perksGroup.perks) {
         perk.variant = perksGroup.variant;
         perk.classCode = classCode;
 
-        final paddedIndex = (perkIndex + 1).toString().padLeft(2, '0');
+        final paddedIndex = perk.number.toString().padLeft(2, '0');
         for (int i = 0; i < perk.quantity; i++) {
           // Create a copy so each entry gets its own ID
           final perkCopy = Perk(
+            perk.number,
             perk.perkDetails,
             quantity: perk.quantity,
             grouped: perk.grouped,

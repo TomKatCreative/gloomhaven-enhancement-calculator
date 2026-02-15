@@ -16,9 +16,15 @@ class Mastery {
   late String masteryDetails;
   Variant variant = Variant.base;
 
-  Mastery({required this.masteryDetails});
+  /// Stable identity number for this mastery within its class+variant group.
+  ///
+  /// Used to generate mastery IDs that are independent of list position.
+  /// Must be unique within each (classCode, variant) pair.
+  final int number;
 
-  Mastery.fromMap(Map<String, dynamic> map) {
+  Mastery(this.number, {required this.masteryDetails});
+
+  Mastery.fromMap(Map<String, dynamic> map) : number = 0 {
     id = map[columnMasteryId];
     classCode = map[columnMasteryClass];
     masteryDetails = map[columnMasteryDetails];

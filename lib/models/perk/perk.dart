@@ -19,9 +19,20 @@ class Perk {
   bool grouped = false;
   Variant variant = Variant.base;
 
-  Perk(this.perkDetails, {this.quantity = 1, this.grouped = false});
+  /// Stable identity number for this perk within its class+variant group.
+  ///
+  /// Used to generate perk IDs that are independent of list position.
+  /// Must be unique within each (classCode, variant) pair.
+  final int number;
 
-  Perk.fromMap(Map<String, dynamic> map) {
+  Perk(
+    this.number,
+    this.perkDetails, {
+    this.quantity = 1,
+    this.grouped = false,
+  });
+
+  Perk.fromMap(Map<String, dynamic> map) : number = 0 {
     perkId = map[columnPerkId];
     classCode = map[columnPerkClass];
     perkDetails = map[columnPerkDetails];
