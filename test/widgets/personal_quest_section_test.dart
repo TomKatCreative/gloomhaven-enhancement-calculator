@@ -144,9 +144,20 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.textContaining('523: Aberrant Slayer'), findsOneWidget);
-        // Should show 6 progress indicators (3 complete, 3 incomplete)
-        expect(find.text('1/1'), findsNWidgets(3));
-        expect(find.text('0/1'), findsNWidgets(3));
+        // Binary requirements show disabled checkboxes in view mode
+        final checkboxes = find.byType(Checkbox);
+        expect(checkboxes, findsNWidgets(6));
+        // All should be disabled (onChanged: null)
+        for (var i = 0; i < 6; i++) {
+          final cb = tester.widget<Checkbox>(checkboxes.at(i));
+          expect(cb.onChanged, isNull);
+        }
+        // 3 checked, 3 unchecked
+        final checked = List.generate(
+          6,
+          (i) => tester.widget<Checkbox>(checkboxes.at(i)),
+        ).where((cb) => cb.value == true).length;
+        expect(checked, 3);
       });
 
       testWidgets('shows envelope letter in header for envelope quests', (
