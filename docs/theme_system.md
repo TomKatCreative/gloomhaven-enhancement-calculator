@@ -134,8 +134,8 @@ Pinned headers throughout the app use an M3-inspired scroll-aware tint to indica
 
 | Component | File | Behavior |
 |-----------|------|----------|
-| Character header (`_CharacterHeaderDelegate`) | `character_screen.dart` | Transparent when expanded; tints when content scrolls behind pinned header |
-| Chip nav bar (`_SectionNavBarDelegate`) | `character_screen.dart` | Same — transparent when header expanding, tints when content overlaps |
+| Character header (`CharacterHeaderDelegate`) | `character_header_delegates.dart` | Transparent when expanded; tints when content scrolls behind pinned header |
+| Chip nav bar (`SectionNavBarDelegate`) | `character_header_delegates.dart` | Same — transparent when header expanding, tints when content overlaps |
 | Calculator page app bar | `enhancement_calculator_screen.dart` | Tints when `CustomScrollView` content scrolls behind pinned app bar |
 | Main app bar (`GHCAnimatedAppBar`) | `ghc_animated_app_bar.dart` | Tints in sync with character header on characters page; title flips vertically on page transitions |
 

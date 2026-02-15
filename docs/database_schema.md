@@ -1,6 +1,6 @@
 # Database Schema Reference
 
-> **Files**: `lib/data/database_helpers.dart`, `lib/data/database_migrations.dart`
+> **Files**: `lib/data/database_helper.dart`, `lib/data/database_migrations.dart`
 
 This document provides a comprehensive reference for the SQLite database schema, migrations, and key operations.
 

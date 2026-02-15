@@ -102,7 +102,7 @@ lib/
 ├── main.dart                 # App entry, Provider setup
 ├── models/                   # Data models (Character, Perk, Mastery, etc.)
 ├── data/                     # Repositories, database, static game data
-│   ├── database_helpers.dart # SQLite singleton (sqflite)
+│   ├── database_helper.dart  # SQLite singleton (sqflite)
 │   ├── database_migrations.dart
 │   ├── perks/               # Perk definitions by class
 │   ├── masteries/           # Mastery definitions
@@ -116,6 +116,7 @@ lib/
 │   ├── screens/             # Full-page views
 │   ├── widgets/             # Reusable components
 │   │   ├── calculator/      # Enhancement calculator card components
+│   │   ├── character/       # Character screen section widgets
 │   │   ├── settings/        # Settings screen section widgets
 │   │   └── town/            # Town screen section widgets
 │   └── dialogs/             # Modal dialogs
@@ -151,7 +152,7 @@ const bool kTownSheetEnabled = false;
 
 **Database versioning**: Production schema is v18 (includes Personal Quests with 24 GH quests). Dev branch bumps to v19 (adds 23 FH quests via PQ table regeneration). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
-**Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helpers.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
+**Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helper.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
 **Affected files** (test): `helpers/fake_database_helper.dart`, `viewmodels/characters_model_test.dart`, `viewmodels/app_model_test.dart`
 
 ## Key Domain Concepts

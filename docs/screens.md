@@ -376,16 +376,16 @@ await CreateCampaignScreen.show(context, townModel);
 
 ---
 
-## Create Party Screen
+## Create Party Sheet
 
-> **File**: `lib/ui/screens/create_party_screen.dart`
+> **File**: `lib/ui/screens/create_party_sheet.dart`
 
 Pushed route for creating a new party within the active campaign.
 
 ### Invocation
 
 ```dart
-await CreatePartyScreen.show(context, townModel);
+await CreatePartySheet.show(context, townModel);
 ```
 
 ### Form Fields
@@ -398,8 +398,9 @@ await CreatePartyScreen.show(context, townModel);
 ## Character Screen
 
 > **File**: `lib/ui/screens/character_screen.dart`
+> **Extracted widgets**: `lib/ui/widgets/character/`
 
-Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child.
+Displays and edits a single character's stats, perks, masteries, and resources. Embedded within `CharactersScreen` as a PageView child. The main file contains scroll-spy logic and sliver assembly; section widgets are extracted to `lib/ui/widgets/character/`.
 
 ### Architecture
 
@@ -449,7 +450,7 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 
 ### Pinned Header
 
-`_CharacterHeaderDelegate` — a `SliverPersistentHeaderDelegate` that:
+`CharacterHeaderDelegate` (in `lib/ui/widgets/character/character_header_delegates.dart`) — a `SliverPersistentHeaderDelegate` that:
 - Expands to 180px (name, class info, traits, level badge, faded class icon background)
 - Collapses to 56px (name only) on scroll
 - In edit mode with non-retired character: stays at 90px (name `TextFormField`)
@@ -458,12 +459,12 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 
 ### Chip Nav Bar
 
-`_SectionNavBarDelegate` — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets (2–3 chips, see Section-to-Chip Mapping above):
+`SectionNavBarDelegate` (in `lib/ui/widgets/character/character_header_delegates.dart`) — a pinned `SliverPersistentHeaderDelegate` containing a horizontal row of `ChoiceChip` widgets (2–3 chips, see Section-to-Chip Mapping above):
 - Labels vary by feature flags and context: Stats/General, Notes/Quest & Notes, Perks/Perks & Masteries. The third chip label is "Perks" when the class has no masteries, "Perks & Masteries" when it does.
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
-- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `TweenAnimationBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`_CharacterHeaderDelegate`) also tint in sync using the same pattern.
+- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `TweenAnimationBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`CharacterHeaderDelegate`) also tint in sync using the same pattern.
 
 ### Section Cards
 
@@ -494,14 +495,18 @@ Controlled by `charactersModel.isEditMode`:
 
 ### Content Widgets
 
-- `_StatsSection` — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
-- `_CheckmarksAndRetirementsRow` — edit-mode only row with +/- controls
-- `_ResourcesContent` — 9 `ResourceCard` inventory-slot cells with a "Resources" header; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
+Extracted into `lib/ui/widgets/character/`:
+
+- **`StatsAndResourcesCard`** (`stats_and_resources_card.dart`) — Collapsible card owning expansion state; contains `StatsSection`, `CheckmarksAndRetirementsRow`, `PartyAssignmentRow`, Resources header, and `ResourcesContent`
+- **`StatsSection`** (`stats_section.dart`) — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- **`CheckmarksAndRetirementsRow`** (`checkmarks_and_retirements_row.dart`) — edit-mode only row with +/- controls
+- **`ResourcesContent`** (`stats_section.dart`) — 9 `ResourceCard` inventory-slot cells; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
+- **`QuestAndNotesCard`** (`quest_and_notes_card.dart`) — Collapsible card with `PersonalQuestSection` and notes
+- **`PerksAndMasteriesCard`** (`perks_and_masteries_card.dart`) — Collapsible card with `PerksSection`, `MasteriesSection`, and `_PerksCountBadge`
+- **`PartyAssignmentRow`** (`party_assignment_row.dart`) — Party assignment (feature-flagged behind `kTownSheetEnabled`)
 - `PersonalQuestSection` — PQ progress with retirement prompt (see below)
-- `_NotesSection` — User notes (hidden when empty and not editing)
 - `PerksSection` — Perk checkboxes with parsed game text
 - `MasteriesSection` — Mastery checkboxes (conditional display)
-- `_PerksCountBadge` — Shows checked/total perk count in Perks card title
 
 ### Personal Quest Section
 
