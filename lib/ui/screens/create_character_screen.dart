@@ -16,7 +16,7 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/labeled_text_field.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
-import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/party_assignment_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/town_model.dart';

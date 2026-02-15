@@ -3,7 +3,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
-import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
