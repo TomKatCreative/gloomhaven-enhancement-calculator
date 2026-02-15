@@ -831,6 +831,16 @@ const Map<String, AssetConfig> assets = {
   ),
 
   // ===========================================================================
+  // scenario/ - Frosthaven scenario travel requirements
+  // ===========================================================================
+  'BOAT': AssetConfig('scenario/boat.svg', themeMode: CurrentColorTheme()),
+  'CLIMBING_GEAR': AssetConfig(
+    'scenario/climbing_gear.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'SLED': AssetConfig('scenario/sled.svg', themeMode: CurrentColorTheme()),
+
+  // ===========================================================================
   // pips/
   // ===========================================================================
   'PIP_CIRCLE': AssetConfig('pips/circle.svg'),

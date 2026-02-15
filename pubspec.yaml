@@ -78,6 +78,7 @@ flutter:
     - images/class_abilities/
     - images/ui/
     - images/branding/
+    - images/scenario/
 
   fonts:
     - family: PirataOne
