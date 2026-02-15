@@ -405,7 +405,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Collect five different types of herbs through loot tokens',
+              'Personally collect five different types of herbs through loot tokens',
           target: 5,
         ),
       ],
@@ -419,12 +419,12 @@ class PersonalQuestsRepository {
       unlockEnvelope: '24/42',
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Loot eight lumber cards',
+          description: 'Personally loot eight lumber cards through loot tokens',
           target: 8,
         ),
         PersonalQuestRequirement(
           description:
-              'Then follow "Sacred Soil" (Scenario 69) to a conclusion',
+              'Then unlock "Sacred Soil" (Scenario 69) and follow it to a conclusion',
           target: 1,
         ),
       ],
@@ -486,7 +486,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Read a person\'s name in eight different outpost phases',
+              'During eight different outpost phases, read a person\'s name in an event or section',
           target: 8,
         ),
       ],
@@ -501,7 +501,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Follow "A Strong Foundation" (Scenario 65) to a conclusion',
+              'Immediately unlock "A Strong Foundation" (Scenario 65) and follow it to a conclusion',
           target: 1,
         ),
       ],
@@ -579,7 +579,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Follow "Invasion of the Docks" (Scenario 71) to a conclusion',
+              'Immediately unlock "Invasion of the Docks" (Scenario 71) and follow it to a conclusion',
           target: 1,
         ),
       ],
@@ -752,7 +752,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Have ten allies exhaust during scenarios you otherwise complete',
+              'Experience ten allies exhaust during scenarios you otherwise complete',
           target: 10,
         ),
       ],
