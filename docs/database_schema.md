@@ -7,11 +7,11 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 18 (production) / 19 (dev — Frosthaven PQs)
+- **Current Schema Version**: 18 (production) / 19 (dev — Frosthaven PQs + Perks/Masteries table removal)
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
-> **Conditional schema**: Production schema is v18 (Personal Quests table with 24 GH quests and PQ columns on Characters). Dev branch bumps to v19 (regenerates PQ table with 24 GH + 23 FH quests). When `kTownSheetEnabled` is `true`, Campaigns and Parties tables plus `PartyId` column on Characters are created on fresh installs.
+> **Conditional schema**: Production schema is v18 (Personal Quests table with 24 GH quests and PQ columns on Characters). Dev branch bumps to v19 (regenerates PQ table with 24 GH + 23 FH quests, drops Perks and Masteries definition tables). When `kTownSheetEnabled` is `true`, Campaigns and Parties tables plus `PartyId` column on Characters are created on fresh installs.
 
 ## Tables
 
@@ -77,19 +77,11 @@ Core character data storage.
 
 ---
 
-### Perks
+### ~~Perks~~ (Removed in v19)
 
-Perk definitions seeded from `PerksRepository`.
+> **Dropped in v19.** Perk definitions are now loaded directly from `PerksRepository.getPerksForCharacter()` at runtime. The table existed in v5-v18 for storing seeded perk definitions. Migration code (v5-v17) still references this table for users upgrading from old versions.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `PerkId` | TEXT | PRIMARY KEY | Format: `{classCode}_{variant}_{index}{letter}` |
-| `PerkClass` | TEXT | NOT NULL | Class code |
-| `PerkDetails` | TEXT | NOT NULL | Perk description with icons |
-| `PerkIsGrouped` | BOOL | NOT NULL DEFAULT 0 | Grouping flag |
-| `PerkVariant` | TEXT | NOT NULL | Variant name |
-
-**Perk ID Format**:
+**Perk ID Format** (still used by `CharacterPerks` and `PerksRepository`):
 ```
 {classCode}_{variant}_{paddedIndex}{letter}
 ```
@@ -110,23 +102,16 @@ Join table linking characters to their perk selections.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `AssociatedCharacterUuid` | TEXT | NOT NULL | FK to Characters.CharacterUUID |
-| `AssociatedPerkId` | TEXT | NOT NULL | FK to Perks.PerkId |
+| `AssociatedPerkId` | TEXT | NOT NULL | Perk ID (format: `{classCode}_{variant}_{index}{letter}`) |
 | `CharacterPerkIsSelected` | BOOL | NOT NULL | Selection state |
 
-**Auto-created**: When a character is inserted, rows are created for all matching perks with `isSelected = 0`.
+**Auto-created**: When a character is inserted, rows are created for all matching perks (IDs from `PerksRepository.getPerkIds()`) with `isSelected = 0`.
 
 ---
 
-### Masteries
+### ~~Masteries~~ (Removed in v19)
 
-Mastery definitions seeded from `MasteriesRepository` (Frosthaven+ only).
-
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `MasteryId` | TEXT | PRIMARY KEY | Format: `{classCode}_{variant}_{index}` |
-| `MasteryClass` | TEXT | NOT NULL | Class code |
-| `MasteryDetails` | TEXT | NOT NULL | Mastery description |
-| `MasteryVariant` | TEXT | NOT NULL | Variant name |
+> **Dropped in v19.** Mastery definitions are now loaded directly from `MasteriesRepository.getMasteriesForCharacter()` at runtime. The table existed in v7-v18 for storing seeded mastery definitions.
 
 ---
 
@@ -137,27 +122,18 @@ Join table linking characters to their mastery achievements.
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | `AssociatedCharacterUuid` | TEXT | NOT NULL | FK to Characters.CharacterUUID |
-| `AssociatedMasteryId` | TEXT | NOT NULL | FK to Masteries.MasteryId |
+| `AssociatedMasteryId` | TEXT | NOT NULL | Mastery ID (format: `{classCode}_{variant}_{index}`) |
 | `CharacterMasteryAchieved` | BOOL | NOT NULL | Achievement state |
 
 **Conditional creation**: Only created when `character.shouldShowMasteries == true`.
 
 ---
 
-### PersonalQuestsTable
+### ~~PersonalQuestsTable~~ (Removed in v19)
 
-Personal quest definitions seeded from `PersonalQuestsRepository` (47 quests: 24 Gloomhaven + 23 Frosthaven).
+> **Dropped in v19.** Personal quest definitions are now loaded directly from `PersonalQuestsRepository` at runtime. The table existed in v18 for storing seeded quest definitions (id, number, title, edition). Requirements, unlock class, and unlock envelope were always stored in the repository, not the DB.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `_id` | TEXT | PRIMARY KEY | Quest ID (e.g., "pq_gh_510") |
-| `Number` | INTEGER | NOT NULL | Card number (e.g., 510) |
-| `Title` | TEXT | NOT NULL | Quest title (e.g., "Seeker of Xorn") |
-| `Edition` | TEXT | NOT NULL | Game edition (e.g., "gloomhaven") |
-
-**Note**: Requirements, unlock class, and unlock envelope are stored in `PersonalQuestsRepository` (not in DB), similar to how perk details are stored. The DB table holds the basic quest reference data only.
-
-**Added in**: v18
+**Added in**: v18 | **Removed in**: v19
 
 ---
 
@@ -216,23 +192,24 @@ Tracks parties within a campaign.
 
 | Method | Description |
 |--------|-------------|
-| `queryPerks(Character)` | Fetch perks matching class + variant |
 | `queryCharacterPerks(String uuid)` | Fetch perk selections for character |
 | `updateCharacterPerk(CharacterPerk, bool)` | Update selection state |
+
+> Perk definitions are loaded via `PerksRepository.getPerksForCharacter()` (not from DB).
 
 ### Mastery Operations
 
 | Method | Description |
 |--------|-------------|
-| `queryMasteries(Character)` | Fetch masteries matching class + variant |
 | `queryCharacterMasteries(String uuid)` | Fetch mastery achievements |
 | `updateCharacterMastery(CharacterMastery, bool)` | Update achievement state |
 
+> Mastery definitions are loaded via `MasteriesRepository.getMasteriesForCharacter()` (not from DB).
+
 ### Personal Quest Operations
 
-| Method | Description |
-|--------|-------------|
-| `queryPersonalQuests({String? edition})` | Fetch quest definitions, optionally filtered by edition |
+> Quest definitions are loaded via `PersonalQuestsRepository` (not from DB).
+> Characters store their assigned quest ID and progress directly in the Characters table.
 
 ### Campaign Operations
 
@@ -288,7 +265,7 @@ Tracks parties within a campaign.
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
 | v18 | Personal Quests table (24 GH quests), PQ columns on Characters |
-| v19 | Frosthaven Personal Quests (regenerate PQ table with 24 GH + 23 FH quests) |
+| v19 | Drop all definition tables (Perks, Masteries, PersonalQuests) — loaded from repositories |
 
 ### Critical Migrations
 
@@ -347,44 +324,36 @@ if (perk724Selected) {
 
 ---
 
-## Database Seeding
+## Perk & Mastery Definitions (Repository-Based)
 
-### Perk Seeding
+As of v19, perk and mastery definitions are loaded directly from code repositories at runtime — no database tables needed.
 
-When the database is created, perks are seeded from `PerksRepository.perksMap`:
+### Loading Definitions
 
 ```dart
-for (classCode in perksMap.keys) {
-  for (perk in perksMap[classCode]) {
-    for (i in 0..<perk.quantity) {
-      INSERT INTO Perks VALUES (
-        '${classCode}_${variant}_${paddedIndex}${letter}',
-        classCode,
-        perk.perkDetails,
-        perk.grouped ? 1 : 0,
-        variant
-      )
-    }
-  }
+// In CharactersModel._loadPerks():
+character.perks = PerksRepository.getPerksForCharacter(classCode, variant);
+
+// In CharactersModel._loadMasteries():
+character.masteries = MasteriesRepository.getMasteriesForCharacter(classCode, variant);
+```
+
+### Creating CharacterPerk/Mastery Records
+
+When a character is inserted, `DatabaseHelper.insertCharacter()` creates join records using IDs from the repositories:
+
+```dart
+final perkIds = PerksRepository.getPerkIds(classCode, variant);
+for (final perkId in perkIds) {
+  INSERT INTO CharacterPerks VALUES (characterUuid, perkId, 0);
 }
 ```
 
-### Mastery Seeding
+### Historical Context
 
-Similar pattern from `MasteriesRepository.masteriesMap`:
+The Perks and Masteries **definition tables** existed in v5-v18. They were seeded from the same repositories and regenerated whenever a new class was added (migrations v9-v17). Removing them eliminates redundant data and the need for regeneration migrations when adding classes or fixing perk text.
 
-```dart
-for (classCode in masteriesMap.keys) {
-  for (mastery in masteriesMap[classCode]) {
-    INSERT INTO Masteries VALUES (
-      '${classCode}_${variant}_${index}',
-      classCode,
-      mastery.masteryDetails,
-      variant
-    )
-  }
-}
-```
+The **CharacterPerks** and **CharacterMasteries** join tables (which store user progress) remain unchanged.
 
 ---
 
@@ -392,7 +361,7 @@ for (classCode in masteriesMap.keys) {
 
 ### indexToLetter
 
-Converts a 0-based index to a lowercase letter:
+Converts a 0-based index to a lowercase letter (defined in `perks_repository.dart`):
 
 ```dart
 String indexToLetter(int index) => String.fromCharCode('a'.codeUnitAt(0) + index);
@@ -456,7 +425,7 @@ The backup JSON structure:
 }
 ```
 
-**Note**: Perks, Masteries, and PersonalQuests tables are NOT included in backup since they're seeded from repositories on database creation. Campaigns and Parties tables ARE included in backup since they contain user-created data.
+**Note**: All definition tables (Perks, Masteries, PersonalQuests) were removed in v19 and were never included in backup. Campaigns and Parties tables ARE included in backup since they contain user-created data.
 
 **Minimum supported backup version**: DB schema v8 (app v4.2.0). Backups from older versions are rejected during restore with a descriptive error message.
 

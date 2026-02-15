@@ -1,6 +1,5 @@
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
@@ -40,22 +39,11 @@ abstract class IDatabaseHelper {
   /// Queries all mastery achievements for a character by UUID.
   Future<List<CharacterMastery>> queryCharacterMasteries(String uuid);
 
-  /// Queries available perks for a character based on class and variant.
-  Future<List<Map<String, Object?>>> queryPerks(Character character);
-
-  /// Queries available masteries for a character based on class and variant.
-  Future<List<Map<String, Object?>>> queryMasteries(Character character);
-
   /// Updates a character's perk selection.
   Future<void> updateCharacterPerk(CharacterPerk perk, bool value);
 
   /// Updates a character's mastery achievement status.
   Future<void> updateCharacterMastery(CharacterMastery mastery, bool value);
-
-  /// Queries available personal quests, optionally filtered by edition.
-  Future<List<Map<String, Object?>>> queryPersonalQuests({
-    GameEdition? edition,
-  });
 
   // ── Campaign CRUD ──
 

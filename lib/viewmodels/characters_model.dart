@@ -41,15 +41,14 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
+import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
-import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
-import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
@@ -484,33 +483,33 @@ class CharactersModel with ChangeNotifier {
   }
 
   Future<List<CharacterPerk>> _loadPerks(Character character) async {
-    // Load perks from database
-    await _loadCharacterPerks(character);
+    // Load perk definitions from repository (single source of truth)
+    character.perks
+      ..clear()
+      ..addAll(
+        PerksRepository.getPerksForCharacter(
+          character.playerClass.classCode,
+          character.variant,
+        ),
+      );
 
-    // Return character-specific perk selections
+    // Return character-specific perk selections from database
     return await databaseHelper.queryCharacterPerks(character.uuid);
-  }
-
-  Future<void> _loadCharacterPerks(Character character) async {
-    final List<Map<String, Object?>> perks = await databaseHelper.queryPerks(
-      character,
-    );
-
-    for (var perkMap in perks) {
-      character.perks.add(Perk.fromMap(perkMap));
-    }
   }
 
   Future<List<CharacterMastery>> _loadMasteries(Character character) async {
     if (!character.shouldShowMasteries) {
       return [];
     }
-    List<Map<String, Object?>> masteries = await databaseHelper.queryMasteries(
-      character,
-    );
-    for (var masteryMap in masteries) {
-      character.masteries.add(Mastery.fromMap(masteryMap));
-    }
+    // Load mastery definitions from repository (single source of truth)
+    character.masteries
+      ..clear()
+      ..addAll(
+        MasteriesRepository.getMasteriesForCharacter(
+          character.playerClass.classCode,
+          character.variant,
+        ),
+      );
     return await databaseHelper.queryCharacterMasteries(character.uuid);
   }
 

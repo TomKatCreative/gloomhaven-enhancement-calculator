@@ -1,10 +1,8 @@
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
-import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
@@ -51,14 +49,6 @@ class FakeDatabaseHelper implements IDatabaseHelper {
 
   /// In-memory CharacterMastery storage keyed by character UUID.
   Map<String, List<CharacterMastery>> characterMasteriesMap = {};
-
-  /// Raw perk definition data (returned by [queryPerks]).
-  /// If null, auto-generates from PerksRepository for the character's class.
-  List<Map<String, Object?>>? perksData;
-
-  /// Raw mastery definition data (returned by [queryMasteries]).
-  /// If null, auto-generates from MasteriesRepository for the character's class.
-  List<Map<String, Object?>>? masteriesData;
 
   /// In-memory campaign storage.
   List<Campaign> campaigns = [];
@@ -116,32 +106,6 @@ class FakeDatabaseHelper implements IDatabaseHelper {
   }
 
   @override
-  Future<List<Map<String, Object?>>> queryPerks(Character character) async {
-    if (perksData != null) return List.from(perksData!);
-
-    // Auto-generate from PerksRepository
-    return _generatePerkMaps(character);
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> queryMasteries(Character character) async {
-    if (masteriesData != null) return List.from(masteriesData!);
-
-    // Auto-generate from MasteriesRepository
-    return _generateMasteryMaps(character);
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> queryPersonalQuests({
-    GameEdition? edition,
-  }) async {
-    final quests = edition != null
-        ? PersonalQuestsRepository.getByEdition(edition)
-        : PersonalQuestsRepository.quests;
-    return quests.map((q) => q.toMap()).toList();
-  }
-
-  @override
   Future<void> updateCharacterPerk(CharacterPerk perk, bool value) async {
     perkUpdateCalls.add((perkId: perk.associatedPerkId, value: value));
 
@@ -177,87 +141,26 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     }
   }
 
-  /// Generates CharacterPerk records from PerksRepository for a character.
+  /// Generates CharacterPerk records using canonical IDs from PerksRepository.
   void _generateCharacterPerks(Character character) {
-    final perksList = PerksRepository.perksMap[character.playerClass.classCode];
-    if (perksList == null) return;
-
-    final perks = <CharacterPerk>[];
-    for (final perksGroup in perksList) {
-      if (perksGroup.variant != character.variant) continue;
-      int perkIndex = 0;
-      for (final perk in perksGroup.perks) {
-        for (int i = 0; i < perk.quantity; i++) {
-          final perkId =
-              '${character.playerClass.classCode}_${perksGroup.variant.name}_$perkIndex';
-          perks.add(CharacterPerk(character.uuid, perkId, false));
-          perkIndex++;
-        }
-      }
-    }
-    characterPerks[character.uuid] = perks;
+    final perkIds = PerksRepository.getPerkIds(
+      character.playerClass.classCode,
+      character.variant,
+    );
+    characterPerks[character.uuid] = perkIds
+        .map((id) => CharacterPerk(character.uuid, id, false))
+        .toList();
   }
 
-  /// Generates CharacterMastery records from MasteriesRepository for a character.
+  /// Generates CharacterMastery records using canonical IDs from MasteriesRepository.
   void _generateCharacterMasteries(Character character) {
-    final masteriesList =
-        MasteriesRepository.masteriesMap[character.playerClass.classCode];
-    if (masteriesList == null) return;
-
-    final masteries = <CharacterMastery>[];
-    for (final masteriesGroup in masteriesList) {
-      if (masteriesGroup.variant != character.variant) continue;
-      int masteryIndex = 0;
-      for (var i = 0; i < masteriesGroup.masteries.length; i++) {
-        final masteryId =
-            '${character.playerClass.classCode}_${masteriesGroup.variant.name}_$masteryIndex';
-        masteries.add(CharacterMastery(character.uuid, masteryId, false));
-        masteryIndex++;
-      }
-    }
-    characterMasteriesMap[character.uuid] = masteries;
-  }
-
-  /// Generates perk definition maps from PerksRepository.
-  List<Map<String, Object?>> _generatePerkMaps(Character character) {
-    final classCode = character.playerClass.classCode;
-    final perksList = PerksRepository.perksMap[classCode];
-    if (perksList == null) return [];
-
-    final maps = <Map<String, Object?>>[];
-    for (final perksGroup in perksList) {
-      if (perksGroup.variant != character.variant) continue;
-      int perkIndex = 0;
-      for (final perk in perksGroup.perks) {
-        perk.classCode = classCode;
-        perk.variant = perksGroup.variant;
-        for (int i = 0; i < perk.quantity; i++) {
-          maps.add(perk.toMap('$perkIndex'));
-          perkIndex++;
-        }
-      }
-    }
-    return maps;
-  }
-
-  /// Generates mastery definition maps from MasteriesRepository.
-  List<Map<String, Object?>> _generateMasteryMaps(Character character) {
-    final classCode = character.playerClass.classCode;
-    final masteriesList = MasteriesRepository.masteriesMap[classCode];
-    if (masteriesList == null) return [];
-
-    final maps = <Map<String, Object?>>[];
-    for (final masteriesGroup in masteriesList) {
-      if (masteriesGroup.variant != character.variant) continue;
-      int masteryIndex = 0;
-      for (final mastery in masteriesGroup.masteries) {
-        mastery.classCode = classCode;
-        mastery.variant = masteriesGroup.variant;
-        maps.add(mastery.toMap('$masteryIndex'));
-        masteryIndex++;
-      }
-    }
-    return maps;
+    final masteryIds = MasteriesRepository.getMasteryIds(
+      character.playerClass.classCode,
+      character.variant,
+    );
+    characterMasteriesMap[character.uuid] = masteryIds
+        .map((id) => CharacterMastery(character.uuid, id, false))
+        .toList();
   }
 
   // ── Campaign CRUD ──
@@ -359,8 +262,6 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     masteryUpdateCalls = [];
     characterPerks = {};
     characterMasteriesMap = {};
-    perksData = null;
-    masteriesData = null;
     campaigns = [];
     partiesMap = {};
     _nextId = 1;

@@ -4,6 +4,43 @@ import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
 class MasteriesRepository {
+  /// Returns mastery definitions with canonical IDs for a given class and variant.
+  ///
+  /// This is the single source of truth for mastery loading — replaces the
+  /// former database query approach.
+  static List<Mastery> getMasteriesForCharacter(
+    String classCode,
+    Variant variant,
+  ) {
+    final masteriesList = masteriesMap[classCode];
+    if (masteriesList == null) return [];
+
+    final result = <Mastery>[];
+    for (final masteriesGroup in masteriesList) {
+      if (masteriesGroup.variant != variant) continue;
+      for (int i = 0; i < masteriesGroup.masteries.length; i++) {
+        final mastery = masteriesGroup.masteries[i];
+        // Create a copy so each entry gets its own ID
+        final masteryCopy = Mastery(masteryDetails: mastery.masteryDetails);
+        masteryCopy.classCode = classCode;
+        masteryCopy.variant = masteriesGroup.variant;
+        masteryCopy.id = '${classCode}_${variant.name}_$i';
+        result.add(masteryCopy);
+      }
+    }
+    return result;
+  }
+
+  /// Returns canonical mastery IDs for a given class and variant.
+  ///
+  /// Used when creating CharacterMastery join records for a new character.
+  static List<String> getMasteryIds(String classCode, Variant variant) {
+    return getMasteriesForCharacter(
+      classCode,
+      variant,
+    ).map((m) => m.id).toList();
+  }
+
   static final Map<String, List<Masteries>> masteriesMap = {
     // BRUTE/BRUISER
     ClassCodes.brute: [

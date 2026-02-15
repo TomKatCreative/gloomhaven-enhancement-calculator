@@ -48,19 +48,15 @@ void main() {
   /// Sets up fakeDb and loads a Drifter character with pre-populated masteries.
   ///
   /// Uses the Drifter (Frosthaven) since shouldShowMasteries must return true.
-  /// Same pattern as perk tests: populates fakeDb before loadCharacters to
-  /// avoid data overwrite issues.
+  /// Loads the character from fakeDb, then overrides mastery definitions and
+  /// join records with custom test data.
   Future<CharactersModel> setupModelWithMasteries({
     required Character character,
     required List<Mastery> masteries,
     required List<CharacterMasteryData> masteryData,
     bool isEditMode = true,
   }) async {
-    character.masteries = masteries;
-
     fakeDb.characters = [character];
-    fakeDb.perksData = [];
-    fakeDb.masteriesData = [];
     fakeDb.characterMasteriesMap[character.uuid] = masteryData
         .map(
           (d) => TestData.createCharacterMastery(
@@ -70,11 +66,15 @@ void main() {
           ),
         )
         .toList();
-    // Also provide empty characterPerks to avoid null issues during load
-    fakeDb.characterPerks[character.uuid] = [];
 
     final model = createModel();
     await model.loadCharacters();
+
+    // Override mastery definitions and join records with custom test data
+    character.masteries = masteries;
+    character.characterMasteries =
+        fakeDb.characterMasteriesMap[character.uuid]!;
+
     model.isEditMode = isEditMode;
     return model;
   }

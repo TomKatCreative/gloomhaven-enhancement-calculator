@@ -1,5 +1,9 @@
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
+// Legacy database table/column constants.
+// The PerksTable was dropped in v19 — definitions now come from
+// PerksRepository. These constants are kept for historical migration
+// compatibility (database_migrations.dart v5-v17).
 const String tablePerks = 'PerksTable';
 const String columnPerkId = '_id';
 const String columnPerkClass = 'Class';

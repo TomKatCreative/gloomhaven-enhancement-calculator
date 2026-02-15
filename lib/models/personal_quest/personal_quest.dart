@@ -4,11 +4,9 @@
 /// be fulfilled for a character to retire. Quests are edition-specific
 /// (e.g., Gloomhaven, Frosthaven) and may unlock a new class or envelope.
 ///
-/// ## Database Columns
-///
-/// The `column*` constants define SQLite column names for the
-/// PersonalQuests definition table. Requirement data and unlock info
-/// are stored in [PersonalQuestsRepository], not in the database.
+/// Quest definitions are loaded from [PersonalQuestsRepository] at runtime.
+/// Characters store their assigned quest ID and progress directly in the
+/// Characters table.
 ///
 /// See also:
 /// - [PersonalQuestsRepository] for static quest definitions
@@ -19,7 +17,10 @@ import 'dart:convert';
 
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 
-// Database table and column constants
+// Legacy database table/column constants.
+// The PersonalQuestsTable was dropped in v19 — definitions now come from
+// PersonalQuestsRepository. These constants are kept for historical migration
+// compatibility (database_migrations.dart v18).
 const String tablePersonalQuests = 'PersonalQuestsTable';
 const String columnPersonalQuestId = '_id';
 const String columnPersonalQuestNumber = 'Number';
@@ -42,7 +43,6 @@ class PersonalQuest {
 
   /// Secondary card number for editions with dual numbering (e.g., Frosthaven
   /// cards have both an edition-specific number 1-23 and an asset number).
-  /// Repository-only — not stored in the database.
   int? altNumber;
 
   PersonalQuest({

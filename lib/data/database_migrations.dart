@@ -23,11 +23,19 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseMigrations {
+  /// Regenerates both Perks and Masteries definition tables.
+  ///
+  /// Kept for historical migration compatibility (v9-v17).
+  /// The Perks and Masteries tables were dropped in v19 — definitions now
+  /// come from [PerksRepository] and [MasteriesRepository] directly.
   static Future<void> regeneratePerksAndMasteriesTables(Transaction txn) async {
     await regeneratePerksTable(txn);
     await _regenerateMasteriesTable(txn);
   }
 
+  /// Regenerates the Perks definition table.
+  ///
+  /// Kept for historical migration compatibility (v8-v17).
   static Future<void> regeneratePerksTable(Transaction txn) async {
     await txn.execute('DROP TABLE IF EXISTS $tablePerks');
     await txn.execute('''
@@ -62,6 +70,9 @@ class DatabaseMigrations {
     });
   }
 
+  /// Regenerates the Masteries definition table.
+  ///
+  /// Kept for historical migration compatibility (v8-v17).
   static Future<void> _regenerateMasteriesTable(Transaction txn) async {
     await txn.execute('DROP TABLE IF EXISTS $tableMasteries');
     await txn.execute('''
@@ -595,6 +606,10 @@ class DatabaseMigrations {
   }
 
   /// Creates the PersonalQuests definition table and seeds it from repository.
+  ///
+  /// Kept for historical migration compatibility (v18).
+  /// The PersonalQuests table was dropped in v19 — quest definitions now
+  /// come from [PersonalQuestsRepository] directly.
   static Future<void> createAndSeedPersonalQuestsTable(Transaction txn) async {
     await txn.execute('''
       ${DatabaseHelper.createTable} $tablePersonalQuests (
@@ -621,7 +636,9 @@ class DatabaseMigrations {
   }
 
   /// Drops and recreates the PersonalQuests table from the repository.
-  /// Useful for future updates when adding more editions.
+  ///
+  /// Kept for historical migration compatibility.
+  /// The PersonalQuests table was dropped in v19.
   static Future<void> regeneratePersonalQuestsTable(Transaction txn) async {
     await txn.execute('DROP TABLE IF EXISTS $tablePersonalQuests');
     await createAndSeedPersonalQuestsTable(txn);

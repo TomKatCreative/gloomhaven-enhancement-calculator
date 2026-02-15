@@ -5,6 +5,7 @@ import 'package:gloomhaven_enhancement_calc/data/perks/perks_gloomhaven.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_jaws_of_the_lion.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_mercenary_packs.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
 /// Aggregates all perk definitions from edition-specific files.
 ///
@@ -25,4 +26,67 @@ class PerksRepository {
     ...CrimsonScalesPerks.perks,
     ...CustomPerks.perks,
   };
+
+  /// Returns perk definitions with canonical IDs for a given class and variant.
+  ///
+  /// This is the single source of truth for perk loading — replaces the
+  /// former database query approach.
+  static List<Perk> getPerksForCharacter(String classCode, Variant variant) {
+    final perksList = perksMap[classCode];
+    if (perksList == null) return [];
+
+    final result = <Perk>[];
+    for (final perksGroup in perksList) {
+      if (perksGroup.variant != variant) continue;
+      for (
+        int perkIndex = 0;
+        perkIndex < perksGroup.perks.length;
+        perkIndex++
+      ) {
+        final perk = perksGroup.perks[perkIndex];
+        perk.variant = perksGroup.variant;
+        perk.classCode = classCode;
+
+        final paddedIndex = (perkIndex + 1).toString().padLeft(2, '0');
+        for (int i = 0; i < perk.quantity; i++) {
+          // Create a copy so each entry gets its own ID
+          final perkCopy = Perk(
+            perk.perkDetails,
+            quantity: perk.quantity,
+            grouped: perk.grouped,
+          );
+          perkCopy.classCode = classCode;
+          perkCopy.variant = perksGroup.variant;
+          perkCopy.perkId =
+              '${classCode}_${variant.name}_$paddedIndex${indexToLetter(i)}';
+          result.add(perkCopy);
+        }
+      }
+    }
+    return result;
+  }
+
+  /// Returns canonical perk IDs for a given class and variant.
+  ///
+  /// Used when creating CharacterPerk join records for a new character.
+  static List<String> getPerkIds(String classCode, Variant variant) {
+    return getPerksForCharacter(
+      classCode,
+      variant,
+    ).map((p) => p.perkId).toList();
+  }
+}
+
+/// Converts a 0-based index to a lowercase letter (a, b, c, ...).
+///
+/// Used for generating unique perk IDs when quantity > 1.
+String indexToLetter(int index) {
+  if (index < 0) {
+    throw ArgumentError('Index must be non-negative');
+  }
+
+  const int alphabetSize = 26;
+  final int letterCode = 97 + (index % alphabetSize);
+
+  return String.fromCharCode(letterCode);
 }

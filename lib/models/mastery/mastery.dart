@@ -1,5 +1,9 @@
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
+// Legacy database table/column constants.
+// The MasteriesTable was dropped in v19 — definitions now come from
+// MasteriesRepository. These constants are kept for historical migration
+// compatibility (database_migrations.dart v7-v17).
 const String tableMasteries = 'MasteriesTable';
 const String columnMasteryId = '_id';
 const String columnMasteryClass = 'Class';

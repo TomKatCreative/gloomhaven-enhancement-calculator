@@ -54,8 +54,6 @@ void main() {
     bool isEditMode = false,
   }) async {
     fakeDb.characters = [character];
-    fakeDb.perksData = [];
-    fakeDb.masteriesData = [];
     final model = CharactersModel(
       databaseHelper: fakeDb,
       themeProvider: mockTheme,

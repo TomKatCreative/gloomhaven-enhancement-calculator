@@ -48,22 +48,17 @@ void main() {
 
   /// Sets up fakeDb and loads a character with pre-populated perks.
   ///
-  /// This handles the tricky interaction between loadCharacters() and the DB:
-  /// - Sets `perksData = []` to prevent auto-generation of Perk definitions
-  /// - Populates `fakeDb.characterPerks[uuid]` so queryCharacterPerks returns
-  ///   the correct join records (loadCharacters overwrites character.characterPerks)
-  /// - Sets `character.perks` directly with the Perk definitions
+  /// Loads the character from fakeDb, then overrides perk definitions and
+  /// join records with custom test data (since perk definitions are now
+  /// loaded from PerksRepository during loadCharacters).
   Future<CharactersModel> setupModelWithPerks({
     required Character character,
     required List<Perk> perks,
     required List<CharacterPerkData> perkData,
     bool isEditMode = true,
   }) async {
-    character.perks = perks;
-
     // Populate the fakeDb so loadCharacters can find the data
     fakeDb.characters = [character];
-    fakeDb.perksData = []; // Prevent Perk definition auto-generation
     fakeDb.characterPerks[character.uuid] = perkData
         .map(
           (d) => TestData.createCharacterPerk(
@@ -76,6 +71,11 @@ void main() {
 
     final model = createModel();
     await model.loadCharacters();
+
+    // Override perk definitions and join records with custom test data
+    character.perks = perks;
+    character.characterPerks = fakeDb.characterPerks[character.uuid]!;
+
     model.isEditMode = isEditMode;
     return model;
   }

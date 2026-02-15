@@ -66,7 +66,7 @@ The helper `setupSharedPreferences()` in `test_helpers.dart` handles common defa
 - **Call tracking** via `updateCalls`, `deleteCalls`, `perkUpdateCalls`, `masteryUpdateCalls`
 - **Auto-generation** of perk/mastery definitions from `PerksRepository`/`MasteriesRepository` on `insertCharacter()`
 
-Key behavior: When you insert a character, `FakeDatabaseHelper` automatically generates `CharacterPerk` and `CharacterMastery` records matching the real database behavior. To prevent this (e.g., when providing custom perk data), set `fakeDb.perksData = []` and `fakeDb.masteriesData = []` before inserting.
+Key behavior: When you insert a character, `FakeDatabaseHelper` automatically generates `CharacterPerk` and `CharacterMastery` records using canonical IDs from `PerksRepository`/`MasteriesRepository`, matching the real database behavior. To use custom perk/mastery definitions in tests, set `character.perks` and `character.characterPerks` AFTER calling `loadCharacters()`, since `loadCharacters()` loads definitions from the repository.
 
 ### TestData
 

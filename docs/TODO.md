@@ -79,6 +79,7 @@ Campaign/party management for tracking persistent game state across play groups.
 - **GH2E prosperity thresholds** — May differ from GH, needs research
 - **Character assignment UI** — UI for assigning characters to parties from the Characters tab
 - **Party filter toggle** — UI toggle on Characters tab to filter by active party
+- **FH PQ #4 "Greed is Good" prosperity integration** — Currently uses `target: 1` (bool checkbox). When town/campaign data is available, compute the actual target threshold (`80 + 20 × prosperity`) from the character's campaign. No DB migration needed — quest definitions live in code, not the DB. Existing users with `progress[0] >= 1` can be treated as "already confirmed."
 
 ---
 
@@ -226,3 +227,7 @@ Replace per-category `_configure*` methods with data-driven configuration.
 
 ### Import Style Standardization
 Some files use relative imports, most use `package:` — standardize on `package:` imports throughout the codebase.
+
+### ~~Eliminate Definition Tables~~ — Done (v19)
+
+All three definition tables (Perks, Masteries, PersonalQuests) were removed in v19. Definitions now load directly from `PerksRepository`, `MasteriesRepository`, and `PersonalQuestsRepository` at runtime. Only the join tables (`CharacterPerks`, `CharacterMasteries`) remain for storing user state.

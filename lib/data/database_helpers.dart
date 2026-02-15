@@ -6,7 +6,6 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
-import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,13 +14,9 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
-import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
-import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
-import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 import 'database_migrations.dart';
 
@@ -93,14 +88,11 @@ class DatabaseHelper implements IDatabaseHelper {
       await DatabaseMigrations.createMetaDataTable(txn, version);
       await _createTables(txn);
       if (kTownSheetEnabled) await _createCampaignPartyTables(txn);
-      await _seedPerks(txn);
-      await _seedMasteries(txn);
-      await _seedPersonalQuests(txn);
     });
   }
 
-  /// Creates all database tables (Characters, Perks, CharacterPerks,
-  /// Masteries, CharacterMasteries).
+  /// Creates all database tables (Characters, CharacterPerks,
+  /// CharacterMasteries).
   Future<void> _createTables(Transaction txn) async {
     final characterColumns = [
       '$columnCharacterId $idType',
@@ -132,27 +124,10 @@ class DatabaseHelper implements IDatabaseHelper {
     );
 
     await txn.execute('''
-      $createTable $tablePerks (
-        $columnPerkId $idTextPrimaryType,
-        $columnPerkClass $textType,
-        $columnPerkDetails $textType,
-        $columnPerkIsGrouped $boolType DEFAULT 0,
-        $columnPerkVariant $textType
-      )''');
-
-    await txn.execute('''
       $createTable $tableCharacterPerks (
         $columnAssociatedCharacterUuid $textType,
         $columnAssociatedPerkId $textType,
         $columnCharacterPerkIsSelected $boolType
-      )''');
-
-    await txn.execute('''
-      $createTable $tableMasteries (
-        $columnMasteryId $idTextPrimaryType,
-        $columnMasteryClass $textType,
-        $columnMasteryDetails $textType,
-        $columnMasteryVariant $textType
       )''');
 
     await txn.execute('''
@@ -161,63 +136,6 @@ class DatabaseHelper implements IDatabaseHelper {
         $columnAssociatedMasteryId $textType,
         $columnCharacterMasteryAchieved $boolType
       )''');
-
-    await txn.execute('''
-      $createTable $tablePersonalQuests (
-        $columnPersonalQuestId $idTextPrimaryType,
-        $columnPersonalQuestNumber $integerType,
-        $columnPersonalQuestTitle $textType,
-        $columnPersonalQuestEdition $textType
-      )''');
-  }
-
-  /// Seeds the Perks table from PerksRepository.
-  Future<void> _seedPerks(Transaction txn) async {
-    for (final entry in PerksRepository.perksMap.entries) {
-      final classCode = entry.key;
-      final perkLists = entry.value;
-
-      for (final list in perkLists) {
-        for (int perkIndex = 0; perkIndex < list.perks.length; perkIndex++) {
-          final perk = list.perks[perkIndex];
-          perk.variant = list.variant;
-          perk.classCode = classCode;
-
-          final paddedIndex = (perkIndex + 1).toString().padLeft(2, '0');
-          for (int i = 0; i < perk.quantity; i++) {
-            await txn.insert(
-              tablePerks,
-              perk.toMap('$paddedIndex${indexToLetter(i)}'),
-            );
-          }
-        }
-      }
-    }
-  }
-
-  /// Seeds the Masteries table from MasteriesRepository.
-  Future<void> _seedMasteries(Transaction txn) async {
-    for (final entry in MasteriesRepository.masteriesMap.entries) {
-      final classCode = entry.key;
-      final masteriesList = entry.value;
-
-      for (final list in masteriesList) {
-        for (int i = 0; i < list.masteries.length; i++) {
-          final mastery = list.masteries[i];
-          mastery.variant = list.variant;
-          mastery.classCode = classCode;
-
-          await txn.insert(tableMasteries, mastery.toMap('$i'));
-        }
-      }
-    }
-  }
-
-  /// Seeds the PersonalQuests table from PersonalQuestsRepository.
-  Future<void> _seedPersonalQuests(Transaction txn) async {
-    for (final quest in PersonalQuestsRepository.quests) {
-      await txn.insert(tablePersonalQuests, quest.toMap());
-    }
   }
 
   /// Creates Campaigns and Parties tables (for fresh installs).
@@ -326,8 +244,15 @@ class DatabaseHelper implements IDatabaseHelper {
         await DatabaseMigrations.createAndSeedPersonalQuestsTable(txn);
         await DatabaseMigrations.addPersonalQuestColumnsToCharacters(txn);
       },
-      // v19: Frosthaven Personal Quests
-      18: () => DatabaseMigrations.regeneratePersonalQuestsTable(txn),
+      // v19: Drop all definition tables (Perks, Masteries, PersonalQuests).
+      // Definitions now come from repositories directly at runtime.
+      // PersonalQuests was regenerated in v18→v19 for FH quests, but
+      // the table itself is no longer needed.
+      18: () async {
+        await txn.execute('DROP TABLE IF EXISTS PerksTable');
+        await txn.execute('DROP TABLE IF EXISTS MasteriesTable');
+        await txn.execute('DROP TABLE IF EXISTS PersonalQuestsTable');
+      },
     };
 
     // Run migrations in order for versions > oldVersion
@@ -451,20 +376,26 @@ class DatabaseHelper implements IDatabaseHelper {
   Future<int> insertCharacter(Character character) async {
     Database db = await database;
     int id = await db.insert(tableCharacters, character.toMap());
-    final perks = await queryPerks(character);
-    for (final perk in perks) {
+    final perkIds = PerksRepository.getPerkIds(
+      character.playerClass.classCode,
+      character.variant,
+    );
+    for (final perkId in perkIds) {
       await db.insert(tableCharacterPerks, {
         columnAssociatedCharacterUuid: character.uuid,
-        columnAssociatedPerkId: perk[columnPerkId],
+        columnAssociatedPerkId: perkId,
         columnCharacterPerkIsSelected: 0,
       });
     }
     if (character.shouldShowMasteries) {
-      final masteries = await queryMasteries(character);
-      for (final mastery in masteries) {
+      final masteryIds = MasteriesRepository.getMasteryIds(
+        character.playerClass.classCode,
+        character.variant,
+      );
+      for (final masteryId in masteryIds) {
         await db.insert(tableCharacterMasteries, {
           columnAssociatedCharacterUuid: character.uuid,
-          columnAssociatedMasteryId: mastery[columnMasteryId],
+          columnAssociatedMasteryId: masteryId,
           columnCharacterMasteryAchieved: 0,
         });
       }
@@ -550,43 +481,6 @@ class DatabaseHelper implements IDatabaseHelper {
       list.add(CharacterMastery.fromMap(mastery));
     }
     return list;
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> queryPerks(Character character) async {
-    Database db = await database;
-    List<Map<String, Object?>> result = await db.query(
-      tablePerks,
-      where: '$columnPerkClass = ? AND $columnPerkVariant = ?',
-      whereArgs: [character.playerClass.classCode, character.variant.name],
-    );
-    return result.toList();
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> queryMasteries(Character character) async {
-    Database db = await database;
-    List<Map<String, Object?>> result = await db.query(
-      tableMasteries,
-      where: '$columnMasteryClass = ? AND $columnMasteryVariant = ?',
-      whereArgs: [character.playerClass.classCode, character.variant.name],
-    );
-    return result.toList();
-  }
-
-  @override
-  Future<List<Map<String, Object?>>> queryPersonalQuests({
-    GameEdition? edition,
-  }) async {
-    Database db = await database;
-    if (edition != null) {
-      return await db.query(
-        tablePersonalQuests,
-        where: '$columnPersonalQuestEdition = ?',
-        whereArgs: [edition.name],
-      );
-    }
-    return await db.query(tablePersonalQuests);
   }
 
   @override
@@ -757,18 +651,4 @@ class DatabaseHelper implements IDatabaseHelper {
     );
     return maps.map((m) => Character.fromMap(m)).toList();
   }
-}
-
-String indexToLetter(int index) {
-  if (index < 0) {
-    throw ArgumentError('Index must be non-negative');
-  }
-
-  const int alphabetSize = 26; // Assuming you want to use the English alphabet
-
-  // Calculate the corresponding letter based on ASCII value
-  // 'a' is ASCII 97
-  final int letterCode = 97 + (index % alphabetSize);
-
-  return String.fromCharCode(letterCode);
 }
