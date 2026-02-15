@@ -131,40 +131,6 @@ void main() {
         expect(find.text('12/20'), findsOneWidget);
       });
 
-      testWidgets('shows check_circle when requirement is complete', (
-        tester,
-      ) async {
-        final character = TestData.createCharacter(uuid: 'test-pq-3');
-        character.personalQuestId = 'pq_gh_515';
-        character.personalQuestProgress = [20]; // target is 20, so complete
-
-        final model = await setupModel(character: character);
-        await tester.pumpWidget(
-          buildTestWidget(model: model, character: model.characters.first),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.byIcon(Icons.check_circle), findsOneWidget);
-        expect(find.byIcon(Icons.radio_button_unchecked), findsNothing);
-      });
-
-      testWidgets('shows unchecked circle when requirement is incomplete', (
-        tester,
-      ) async {
-        final character = TestData.createCharacter(uuid: 'test-pq-4');
-        character.personalQuestId = 'pq_gh_515';
-        character.personalQuestProgress = [5];
-
-        final model = await setupModel(character: character);
-        await tester.pumpWidget(
-          buildTestWidget(model: model, character: model.characters.first),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.byIcon(Icons.radio_button_unchecked), findsOneWidget);
-        expect(find.byIcon(Icons.check_circle), findsNothing);
-      });
-
       testWidgets('displays multiple requirements', (tester) async {
         final character = TestData.createCharacter(uuid: 'test-pq-5');
         // Quest 523 (Aberrant Slayer) has 6 requirements (one per demon type)
@@ -178,9 +144,9 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.textContaining('523: Aberrant Slayer'), findsOneWidget);
-        // Should show 3 complete (check_circle) and 3 incomplete
-        expect(find.byIcon(Icons.check_circle), findsNWidgets(3));
-        expect(find.byIcon(Icons.radio_button_unchecked), findsNWidgets(3));
+        // Should show 6 progress indicators (3 complete, 3 incomplete)
+        expect(find.text('1/1'), findsNWidgets(3));
+        expect(find.text('0/1'), findsNWidgets(3));
       });
 
       testWidgets('shows envelope letter in header for envelope quests', (
@@ -369,6 +335,47 @@ void main() {
         expect(plusButton.onPressed, isNull);
       });
 
+      testWidgets('shows checkbox for binary (target=1) requirements', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(uuid: 'test-pq-chk-1');
+        // Quest 523 (Aberrant Slayer) has 6 binary requirements
+        character.personalQuestId = 'pq_gh_523';
+        character.personalQuestProgress = [1, 0, 0, 0, 0, 0];
+
+        final model = await setupModel(character: character, isEditMode: true);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
+
+        // Should show 6 checkboxes, no +/- buttons
+        expect(find.byType(Checkbox), findsNWidgets(6));
+        expect(find.byIcon(Icons.add_circle_outline), findsNothing);
+        expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+
+        // First checkbox should be checked
+        final firstCheckbox = tester.widget<Checkbox>(
+          find.byType(Checkbox).first,
+        );
+        expect(firstCheckbox.value, isTrue);
+
+        // Second checkbox should be unchecked
+        final secondCheckbox = tester.widget<Checkbox>(
+          find.byType(Checkbox).at(1),
+        );
+        expect(secondCheckbox.value, isFalse);
+
+        // Tap the second checkbox to check it
+        await tester.tap(find.byType(Checkbox).at(1));
+        await tester.pumpAndSettle();
+
+        final updatedCheckbox = tester.widget<Checkbox>(
+          find.byType(Checkbox).at(1),
+        );
+        expect(updatedCheckbox.value, isTrue);
+      });
+
       testWidgets('does not show edit controls for retired characters', (
         tester,
       ) async {
@@ -449,7 +456,7 @@ void main() {
         expect(model.characters.first.personalQuestProgress[0], 120);
       });
 
-      testWidgets('text field shows check_circle when value meets target', (
+      testWidgets('text field shows dimmed text when value meets target', (
         tester,
       ) async {
         tester.view.physicalSize = const Size(800, 600);
@@ -467,8 +474,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.byIcon(Icons.check_circle), findsOneWidget);
-        expect(find.byIcon(Icons.radio_button_unchecked), findsNothing);
+        // Requirement text should be dimmed (wrapped in Opacity)
+        final opacity = tester.widget<Opacity>(find.byType(Opacity).first);
+        expect(opacity.opacity, lessThan(1.0));
       });
 
       testWidgets('tapping swap button opens selector directly', (
@@ -726,7 +734,7 @@ void main() {
         'does not show snackbar when progress changes on already-complete quest',
         (tester) async {
           final character = TestData.createCharacter(uuid: 'test-pq-retire-5');
-          // Quest 523 has 6 binary requirements
+          // Quest 523 has 6 binary (target=1) requirements → rendered as checkboxes
           character.personalQuestId = 'pq_gh_523';
           // All complete
           character.personalQuestProgress = [1, 1, 1, 1, 1, 1];
@@ -740,15 +748,15 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          // Decrement requirement 0 from 1 to 0 (quest becomes incomplete)
-          await tester.tap(find.byIcon(Icons.remove_circle_outline).first);
+          // Uncheck requirement 0 (quest becomes incomplete)
+          await tester.tap(find.byType(Checkbox).first);
           await tester.pumpAndSettle();
 
           // No snackbar should appear
           expect(find.byType(SnackBar), findsNothing);
 
-          // Now increment it back to 1 (quest becomes complete again)
-          await tester.tap(find.byIcon(Icons.add_circle_outline).first);
+          // Re-check it (quest becomes complete again)
+          await tester.tap(find.byType(Checkbox).first);
           await tester.pumpAndSettle();
 
           // Snackbar SHOULD appear because it transitioned from incomplete to complete
@@ -842,7 +850,7 @@ void main() {
           );
           await tester.pumpAndSettle();
 
-          // There should be 2 pairs of +/- buttons (one per requirement)
+          // First requirement (target 3) has +/- buttons
           final addButtons = find.widgetWithIcon(
             IconButton,
             Icons.add_circle_outline,
@@ -851,20 +859,16 @@ void main() {
             IconButton,
             Icons.remove_circle_outline,
           );
-          expect(addButtons, findsNWidgets(2));
-          expect(removeButtons, findsNWidgets(2));
+          expect(addButtons, findsOneWidget);
+          expect(removeButtons, findsOneWidget);
 
           // First requirement's + button should be enabled
           final firstAddButton = tester.widget<IconButton>(addButtons.at(0));
           expect(firstAddButton.onPressed, isNotNull);
 
-          // Second requirement's +/- buttons should be disabled (locked)
-          final secondAddButton = tester.widget<IconButton>(addButtons.at(1));
-          expect(secondAddButton.onPressed, isNull);
-          final secondRemoveButton = tester.widget<IconButton>(
-            removeButtons.at(1),
-          );
-          expect(secondRemoveButton.onPressed, isNull);
+          // Second requirement (target 1) renders as checkbox — should be disabled (locked)
+          final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+          expect(checkbox.onChanged, isNull);
         },
       );
 
@@ -887,13 +891,9 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Second requirement's + button should now be enabled
-        final addButtons = find.widgetWithIcon(
-          IconButton,
-          Icons.add_circle_outline,
-        );
-        final secondAddButton = tester.widget<IconButton>(addButtons.at(1));
-        expect(secondAddButton.onPressed, isNotNull);
+        // Second requirement (target 1) renders as checkbox — should be enabled
+        final checkbox = tester.widget<Checkbox>(find.byType(Checkbox));
+        expect(checkbox.onChanged, isNotNull);
       });
 
       testWidgets(
@@ -931,30 +931,24 @@ void main() {
         },
       );
 
-      testWidgets(
-        'locked "Then" requirement shows disabled icon color in view mode',
-        (tester) async {
-          final character = TestData.createCharacter(uuid: 'test-pq-lock-4');
-          character.personalQuestId = 'pq_gh_510';
-          character.personalQuestProgress = [1, 0]; // first incomplete
+      testWidgets('locked "Then" requirement shows dimmed text in view mode', (
+        tester,
+      ) async {
+        final character = TestData.createCharacter(uuid: 'test-pq-lock-4');
+        character.personalQuestId = 'pq_gh_510';
+        character.personalQuestProgress = [1, 0]; // first incomplete
 
-          final model = await setupModel(
-            character: character,
-            isEditMode: false,
-          );
-          final themeData = testThemeData();
-          await tester.pumpWidget(
-            buildTestWidget(model: model, character: model.characters.first),
-          );
-          await tester.pumpAndSettle();
+        final model = await setupModel(character: character, isEditMode: false);
+        await tester.pumpWidget(
+          buildTestWidget(model: model, character: model.characters.first),
+        );
+        await tester.pumpAndSettle();
 
-          // The second requirement's icon should use disabledColor
-          final icons = find.byIcon(Icons.radio_button_unchecked);
-          expect(icons, findsNWidgets(2));
-          final secondIcon = tester.widget<Icon>(icons.at(1));
-          expect(secondIcon.color, themeData.disabledColor);
-        },
-      );
+        // The second requirement should be dimmed via Opacity
+        final opacities = find.byType(Opacity);
+        final secondOpacity = tester.widget<Opacity>(opacities.at(1));
+        expect(secondOpacity.opacity, lessThan(1.0));
+      });
     });
 
     group('expansion state', () {
