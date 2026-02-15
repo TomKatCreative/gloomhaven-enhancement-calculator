@@ -907,6 +907,7 @@ const Map<String, AssetConfig> assets = {
     'ui/plus_one.svg',
     lightPath: 'ui/plus_one_light.svg',
   ),
+  'ENVELOPE': AssetConfig('ui/envelope.svg', themeMode: CurrentColorTheme()),
   'SECTION': AssetConfig('ui/section.svg', themeMode: CurrentColorTheme()),
   'XP': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
   'xp': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
