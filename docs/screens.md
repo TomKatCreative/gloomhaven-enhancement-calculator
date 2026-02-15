@@ -140,7 +140,7 @@ Full-page screen for selecting a personal quest for a character.
 ```
 
 **Features:**
-- Search filters by quest title or number
+- Search filters by quest title or display number (including padded and alt numbers)
 - Sticky section headers group quests by `GameEdition.displayName` (pinned via `SliverPersistentHeader`)
 - Highlights currently assigned quest with `selectedTileColor`
 - Remove button (error-colored circle) on the selected quest's tile

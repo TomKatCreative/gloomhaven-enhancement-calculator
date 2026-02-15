@@ -24,9 +24,12 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) shipped in v4.5.0 wit
 - Dual numbering: `altNumber` field on `PersonalQuest` for FH cards (e.g., card #1 / asset 581)
 - `displayNumber` getter: `"01 (581)"` for FH, `"510"` for GH
 - FH quests all unlock envelopes (no class unlocks); envelope values shown in UI
+- Envelope display: PirataOne for single-letter (X, A), ENVELOPE SVG + styled text for numbered envelopes (alt number in `#1D5678`)
 - Scenario SVG assets (boat, climbing_gear, sled) for FH quest descriptions
-- Checkbox UI for binary (target=1) requirements instead of stepper
-- Removed circle status icons from requirement rows (dimming + color conveys state)
+- Checkbox UI for binary (target=1) requirements: edit mode (interactive), view mode (disabled)
+- Removed circle status icons from requirement rows (dimming + primary color conveys state)
+- Edit-mode stepper counter uses `contrastedPrimary` when complete
+- Search in PQ selector matches `displayNumber` (padded + alt numbers)
 
 ## Remaining Work
 
