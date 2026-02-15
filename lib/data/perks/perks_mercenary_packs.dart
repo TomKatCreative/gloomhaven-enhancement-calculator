@@ -69,65 +69,78 @@ class MercenaryPacksPerks {
   static final Map<String, List<Perks>> perks = {
     ClassCodes.anaphi: [
       Perks([
-        Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
+        Perk(1, '$_replace $_one -2 $_card with $_one +0 $_card'),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 $_poison $_card',
           quantity: 3,
         ),
         Perk(
+          3,
           '$_replace $_two +0 $_cards with $_one +1 "Add $_plusOne $_attack when drawn by a summon" $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_one +0 $_card with $_one +0 $_stun $_card'),
+        Perk(4, '$_replace $_one +0 $_card with $_one +0 $_stun $_card'),
         Perk(
+          5,
           '$_replace $_one +1 $_card with $_one +1 "$_invisible, self" $_card',
           quantity: 2,
         ),
-        Perk('$_add $_one +2 $_air/$_dark $_card', quantity: 3),
+        Perk(6, '$_add $_one +2 $_air/$_dark $_card', quantity: 3),
         Perk(
+          7,
           '$_add $_one +2 "$_strengthen, $_targetCircle 1 of your summons" $_card',
           quantity: 2,
         ),
-        Perk('$_ignoreScenarioEffectsAndRemove $_one +0 $_card'),
-        Perk('$_wheneverYouLongRest, you may $_air/$_dark'),
+        Perk(8, '$_ignoreScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(9, '$_wheneverYouLongRest, you may $_air/$_dark'),
         Perk(
+          10,
           '$_onceEachScenario, during your turn, all enemies adjacent to a wall suffer $_damage 1',
         ),
         Perk(
+          11,
           'At the start of the first round of each $_scenario, after all ability cards have been revealed, control one enemy within $_range 5: $_move 2',
         ),
       ], variant: Variant.base),
     ],
     ClassCodes.cassandra: [
       Perks([
-        Perk('$_remove $_one -2 $_card'),
-        Perk('$_remove $_two -1 $_cards'),
+        Perk(1, '$_remove $_one -2 $_card'),
+        Perk(2, '$_remove $_two -1 $_cards'),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 "$_bless, $_targetCircle self or 1 ally" $_card',
           quantity: 3,
         ),
         Perk(
+          4,
           '$_replace $_one +0 $_card with $_one +2 "Add $_plusOne $_attack if the top card of the monster attack modifier deck is revealed" $_card',
           quantity: 3,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one +2 $_light/$_dark $_card',
           quantity: 2,
         ),
         Perk(
+          6,
           '$_add $_one +1 "Place this card in your active area. When you next place a $_rift, discard this card to place another $_rift within $_range 1 of it" $_rolling $_card',
           quantity: 2,
         ),
-        Perk('$_ignoreScenarioEffectsAndAdd $_two +1 $_cards'),
+        Perk(7, '$_ignoreScenarioEffectsAndAdd $_two +1 $_cards'),
         Perk(
+          8,
           '$_wheneverYouLongRest, you may read one unread $_section from the current $_scenario\'s "Section Links"',
         ),
         Perk(
+          9,
           'Whenever you place a $_rift, you may perform "$_pull 1, $_targetCircle 1 ally or enemy, $_range 1" as if you occupied a hex containing a $_rift',
           quantity: 2,
           grouped: true,
         ),
         Perk(
+          10,
           'Whenever a deck is shuffled, you may set aside all revealed cards from that deck and place them back on top after shuffling',
           quantity: 2,
           grouped: true,
@@ -136,72 +149,91 @@ class MercenaryPacksPerks {
     ],
     ClassCodes.hail: [
       Perks([
-        Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
+        Perk(1, '$_replace $_one -2 $_card with $_one +0 $_card'),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 $_wound or $_immobilize $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +1 $_wildElement $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_two +0 $_cards with $_one +1 $_poison or $_muddle $_card',
           quantity: 2,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one +1 "$_heal 1, $_targetCircle 1 ally" $_rolling $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_two +1 $_cards with $_two +2 $_cards'),
-        Perk('$_add $_one +1 $_stun $_card', quantity: 2),
+        Perk(6, '$_replace $_two +1 $_cards with $_two +2 $_cards'),
+        Perk(7, '$_add $_one +1 $_stun $_card', quantity: 2),
         Perk(
+          8,
           '$_add $_one +3 "$_safeguard, $_targetCircle 1 ally" $_card',
           quantity: 2,
         ),
-        Perk('$_ignoreScenarioEffectsAndAdd $_two +1 $_cards'),
-        Perk('$_wheneverYouShortRest, you may choose which $_card to lose'),
+        Perk(9, '$_ignoreScenarioEffectsAndAdd $_two +1 $_cards'),
+        Perk(10, '$_wheneverYouShortRest, you may choose which $_card to lose'),
         Perk(
+          11,
           'Your and your allies\' enhancements cost five gold less and whenever an ally enhances a $_card, you gain five gold',
         ),
         Perk(
+          12,
           '$_add $_one +1 "$_hail gains 1 $_resolve" $_card to the monster attack modifier deck',
         ),
       ], variant: Variant.base),
     ],
     ClassCodes.satha: [
       Perks([
-        Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
+        Perk(1, '$_replace $_one -2 $_card with $_one +0 $_card'),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one "$_shield 1" $_rolling $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 $_ice $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_two +0 $_cards with $_one +1 "$_heal 1, $_targetCircle 1 ally and self" $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_two +1 $_cards with $_two +2 $_cards'),
+        Perk(5, '$_replace $_two +1 $_cards with $_two +2 $_cards'),
         Perk(
+          6,
           '$_add $_one +0 "Grant one ally within $_range 3: $_attack 2 $_range 3 or $_attack 3" $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_add $_one $_disarm $_rolling and $_one +0 "Grant one ally within $_range 3: $_move 2" $_rolling $_card',
           quantity: 2,
         ),
-        Perk('$_add $_two "$_ward, $_range 1" $_rolling $_cards', quantity: 2),
         Perk(
+          8,
+          '$_add $_two "$_ward, $_range 1" $_rolling $_cards',
+          quantity: 2,
+        ),
+        Perk(
+          9,
           '$_ignoreItemMinusOneEffects and whenever you would gain $_stun, prevent the condition',
         ),
         Perk(
+          10,
           '$_wheneverYouLongRest, perform: $_strengthen, $_targetCircle 1 ally, $_range 3',
         ),
-        Perk('All initiative values may be discussed freely and precisely'),
+        Perk(11, 'All initiative values may be discussed freely and precisely'),
         Perk(
+          12,
           'The first time each $_scenario that you or an ally exhaust, perform: $_heal 3, $_targetCircle all, $_ward, $_strengthen',
         ),
       ], variant: Variant.base),

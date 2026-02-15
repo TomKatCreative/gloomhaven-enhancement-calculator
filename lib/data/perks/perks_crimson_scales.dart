@@ -74,175 +74,217 @@ class CrimsonScalesPerks {
     ClassCodes.amberAegis: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -2 $_card with $_one -1 "Place $_one Colony token of your choice on any empty hex within $_range 2" $_card',
         ),
-        Perk('$_remove $_two -1 $_cards'),
-        Perk('$_remove four +0 $_cards'),
-        Perk('$_replace $_one -1 $_card with $_one +2 $_muddle $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +1 $_poison $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +1 $_wound $_card'),
-        Perk('$_add $_two $_rolling +1 $_immobilize $_cards', quantity: 2),
+        Perk(2, '$_remove $_two -1 $_cards'),
+        Perk(3, '$_remove four +0 $_cards'),
+        Perk(4, '$_replace $_one -1 $_card with $_one +2 $_muddle $_card'),
+        Perk(5, '$_replace $_one -1 $_card with $_one +1 $_poison $_card'),
+        Perk(6, '$_replace $_one -1 $_card with $_one +1 $_wound $_card'),
+        Perk(7, '$_add $_two $_rolling +1 $_immobilize $_cards', quantity: 2),
         Perk(
+          8,
           '$_add $_one $_rolling "$_heal 1, Self" $_card and $_one $_rolling "$_shield 1, Self" $_card',
           quantity: 2,
         ),
         Perk(
+          9,
           '$_add $_one $_rolling "$_retaliate 1, $_range 3" $_card',
           quantity: 2,
         ),
-        Perk('$_add $_one +2 $_fire/$_earth $_card'),
-        Perk('$_ignoreNegativeItemEffectsAndAdd $_one +1 $_card'),
+        Perk(10, '$_add $_one +2 $_fire/$_earth $_card'),
+        Perk(11, '$_ignoreNegativeItemEffectsAndAdd $_one +1 $_card'),
         Perk(
+          12,
           '$_ignoreScenarioEffectsAndAdd $_one "+X, where X is the number of active Cultivate actions" card',
         ),
       ], variant: Variant.base),
     ],
     ClassCodes.artificer: [
       Perks([
-        Perk('$_replace $_one -2 $_card with $_one -1 $_wildElement $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +1 $_disarm $_card'),
+        Perk(1, '$_replace $_one -2 $_card with $_one -1 $_wildElement $_card'),
+        Perk(2, '$_replace $_one -1 $_card with $_one +1 $_disarm $_card'),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +1 $_push 1 $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_one -1 $_card with $_one +1 $_pull 1 $_card',
           quantity: 2,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one +0 "$_recover a spent item" $_card',
           quantity: 2,
         ),
         Perk(
+          6,
           '$_replace $_one +0 $_card with $_one +1 "$_shield 1, Self" $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_replace $_one +0 $_card with $_one +1 $_pierce 2 $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_one +2 $_card with $_one +3 "$_heal 2, Self" $_card'),
         Perk(
+          8,
+          '$_replace $_one +2 $_card with $_one +3 "$_heal 2, Self" $_card',
+        ),
+        Perk(
+          9,
           '$_replace $_two +1 $_cards with $_two $_rolling +1 $_poison $_cards',
         ),
         Perk(
+          10,
           '$_replace $_two +1 $_cards with $_two $_rolling +1 $_wound $_cards',
         ),
       ], variant: Variant.base),
     ],
     ClassCodes.bombard: [
       Perks([
-        Perk('$_remove $_two -1 $_cards'),
+        Perk(1, '$_remove $_two -1 $_cards'),
         Perk(
+          2,
           '$_replace $_two +0 $_cards with $_two $_rolling $_pierce 3 $_cards',
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 "+3 if Projectile" $_card',
           quantity: 2,
         ),
-        Perk('$_add $_one +2 $_immobilize $_card', quantity: 2),
+        Perk(4, '$_add $_one +2 $_immobilize $_card', quantity: 2),
         Perk(
+          5,
           '$_replace $_one +1 $_card with $_two +1 "$_retaliate 1, $_range 3" $_cards',
         ),
-        Perk('$_add $_two +1 "$_pull 3, Self, toward the target" $_cards'),
-        Perk('$_add $_one +0 "$_strengthen, Self" $_card'),
-        Perk('$_add $_one +0 $_stun $_card'),
-        Perk('$_add $_one +1 $_wound $_card'),
-        Perk('$_add $_two $_rolling "$_shield 1, Self" $_cards'),
-        Perk('$_add $_two $_rolling "$_heal 1, Self" $_cards'),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
-        Perk('$_ignoreNegativeItemEffectsAndRemove $_one +0 $_card'),
+        Perk(6, '$_add $_two +1 "$_pull 3, Self, toward the target" $_cards'),
+        Perk(7, '$_add $_one +0 "$_strengthen, Self" $_card'),
+        Perk(8, '$_add $_one +0 $_stun $_card'),
+        Perk(9, '$_add $_one +1 $_wound $_card'),
+        Perk(10, '$_add $_two $_rolling "$_shield 1, Self" $_cards'),
+        Perk(11, '$_add $_two $_rolling "$_heal 1, Self" $_cards'),
+        Perk(12, '$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(13, '$_ignoreNegativeItemEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.brightspark: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -1 $_card with $_one +0 "$_consume$_wildElement to $_addLowercase +2 $_attack" $_card',
           quantity: 3,
         ),
         Perk(
+          2,
           '$_replace $_one -2 $_card with $_one -2 "$_recover $_one random $_card from your discard pile" $_card',
         ),
         Perk(
+          3,
           '$_replace $_two +0 $_cards with $_one +1 "$_heal 1, Affect $_one Ally within $_range 2" $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_two +0 $_cards with $_one +1 "$_shield 1, Affect $_one Ally within $_range 2" $_card',
         ),
         Perk(
+          5,
           '$_replace $_one +1 $_card with $_one +2 $_wildElement $_card',
           quantity: 2,
         ),
         Perk(
+          6,
           '$_add $_one +1 "$_strengthen, Affect $_one Ally within $_range 2" $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_add $_one $_rolling "$_push 1 or $_pull 1, $_air" $_card and $_one $_rolling "$_immobilize, $_ice" $_card',
         ),
         Perk(
+          8,
           '$_add $_one $_rolling "$_heal 1, $_range 3, $_light" $_card and $_one $_rolling "$_pierce 2, $_fire" $_card',
         ),
         Perk(
+          9,
           '$_add $_three $_rolling "$_consume$_wildElement : $_wildElement" $_cards',
         ),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one -1 $_card'),
+        Perk(10, '$_ignoreNegativeScenarioEffectsAndRemove $_one -1 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.chieftain: [
       Perks([
-        Perk('$_replace $_one -1 $_card with $_one +0 $_poison $_card'),
+        Perk(1, '$_replace $_one -1 $_card with $_one +0 $_poison $_card'),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 "$_heal 1, Chieftain" $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 "$_heal 1, Affect all summoned allies owned" $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_one -2 $_card with $_one -2 "$_bless, Self" $_card'),
         Perk(
+          4,
+          '$_replace $_one -2 $_card with $_one -2 "$_bless, Self" $_card',
+        ),
+        Perk(
+          5,
           '$_replace $_two +0 $_cards with $_one +0 "$_immobilize and $_push 1" $_card',
         ),
         Perk(
+          6,
           '$_replace $_one +0 $_card with $_one "+X, where X is the number of summoned allies you own" $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_replace $_one +1 $_card with $_two +1 "$_rolling +1, if summon is attacking" $_cards',
         ),
-        Perk('$_add $_one +0 $_wound, $_pierce 1 $_card'),
-        Perk('$_add $_one +1 $_earth $_card', quantity: 2),
+        Perk(8, '$_add $_one +0 $_wound, $_pierce 1 $_card'),
+        Perk(9, '$_add $_one +1 $_earth $_card', quantity: 2),
         Perk(
+          10,
           '$_add $_two $_rolling "$_pierce 2, ignore $_retaliate on the target" $_cards',
         ),
-        Perk('$_ignoreNegativeScenarioEffectsAndAdd $_one +1 $_card'),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndAdd $_one +1 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.fireKnight: [
       Perks([
-        Perk('$_remove $_two -1 $_cards'),
+        Perk(1, '$_remove $_two -1 $_cards'),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 "$_strengthen, Ally" $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_two +0 $_cards with $_two +0 "+2 if you are on Ladder" $_cards',
           quantity: 2,
         ),
-        Perk('$_replace $_one +0 $_card with $_one +1 $_fire $_card'),
-        Perk('$_replace $_one +0 $_card with $_one +1 $_wound $_card'),
-        Perk('$_replace $_two +1 $_cards with $_one +2 $_fire $_card'),
-        Perk('$_replace $_two +1 $_cards with $_one +2 $_wound $_card'),
-        Perk('$_add $_one +1 "$_strengthen, Ally" $_card'),
+        Perk(4, '$_replace $_one +0 $_card with $_one +1 $_fire $_card'),
+        Perk(5, '$_replace $_one +0 $_card with $_one +1 $_wound $_card'),
+        Perk(6, '$_replace $_two +1 $_cards with $_one +2 $_fire $_card'),
+        Perk(7, '$_replace $_two +1 $_cards with $_one +2 $_wound $_card'),
+        Perk(8, '$_add $_one +1 "$_strengthen, Ally" $_card'),
         Perk(
+          9,
           '$_add $_two $_rolling "$_heal 1, $_range 1" $_cards',
           quantity: 2,
         ),
-        Perk('$_add $_two $_rolling $_wound $_cards'),
-        Perk('$_ignoreNegativeItemEffectsAndAdd $_one $_rolling $_fire $_card'),
+        Perk(10, '$_add $_two $_rolling $_wound $_cards'),
         Perk(
+          11,
+          '$_ignoreNegativeItemEffectsAndAdd $_one $_rolling $_fire $_card',
+        ),
+        Perk(
+          12,
           '$_ignoreNegativeScenarioEffectsAndAdd $_one $_rolling $_fire $_card',
         ),
       ], variant: Variant.base),
@@ -250,142 +292,182 @@ class CrimsonScalesPerks {
     ClassCodes.hollowpact: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -1 $_card with $_one +0 "$_heal 2, Self" $_card',
           quantity: 2,
         ),
         Perk(
+          2,
           '$_replace $_two +0 $_cards with $_one +0 VOIDSIGHT $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_add $_one -2 $_earth $_card and $_two +2 $_dark $_cards',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_one -1 $_card with $_one -2 $_stun $_card and $_one +0 VOIDSIGHT $_card',
         ),
         Perk(
+          5,
           '$_replace $_one -2 $_card with $_one +0 $_disarm $_card and $_one -1 $_wildElement $_card',
         ),
         Perk(
+          6,
           '$_replace $_one -1 $_card with $_one $_rolling +1 VOID $_card and $_one $_rolling -1 $_curse $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_replace $_two +1 $_cards with $_one +3 "$_regenerate, Self" $_card',
           quantity: 2,
         ),
         Perk(
+          8,
           '$_replace $_one +0 $_card with $_one +1 "Create a Void pit in an empty hex within $_range 2" $_card',
           quantity: 2,
         ),
         Perk(
+          9,
           '$_ignoreNegativeScenarioEffectsAndAdd $_one +0 "$_ward, Self" $_card',
         ),
       ], variant: Variant.base),
     ],
     ClassCodes.mirefoot: [
       Perks([
-        Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +1 $_card', quantity: 2),
+        Perk(1, '$_replace $_one -2 $_card with $_one +0 $_card'),
+        Perk(2, '$_replace $_one -1 $_card with $_one +1 $_card', quantity: 2),
         Perk(
+          3,
           '$_replace $_two +0 $_cards with $_two "+X, where X is the $_poison value of the target" $_cards',
           quantity: 2,
         ),
-        Perk('$_replace $_two +1 $_cards with $_two +2 $_cards'),
+        Perk(4, '$_replace $_two +1 $_cards with $_two +2 $_cards'),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_two $_rolling "Create difficult terrain in the hex occupied by the target" $_cards',
           quantity: 2,
         ),
         Perk(
+          6,
           '$_replace $_one +1 $_card with $_one +0 $_wound 2 $_card',
           quantity: 2,
         ),
         Perk(
+          7,
           '$_add four $_rolling +0 "+1 if the target occupies difficult terrain" $_cards',
         ),
         Perk(
+          8,
           '$_add $_two $_rolling "$_invisible, Self, if you occupy difficult terrain" $_cards',
         ),
         Perk(
+          9,
           'Gain "Poison Dagger" (Item 011). You may carry $_one additional $_oneHand item with "Dagger" in its name',
         ),
         Perk(
+          10,
           'Ignore damage, $_negative conditions, and modifiers from Events, and $_removeLowercase $_one -1 $_card',
         ),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one -1 $_card'),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndRemove $_one -1 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.chainguard: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -1 $_card with $_one +1 Shackle $_card',
           quantity: 2,
         ),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 "+2 if the target is Shackled" $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_two +0 $_cards with $_one $_rolling "$_shield 1, Self" $_card',
           quantity: 2,
         ),
-        Perk('$_add $_two $_rolling "$_retaliate 1, Self" $_cards'),
-        Perk('$_add $_three $_rolling SWING 3 $_cards'),
-        Perk('$_replace $_one +1 $_card with $_one +2 $_wound $_card'),
-        Perk('$_add $_one +1 "$_disarm if the target is Shackled" $_card'),
+        Perk(4, '$_add $_two $_rolling "$_retaliate 1, Self" $_cards'),
+        Perk(5, '$_add $_three $_rolling SWING 3 $_cards'),
+        Perk(6, '$_replace $_one +1 $_card with $_one +2 $_wound $_card'),
+        Perk(7, '$_add $_one +1 "$_disarm if the target is Shackled" $_card'),
         Perk(
+          8,
           '$_add $_one +1 "Create a 2 $_damage trap in an empty hex within $_range 2" $_card',
         ),
-        Perk('$_add $_two $_rolling "$_heal 1, Self" $_cards'),
-        Perk('$_add $_one +2 Shackle $_card', quantity: 2),
-        Perk('$_ignoreNegativeItemEffectsAndRemove $_one +0 $_card'),
+        Perk(9, '$_add $_two $_rolling "$_heal 1, Self" $_cards'),
+        Perk(10, '$_add $_one +2 Shackle $_card', quantity: 2),
+        Perk(11, '$_ignoreNegativeItemEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.hierophant: [
       Perks([
-        Perk('$_remove $_two -1 $_cards'),
-        Perk('$_replace $_two +0 $_cards with $_one $_rolling $_light $_card'),
-        Perk('$_replace $_two +0 $_cards with $_one $_rolling $_earth $_card'),
+        Perk(1, '$_remove $_two -1 $_cards'),
         Perk(
+          2,
+          '$_replace $_two +0 $_cards with $_one $_rolling $_light $_card',
+        ),
+        Perk(
+          3,
+          '$_replace $_two +0 $_cards with $_one $_rolling $_earth $_card',
+        ),
+        Perk(
+          4,
           '$_replace $_one -1 $_card with $_one +0 $_curse $_card',
           quantity: 2,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one +1 "$_shield 1, Ally" $_card',
         ),
         Perk(
+          6,
           '$_replace $_one -2 $_card with $_one -1 "Give $_one Ally a \'Prayer\' ability $_card" and $_one +0 $_card',
         ),
-        Perk('$_replace $_one +1 $_card with $_one +3 $_card', quantity: 2),
+        Perk(7, '$_replace $_one +1 $_card with $_one +3 $_card', quantity: 2),
         Perk(
+          8,
           '$_add $_two $_rolling "$_heal 1, Self or Ally" $_cards',
           quantity: 2,
         ),
-        Perk('$_add $_one +1 $_wound, $_muddle $_card', quantity: 2),
-        Perk('At the start of your first turn each $_scenario, gain $_bless'),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(9, '$_add $_one +1 $_wound, $_muddle $_card', quantity: 2),
+        Perk(
+          10,
+          'At the start of your first turn each $_scenario, gain $_bless',
+        ),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.luminary: [
       Perks([
-        Perk('$_remove four +0 $_cards'),
-        Perk('$_replace $_one +0 $_card with $_one +2 $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +0 $_ice $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +0 $_fire $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +0 $_light $_card'),
-        Perk('$_replace $_one -1 $_card with $_one +0 $_dark $_card'),
+        Perk(1, '$_remove four +0 $_cards'),
+        Perk(2, '$_replace $_one +0 $_card with $_one +2 $_card'),
+        Perk(3, '$_replace $_one -1 $_card with $_one +0 $_ice $_card'),
+        Perk(4, '$_replace $_one -1 $_card with $_one +0 $_fire $_card'),
+        Perk(5, '$_replace $_one -1 $_card with $_one +0 $_light $_card'),
+        Perk(6, '$_replace $_one -1 $_card with $_one +0 $_dark $_card'),
         Perk(
+          7,
           '$_replace $_one -2 $_card with $_one -2 "Perform $_one Glow ability" $_card',
         ),
-        Perk('$_add $_one +0 $_wildElement $_card', quantity: 2),
-        Perk('$_add $_one $_rolling +1 "$_heal 1, Self" $_card', quantity: 2),
+        Perk(8, '$_add $_one +0 $_wildElement $_card', quantity: 2),
         Perk(
+          9,
+          '$_add $_one $_rolling +1 "$_heal 1, Self" $_card',
+          quantity: 2,
+        ),
+        Perk(
+          10,
           '$_add $_one "$_poison, target all enemies in the depicted LUMINARY_HEXES area" $_card',
           quantity: 2,
         ),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
         Perk(
+          12,
           '$_ignoreNegativeItemEffectsAndAdd $_one $_rolling "$_consume$_wildElement : $_wildElement" $_card',
         ),
       ], variant: Variant.base),
@@ -393,91 +475,110 @@ class CrimsonScalesPerks {
     ClassCodes.spiritCaller: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -2 $_card with $_one -1 $_card and $_one +1 $_card',
         ),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 "+2 if a Spirit performed the attack" $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 $_card and $_one $_rolling $_poison $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_one +0 $_card with $_one +1 $_air $_card',
           quantity: 2,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one +1 $_dark $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_one +0 $_card with $_one +1 $_pierce 2 $_card'),
-        Perk('$_add $_three $_rolling $_pierce 3 $_cards'),
-        Perk('$_add $_one +1 $_curse $_card'),
-        Perk('$_add $_one $_rolling ADD $_targetDiamond $_card'),
-        Perk('$_replace $_one +1 $_card with $_one +2 $_push 2 $_card'),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(6, '$_replace $_one +0 $_card with $_one +1 $_pierce 2 $_card'),
+        Perk(7, '$_add $_three $_rolling $_pierce 3 $_cards'),
+        Perk(8, '$_add $_one +1 $_curse $_card'),
+        Perk(9, '$_add $_one $_rolling ADD $_targetDiamond $_card'),
+        Perk(10, '$_replace $_one +1 $_card with $_one +2 $_push 2 $_card'),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.starslinger: [
       Perks([
         Perk(
+          1,
           '$_replace $_two +0 $_cards with $_one $_rolling "$_heal 1, Self" $_card',
           quantity: 2,
         ),
         Perk(
+          2,
           '$_replace $_one -2 $_card with $_one -1 "$_invisible, Self" $_card',
         ),
-        Perk('$_replace $_two -1 $_cards with $_one +0 $_dark $_card'),
+        Perk(3, '$_replace $_two -1 $_cards with $_one +0 $_dark $_card'),
         Perk(
+          4,
           '$_replace $_one -1 $_card with $_one +1 $_light $_card',
           quantity: 2,
         ),
-        Perk('$_add $_one $_rolling $_loot 1 $_card'),
+        Perk(5, '$_add $_one $_rolling $_loot 1 $_card'),
         Perk(
+          6,
           '$_add $_one +1 "+3 if you are at full health" $_card',
           quantity: 2,
         ),
-        Perk('$_add $_two $_rolling $_immobilize $_cards'),
-        Perk('$_add $_one +1 "$_heal 1, $_range 3" $_card', quantity: 2),
+        Perk(7, '$_add $_two $_rolling $_immobilize $_cards'),
+        Perk(8, '$_add $_one +1 "$_heal 1, $_range 3" $_card', quantity: 2),
         Perk(
+          9,
           '$_add $_two $_rolling "Force the target to perform a \'$_move 1\' ability" $_cards',
         ),
-        Perk('$_add $_two $_rolling "$_heal 1, $_range 1" $_cards'),
-        Perk('$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
+        Perk(10, '$_add $_two $_rolling "$_heal 1, $_range 1" $_cards'),
+        Perk(11, '$_ignoreNegativeScenarioEffectsAndRemove $_one +0 $_card'),
       ], variant: Variant.base),
     ],
     ClassCodes.ruinmaw: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -2 $_card with $_one -1 $_rupture and $_wound $_card',
         ),
         Perk(
+          2,
           '$_replace $_one -1 $_card with $_one +0 $_wound $_card',
           quantity: 2,
         ),
         Perk(
+          3,
           '$_replace $_one -1 $_card with $_one +0 $_rupture $_card',
           quantity: 2,
         ),
         Perk(
+          4,
           '$_replace $_one +0 $_card with $_one +1 "$_add +3 instead if the target has $_rupture or $_wound" $_card',
           quantity: 3,
         ),
         Perk(
+          5,
           '$_replace $_one +0 $_card with $_one $_rolling "$_heal 1, Self, $_empower" $_card',
           quantity: 3,
         ),
         Perk(
+          6,
           'Once each $_scenario, become SATED after collecting your 5th loot token',
         ),
         Perk(
+          7,
           'Become SATED each time you lose a $_card to negate suffering damage',
         ),
         Perk(
+          8,
           'Whenever $_one of your abilities causes at least $_one enemy to gain $_rupture, immediately after that ability perform "$_move 1"',
         ),
         Perk(
+          9,
           '$_ignoreNegativeScenarioEffects, and $_removeLowercase $_one -1 $_card',
         ),
       ], variant: Variant.base),
@@ -485,33 +586,41 @@ class CrimsonScalesPerks {
     ClassCodes.thornreaper: [
       Perks([
         Perk(
+          1,
           '$_replace $_one -1 $_card with $_one $_rolling "+1 if $_light is Strong or Waning" $_card',
           quantity: 2,
         ),
-        Perk('$_replace $_one -2 $_card with $_one +0 $_card'),
+        Perk(2, '$_replace $_one -2 $_card with $_one +0 $_card'),
         Perk(
+          3,
           'Add three $_rolling "+1 if $_light is Strong or Waning" cards',
           quantity: 2,
         ),
-        Perk('$_add $_two $_rolling $_light $_cards'),
+        Perk(4, '$_add $_two $_rolling $_light $_cards'),
         Perk(
+          5,
           '$_add $_three $_rolling "$_earth if $_light is Strong or Waning" $_cards',
         ),
         Perk(
+          6,
           '$_add $_one "Create hazardous terrain in $_one hex within $_range 1" $_card',
         ),
         Perk(
+          7,
           'Add one $_rolling "On the next attack targeting you while occupying hazardous terrain, discard this card to gain $_retaliate 3" card',
           quantity: 2,
         ),
         Perk(
+          8,
           'Add one $_rolling "On the next attack targeting you while occupying hazardous terrain, discard this card to gain $_shield 3" card',
           quantity: 2,
         ),
         Perk(
+          9,
           '$_ignoreNegativeItemEffectsAndAdd $_one $_rolling "+1 if $_light is Strong or Waning" $_card',
         ),
         Perk(
+          10,
           'Gain $_shield 1 while you occupy hazardous terrain',
           quantity: 2,
           grouped: true,
@@ -520,26 +629,33 @@ class CrimsonScalesPerks {
     ],
     ClassCodes.vanquisher: [
       Perks([
-        Perk('Replace two -1 cards with one +0 $_muddle card'),
-        Perk('Replace two -1 cards with one -1 "$_heal 2, Self" card'),
-        Perk('Replace one -2 card with one -1 $_poison $_wound card'),
+        Perk(1, 'Replace two -1 cards with one +0 $_muddle card'),
+        Perk(2, 'Replace two -1 cards with one -1 "$_heal 2, Self" card'),
+        Perk(3, 'Replace one -2 card with one -1 $_poison $_wound card'),
         Perk(
+          4,
           '$_replace one +0 card with one +1 "$_heal 1, Self" card',
           quantity: 2,
         ),
         Perk(
+          5,
           'Replace two +0 cards with one +0 $_curse card and one +0 $_immobilize card',
         ),
-        Perk('Replace one +1 card with one +2 $_fire/$_air card', quantity: 2),
-        Perk('Replace one +2 card with one $_rolling "Gain one RAGE" card'),
         Perk(
+          6,
+          'Replace one +1 card with one +2 $_fire/$_air card',
+          quantity: 2,
+        ),
+        Perk(7, 'Replace one +2 card with one $_rolling "Gain one RAGE" card'),
+        Perk(
+          8,
           'Add one +1 "$_retaliate 1, Self" card and one $_rolling $_pierce 3 card',
           quantity: 2,
         ),
-        Perk('Add one +0 "$_bless, Self" card'),
-        Perk('Add two +1 "+2 instead if you suffer 1 damage" cards'),
-        Perk('Add one +2 "+3 instead if you suffer 1 damage" card'),
-        Perk('$_ignoreNegativeItemEffectsAndRemove one -1 card'),
+        Perk(9, 'Add one +0 "$_bless, Self" card'),
+        Perk(10, 'Add two +1 "+2 instead if you suffer 1 damage" cards'),
+        Perk(11, 'Add one +2 "+3 instead if you suffer 1 damage" card'),
+        Perk(12, '$_ignoreNegativeItemEffectsAndRemove one -1 card'),
       ], variant: Variant.base),
     ],
   };
