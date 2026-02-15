@@ -1,83 +1,36 @@
 # Personal Quests
 
-## Status: Phase 1 Released
+## Status: Released (v4.5.0), Frosthaven WIP on dev
 
-Base Gloomhaven personal quests (24 quests, cards 510-533) are implemented with:
+Base Gloomhaven personal quests (24 quests, cards 510-533) shipped in v4.5.0 with:
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
 - DB migration v18 (PersonalQuestsTable + PQ columns on Characters)
 - PQ selection on character creation screen (GH only; GH2E/FH show "Coming soon")
-- PQ section on character screen with progress tracking (+/- buttons in edit mode)
-- Change quest flow with confirmation dialog
+- PQ section on character screen with stepper-based progress tracking in edit mode
+- Sequential "Then" requirements: disabled until predecessor requirement is complete
+- Change/remove quest flow with confirmation dialog (shown after new quest selection)
+- Remove quest option in PQ selector screen
 - Retirement prompt: snackbar with confetti pop on PQ completion → confirmation dialog → retire
 - `CollapsibleSectionCard` for PQ section; `SectionCard` for static sections
-- Class unlock icon / envelope icon in ExpansionTile header row
-- `TextFormField` selector when no quest assigned (edit mode)
+- Class unlock icon / envelope icon in header row
 - Strikethrough gold display for retired characters (gold forfeited on retirement)
-- Full test coverage (model, repository, viewmodel, widget tests — 25 PQ widget tests)
+- Text overflow handling for long requirement descriptions
+- Full test coverage (model, repository, viewmodel, widget tests)
 
-### Architecture & File Locations
+### Frosthaven PQs (WIP on dev)
 
-| File | Purpose |
-|------|---------|
-| `lib/models/personal_quest/personal_quest.dart` | `PersonalQuest` model, `PersonalQuestRequirement`, progress encode/decode, DB column constants |
-| `lib/data/personal_quests/personal_quests_repository.dart` | Static list of all 24 GH quests with `getById()` and `getByEdition()` |
-| `lib/ui/widgets/personal_quest_section.dart` | `PersonalQuestSection`, `_QuestSelectorField`, `_QuestContent`, `_RequirementRow` |
-| `lib/ui/widgets/blurred_expansion_container.dart` | Reusable animated backdrop blur + bordered `ExpansionTile` |
-| `lib/ui/screens/personal_quest_selector_screen.dart` | Full-screen PQ selector with search, `PersonalQuestSelectorScreen.show()` |
-| `lib/data/database_helpers.dart` | v18 migration, `_seedPersonalQuests()`, `queryPersonalQuests()` |
-| `lib/data/database_migrations.dart` | v18 migration entry in `runMigrations()` |
-| `test/widgets/personal_quest_section_test.dart` | 25 widget tests for the PQ section |
-| `test/models/personal_quest_test.dart` | Model unit tests (constructor, toMap/fromMap, progress encoding) |
-| `test/models/personal_quest_repository_test.dart` | Repository tests (quest data integrity, getById, getByEdition) |
-
-### Data Flow
-
-1. `PersonalQuestsRepository` holds static quest definitions (requirements, unlock rewards)
-2. `Character.personalQuestId` (String, defaults to `''`) references a quest ID like `"pq_gh_510"`
-3. `Character.personalQuestProgress` (List<int>) stores progress per requirement as JSON in DB
-4. `Character.personalQuest` getter resolves the full `PersonalQuest` from the repository
-5. `CharactersModel.updatePersonalQuest()` changes quest and resets progress to zeros
-6. `CharactersModel.updatePersonalQuestProgress()` updates a single requirement's count, returns `bool` (true if quest just transitioned to complete)
-7. `CharactersModel.isPersonalQuestComplete()` checks if all progress values meet their targets
-
-### DB Schema (v18)
-
-**PersonalQuestsTable** - quest definitions (seeded from repository):
-- `_id` TEXT PRIMARY KEY (e.g., "pq_gh_510")
-- `Number` INTEGER NOT NULL (e.g., 510)
-- `Title` TEXT NOT NULL (e.g., "Seeker of Xorn")
-- `Edition` TEXT NOT NULL (e.g., "gloomhaven")
-
-**Characters table** - two new columns:
-- `PersonalQuestId` TEXT NOT NULL DEFAULT '' (references PersonalQuestsTable._id)
-- `PersonalQuestProgress` TEXT NOT NULL DEFAULT '[]' (JSON-encoded List<int>)
-
-### Design Decisions & Lessons Learned
-
-- **`edition` uses `GameEdition` enum**, not String. Initially implemented as String but refactored. The enum is serialized to/from DB via `.name` and `GameEdition.values.byName()`. Type safety prevents invalid editions at compile time.
-- **Second printing values** used for quest targets (e.g., quest 514 target is 12, not 15).
-- **Quests unlock either a class OR an envelope**, never both. Enforced in repository test.
-- **ExpansionTile state** persisted via `SharedPrefs().personalQuestExpanded`.
-- **"Coming soon"** shown for GH2E/FH editions - the selector dialog is disabled, not hidden.
-- **Confirmation dialog** appears when changing an existing quest (resets progress).
-- **Retirement flow** uses two-step UX: snackbar ("Personal quest complete!" with confetti pop) → tap "Retire" → confirmation dialog with full details → retire. `updatePersonalQuestProgress` returns `bool` to detect completion transitions.
-- **`BlurredExpansionContainer`** centralizes animated backdrop blur (`TweenAnimationBuilder<double>` from 0→`expansionBlurSigma`) used by both Resources and PQ sections. Blur fades in on expand, out on collapse.
-- **No-quest selector** shows a read-only `TextFormField` (matching create character screen pattern) instead of an `ExpansionTile` when no quest is assigned in edit mode.
-- **Gold strikethrough** for retired characters uses `StrikethroughText` widget with `onSurfaceVariant` color.
-
-### Known Gotchas
-
-- **`Character.fromMap` id bug**: `id = map[columnCharacterId] ?? ''` assigns String to int? when id is null. This is a pre-existing bug (not from PQ work). Tests that do toMap/fromMap round-trips must set `character.id = 1` first.
-- **PQ section visibility**: Shows when quest is assigned OR in edit mode. If neither, it's hidden entirely.
-- **ThemedSvg/ClassIconSvg in tests**: SVG widgets fail silently in tests (no real asset files). PQ section tests that render class icons can't verify them visually - use model-level assertions instead.
-- **Widget test viewport**: Some PQ tests need `tester.view.physicalSize = const Size(800, 600)` to avoid overflow in +/- button layouts. Remember to reset in `addTearDown`.
-- **Progress encoding**: `encodeProgress([1,0,3])` → `"[1,0,3]"`. `decodeProgress('')` → `[]`. The JSON format is simple but watch for empty-string edge cases.
+- 23 Frosthaven quests added to `PersonalQuestsRepository` (47 total: 24 GH + 23 FH)
+- DB migration v19: regenerates PersonalQuestsTable with all 47 quests
+- Dual numbering: `altNumber` field on `PersonalQuest` for FH cards (e.g., card #1 / asset 581)
+- `displayNumber` getter: `"01 (581)"` for FH, `"510"` for GH
+- FH quests all unlock envelopes (no class unlocks); envelope values shown in UI
+- Scenario SVG assets (boat, climbing_gear, sled) for FH quest descriptions
+- Checkbox UI for binary (target=1) requirements instead of stepper
+- Removed circle status icons from requirement rows (dimming + color conveys state)
 
 ## Remaining Work
 
-- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Will need to add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
-- **Frosthaven quest data** - Same pattern as GH2E but with `edition: GameEdition.frosthaven`.
-- **Adaptive widgets** - Replace basic +/- counters with segmented buttons, sliders, etc. for specific requirement types (e.g., binary yes/no for scenario completion, counter for kill counts).
+- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
 - **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---
@@ -177,7 +130,11 @@ SharedPreferences are now included as an optional third element in the backup JS
 
 Share sheet implemented via `share_plus` in `backup_dialog.dart`. Both "Save" and "Share" buttons available.
 
-#### 3. Auto-Backup to App Documents
+#### ~~3. Minimum Backup Version Enforcement~~ — **Done**
+
+Restore rejects backups older than DB v8 (app 4.2.0) with a user-facing error message. Prevents crashes from ancient schema formats.
+
+#### 4. Auto-Backup to App Documents
 
 - Write backup to app documents directory after each character save
 - Keep last 5 auto-backups, rotate oldest
@@ -187,7 +144,7 @@ Share sheet implemented via `share_plus` in `backup_dialog.dart`. Both "Save" an
 - `lib/viewmodels/characters_model.dart` - Trigger auto-backup on character save
 - New file: `lib/data/auto_backup_service.dart` - Handle rotation logic
 
-#### 4. Backup Age Reminder
+#### 5. Backup Age Reminder
 
 - Track last manual backup date in SharedPrefs
 - Show subtle indicator in Settings if >30 days since last backup
@@ -208,15 +165,17 @@ Share sheet implemented via `share_plus` in `backup_dialog.dart`. Both "Save" an
 ## Character PageView Swiping Performance
 
 **Added:** 2026-02-09
-**Status:** Pending investigation
-**File:** `lib/ui/screens/characters_screen.dart:80-86`
+**Status:** Partially addressed
 
-If swiping between character pages is still not smooth, investigate:
+### Completed Fixes
+- ~~Scroll jank from active section tracking~~ — Replaced `context.watch` rebuild with `ValueNotifier` for active section state (`42925b8`)
+- ~~Header tint persisting after swiping~~ — Fixed character header tint not resetting when swiping to a new character (`8cc8c66`)
+
+### Remaining Investigation (if still needed)
 1. Add `allowImplicitScrolling: true` to `PageView.builder` to preload adjacent pages
-2. Change `context.watch<CharactersModel>()` to more targeted selectors or move to child widgets to reduce unnecessary rebuilds
-3. Consider wrapping entire `CharacterScreen` in `RepaintBoundary` if needed
-4. Profile with Flutter DevTools Performance overlay to identify actual jank
-5. Consider caching the rasterized class icon background image
+2. Consider wrapping entire `CharacterScreen` in `RepaintBoundary` if needed
+3. Profile with Flutter DevTools Performance overlay to identify actual jank
+4. Consider caching the rasterized class icon background image
 
 ---
 

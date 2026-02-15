@@ -479,19 +479,21 @@ Represents a personal quest card with retirement requirements.
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `id` | `String` | required | Quest ID (e.g., `"pq_gh_510"`) |
-| `number` | `int` | required | Card number (e.g., 510) |
+| `id` | `String` | required | Quest ID (e.g., `"pq_gh_510"`, `"pq_fh_581"`) |
+| `number` | `int` | required | Primary card number (e.g., 510 for GH, 1 for FH) |
 | `title` | `String` | required | Quest title (e.g., "Seeker of Xorn") |
 | `edition` | `GameEdition` | required | Game edition |
 | `requirements` | `List<PersonalQuestRequirement>` | `[]` | Retirement requirements (from repository, not DB) |
-| `unlockClassCode` | `String?` | null | Class unlocked upon completion |
+| `unlockClassCode` | `String?` | null | Class unlocked upon completion (GH only) |
 | `unlockEnvelope` | `String?` | null | Envelope unlocked upon completion |
+| `altNumber` | `int?` | null | Secondary card number for dual-numbered editions (e.g., FH asset number). Repository-only, not stored in DB. |
 
 ### Computed Properties
 
 | Getter | Type | Description |
 |--------|------|-------------|
-| `displayName` | `String` | `"510 - Seeker of Xorn"` format |
+| `displayNumber` | `String` | `"510"` for single-numbered, `"01 (581)"` for dual-numbered (padded to 2 digits) |
+| `displayName` | `String` | `"510 - Seeker of Xorn"` or `"01 (581) - The Study of Plants"` |
 
 ### Serialization
 

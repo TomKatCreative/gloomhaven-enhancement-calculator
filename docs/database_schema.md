@@ -7,11 +7,11 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 18 (production) / 19 (with `kTownSheetEnabled`)
+- **Current Schema Version**: 18 (production) / 19 (dev — Frosthaven PQs)
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
-> **Conditional schema**: Production schema is v18 (includes Personal Quests table and PQ columns on Characters). When `kTownSheetEnabled` is `true`, migration v19 runs to create Campaigns and Parties tables plus `PartyId` column on Characters.
+> **Conditional schema**: Production schema is v18 (Personal Quests table with 24 GH quests and PQ columns on Characters). Dev branch bumps to v19 (regenerates PQ table with 24 GH + 23 FH quests). When `kTownSheetEnabled` is `true`, Campaigns and Parties tables plus `PartyId` column on Characters are created on fresh installs.
 
 ## Tables
 
@@ -146,7 +146,7 @@ Join table linking characters to their mastery achievements.
 
 ### PersonalQuestsTable
 
-Personal quest definitions seeded from `PersonalQuestsRepository`.
+Personal quest definitions seeded from `PersonalQuestsRepository` (47 quests: 24 Gloomhaven + 23 Frosthaven).
 
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
@@ -287,8 +287,8 @@ Tracks parties within a campaign.
 | v15 | Fix consume_X icon references |
 | v16 | Add Alchemancer class |
 | v17 | Rename item_minus_one icon |
-| v18 | Personal Quests table, PQ columns on Characters |
-| v19 | Campaigns/Parties tables, PartyId on Characters (**conditional** — only when `kTownSheetEnabled`) |
+| v18 | Personal Quests table (24 GH quests), PQ columns on Characters |
+| v19 | Frosthaven Personal Quests (regenerate PQ table with 24 GH + 23 FH quests) |
 
 ### Critical Migrations
 
