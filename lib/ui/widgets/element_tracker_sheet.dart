@@ -28,7 +28,7 @@ class _ElementTrackerSheetState extends State<ElementTrackerSheet> {
   // Sheet size configuration (three states)
   static const double _collapsedSize = 0.065;
   static const double _expandedSize = 0.14;
-  static const double _fullExpandedSize = 0.85;
+  static const double _fullExpandedSize = sheetExpandedSize;
 
   // Thresholds for determining current state
   static const double _expansionThreshold = 0.10;

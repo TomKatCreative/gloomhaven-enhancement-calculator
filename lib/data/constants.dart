@@ -55,6 +55,10 @@ const double blurBarHeight = 100.0; // Blur bar at bottom of calculator
 const double elementTrackerClearance =
     80.0; // Bottom clearance for element tracker
 const double formFieldSpacing = 28.0; // Vertical spacing between form fields
+const double sheetExpandedSize = 0.85; // Bottom sheet expanded fraction
+const double fabBottomClearance =
+    82.0; // FAB clearance padding at screen bottom
+const double scrollSpyThresholdBuffer = 50.0; // Scroll-spy position tolerance
 
 // Icon Sizes - use these for all icons (never hardcode or derive sizes)
 const double iconSizeTiny = 14.0; // Decorative overlays (+1 badge)
