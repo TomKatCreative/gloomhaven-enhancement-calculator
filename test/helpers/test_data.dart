@@ -186,6 +186,7 @@ class TestData {
     int index = 0,
   }) {
     final perk = Perk(
+      index,
       perkDetails ?? _perkTexts[index % _perkTexts.length],
       grouped: grouped,
     );
@@ -249,6 +250,7 @@ class TestData {
     int index = 0,
   }) {
     final mastery = Mastery(
+      index,
       masteryDetails:
           masteryDetails ?? _masteryTexts[index % _masteryTexts.length],
     );
