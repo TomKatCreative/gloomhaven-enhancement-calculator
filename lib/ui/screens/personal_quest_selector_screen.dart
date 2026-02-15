@@ -43,6 +43,7 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart'
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
 /// Result type for the personal quest selector.
 sealed class PQSelectorResult {}
@@ -114,7 +115,7 @@ class _PersonalQuestSelectorScreenState
         .where(
           (q) =>
               q.title.toLowerCase().contains(query) ||
-              q.number.toString().contains(query),
+              q.displayNumber.toLowerCase().contains(query),
         )
         .toList();
   }
@@ -283,23 +284,59 @@ class _PersonalQuestSelectorScreenState
       );
     }
     if (quest.unlockEnvelope != null) {
-      return SizedBox(
-        width: iconSizeMedium,
-        height: iconSizeMedium,
-        child: Center(
-          child: Text(
-            'X',
-            style: TextStyle(
-              fontFamily: 'PirataOne',
-              fontWeight: FontWeight.normal,
-              fontSize: iconSizeMedium,
-              height: 1,
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+      final color = Theme.of(context).colorScheme.onSurfaceVariant;
+      if (quest.unlockEnvelope!.length == 1) {
+        return SizedBox(
+          width: iconSizeMedium,
+          height: iconSizeMedium,
+          child: Center(
+            child: Text(
+              quest.unlockEnvelope!,
+              style: TextStyle(
+                fontFamily: 'PirataOne',
+                fontWeight: FontWeight.normal,
+                fontSize: iconSizeMedium,
+                height: 1,
+                color: color,
+              ),
             ),
           ),
-        ),
+        );
+      }
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ThemedSvg(assetKey: 'ENVELOPE', width: iconSizeSmall),
+          const SizedBox(width: tinyPadding),
+          Text.rich(
+            envelopeTextSpan(
+              quest.unlockEnvelope!,
+              Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
+            ),
+          ),
+        ],
       );
     }
     return const SizedBox.shrink();
   }
+}
+
+const envelopeAltColor = Color(0xFF1D5678);
+
+/// Styles envelope text with the part after "/" in [envelopeAltColor].
+TextSpan envelopeTextSpan(String envelope, TextStyle? baseStyle) {
+  final parts = envelope.split('/');
+  if (parts.length == 2) {
+    return TextSpan(
+      style: baseStyle,
+      children: [
+        TextSpan(text: '${parts[0]}/'),
+        TextSpan(
+          text: parts[1],
+          style: baseStyle?.copyWith(color: envelopeAltColor),
+        ),
+      ],
+    );
+  }
+  return TextSpan(text: envelope, style: baseStyle);
 }

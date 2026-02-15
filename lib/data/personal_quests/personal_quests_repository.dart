@@ -404,7 +404,8 @@ class PersonalQuestsRepository {
       unlockEnvelope: '24/42',
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Loot five different types of herbs',
+          description:
+              'Collect five different types of herbs through loot tokens',
           target: 5,
         ),
       ],
@@ -440,7 +441,7 @@ class PersonalQuestsRepository {
         PersonalQuestRequirement(description: 'Own 3 Body items', target: 3),
         PersonalQuestRequirement(description: 'Own 3 Feet items', target: 3),
         PersonalQuestRequirement(
-          description: 'Own 3 One_Hand or Two_Hand items',
+          description: 'Own 3 One_Hand and/or Two_Hand items',
           target: 3,
         ),
         PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
@@ -455,7 +456,7 @@ class PersonalQuestsRepository {
       unlockEnvelope: '37/74',
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Have gold equal to 80 + (20 \u00d7 Prosperity Level)',
+          description: 'Have 80 + 20 \u00d7 PROSPERITY gold in your possession',
           target: 1,
         ),
       ],
@@ -469,7 +470,8 @@ class PersonalQuestsRepository {
       unlockEnvelope: '85/21',
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Construct or upgrade twelve buildings',
+          description:
+              'Experience the construction of twelve different buildings or building upgrades',
           target: 12,
         ),
       ],

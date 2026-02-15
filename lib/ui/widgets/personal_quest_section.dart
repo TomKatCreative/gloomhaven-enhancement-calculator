@@ -34,6 +34,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/personal_quest_selector_s
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -174,18 +175,34 @@ class _QuestContent extends StatelessWidget {
                         ),
                       ] else if (quest.unlockEnvelope != null) ...[
                         const TextSpan(text: ' · '),
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: Text(
-                            quest.unlockEnvelope!,
-                            style: TextStyle(
-                              fontFamily: 'PirataOne',
-                              fontWeight: FontWeight.normal,
-                              fontSize: iconSizeMedium,
+                        if (quest.unlockEnvelope!.length == 1)
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: Text(
+                              quest.unlockEnvelope!,
+                              style: TextStyle(
+                                fontFamily: 'PirataOne',
+                                fontWeight: FontWeight.normal,
+                                fontSize: iconSizeMedium,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          )
+                        else ...[
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.middle,
+                            child: ThemedSvg(
+                              assetKey: 'ENVELOPE',
+                              width: iconSizeSmall,
+                            ),
+                          ),
+                          envelopeTextSpan(
+                            ' ${quest.unlockEnvelope}',
+                            theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
-                        ),
+                        ],
                       ],
                     ],
                   ),
@@ -377,7 +394,13 @@ class _RequirementRowState extends State<_RequirementRow> {
                     ),
                     Text(
                       '${widget.progress}/${widget.requirement.target}',
-                      style: theme.textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isComplete
+                            ? theme
+                                  .extension<AppThemeExtension>()!
+                                  .contrastedPrimary
+                            : null,
+                      ),
                     ),
                   ],
                 ),
@@ -394,7 +417,15 @@ class _RequirementRowState extends State<_RequirementRow> {
                     : null,
               ),
             ],
-          ] else
+          ] else if (widget.requirement.target == 1)
+            Checkbox(
+              value: widget.progress >= 1,
+              activeColor: theme
+                  .extension<AppThemeExtension>()!
+                  .contrastedPrimary,
+              onChanged: null,
+            )
+          else
             Padding(
               padding: const EdgeInsets.only(right: mediumPadding),
               child: Text(
