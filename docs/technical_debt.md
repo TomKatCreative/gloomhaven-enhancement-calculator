@@ -16,13 +16,9 @@ The highest-impact debt. These files have too many responsibilities, making them
 >
 > **New files**: `character_header_delegates.dart`, `stats_and_resources_card.dart`, `stats_section.dart`, `checkmarks_and_retirements_row.dart`, `quest_and_notes_card.dart`, `perks_and_masteries_card.dart`, `party_assignment_row.dart`
 
-### `enhancement_calculator_model.dart` (713 lines)
+### ~~`enhancement_calculator_model.dart` (713 lines)~~ — RESOLVED
 
-Cost calculation logic is deeply intertwined with ChangeNotifier state management.
-
-- `getCalculationBreakdown()` is 275+ lines with five sub-methods (`_addBaseCostStep`, `_addMultiplierSteps`, `_addDiscountSteps`, etc.)
-- Edition-specific rules scattered throughout (party boon, enhancer levels, lost modifier, persistent)
-- 11+ different methods touch SharedPrefs directly
+> **Refactored** (2026-02-16): Extracted all pure cost calculation logic into `EnhancementCostCalculator` (`lib/models/enhancement_cost_calculator.dart`), an immutable class with zero dependencies on SharedPrefs, ChangeNotifier, or Flutter. The model (`lib/viewmodels/enhancement_calculator_model.dart`) is now a thin state management layer (~290 lines, down from 713) that caches and delegates to the calculator. `resetCost()` cleaned up from 8+ redundant `notifyListeners()` calls to a single invalidation. 84 new pure unit tests added. All 879 tests pass.
 
 ### `database_helper.dart` (654 lines)
 

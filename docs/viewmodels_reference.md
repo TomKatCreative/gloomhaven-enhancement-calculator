@@ -114,14 +114,24 @@ Handles app-level navigation state and page management.
 
 > **File**: `lib/viewmodels/enhancement_calculator_model.dart`
 
-Manages enhancement calculator state and cost calculations.
+Thin state management layer that delegates cost calculations to `EnhancementCostCalculator`.
+
+### Architecture
+
+```
+UI ← watches → EnhancementCalculatorModel (state + SharedPrefs persistence)
+                        ↓ delegates
+                EnhancementCostCalculator (pure, immutable computation)
+```
+
+The model caches an `EnhancementCostCalculator` instance, invalidating it on any state change. Computed properties (`totalCost`, `showCost`, `getCalculationBreakdown`) delegate to the cached calculator. The calculator is rebuilt lazily on first access after invalidation.
 
 ### Responsibilities
 
-- Enhancement selection and validation
-- Cost calculation with edition-specific rules
-- Modifier and discount tracking
-- Calculation breakdown generation
+- State field management with SharedPrefs persistence
+- Cached calculator delegation for cost computation
+- Enhancement selection and edition-specific validation
+- Thin API wrappers preserving backward compatibility
 
 ### Key Properties
 

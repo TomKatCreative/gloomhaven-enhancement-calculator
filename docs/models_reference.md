@@ -261,6 +261,51 @@ Defined in `lib/models/enhancement_category.dart`:
 
 ---
 
+## EnhancementCostCalculator
+
+> **File**: `lib/models/enhancement_cost_calculator.dart`
+
+Pure, immutable computation class for enhancement cost calculations. Has zero dependencies on SharedPrefs, ChangeNotifier, or Flutter. Used by `EnhancementCalculatorModel` via cached delegation.
+
+### Constructor
+
+All fields are `final`. Construct a new instance when inputs change.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `edition` | `GameEdition` | required | Game edition determining rules |
+| `enhancement` | `Enhancement?` | null | Selected enhancement |
+| `cardLevel` | `int` | 0 | Card level above 1 |
+| `previousEnhancements` | `int` | 0 | Previous enhancements count |
+| `multipleTargets` | `bool` | false | Multi-target multiplier |
+| `lostNonPersistent` | `bool` | false | Lost action modifier (GH2E/FH) |
+| `persistent` | `bool` | false | Persistent modifier (FH only) |
+| `temporaryEnhancementMode` | `bool` | false | Temporary enhancement mode |
+| `hailsDiscount` | `bool` | false | Hail's discount (-5g) |
+| `partyBoon` | `bool` | false | Party boon (GH/GH2E) |
+| `enhancerLvl2` | `bool` | false | Enhancer L2 (-10g base) |
+| `enhancerLvl3` | `bool` | false | Enhancer L3 (-10g/level) |
+| `enhancerLvl4` | `bool` | false | Enhancer L4 (-25g/enh) |
+
+### Getters
+
+| Getter | Type | Description |
+|--------|------|-------------|
+| `totalCost` | `int` | Final calculated total cost |
+| `showCost` | `bool` | Whether any input is set |
+| `breakdown` | `List<CalculationStep>` | Step-by-step cost breakdown |
+
+### Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `enhancementCost(Enhancement?)` | `int` | Base cost with multipliers and discounts |
+| `cardLevelPenalty(int)` | `int` | Card level penalty with discounts |
+| `previousEnhancementsPenalty(int)` | `int` | Previous enhancements penalty |
+| `eligibleForMultipleTargets(Enhancement, {edition})` | `bool` | Static: multi-target eligibility |
+
+---
+
 ## Perk
 
 > **File**: `lib/models/perk/perk.dart`
