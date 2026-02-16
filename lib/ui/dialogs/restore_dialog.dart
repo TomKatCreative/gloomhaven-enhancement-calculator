@@ -106,7 +106,7 @@ class RestoreDialog {
     showLoaderDialog(context);
 
     try {
-      await DatabaseHelper.instance.restoreBackup(contents);
+      await DatabaseHelper.instance.backupService.restoreBackup(contents);
       SharedPrefs().initialPage = 0;
       if (!context.mounted) return;
 

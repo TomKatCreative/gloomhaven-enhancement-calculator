@@ -1,17 +1,14 @@
-import 'dart:convert' as convert;
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_backup_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
-
 import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
@@ -27,9 +24,6 @@ class DatabaseHelper implements IDatabaseHelper {
 
   // Increment this version when you need to change the schema.
   static const _databaseVersion = 19;
-
-  // Minimum DB schema version accepted for backup restore (DB v8 = app v4.2.0).
-  static const _minimumBackupVersion = 8;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -49,6 +43,9 @@ class DatabaseHelper implements IDatabaseHelper {
   ];
 
   Future<Database> get database async => _database ??= await _initDatabase();
+
+  DatabaseBackupService get backupService =>
+      DatabaseBackupService(getDatabase: () => database, tables: tables);
 
   static const String tableMetaData = 'MetaData';
 
@@ -261,114 +258,6 @@ class DatabaseHelper implements IDatabaseHelper {
       if (oldVersion <= version) {
         await migrations[version]!();
       }
-    }
-  }
-
-  Future<String> generateBackup() async {
-    Database dbs = await database;
-    List data = [];
-    List<Map<String, dynamic>> listMaps = [];
-
-    for (final String table in tables) {
-      listMaps = await dbs.query(table);
-      data.add(listMaps);
-    }
-
-    List backups = [tables, data, SharedPrefs().exportForBackup()];
-
-    return convert.jsonEncode(backups);
-  }
-
-  Future<void> restoreBackup(String backup) async {
-    // Backup the current data incase of an error and restore it
-    String fallBack = await generateBackup();
-
-    var dbs = await database;
-
-    await _clearAllTables();
-
-    Batch batch = dbs.batch();
-
-    List json = convert.jsonDecode(backup);
-
-    if (!json[0].contains('MetaData')) {
-      throw ('No Meta Data Table');
-    }
-
-    final metaDataIndex = json[0].indexOf('MetaData');
-    final metaData = json[1][metaDataIndex] as List;
-    if (metaData.isEmpty ||
-        (metaData[0][columnDatabaseVersion] ?? 0) < _minimumBackupVersion) {
-      final version = metaData.isNotEmpty
-          ? metaData[0][columnAppVersion] ?? 'unknown'
-          : 'unknown';
-      throw ('This backup was created with app version $version, '
-          'which is no longer supported. '
-          'Only backups from version 4.2.0 or later can be restored.');
-    }
-
-    for (var i = 0; i < json[0].length; i++) {
-      // Skip tables that don't exist in the current schema
-      if (!tables.contains(json[0][i])) continue;
-
-      for (var k = 0; k < json[1][i].length; k++) {
-        // Patch columns for backups from v8+ (app 4.2.0+) that predate later schema changes.
-        // Resource columns (v7) are defaulted for safety, though v8+ backups already have them.
-        // PersonalQuest columns were added in v18.
-        if (i < 1) {
-          json[1][i][k][columnResourceHide] ??= 0;
-          json[1][i][k][columnResourceMetal] ??= 0;
-          json[1][i][k][columnResourceLumber] ??= 0;
-          json[1][i][k][columnResourceArrowvine] ??= 0;
-          json[1][i][k][columnResourceAxenut] ??= 0;
-          json[1][i][k][columnResourceRockroot] ??= 0;
-          json[1][i][k][columnResourceFlamefruit] ??= 0;
-          json[1][i][k][columnResourceCorpsecap] ??= 0;
-          json[1][i][k][columnResourceSnowthistle] ??= 0;
-          json[1][i][k][columnCharacterPersonalQuestId] ??= '';
-          json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
-          if (kTownSheetEnabled) {
-            // PartyId is nullable, no default needed — just ensure key exists
-            json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
-          } else {
-            json[1][i][k].remove(columnCharacterPartyId);
-          }
-        }
-
-        // Default missing party detail columns (added in v19)
-        if (json[0][i] == tableParties) {
-          json[1][i][k][columnPartyLocation] ??= '';
-          json[1][i][k][columnPartyNotes] ??= '';
-          json[1][i][k][columnPartyAchievements] ??= '[]';
-        }
-
-        batch.insert(json[0][i], json[1][i][k]);
-      }
-    }
-
-    await batch.commit(continueOnError: false, noResult: true).onError((
-      error,
-      stackTrace,
-    ) async {
-      await restoreBackup(fallBack);
-      throw error ?? 'Error restoring backup';
-    });
-
-    // Restore SharedPreferences if present (new format backups)
-    if (json.length > 2 && json[2] is Map) {
-      SharedPrefs().importFromBackup(Map<String, dynamic>.from(json[2]));
-    }
-  }
-
-  Future _clearAllTables() async {
-    try {
-      Database dbs = await database;
-      for (String table in tables) {
-        await dbs.delete(table);
-        await dbs.rawQuery('DELETE FROM sqlite_sequence where name="$table"');
-      }
-    } catch (e) {
-      rethrow;
     }
   }
 

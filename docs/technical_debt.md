@@ -20,15 +20,11 @@ The highest-impact debt. These files have too many responsibilities, making them
 
 > **Refactored** (2026-02-16): Extracted all pure cost calculation logic into `EnhancementCostCalculator` (`lib/models/enhancement_cost_calculator.dart`), an immutable class with zero dependencies on SharedPrefs, ChangeNotifier, or Flutter. The model (`lib/viewmodels/enhancement_calculator_model.dart`) is now a thin state management layer (~290 lines, down from 713) that caches and delegates to the calculator. `resetCost()` cleaned up from 8+ redundant `notifyListeners()` calls to a single invalidation. 84 new pure unit tests added. All 879 tests pass.
 
-### `database_helper.dart` (654 lines)
+### ~~`database_helper.dart` (654 lines)~~ — PARTIALLY RESOLVED
 
-All database operations for the entire app in one file.
-
-- CRUD for 5+ entities (Characters, Perks, Masteries, Campaigns, Parties)
-- Backup/restore logic (95 lines) mixed with schema and CRUD
-- Table creation and migration orchestration embedded alongside queries
-- Manual query building for perk/mastery linking (loops inserting one at a time instead of batch)
-- Backup restore uses magic indices (`if (i < 1)`)
+> **Refactored** (2026-02-16): Extracted backup/restore logic (~107 lines) into `DatabaseBackupService` (`lib/data/database_backup_service.dart`). Fixed magic index check (`if (i < 1)` → explicit `tableCharacters` comparison). `DatabaseHelper` is now ~548 lines focused on DB lifecycle, schema, and CRUD. Accessed via `DatabaseHelper.instance.backupService`. All 879 tests pass unchanged.
+>
+> **Remaining debt**: CRUD for 5+ entities still in one file; table creation and migration orchestration mixed with queries; manual perk/mastery insert loops (no batch).
 
 ### `game_text_parser.dart` (648 lines)
 

@@ -104,7 +104,7 @@ class _BackupDialogState extends State<BackupDialog> {
   String get _fileName => '${_fileNameController.text}.json';
 
   Future<String> _generateBackupFile() async {
-    final value = await DatabaseHelper.instance.generateBackup();
+    final value = await DatabaseHelper.instance.backupService.generateBackup();
     final tempDir = await getTemporaryDirectory();
     final file = File('${tempDir.path}/$_fileName');
     await file.writeAsString(value);
@@ -116,7 +116,8 @@ class _BackupDialogState extends State<BackupDialog> {
 
     setState(() => _isSaving = true);
     try {
-      final value = await DatabaseHelper.instance.generateBackup();
+      final value = await DatabaseHelper.instance.backupService
+          .generateBackup();
       final bytes = Uint8List.fromList(utf8.encode(value));
 
       final savedPath = await FilePicker.platform.saveFile(

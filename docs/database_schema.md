@@ -1,6 +1,6 @@
 # Database Schema Reference
 
-> **Files**: `lib/data/database_helper.dart`, `lib/data/database_migrations.dart`
+> **Files**: `lib/data/database_helper.dart`, `lib/data/database_backup_service.dart`, `lib/data/database_migrations.dart`
 
 This document provides a comprehensive reference for the SQLite database schema, migrations, and key operations.
 
@@ -236,12 +236,14 @@ Tracks parties within a campaign.
 | `assignCharacterToParty(String uuid, String? partyId)` | Link/unlink a character to a party |
 | `queryCharactersByParty(String partyId)` | Fetch characters in a party |
 
-### Backup Operations
+### Backup Operations (`DatabaseBackupService`)
+
+Accessed via `DatabaseHelper.instance.backupService`.
 
 | Method | Description |
 |--------|-------------|
-| `generateBackup()` | Export all tables as JSON string |
-| `restoreBackup(String)` | Restore from JSON with safety fallback |
+| `generateBackup()` | Export all tables + SharedPrefs as JSON string |
+| `restoreBackup(String)` | Restore from JSON with version validation, column patching, and safety fallback |
 
 ---
 
@@ -374,58 +376,40 @@ Used for generating unique perk IDs when quantity > 1.
 
 ## Backup Format
 
-The backup JSON structure:
+The backup is a 3-element JSON array: `[tableNames, tableData, sharedPrefs]`.
 
 ```json
-{
-  "Characters": [
-    {
-      "CharacterUUID": "uuid-string",
-      "CharacterName": "Bob",
-      "CharacterClassCode": "br",
-      // ... all character columns
-    }
+[
+  ["Characters", "CharacterPerks", "CharacterMasteries", "MetaData"],
+  [
+    [
+      {"CharacterUUID": "uuid-string", "CharacterName": "Bob", "CharacterClassCode": "br", "...": "..."}
+    ],
+    [
+      {"AssociatedCharacterUuid": "uuid-string", "AssociatedPerkId": "br_base_01a", "CharacterPerkIsSelected": 1}
+    ],
+    [
+      {"AssociatedCharacterUuid": "uuid-string", "AssociatedMasteryId": "bn_base_0", "CharacterMasteryAchieved": 0}
+    ],
+    [
+      {"DatabaseVersion": 19, "AppVersion": "4.3.0", "AppBuildNumber": 100, "LastUpdated": "2025-01-15T10:30:00.000"}
+    ]
   ],
-  "CharacterPerks": [
-    {
-      "AssociatedCharacterUuid": "uuid-string",
-      "AssociatedPerkId": "br_base_01a",
-      "CharacterPerkIsSelected": 1
-    }
-  ],
-  "CharacterMasteries": [
-    {
-      "AssociatedCharacterUuid": "uuid-string",
-      "AssociatedMasteryId": "bn_base_0",
-      "CharacterMasteryAchieved": 0
-    }
-  ],
-  "Campaigns": [
-    {
-      "_id": "uuid-string",
-      "Name": "My Campaign",
-      "Edition": "gloomhaven",
-      "ProsperityCheckmarks": 12,
-      "DonatedGold": 50,
-      "CreatedAt": "2025-01-15T10:30:00.000"
-    }
-  ],
-  "Parties": [
-    {
-      "_id": "uuid-string",
-      "CampaignId": "uuid-string",
-      "Name": "Party One",
-      "Reputation": 3,
-      "CreatedAt": "2025-01-15T10:30:00.000",
-      "Location": "Gloomhaven",
-      "Notes": "",
-      "Achievements": "[\"First Steps\"]"
-    }
-  ]
-}
+  {
+    "settings": {"darkTheme": true, "useDefaultFonts": false},
+    "calculator": {"selectedEdition": 0},
+    "town": {},
+    "enhancerLevels": {},
+    "classUnlocks": {}
+  }
+]
 ```
 
-**Note**: All definition tables (Perks, Masteries, PersonalQuests) were removed in v19 and were never included in backup. Campaigns and Parties tables ARE included in backup since they contain user-created data.
+- Element 0: Table names (parallel with element 1)
+- Element 1: Array of row arrays, one per table
+- Element 2: SharedPreferences export (added in later versions; may be absent in older backups)
+
+**Note**: All definition tables (Perks, Masteries, PersonalQuests) were removed in v19 and were never included in backup. Campaigns and Parties tables ARE included in backup (when `kTownSheetEnabled`) since they contain user-created data.
 
 **Minimum supported backup version**: DB schema v8 (app v4.2.0). Backups from older versions are rejected during restore with a descriptive error message.
 
