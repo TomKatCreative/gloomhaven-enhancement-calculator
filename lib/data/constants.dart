@@ -73,15 +73,6 @@ const double iconSizeHero = 48.0; // Hero elements (level badge)
 // Font Families
 const String nyala = 'Nyala', pirataOne = 'PirataOne', inter = 'Inter';
 
-/// Game edition-specific colors used for branding elements like edition toggles.
-/// These are intentionally hardcoded as they represent game brand colors,
-/// not character-specific theming.
-class GameEditionColors {
-  static const Color gloomhavenPrimary = Color(0xff005cb2);
-  static const Color gloomhavenLight = Color(0xff6ab7ff);
-  static const Color frosthavenPrimary = Color(0xffa98274);
-}
-
 // Responsive Breakpoints (Material 3 window size classes)
 const double _compactBreakpoint = 600.0;
 const double _mediumBreakpoint = 840.0;

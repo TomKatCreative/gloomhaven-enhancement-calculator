@@ -7,9 +7,9 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/checkable_row.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/conditional_checkbox.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/constants.dart';
-import '../../models/perk/perk.dart';
-import '../../viewmodels/characters_model.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
 class PerkRow extends StatefulWidget {
   final Character character;

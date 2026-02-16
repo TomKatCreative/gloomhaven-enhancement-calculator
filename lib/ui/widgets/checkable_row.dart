@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/constants.dart';
-import '../../utils/utils.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 
 /// Callback that returns the left-side widgets (checkboxes + divider/spacer).
 /// Receives the measured content height for CheckRowDivider sizing.

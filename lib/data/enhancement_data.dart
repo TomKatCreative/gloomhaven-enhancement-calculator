@@ -1,6 +1,6 @@
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 
-import '../models/enhancement.dart';
+import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 
 enum EnhancementCategory {
   charPlusOne,

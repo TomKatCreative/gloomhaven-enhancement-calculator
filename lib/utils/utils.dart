@@ -33,19 +33,6 @@ class Utils {
   }
 }
 
-/// Extension for string casing utilities
-extension StringCasingExtension on String {
-  /// Capitalize the first letter of a string
-  String toCapitalized() =>
-      length > 0 ? '${this[0].toUpperCase()}${substring(1)}' : '';
-
-  /// Convert string to title case (capitalize each word)
-  String get toTitleCase => replaceAll(
-    RegExp(' +'),
-    ' ',
-  ).split(" ").map((str) => str.toCapitalized()).join(" ");
-}
-
 /// Widget that provides its size to a callback
 class SizeProviderWidget extends StatefulWidget {
   final Widget child;
