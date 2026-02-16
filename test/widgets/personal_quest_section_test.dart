@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/retirement_prompt.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
@@ -22,7 +23,6 @@ void main() {
       'showRetiredCharacters': true,
       'darkTheme': false,
       'initialPage': 0,
-      'personalQuestExpanded': true,
     });
     await SharedPrefs().init();
 
@@ -95,8 +95,6 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Section header
-        expect(find.text('Personal quest'), findsOneWidget);
         // Quest display name
         expect(find.textContaining('515: Lawbringer'), findsOneWidget);
       });
@@ -957,36 +955,6 @@ void main() {
         final opacities = find.byType(Opacity);
         final secondOpacity = tester.widget<Opacity>(opacities.at(1));
         expect(secondOpacity.opacity, lessThan(1.0));
-      });
-    });
-
-    group('expansion state', () {
-      testWidgets('respects SharedPrefs initial expansion state', (
-        tester,
-      ) async {
-        // Set expansion to false
-        SharedPreferences.setMockInitialValues({
-          'showRetiredCharacters': true,
-          'darkTheme': false,
-          'initialPage': 0,
-          'personalQuestExpanded': false,
-        });
-        await SharedPrefs().init();
-
-        final character = TestData.createCharacter(uuid: 'test-pq-18');
-        character.personalQuestId = 'pq_gh_515';
-        character.personalQuestProgress = [5];
-
-        final model = await setupModel(character: character);
-        await tester.pumpWidget(
-          buildTestWidget(model: model, character: model.characters.first),
-        );
-        await tester.pumpAndSettle();
-
-        // Header should be visible
-        expect(find.text('Personal quest'), findsOneWidget);
-        // Content should be collapsed - quest name not visible
-        expect(find.textContaining('515: Lawbringer'), findsNothing);
       });
     });
   });

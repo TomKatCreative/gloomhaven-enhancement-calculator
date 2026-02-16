@@ -49,12 +49,11 @@ Remaining responsibilities (tightly coupled, low extraction value):
 - Theme synchronization (`updateThemeForCharacter()` directly calls `themeProvider.updateSeedColor()`)
 - Scroll position tracking via two controllers AND a `ValueNotifier<double>`
 
-### `personal_quest_section.dart` (580 lines)
+### ~~`personal_quest_section.dart` (580 lines)~~ — RESOLVED
 
-- Combined quest display, selection, and progress tracking
-- Conditional rendering for 3 different view states (assigned/unassigned/edit) with nested conditionals
-- 2 embedded StatefulWidget classes
-- Retirement confirmation dialog logic embedded
+> **Refactored** (2026-02-16): Extracted 3 embedded classes into separate files in `lib/ui/widgets/character/`. Removed unused `embedded` parameter and standalone card wrapper (dead code — only `QuestAndNotesCard` provides the card). The main `personal_quest_section.dart` is now ~84 lines containing only orchestration and the select-quest button. All test groups pass (1 expansion-state test removed as it tested the deleted standalone wrapper).
+>
+> **New files**: `retirement_prompt.dart` (retirement celebration flow), `requirement_row.dart` (progress controls widget), `quest_content.dart` (quest title + requirements list)
 
 ---
 
@@ -103,7 +102,7 @@ Code that is no longer needed but remains in the repo.
 | `legacy_perk.dart` | ~37 | Only referenced by dead legacy repositories |
 | `legacy_mastery.dart` | small | Only referenced by dead legacy repositories |
 
-Since DB v19 drops the Perks/Masteries/PersonalQuests definition tables entirely (`DROP TABLE IF EXISTS`), these legacy files are dead code. They exist only to support migrations from very old schema versions.
+These legacy files are **required for database migration** from older schema versions (v5–v17). They cannot be removed without breaking upgrades for users on older app versions. The migration code references them to populate/transform definition tables before v19 drops those tables.
 
 ### Unused `fromMap()` Constructors
 

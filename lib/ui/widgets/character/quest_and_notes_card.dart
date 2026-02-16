@@ -61,7 +61,7 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
           children: [
             // Quest section
             if (showQuestSection)
-              PersonalQuestSection(character: widget.character, embedded: true),
+              PersonalQuestSection(character: widget.character),
             // Notes section
             if (hasNotes) ...[
               if (showQuestSection) const GHCDivider(indent: true),

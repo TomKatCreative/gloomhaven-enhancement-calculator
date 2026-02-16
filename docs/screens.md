@@ -510,14 +510,15 @@ Extracted into `lib/ui/widgets/character/`:
 
 ### Personal Quest Section
 
-> **File**: `lib/ui/widgets/personal_quest_section.dart`
+> **File**: `lib/ui/widgets/personal_quest_section.dart` (orchestrator)
+> **Sub-widgets**: `character/quest_content.dart`, `character/requirement_row.dart`, `character/retirement_prompt.dart`
 
-Three display states:
-1. **Quest assigned** — `CollapsibleSectionCard` with quest title, unlock icon in header row, requirements list with progress
+Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. Three display states:
+1. **Quest assigned** — `QuestContent` with quest title, unlock icon, requirements list with progress
 2. **No quest + not retired** — `OutlinedButton` "Select a Personal Quest" prompt
 3. **No quest + retired** — `SizedBox.shrink()` (hidden)
 
-**Retirement flow** (on PQ completion):
+**Retirement flow** (on PQ completion, in `retirement_prompt.dart`):
 1. `updatePersonalQuestProgress` returns `true` when quest transitions from incomplete → complete
 2. Confetti pop via `ConfettiWidget` overlay from bottom-center
 3. SnackBar: "Personal quest complete!" with "Retire" action (deduplicated via `isRetirementSnackBarVisible` flag)
