@@ -224,10 +224,10 @@ Extracted into `DatabaseBackupService` (`lib/data/database_backup_service.dart`)
 
 Extract shared title row composition.
 
-### Database Query Boilerplate
+### ~~Database Query Boilerplate~~ — Done
 **File:** `lib/data/database_helper.dart`
 
-Create generic `queryAndMap<T>()` method to replace 4 identical query patterns.
+Added private `_queryAndMap<T>()` generic helper. All 6 query methods now delegate to it.
 
 ### InfoDialog Simplification
 **File:** `lib/ui/dialogs/info_dialog.dart`

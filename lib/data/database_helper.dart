@@ -340,49 +340,40 @@ class DatabaseHelper implements IDatabaseHelper {
     );
   }
 
-  @override
-  Future<List<CharacterPerk>> queryCharacterPerks(String characterUuid) async {
-    Database db = await database;
-    List<CharacterPerk> list = [];
-    List<Map<String, Object?>> result = await db.query(
-      tableCharacterPerks,
-      where: '$columnAssociatedCharacterUuid = ?',
-      whereArgs: [characterUuid],
-    );
-    for (final perk in result) {
-      list.add(CharacterPerk.fromMap(perk));
-    }
-    return list;
+  /// Generic query helper that maps database rows to typed objects.
+  Future<List<T>> _queryAndMap<T>(
+    String table,
+    T Function(Map<String, dynamic>) fromMap, {
+    String? where,
+    List<Object?>? whereArgs,
+  }) async {
+    final db = await database;
+    final maps = await db.query(table, where: where, whereArgs: whereArgs);
+    return maps.map(fromMap).toList();
   }
+
+  @override
+  Future<List<CharacterPerk>> queryCharacterPerks(String characterUuid) =>
+      _queryAndMap(
+        tableCharacterPerks,
+        CharacterPerk.fromMap,
+        where: '$columnAssociatedCharacterUuid = ?',
+        whereArgs: [characterUuid],
+      );
 
   @override
   Future<List<CharacterMastery>> queryCharacterMasteries(
     String characterUuid,
-  ) async {
-    Database db = await database;
-    List<CharacterMastery> list = [];
-    List<Map<String, Object?>> result = await db.query(
-      tableCharacterMasteries,
-      where: '$columnAssociatedCharacterUuid = ?',
-      whereArgs: [characterUuid],
-    );
-    for (final mastery in result) {
-      list.add(CharacterMastery.fromMap(mastery));
-    }
-    return list;
-  }
+  ) => _queryAndMap(
+    tableCharacterMasteries,
+    CharacterMastery.fromMap,
+    where: '$columnAssociatedCharacterUuid = ?',
+    whereArgs: [characterUuid],
+  );
 
   @override
-  Future<List<Character>> queryAllCharacters() async {
-    Database db = await database;
-    List<Character> list = [];
-    await db.query(tableCharacters).then((charactersMap) {
-      for (final character in charactersMap) {
-        list.add(Character.fromMap(character));
-      }
-    });
-    return list;
-  }
+  Future<List<Character>> queryAllCharacters() =>
+      _queryAndMap(tableCharacters, Character.fromMap);
 
   @override
   Future<void> deleteCharacter(Character character) async {
@@ -409,11 +400,8 @@ class DatabaseHelper implements IDatabaseHelper {
   // ── Campaign CRUD ──
 
   @override
-  Future<List<Campaign>> queryAllCampaigns() async {
-    Database db = await database;
-    final maps = await db.query(tableCampaigns);
-    return maps.map((m) => Campaign.fromMap(m)).toList();
-  }
+  Future<List<Campaign>> queryAllCampaigns() =>
+      _queryAndMap(tableCampaigns, Campaign.fromMap);
 
   @override
   Future<void> insertCampaign(Campaign campaign) async {
@@ -468,15 +456,12 @@ class DatabaseHelper implements IDatabaseHelper {
   // ── Party CRUD ──
 
   @override
-  Future<List<Party>> queryParties(String campaignId) async {
-    Database db = await database;
-    final maps = await db.query(
-      tableParties,
-      where: '$columnPartyCampaignId = ?',
-      whereArgs: [campaignId],
-    );
-    return maps.map((m) => Party.fromMap(m)).toList();
-  }
+  Future<List<Party>> queryParties(String campaignId) => _queryAndMap(
+    tableParties,
+    Party.fromMap,
+    where: '$columnPartyCampaignId = ?',
+    whereArgs: [campaignId],
+  );
 
   @override
   Future<void> insertParty(Party party) async {
@@ -531,13 +516,11 @@ class DatabaseHelper implements IDatabaseHelper {
   }
 
   @override
-  Future<List<Character>> queryCharactersByParty(String partyId) async {
-    Database db = await database;
-    final maps = await db.query(
-      tableCharacters,
-      where: '$columnCharacterPartyId = ?',
-      whereArgs: [partyId],
-    );
-    return maps.map((m) => Character.fromMap(m)).toList();
-  }
+  Future<List<Character>> queryCharactersByParty(String partyId) =>
+      _queryAndMap(
+        tableCharacters,
+        Character.fromMap,
+        where: '$columnCharacterPartyId = ?',
+        whereArgs: [partyId],
+      );
 }
