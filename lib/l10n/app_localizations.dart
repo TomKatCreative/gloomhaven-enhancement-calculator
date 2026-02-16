@@ -488,18 +488,6 @@ abstract class AppLocalizations {
   /// **'TESTING'**
   String get testing;
 
-  /// No description provided for @customClasses.
-  ///
-  /// In en, this message translates to:
-  /// **'Custom classes'**
-  String get customClasses;
-
-  /// No description provided for @customClassesDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Include Crimson Scales, Trail of Ashes, and \'released\' custom classes created by the CCUG community'**
-  String get customClassesDescription;
-
   /// No description provided for @solveEnvelopeX.
   ///
   /// In en, this message translates to:

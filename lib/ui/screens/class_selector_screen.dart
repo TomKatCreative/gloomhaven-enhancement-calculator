@@ -132,9 +132,6 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
   bool _doNotRenderPlayerClass(PlayerClass playerClass) =>
       (!SharedPrefs().envelopeX && playerClass.classCode == 'bs') ||
       (!SharedPrefs().envelopeV && playerClass.classCode == 'vanquisher') ||
-      (!SharedPrefs().customClasses &&
-          (playerClass.category == ClassCategory.custom ||
-              playerClass.category == ClassCategory.crimsonScales)) ||
       (_hideLockedClasses &&
           playerClass.locked &&
           !SharedPrefs().getPlayerClassIsUnlocked(playerClass.classCode));
@@ -248,16 +245,14 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
                           category: ClassCategory.mercenaryPacks,
                           label: 'Mercenary Packs',
                         ),
-                        if (SharedPrefs().customClasses) ...[
-                          _buildCategoryFilterChip(
-                            category: ClassCategory.crimsonScales,
-                            label: 'Crimson Scales',
-                          ),
-                          _buildCategoryFilterChip(
-                            category: ClassCategory.custom,
-                            label: 'Custom classes',
-                          ),
-                        ],
+                        _buildCategoryFilterChip(
+                          category: ClassCategory.crimsonScales,
+                          label: 'Crimson Scales',
+                        ),
+                        _buildCategoryFilterChip(
+                          category: ClassCategory.custom,
+                          label: 'Custom classes',
+                        ),
                       ],
                     ),
                   ),

@@ -78,10 +78,6 @@ class SharedPrefs {
     _sharedPrefs.setBool('enhancerLvl4', value);
   }
 
-  bool get customClasses => _sharedPrefs.getBool('customClasses') ?? false;
-
-  set customClasses(bool value) => _sharedPrefs.setBool('customClasses', value);
-
   bool get darkTheme => _sharedPrefs.getBool('darkTheme') ?? false;
 
   set darkTheme(bool value) => _sharedPrefs.setBool('darkTheme', value);
@@ -324,7 +320,6 @@ class SharedPrefs {
         'useDefaultFonts': useDefaultFonts,
         'primaryClassColor': primaryClassColor,
         'showRetiredCharacters': showRetiredCharacters,
-        'customClasses': customClasses,
         'hideCustomClassesWarningMessage': hideCustomClassesWarningMessage,
         'envelopeX': envelopeX,
         'envelopeV': envelopeV,
@@ -376,9 +371,6 @@ class SharedPrefs {
       }
       if (s.containsKey('showRetiredCharacters')) {
         showRetiredCharacters = s['showRetiredCharacters'] as bool;
-      }
-      if (s.containsKey('customClasses')) {
-        customClasses = s['customClasses'] as bool;
       }
       if (s.containsKey('hideCustomClassesWarningMessage')) {
         hideCustomClassesWarningMessage =

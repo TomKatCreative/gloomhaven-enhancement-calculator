@@ -20,7 +20,6 @@ void main() {
           'useDefaultFonts': true,
           'primaryClassColor': 0xffff0000,
           'showRetiredCharacters': false,
-          'customClasses': true,
           'hideCustomClassesWarningMessage': true,
           'envelopeX': true,
           'envelopeV': false,
@@ -55,7 +54,6 @@ void main() {
         expect(settings['useDefaultFonts'], isTrue);
         expect(settings['primaryClassColor'], 0xffff0000);
         expect(settings['showRetiredCharacters'], isFalse);
-        expect(settings['customClasses'], isTrue);
         expect(settings['hideCustomClassesWarningMessage'], isTrue);
         expect(settings['envelopeX'], isTrue);
         expect(settings['envelopeV'], isFalse);
@@ -119,7 +117,6 @@ void main() {
             'useDefaultFonts': true,
             'primaryClassColor': 0xffaabbcc,
             'showRetiredCharacters': false,
-            'customClasses': true,
             'hideCustomClassesWarningMessage': true,
             'envelopeX': true,
             'envelopeV': true,
@@ -154,7 +151,6 @@ void main() {
         expect(prefs.useDefaultFonts, isTrue);
         expect(prefs.primaryClassColor, 0xffaabbcc);
         expect(prefs.showRetiredCharacters, isFalse);
-        expect(prefs.customClasses, isTrue);
         expect(prefs.hideCustomClassesWarningMessage, isTrue);
         expect(prefs.envelopeX, isTrue);
         expect(prefs.envelopeV, isTrue);
@@ -192,7 +188,6 @@ void main() {
           'useDefaultFonts': true,
           'primaryClassColor': 0xff112233,
           'showRetiredCharacters': false,
-          'customClasses': true,
           'hideCustomClassesWarningMessage': true,
           'envelopeX': true,
           'envelopeV': false,

@@ -215,13 +215,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get testing => 'TESTING';
 
   @override
-  String get customClasses => 'Custom classes';
-
-  @override
-  String get customClassesDescription =>
-      'Include Crimson Scales, Trail of Ashes, and \'released\' custom classes created by the CCUG community';
-
-  @override
   String get solveEnvelopeX => 'Solve \'Envelope X\'';
 
   @override

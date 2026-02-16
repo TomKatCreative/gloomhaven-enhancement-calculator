@@ -72,8 +72,6 @@
   "display": "DISPLAY",
   "backupAndRestore": "LOCAL BACKUP & RESTORE",
   "testing": "TESTING",
-  "customClasses": "Custom classes",
-  "customClassesDescription": "Include Crimson Scales, Trail of Ashes, and 'released' custom classes created by the CCUG community",
   "solveEnvelopeX": "Solve 'Envelope X'",
   "gloomhavenSpoilers": "Gloomhaven spoilers",
   "enterSolution": "Enter the solution to the puzzle",

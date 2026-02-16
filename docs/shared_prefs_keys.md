@@ -37,7 +37,6 @@ prefs.darkTheme = true;
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `showRetiredCharacters` | bool | true | Show/hide retired characters in list |
-| `customClasses` | bool | false | Enable custom class creation |
 | `hideCustomClassesWarningMessage` | bool | false | Suppress custom class warning dialog |
 | `{classCode}` | bool | false | Per-class unlock status (dynamic) |
 
@@ -322,7 +321,7 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 
 | Category | Keys |
 |----------|------|
-| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, showAllCharacters, customClasses, hideCustomClassesWarningMessage, envelopeX, envelopeV |
+| `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, showAllCharacters, hideCustomClassesWarningMessage, envelopeX, envelopeV |
 | `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
 | `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
 | `classUnlocks` | Dynamic keys (class codes) for locked classes only |

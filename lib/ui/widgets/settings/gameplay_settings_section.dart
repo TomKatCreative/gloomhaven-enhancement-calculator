@@ -7,12 +7,10 @@ import 'package:gloomhaven_enhancement_calc/ui/dialogs/envelope_puzzle_dialog.da
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/settings_section_header.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 /// Settings section for gameplay-related preferences.
 ///
 /// Contains:
-/// - Custom classes toggle
 /// - Envelope X puzzle toggle (Gloomhaven spoilers)
 /// - Envelope V puzzle toggle (Crimson Scales spoilers)
 /// - Enhancement guidelines link
@@ -31,30 +29,10 @@ class GameplaySettingsSection extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SettingsSectionHeader(title: l10n.gameplay),
-        _buildCustomClassesToggle(context, theme, l10n),
         _buildEnvelopeXToggle(context, theme, l10n),
         _buildEnvelopeVToggle(context, theme, l10n),
         _buildEnhancementGuidelinesLink(context, theme, l10n),
       ],
-    );
-  }
-
-  Widget _buildCustomClassesToggle(
-    BuildContext context,
-    ThemeData theme,
-    AppLocalizations l10n,
-  ) {
-    return SwitchListTile(
-      secondary: Icon(
-        SharedPrefs().customClasses ? MdiIcons.testTube : MdiIcons.testTubeOff,
-      ),
-      subtitle: Text(l10n.customClassesDescription),
-      title: Text(l10n.customClasses),
-      value: SharedPrefs().customClasses,
-      onChanged: (val) {
-        SharedPrefs().customClasses = val;
-        onSettingsChanged();
-      },
     );
   }
 
