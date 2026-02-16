@@ -150,6 +150,18 @@ class _SettingsBottomSheet extends StatelessWidget {
           },
         ),
         IconButton(
+          icon: const FaIcon(FontAwesomeIcons.github),
+          onPressed: () {
+            launchURL(
+              Uri(
+                scheme: 'https',
+                host: 'github.com',
+                path: 'TomKatCreative/gloomhaven-enhancement-calculator',
+              ),
+            );
+          },
+        ),
+        IconButton(
           icon: const Icon(Icons.email),
           onPressed: () => _sendSupportEmail(context),
         ),

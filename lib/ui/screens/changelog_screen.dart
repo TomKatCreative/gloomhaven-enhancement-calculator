@@ -36,6 +36,12 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.5.1',
+              date: '2026-02-16',
+              changes: ['Added Frosthaven personal quests.'],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.5.0',
               date: '2026-02-13',
               changes: [

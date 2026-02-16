@@ -135,7 +135,7 @@ test/
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (production schema v18, dev schema v19 — see Feature Flags)
+- **SQLite** (`sqflite`) - Characters, perks, masteries, campaigns, parties (schema v19 — see Feature Flags)
 - **SharedPreferences** - App settings, theme, calculator state
 
 ### Feature Flags
@@ -150,7 +150,7 @@ const bool kTownSheetEnabled = false;
 |------|---------------|
 | `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page index mapping (characters=0→1, calculator=1→2) |
 
-**Database versioning**: Production schema is v18 (includes Personal Quests with 24 GH quests). Dev branch bumps to v19 (adds 23 FH quests via PQ table regeneration). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
+**Database versioning**: Production schema is v19 (Personal Quests with 24 GH + 23 FH quests; Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
 **Affected files** (lib): `main.dart`, `data/constants.dart`, `data/database_helper.dart`, `data/database_migrations.dart`, `ui/screens/home.dart`, `viewmodels/app_model.dart`, `viewmodels/characters_model.dart`
 **Affected files** (test): `helpers/fake_database_helper.dart`, `viewmodels/characters_model_test.dart`, `viewmodels/app_model_test.dart`

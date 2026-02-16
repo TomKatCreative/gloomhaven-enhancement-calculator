@@ -7,11 +7,11 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 18 (production) / 19 (dev — Frosthaven PQs + Perks/Masteries table removal)
+- **Current Schema Version**: 19
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
-> **Conditional schema**: Production schema is v18 (Personal Quests table with 24 GH quests and PQ columns on Characters). Dev branch bumps to v19 (regenerates PQ table with 24 GH + 23 FH quests, drops Perks and Masteries definition tables). When `kTownSheetEnabled` is `true`, Campaigns and Parties tables plus `PartyId` column on Characters are created on fresh installs.
+> **Conditional schema**: When `kTownSheetEnabled` is `true`, Campaigns and Parties tables plus `PartyId` column on Characters are created on fresh installs.
 
 ## Tables
 
@@ -436,7 +436,7 @@ The backup JSON structure:
 When adding new migrations:
 
 1. **Append only** - Never modify existing migrations
-2. **Increment version** - Update schema version in `database_helpers.dart`
+2. **Increment version** - Update schema version in `database_helper.dart`
 3. **Add to map** - Add migration function to `_migrations` map
 4. **Handle nulls** - Account for existing data that may not have new columns
 5. **Test upgrade paths** - Verify migrations work from multiple prior versions

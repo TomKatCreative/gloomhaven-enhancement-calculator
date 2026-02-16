@@ -1,11 +1,13 @@
 # Personal Quests
 
-## Status: Released (v4.5.0), Frosthaven WIP on dev
+## Status: Released (v4.5.1)
 
-Base Gloomhaven personal quests (24 quests, cards 510-533) shipped in v4.5.0 with:
+Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are fully shipped.
+
+### Gloomhaven PQs (v4.5.0)
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
 - DB migration v18 (PersonalQuestsTable + PQ columns on Characters)
-- PQ selection on character creation screen (GH only; GH2E/FH show "Coming soon")
+- PQ selection on character creation screen
 - PQ section on character screen with stepper-based progress tracking in edit mode
 - Sequential "Then" requirements: disabled until predecessor requirement is complete
 - Change/remove quest flow with confirmation dialog (shown after new quest selection)
@@ -17,10 +19,10 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) shipped in v4.5.0 wit
 - Text overflow handling for long requirement descriptions
 - Full test coverage (model, repository, viewmodel, widget tests)
 
-### Frosthaven PQs (WIP on dev)
+### Frosthaven PQs (v4.5.1)
 
 - 23 Frosthaven quests added to `PersonalQuestsRepository` (47 total: 24 GH + 23 FH)
-- DB migration v19: regenerates PersonalQuestsTable with all 47 quests
+- DB migration v19: drops Perks, Masteries, and PersonalQuests definition tables (loaded from repositories)
 - Dual numbering: `altNumber` field on `PersonalQuest` for FH cards (e.g., card #1 / asset 581)
 - `displayNumber` getter: `"01 (581)"` for FH, `"510"` for GH
 - FH quests all unlock envelopes (no class unlocks); envelope values shown in UI
@@ -30,10 +32,11 @@ Base Gloomhaven personal quests (24 quests, cards 510-533) shipped in v4.5.0 wit
 - Removed circle status icons from requirement rows (dimming + primary color conveys state)
 - Edit-mode stepper counter uses `contrastedPrimary` when complete
 - Search in PQ selector matches `displayNumber` (padded + alt numbers)
+- Edition filter chips on PQ selector screen
 
 ## Remaining Work
 
-- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`, and regenerate the PersonalQuestsTable (use `DatabaseMigrations.regeneratePersonalQuestsTable()`).
+- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`. No DB migration needed — quest definitions live in code, not the DB.
 - **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---
@@ -206,7 +209,7 @@ Extract `calculateCost()` and `getCalculationBreakdown()` into a pure `CostCalcu
 Move the cascade validation logic (setting lvl4 triggers lvl3/2/1) out of property setters into a dedicated validator.
 
 ### DatabaseHelper Decomposition
-**File:** `lib/data/database_helpers.dart`
+**File:** `lib/data/database_helper.dart`
 
 Extract backup/restore into `DatabaseBackupService`, separate from query logic.
 
@@ -216,7 +219,7 @@ Extract backup/restore into `DatabaseBackupService`, separate from query logic.
 Extract shared title row composition.
 
 ### Database Query Boilerplate
-**File:** `lib/data/database_helpers.dart`
+**File:** `lib/data/database_helper.dart`
 
 Create generic `queryAndMap<T>()` method to replace 4 identical query patterns.
 
