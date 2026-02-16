@@ -38,16 +38,16 @@ The highest-impact debt. These files have too many responsibilities, making them
 - Form validation mixed with UI layout
 - Random name generation via `faker` package
 
-### `characters_model.dart` (598 lines)
+### `characters_model.dart` (~470 lines, down from 598) — PARTIALLY RESOLVED
 
-Too many responsibilities in one ViewModel:
+> **Refactored** (2026-02-16): Extracted personal quest logic into `PersonalQuestService` (`lib/data/personal_quest_service.dart`). Moved debug character creation (`createCharactersTest`) to `DebugSettingsSection` where it's actually used. 15 new service tests added. All 894 tests pass.
+
+Remaining responsibilities (tightly coupled, low extraction value):
 - Character CRUD
 - Filtering & pagination with complex index management (`_calculateTargetIndex()` — 50+ lines)
 - Perk/mastery loading & toggling
 - Theme synchronization (`updateThemeForCharacter()` directly calls `themeProvider.updateSeedColor()`)
-- Personal quest management
 - Scroll position tracking via two controllers AND a `ValueNotifier<double>`
-- `createCharactersTest()` method is test-only code in production
 
 ### `personal_quest_section.dart` (580 lines)
 
@@ -136,9 +136,9 @@ Town features cannot be properly mocked in tests because these methods are not o
 
 `columnResourceLumber` maps to DB column `'ResourceWood'` — the Dart constant name doesn't match the stored column name.
 
-### Test Code in Production
+### ~~Test Code in Production~~ — RESOLVED
 
-`characters_model.dart` contains `createCharactersTest()` — a method that exists solely for test setup but ships in production code.
+> `createCharactersTest()` moved from `CharactersModel` to `DebugSettingsSection` (debug-only widget behind `kDebugMode`).
 
 ---
 

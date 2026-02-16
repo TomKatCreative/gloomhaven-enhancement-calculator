@@ -246,12 +246,23 @@ All calculator state is persisted via SharedPrefs:
 
 Manages character CRUD operations, perk/mastery state, and character list navigation.
 
+### Architecture
+
+```
+UI ← watches → CharactersModel (state + navigation + notifications)
+                        ↓ delegates
+                PersonalQuestService (quest assignment, progress, completion)
+```
+
+Personal quest operations are delegated to `PersonalQuestService` (`lib/data/personal_quest_service.dart`), following the same delegation pattern as `EnhancementCostCalculator`. The service is independently testable (`test/data/personal_quest_service_test.dart`).
+
 ### Responsibilities
 
 - Character list management (load, create, delete)
 - Current character selection and navigation
 - Edit mode toggling
 - Perk and mastery state updates
+- Personal quest management (via PersonalQuestService)
 - Theme synchronization with character color
 - Element sheet expansion state
 - Scroll state tracking
@@ -260,6 +271,7 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 
 - `ThemeProvider` (via ProxyProvider) - for color sync
 - `DatabaseHelper` (singleton) - for persistence
+- `PersonalQuestService` (created internally) - for quest operations
 
 ### Key Properties
 
@@ -310,13 +322,13 @@ Manages character CRUD operations, perk/mastery state, and character list naviga
 | `jumpToPage(int)` | Instant page jump |
 | `toggleShowRetired()` | Toggle retired visibility with smart navigation |
 
-### Personal Quest Methods
+### Personal Quest Methods (delegated to PersonalQuestService)
 
 | Method | Returns | Description |
 |--------|---------|-------------|
 | `updatePersonalQuest(Character, String questId)` | `Future<void>` | Change quest and reset progress to zeros |
 | `updatePersonalQuestProgress(Character, int index, int value)` | `Future<bool>` | Update a single requirement's progress. Returns `true` if quest just transitioned from incomplete → complete |
-| `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets |
+| `isPersonalQuestComplete(Character)` | `bool` | Check if all progress values meet their targets (delegates to `PersonalQuestService.isComplete`) |
 
 ### Party Methods
 

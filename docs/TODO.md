@@ -193,25 +193,31 @@ Restore rejects backups older than DB v8 (app 4.2.0) with a user-facing error me
 
 Larger refactoring opportunities identified during codebase audit. These are non-urgent structural improvements that would reduce complexity and improve maintainability.
 
-### CharactersModel Decomposition
-**File:** `lib/viewmodels/characters_model.dart` (~590 lines)
+### CharactersModel Decomposition — Partially Done
+**File:** `lib/viewmodels/characters_model.dart` (~470 lines, down from ~598)
 
-Extract element sheet state, scroll controllers, and navigation logic into smaller focused classes. Currently a god class managing too many concerns.
+**Completed:**
+- Extracted `PersonalQuestService` (`lib/data/personal_quest_service.dart`) — quest assignment, progress, and completion logic delegated from CharactersModel
+- Moved debug character creation (`createCharactersTest`) from CharactersModel to `DebugSettingsSection` (where it's actually used)
 
-### EnhancementCalculatorModel Cost Calculation Extraction
+**Remaining candidates (low priority — thin wrappers, tightly coupled):**
+- Element sheet state, scroll controllers, navigation logic — tightly coupled to CRUD/theme sync
+- Perk/mastery toggle — too thin (2 methods, ~13 lines each)
+
+### ~~EnhancementCalculatorModel Cost Calculation Extraction~~ — Done
 **File:** `lib/viewmodels/enhancement_calculator_model.dart`
 
-Extract `calculateCost()` and `getCalculationBreakdown()` into a pure `CostCalculator` class, separate from state management.
+Extracted into `EnhancementCostCalculator` (`lib/models/enhancement_cost_calculator.dart`). Model delegates cost computation to cached calculator instance.
 
 ### SharedPrefs Enhancer Level Cascade
 **File:** `lib/shared_prefs.dart`
 
 Move the cascade validation logic (setting lvl4 triggers lvl3/2/1) out of property setters into a dedicated validator.
 
-### DatabaseHelper Decomposition
+### ~~DatabaseHelper Decomposition~~ — Done
 **File:** `lib/data/database_helper.dart`
 
-Extract backup/restore into `DatabaseBackupService`, separate from query logic.
+Extracted into `DatabaseBackupService` (`lib/data/database_backup_service.dart`), separate from query logic.
 
 ### SectionCard / CollapsibleSectionCard Deduplication
 **File:** `lib/ui/widgets/section_card.dart`

@@ -37,12 +37,11 @@
 /// - `docs/viewmodels_reference.md` for full documentation
 library;
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/personal_quest_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -70,7 +69,12 @@ class CharactersModel with ChangeNotifier {
     required this.themeProvider,
     required this.showRetired,
     bool showAllCharacters = true,
-  }) : _showAllCharacters = showAllCharacters;
+  }) : _showAllCharacters = showAllCharacters,
+       _personalQuestService = PersonalQuestService(
+         databaseHelper: databaseHelper,
+       );
+
+  final PersonalQuestService _personalQuestService;
 
   List<Character> _characters = [];
   Character? currentCharacter;
@@ -262,78 +266,6 @@ class CharactersModel with ChangeNotifier {
     _setCurrentCharacter(index: SharedPrefs().currentCharacterIndex);
     notifyListeners();
     return characters;
-  }
-
-  // Usable for testing purposes to create all characters with all variants and random attributes.
-  Future<void> createCharactersTest({
-    ClassCategory? classCategory,
-    bool includeAllVariants = false,
-  }) async {
-    var random = Random();
-
-    final playerClassesToCreate = classCategory == null
-        ? PlayerClasses.playerClasses
-        : PlayerClasses.playerClasses.where(
-            (element) => element.category == classCategory,
-          );
-
-    for (PlayerClass playerClass in playerClassesToCreate) {
-      if (includeAllVariants) {
-        // Create a character for each available variant
-        final availableVariants = _getAvailableVariants(playerClass);
-
-        for (Variant variant in availableVariants) {
-          final variantName = _getVariantDisplayName(playerClass.name, variant);
-
-          await createCharacter(
-            variantName,
-            playerClass,
-            initialLevel: random.nextInt(9) + 1,
-            previousRetirements: random.nextInt(4),
-            edition: GameEdition.values[random.nextInt(3)],
-            prosperityLevel: random.nextInt(5),
-            variant: variant,
-          );
-        }
-      } else {
-        // Create only base variant
-        await createCharacter(
-          playerClass.name,
-          playerClass,
-          initialLevel: random.nextInt(9) + 1,
-          previousRetirements: random.nextInt(4),
-          edition: GameEdition.values[random.nextInt(3)],
-          prosperityLevel: random.nextInt(5),
-        );
-      }
-    }
-  }
-
-  /// Get all available variants for a player class by checking the perks repository
-  List<Variant> _getAvailableVariants(PlayerClass playerClass) {
-    // Get the perks for this class from the repository
-    final perksForClass = PerksRepository.perksMap[playerClass.classCode];
-
-    if (perksForClass == null || perksForClass.isEmpty) {
-      return [Variant.base]; // Default to base if no perks found
-    }
-
-    // Extract unique variants from the perks list
-    return perksForClass.map((perks) => perks.variant).toSet().toList();
-  }
-
-  /// Generate a display name for the character based on variant
-  String _getVariantDisplayName(String className, Variant variant) {
-    switch (variant) {
-      case Variant.base:
-        return className;
-      case Variant.frosthavenCrossover:
-        return '$className (FH)';
-      case Variant.gloomhaven2E:
-        return '$className (GH2E)';
-      default:
-        return '$className (${variant.name})';
-    }
   }
 
   void onPageChanged(int index) {
@@ -543,14 +475,7 @@ class CharactersModel with ChangeNotifier {
 
   /// Updates the personal quest for a character, resetting progress.
   Future<void> updatePersonalQuest(Character character, String? questId) async {
-    character.personalQuestId = questId ?? '';
-    character.personalQuestProgress = questId != null
-        ? List.filled(
-            PersonalQuestsRepository.getById(questId)?.requirements.length ?? 0,
-            0,
-          )
-        : [];
-    await databaseHelper.updateCharacter(character);
+    await _personalQuestService.updateQuest(character, questId);
     notifyListeners();
   }
 
@@ -563,27 +488,18 @@ class CharactersModel with ChangeNotifier {
     int requirementIndex,
     int value,
   ) async {
-    final wasComplete = isPersonalQuestComplete(character);
-    character.personalQuestProgress[requirementIndex] = value;
-    await databaseHelper.updateCharacter(character);
+    final result = await _personalQuestService.updateProgress(
+      character,
+      requirementIndex,
+      value,
+    );
     notifyListeners();
-    final isNowComplete = isPersonalQuestComplete(character);
-    return !wasComplete && isNowComplete;
+    return result;
   }
 
   /// Whether all personal quest requirements are met for the given character.
   bool isPersonalQuestComplete(Character character) {
-    final quest = character.personalQuest;
-    if (quest == null) return false;
-    if (character.personalQuestProgress.length != quest.requirements.length) {
-      return false;
-    }
-    for (int i = 0; i < quest.requirements.length; i++) {
-      if (character.personalQuestProgress[i] < quest.requirements[i].target) {
-        return false;
-      }
-    }
-    return true;
+    return PersonalQuestService.isComplete(character);
   }
 
   /// Assigns a character to a party (or null to unassign).
