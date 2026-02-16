@@ -11,11 +11,11 @@ Available on [Google Play](https://play.google.com/store/apps/details?id=tomkatc
 - Supports all enhancement types: +1 stats, elements, conditions, summon stats, and more
 - Accounts for card level, previous enhancements, and multi-target abilities
 - Edition-specific modifiers (Lost, Persistent, Temporary Enhancement)
-- Frosthaven Building 44 enhancer upgrades
 - Detailed cost breakdown showing how the final price is calculated
 
 ### Character Sheets
 - Create and manage multiple characters across all supported game editions
+- Personal quest selector for Gloomhaven and Frosthaven
 - Track gold, XP, checkmarks, and resources
 - Perk tracking with attack modifier deck visualization
 - Mastery tracking for Frosthaven characters
@@ -34,7 +34,6 @@ Available on [Google Play](https://play.google.com/store/apps/details?id=tomkatc
 ### Quality of Life
 - Dark mode support
 - Multiple theme color options
-- Element tracker for managing infusions during gameplay
 - Clean, intuitive interface optimized for mobile
 - Available in English and Portuguese
 
