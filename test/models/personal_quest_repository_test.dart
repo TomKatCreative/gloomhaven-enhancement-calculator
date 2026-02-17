@@ -2,12 +2,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
+import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 void main() {
   group('PersonalQuestsRepository', () {
-    test('contains 47 total quests (24 GH + 23 FH)', () {
-      expect(PersonalQuestsRepository.quests.length, 47);
+    test('contains 83 total quests (24 GH + 23 FH + 28 CS + 8 TOA)', () {
+      expect(PersonalQuestsRepository.quests.length, 83);
     });
 
     test('all quest IDs are unique', () {
@@ -87,14 +87,14 @@ void main() {
     group('Gloomhaven quests', () {
       test('contains 24 quests', () {
         final ghQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven,
+          PersonalQuestEdition.gloomhaven,
         );
         expect(ghQuests.length, 24);
       });
 
       test('quest numbers range from 510 to 533', () {
         final ghQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven,
+          PersonalQuestEdition.gloomhaven,
         );
         final numbers = ghQuests.map((q) => q.number).toList()..sort();
         expect(numbers.first, 510);
@@ -103,7 +103,7 @@ void main() {
 
       test('GH quests have no altNumber', () {
         final ghQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven,
+          PersonalQuestEdition.gloomhaven,
         );
         for (final quest in ghQuests) {
           expect(
@@ -121,7 +121,7 @@ void main() {
 
       test('all quest IDs start with pq_gh_', () {
         final ghQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven,
+          PersonalQuestEdition.gloomhaven,
         );
         for (final quest in ghQuests) {
           expect(quest.id, startsWith('pq_gh_'));
@@ -163,14 +163,14 @@ void main() {
     group('Frosthaven quests', () {
       test('contains 23 quests', () {
         final fhQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         expect(fhQuests.length, 23);
       });
 
       test('FH numbers range from 1 to 23', () {
         final fhQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         final numbers = fhQuests.map((q) => q.number).toList()..sort();
         expect(numbers.first, 1);
@@ -180,7 +180,7 @@ void main() {
 
       test('all FH quests have altNumber (asset number)', () {
         final fhQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         for (final quest in fhQuests) {
           expect(
@@ -200,7 +200,7 @@ void main() {
 
       test('all quest IDs start with pq_fh_', () {
         final fhQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         for (final quest in fhQuests) {
           expect(quest.id, startsWith('pq_fh_'));
@@ -209,7 +209,7 @@ void main() {
 
       test('all FH quests unlock envelopes (no class unlocks)', () {
         final fhQuests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         for (final quest in fhQuests) {
           expect(
@@ -280,6 +280,253 @@ void main() {
       });
     });
 
+    group('Crimson Scales quests', () {
+      test('contains 28 quests (22 core + 6 add-on)', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        expect(csQuests.length, 28);
+      });
+
+      test('quest numbers range from 330 to 357', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        final numbers = csQuests.map((q) => q.number).toList()..sort();
+        expect(numbers.first, 330);
+        expect(numbers.last, 357);
+        expect(numbers.toSet().length, 28);
+      });
+
+      test('all quest IDs start with pq_cs_', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        for (final quest in csQuests) {
+          expect(quest.id, startsWith('pq_cs_'));
+        }
+      });
+
+      test('all CS quests unlock classes (no envelope unlocks)', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        for (final quest in csQuests) {
+          expect(
+            quest.unlockClassCode,
+            isNotNull,
+            reason: '${quest.id} should unlock a class',
+          );
+          expect(
+            quest.unlockEnvelope,
+            isNull,
+            reason: '${quest.id} should not unlock an envelope',
+          );
+        }
+      });
+
+      test('each CS class has exactly 2 quests', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        final classCounts = <String, int>{};
+        for (final quest in csQuests) {
+          classCounts[quest.unlockClassCode!] =
+              (classCounts[quest.unlockClassCode!] ?? 0) + 1;
+        }
+        for (final entry in classCounts.entries) {
+          expect(
+            entry.value,
+            2,
+            reason: 'Class ${entry.key} should have exactly 2 quests',
+          );
+        }
+        // 11 core classes + 3 add-on classes
+        expect(classCounts.length, 14);
+      });
+
+      test('add-on quests use displayNumberOverride', () {
+        final addOnIds = [
+          'pq_cs_aa_001',
+          'pq_cs_aa_002',
+          'pq_cs_qa_001',
+          'pq_cs_qa_002',
+          'pq_cs_rm_001',
+          'pq_cs_rm_002',
+        ];
+        for (final id in addOnIds) {
+          final quest = PersonalQuestsRepository.getById(id)!;
+          expect(
+            quest.displayNumberOverride,
+            isNotNull,
+            reason: '$id should have displayNumberOverride',
+          );
+          expect(
+            quest.displayNumber,
+            quest.displayNumberOverride,
+            reason: '$id displayNumber should use override',
+          );
+        }
+      });
+
+      test('core quests do not use displayNumberOverride', () {
+        final csQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.crimsonScales,
+        );
+        final coreQuests = csQuests.where(
+          (q) => q.number >= 330 && q.number <= 351,
+        );
+        for (final quest in coreQuests) {
+          expect(
+            quest.displayNumberOverride,
+            isNull,
+            reason: '${quest.id} should not have displayNumberOverride',
+          );
+        }
+      });
+
+      group('specific quest data', () {
+        test('330 Protect and Serve has 2 sequential requirements', () {
+          final quest = PersonalQuestsRepository.getById('pq_cs_330');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.length, 2);
+          expect(quest.requirements[0].target, 10);
+          expect(quest.requirements[1].description, startsWith('Then '));
+          expect(quest.unlockClassCode, ClassCodes.bombard);
+        });
+
+        test(
+          '344 Natural Selection has 5 requirements (4 elements + scenario)',
+          () {
+            final quest = PersonalQuestsRepository.getById('pq_cs_344');
+            expect(quest, isNotNull);
+            expect(quest!.requirements.length, 5);
+            expect(quest.requirements[4].description, startsWith('Then '));
+            expect(quest.unlockClassCode, ClassCodes.luminary);
+          },
+        );
+
+        test('339 Mutual Support has target 30', () {
+          final quest = PersonalQuestsRepository.getById('pq_cs_339');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.first.target, 30);
+          expect(quest.unlockClassCode, ClassCodes.fireKnight);
+        });
+
+        test('AA-001 At All Costs displays as AA-001', () {
+          final quest = PersonalQuestsRepository.getById('pq_cs_aa_001');
+          expect(quest, isNotNull);
+          expect(quest!.displayNumber, 'AA-001');
+          expect(quest.displayName, 'AA-001 - At All Costs');
+          expect(quest.unlockClassCode, ClassCodes.amberAegis);
+        });
+
+        test('QA-001 Ingenious Inventor has 3 sequential requirements', () {
+          final quest = PersonalQuestsRepository.getById('pq_cs_qa_001');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.length, 3);
+          expect(quest.unlockClassCode, ClassCodes.artificer);
+        });
+
+        test('RM-002 Apex Predator has 2 requirements', () {
+          final quest = PersonalQuestsRepository.getById('pq_cs_rm_002');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.length, 2);
+          expect(quest.unlockClassCode, ClassCodes.ruinmaw);
+        });
+      });
+    });
+
+    group('Trail of Ashes quests', () {
+      test('contains 8 quests', () {
+        final toaQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        expect(toaQuests.length, 8);
+      });
+
+      test('quest numbers range from 641 to 648', () {
+        final toaQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        final numbers = toaQuests.map((q) => q.number).toList()..sort();
+        expect(numbers.first, 641);
+        expect(numbers.last, 648);
+        expect(numbers.toSet().length, 8);
+      });
+
+      test('all quest IDs start with pq_toa_', () {
+        final toaQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        for (final quest in toaQuests) {
+          expect(quest.id, startsWith('pq_toa_'));
+        }
+      });
+
+      test('all TOA quests unlock classes (no envelope unlocks)', () {
+        final toaQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        for (final quest in toaQuests) {
+          expect(
+            quest.unlockClassCode,
+            isNotNull,
+            reason: '${quest.id} should unlock a class',
+          );
+          expect(
+            quest.unlockEnvelope,
+            isNull,
+            reason: '${quest.id} should not unlock an envelope',
+          );
+        }
+      });
+
+      test('each TOA class has exactly 2 quests', () {
+        final toaQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        final classCounts = <String, int>{};
+        for (final quest in toaQuests) {
+          classCounts[quest.unlockClassCode!] =
+              (classCounts[quest.unlockClassCode!] ?? 0) + 1;
+        }
+        for (final entry in classCounts.entries) {
+          expect(
+            entry.value,
+            2,
+            reason: 'Class ${entry.key} should have exactly 2 quests',
+          );
+        }
+        expect(classCounts.length, 4);
+      });
+
+      group('specific quest data', () {
+        test('643 False Dichotomies has 2 requirements', () {
+          final quest = PersonalQuestsRepository.getById('pq_toa_643');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.length, 2);
+          expect(quest.requirements[0].target, 8);
+          expect(quest.requirements[1].target, 8);
+          expect(quest.unlockClassCode, ClassCodes.rimehearth);
+        });
+
+        test('644 Shared Suffering has target 30', () {
+          final quest = PersonalQuestsRepository.getById('pq_toa_644');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.first.target, 30);
+        });
+
+        test('641 Grave Robber has 2 sequential requirements', () {
+          final quest = PersonalQuestsRepository.getById('pq_toa_641');
+          expect(quest, isNotNull);
+          expect(quest!.requirements.length, 2);
+          expect(quest.requirements[1].description, startsWith('Then '));
+          expect(quest.unlockClassCode, ClassCodes.incarnate);
+        });
+      });
+    });
+
     group('getById', () {
       test('returns correct GH quest for valid ID', () {
         final quest = PersonalQuestsRepository.getById('pq_gh_510');
@@ -292,7 +539,21 @@ void main() {
         final quest = PersonalQuestsRepository.getById('pq_fh_581');
         expect(quest, isNotNull);
         expect(quest!.title, 'The Study of Plants');
-        expect(quest.edition, GameEdition.frosthaven);
+        expect(quest.edition, PersonalQuestEdition.frosthaven);
+      });
+
+      test('returns correct CS quest for valid ID', () {
+        final quest = PersonalQuestsRepository.getById('pq_cs_330');
+        expect(quest, isNotNull);
+        expect(quest!.title, 'Protect and Serve');
+        expect(quest.edition, PersonalQuestEdition.crimsonScales);
+      });
+
+      test('returns correct TOA quest for valid ID', () {
+        final quest = PersonalQuestsRepository.getById('pq_toa_641');
+        expect(quest, isNotNull);
+        expect(quest!.title, 'Grave Robber');
+        expect(quest.edition, PersonalQuestEdition.trailOfAshes);
       });
 
       test('returns null for invalid ID', () {
@@ -307,23 +568,30 @@ void main() {
     group('getByEdition', () {
       test('returns 24 quests for gloomhaven', () {
         final quests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven,
+          PersonalQuestEdition.gloomhaven,
         );
         expect(quests.length, 24);
       });
 
       test('returns 23 quests for frosthaven', () {
         final quests = PersonalQuestsRepository.getByEdition(
-          GameEdition.frosthaven,
+          PersonalQuestEdition.frosthaven,
         );
         expect(quests.length, 23);
       });
 
-      test('returns empty list for gloomhaven2e (not yet added)', () {
+      test('returns 28 quests for crimsonScales', () {
         final quests = PersonalQuestsRepository.getByEdition(
-          GameEdition.gloomhaven2e,
+          PersonalQuestEdition.crimsonScales,
         );
-        expect(quests, isEmpty);
+        expect(quests.length, 28);
+      });
+
+      test('returns 8 quests for trailOfAshes', () {
+        final quests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.trailOfAshes,
+        );
+        expect(quests.length, 8);
       });
     });
 
@@ -336,6 +604,16 @@ void main() {
       test('FH quest shows both numbers and title', () {
         final quest = PersonalQuestsRepository.getById('pq_fh_581')!;
         expect(quest.displayName, '01 (581) - The Study of Plants');
+      });
+
+      test('CS quest shows number and title', () {
+        final quest = PersonalQuestsRepository.getById('pq_cs_330')!;
+        expect(quest.displayName, '330 - Protect and Serve');
+      });
+
+      test('TOA quest shows number and title', () {
+        final quest = PersonalQuestsRepository.getById('pq_toa_641')!;
+        expect(quest.displayName, '641 - Grave Robber');
       });
     });
   });

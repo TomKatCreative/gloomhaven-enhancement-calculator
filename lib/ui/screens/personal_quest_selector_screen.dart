@@ -1,13 +1,13 @@
 /// Full-page screen for selecting a Personal Quest.
 ///
-/// Displays all available quests grouped by [GameEdition], with edition
-/// filter chips and search functionality. Each quest shows its number,
+/// Displays all available quests grouped by [PersonalQuestEdition], with
+/// edition filter chips and search functionality. Each quest shows its number,
 /// title, and unlock reward.
 ///
 /// ## Features
-/// - **Edition filter chips**: Narrow results by Gloomhaven or Frosthaven
+/// - **Edition filter chips**: Narrow results by edition/expansion
 /// - **Search**: Filters quests by title or number
-/// - **Section headers**: Groups quests by [GameEdition.displayName]
+/// - **Section headers**: Groups quests by [PersonalQuestEdition.displayName]
 /// - **Current quest highlight**: Shows selected quest with highlight styling
 /// - **Remove action**: Remove button on selected quest's tile
 ///
@@ -41,7 +41,6 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
@@ -95,7 +94,7 @@ class _PersonalQuestSelectorScreenState
   final FocusNode _searchFocusNode = FocusNode();
   final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
-  final Set<GameEdition> _selectedEditions = {};
+  final Set<PersonalQuestEdition> _selectedEditions = {};
 
   /// Returns quests filtered by edition and search query.
   List<PersonalQuest> get _filteredQuests {
@@ -180,8 +179,8 @@ class _PersonalQuestSelectorScreenState
                 spacing: smallPadding,
                 runSpacing: smallPadding,
                 children: [
-                  _buildEditionFilterChip(edition: GameEdition.gloomhaven),
-                  _buildEditionFilterChip(edition: GameEdition.frosthaven),
+                  for (final edition in PersonalQuestEdition.values)
+                    _buildEditionFilterChip(edition: edition),
                 ],
               ),
             ),
@@ -223,7 +222,7 @@ class _PersonalQuestSelectorScreenState
     );
   }
 
-  Widget _buildEditionFilterChip({required GameEdition edition}) {
+  Widget _buildEditionFilterChip({required PersonalQuestEdition edition}) {
     final isSelected = _selectedEditions.contains(edition);
     return FilterChip(
       visualDensity: VisualDensity.compact,

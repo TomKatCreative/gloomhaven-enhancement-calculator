@@ -1,15 +1,17 @@
 /// Static repository of all Personal Quest definitions.
 ///
-/// Contains 24 base Gloomhaven quests (cards 510-533) using second printing
-/// values and 23 Frosthaven quests. GH2E quests will be added in future
-/// updates.
+/// Contains 83 quests across 4 editions:
+/// - 24 base Gloomhaven quests (cards 510-533, second printing values)
+/// - 23 Frosthaven quests (cards 1-23 / asset 505-590)
+/// - 28 Crimson Scales quests (22 core cards 330-351 + 6 add-on class quests)
+/// - 8 Trail of Ashes quests (cards 641-648)
 ///
 /// ## Usage
 ///
 /// ```dart
 /// final quest = PersonalQuestsRepository.getById('pq_gh_510');
-/// final ghQuests = PersonalQuestsRepository.getByEdition(GameEdition.gloomhaven);
-/// final fhQuests = PersonalQuestsRepository.getByEdition(GameEdition.frosthaven);
+/// final ghQuests = PersonalQuestsRepository.getByEdition(PersonalQuestEdition.gloomhaven);
+/// final csQuests = PersonalQuestsRepository.getByEdition(PersonalQuestEdition.crimsonScales);
 /// ```
 ///
 /// See also:
@@ -19,7 +21,6 @@ library;
 
 import 'package:collection/collection.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 class PersonalQuestsRepository {
@@ -28,7 +29,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_510',
       number: 510,
       title: 'Seeker of Xorn',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.plagueherald,
       requirements: const [
         PersonalQuestRequirement(
@@ -46,7 +47,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_511',
       number: 511,
       title: 'Merchant Class',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.quartermaster,
       requirements: const [
         PersonalQuestRequirement(description: 'Own 2 Head items', target: 2),
@@ -63,7 +64,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_512',
       number: 512,
       title: 'Greed is Good',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.quartermaster,
       requirements: const [
         PersonalQuestRequirement(
@@ -76,7 +77,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_513',
       number: 513,
       title: 'Finding the Cure',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockEnvelope: 'X',
       requirements: const [
         PersonalQuestRequirement(
@@ -94,7 +95,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_514',
       number: 514,
       title: 'A Study of Anatomy',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.sawbones,
       requirements: const [
         PersonalQuestRequirement(
@@ -108,7 +109,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_515',
       number: 515,
       title: 'Lawbringer',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
         PersonalQuestRequirement(
@@ -121,7 +122,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_516',
       number: 516,
       title: 'Pounds of Flesh',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.berserker,
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 15 Vermlings', target: 15),
@@ -131,7 +132,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_517',
       number: 517,
       title: 'Trophy Hunt',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
@@ -144,7 +145,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_518',
       number: 518,
       title: 'Eternal Wanderer',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.summoner,
       requirements: const [
         PersonalQuestRequirement(
@@ -157,7 +158,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_519',
       number: 519,
       title: 'Battle Legend',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
@@ -170,7 +171,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_520',
       number: 520,
       title: 'Implement of Light',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
         PersonalQuestRequirement(
@@ -188,7 +189,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_521',
       number: 521,
       title: 'Take Back the Trees',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
@@ -206,7 +207,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_522',
       number: 522,
       title: 'The Thin Places',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
         PersonalQuestRequirement(
@@ -219,7 +220,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_523',
       number: 523,
       title: 'Aberrant Slayer',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.elementalist,
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 1 Flame Demon', target: 1),
@@ -234,7 +235,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_524',
       number: 524,
       title: 'Fearless Stand',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
@@ -247,7 +248,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_525',
       number: 525,
       title: 'Piety in All Things',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.sawbones,
       requirements: const [
         PersonalQuestRequirement(
@@ -260,7 +261,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_526',
       number: 526,
       title: 'Vengeance',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockEnvelope: 'X',
       requirements: const [
         PersonalQuestRequirement(
@@ -278,7 +279,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_527',
       number: 527,
       title: 'Zealot of the Blood God',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.berserker,
       requirements: const [
         PersonalQuestRequirement(
@@ -291,7 +292,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_528',
       number: 528,
       title: 'Goliath Toppler',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
@@ -304,7 +305,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_529',
       number: 529,
       title: 'The Fall of Man',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
         PersonalQuestRequirement(
@@ -322,7 +323,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_530',
       number: 530,
       title: 'Augmented Abilities',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.summoner,
       requirements: const [
         PersonalQuestRequirement(
@@ -335,7 +336,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_531',
       number: 531,
       title: 'Elemental Samples',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.elementalist,
       requirements: const [
         PersonalQuestRequirement(
@@ -368,7 +369,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_532',
       number: 532,
       title: 'A Helping Hand',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
@@ -382,7 +383,7 @@ class PersonalQuestsRepository {
       id: 'pq_gh_533',
       number: 533,
       title: 'The Perfect Poison',
-      edition: GameEdition.gloomhaven,
+      edition: PersonalQuestEdition.gloomhaven,
       unlockClassCode: ClassCodes.plagueherald,
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 3 Oozes', target: 3),
@@ -400,7 +401,7 @@ class PersonalQuestsRepository {
       number: 1,
       altNumber: 581,
       title: 'The Study of Plants',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '24/42',
       requirements: const [
         PersonalQuestRequirement(
@@ -415,7 +416,7 @@ class PersonalQuestsRepository {
       number: 2,
       altNumber: 582,
       title: 'Searching for the Oak',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '24/42',
       requirements: const [
         PersonalQuestRequirement(
@@ -434,7 +435,7 @@ class PersonalQuestsRepository {
       number: 3,
       altNumber: 583,
       title: 'Merchant Class',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '37/74',
       requirements: const [
         PersonalQuestRequirement(description: 'Own 3 Head items', target: 3),
@@ -452,7 +453,7 @@ class PersonalQuestsRepository {
       number: 4,
       altNumber: 584,
       title: 'Greed is Good',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '37/74',
       requirements: const [
         PersonalQuestRequirement(
@@ -466,7 +467,7 @@ class PersonalQuestsRepository {
       number: 5,
       altNumber: 585,
       title: 'Build, not Destroy',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '85/21',
       requirements: const [
         PersonalQuestRequirement(
@@ -481,7 +482,7 @@ class PersonalQuestsRepository {
       number: 6,
       altNumber: 586,
       title: 'Team Building',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '85/21',
       requirements: const [
         PersonalQuestRequirement(
@@ -496,7 +497,7 @@ class PersonalQuestsRepository {
       number: 7,
       altNumber: 587,
       title: 'Aesther Outpost',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '44/88',
       requirements: const [
         PersonalQuestRequirement(
@@ -511,7 +512,7 @@ class PersonalQuestsRepository {
       number: 8,
       altNumber: 588,
       title: 'Dangerous Game',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '44/88',
       requirements: const [
         PersonalQuestRequirement(description: 'Kill 2 Algox Guards', target: 2),
@@ -530,7 +531,7 @@ class PersonalQuestsRepository {
       number: 9,
       altNumber: 589,
       title: 'Life Lessons',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '90/83',
       requirements: const [
         PersonalQuestRequirement(
@@ -544,7 +545,7 @@ class PersonalQuestsRepository {
       number: 10,
       altNumber: 590,
       title: 'Explore the Reaches',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '90/83',
       requirements: const [
         PersonalQuestRequirement(
@@ -559,7 +560,7 @@ class PersonalQuestsRepository {
       number: 11,
       altNumber: 505,
       title: 'Refined Tastes',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '39/72',
       requirements: const [
         PersonalQuestRequirement(
@@ -574,7 +575,7 @@ class PersonalQuestsRepository {
       number: 12,
       altNumber: 509,
       title: 'Threat from the Deep',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '90/42',
       requirements: const [
         PersonalQuestRequirement(
@@ -589,7 +590,7 @@ class PersonalQuestsRepository {
       number: 13,
       altNumber: 514,
       title: 'End the Trickery',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '44/74',
       requirements: const [
         PersonalQuestRequirement(description: 'Kill fifteen Imps', target: 15),
@@ -600,7 +601,7 @@ class PersonalQuestsRepository {
       number: 14,
       altNumber: 519,
       title: 'Eternal Wanderer',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '37/72',
       requirements: const [
         PersonalQuestRequirement(
@@ -630,7 +631,7 @@ class PersonalQuestsRepository {
       number: 15,
       altNumber: 523,
       title: 'Continued Prosperity',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '65/85',
       requirements: const [
         PersonalQuestRequirement(
@@ -644,7 +645,7 @@ class PersonalQuestsRepository {
       number: 16,
       altNumber: 527,
       title: 'Prepared for the Worst',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '85/88',
       requirements: const [
         PersonalQuestRequirement(
@@ -658,7 +659,7 @@ class PersonalQuestsRepository {
       number: 17,
       altNumber: 538,
       title: 'Battle Legend',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '81/67',
       requirements: const [
         PersonalQuestRequirement(
@@ -672,7 +673,7 @@ class PersonalQuestsRepository {
       number: 18,
       altNumber: 542,
       title: 'Let Them Be',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '44/67',
       requirements: const [
         PersonalQuestRequirement(
@@ -686,7 +687,7 @@ class PersonalQuestsRepository {
       number: 19,
       altNumber: 545,
       title: 'Quiet the Dead Places',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '81/67',
       requirements: const [
         PersonalQuestRequirement(
@@ -705,7 +706,7 @@ class PersonalQuestsRepository {
       number: 20,
       altNumber: 549,
       title: 'Return to Simplicity',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '24/21',
       requirements: const [
         PersonalQuestRequirement(
@@ -719,7 +720,7 @@ class PersonalQuestsRepository {
       number: 21,
       altNumber: 552,
       title: 'The Study of Life',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '39/72',
       requirements: const [
         PersonalQuestRequirement(
@@ -733,7 +734,7 @@ class PersonalQuestsRepository {
       number: 22,
       altNumber: 557,
       title: 'The Greatest Challenge',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: '37/83',
       requirements: const [
         PersonalQuestRequirement(
@@ -747,13 +748,598 @@ class PersonalQuestsRepository {
       number: 23,
       altNumber: 543,
       title: 'The Chosen One',
-      edition: GameEdition.frosthaven,
+      edition: PersonalQuestEdition.frosthaven,
       unlockEnvelope: 'A',
       requirements: const [
         PersonalQuestRequirement(
           description:
               'Experience ten allies exhaust during scenarios you otherwise complete',
           target: 10,
+        ),
+      ],
+    ),
+    // ── Crimson Scales Personal Quests ──
+    // 22 core quests (cards 330-351), 2 per class, all unlock classes
+    PersonalQuest(
+      id: 'pq_cs_330',
+      number: 330,
+      title: 'Protect and Serve',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.bombard,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Kill ten Inox', target: 10),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Siege Tower" (Scenario 33) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_331',
+      number: 331,
+      title: 'Weapons Specialist',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.bombard,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Consume fifteen one-hand or two-hand items',
+          target: 15,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_332',
+      number: 332,
+      title: 'Experimentation',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.brightspark,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Play thirty cards for their lost action',
+          target: 30,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_333',
+      number: 333,
+      title: 'Thrill Seeker',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.brightspark,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Reveal a room tile by opening a door twenty times',
+          target: 20,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_334',
+      number: 334,
+      title: 'Trap Setter',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.chainguard,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Disarm or cause an enemy to spring a trap during your turn fifteen times',
+          target: 15,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_335',
+      number: 335,
+      title: 'Bandit Banisher',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.chainguard,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill ten Guards or Archers',
+          target: 10,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Prison Riot" (Scenario 35) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_336',
+      number: 336,
+      title: 'Creatures in the Night',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.chieftain,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill twenty Oozes, Forest Imps, or Black Imps',
+          target: 20,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_337',
+      number: 337,
+      title: 'Experienced Leader',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.chieftain,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Complete twelve scenarios where you gained at least 12 experience points',
+          target: 12,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_338',
+      number: 338,
+      title: 'Adrenaline Spike',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.fireKnight,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Kill an enemy and loot its money token in the same round fifteen times',
+          target: 15,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_339',
+      number: 339,
+      title: 'Mutual Support',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.fireKnight,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Kill thirty enemies that are adjacent to any of your allies',
+          target: 30,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_340',
+      number: 340,
+      title: 'Thy be Blessed',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.mirefoot,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Draw a BLESS card twelve times during an attack',
+          target: 12,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_341',
+      number: 341,
+      title: 'Spiritual Gains',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.mirefoot,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Spend 200 gold on enhancements',
+          target: 200,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_342',
+      number: 342,
+      title: 'The Path of Agony',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.hollowpact,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Experience an ally or enemy dying or becoming exhausted during its own turn thirteen times',
+          target: 13,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_343',
+      number: 343,
+      title: 'Cruel Dominion',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.hollowpact,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Complete ten scenarios during which you kill an enemy who has a negative condition',
+          target: 10,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_344',
+      number: 344,
+      title: 'Natural Selection',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.luminary,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Generate Fire two times',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description: 'Generate Ice two times',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description: 'Generate Light two times',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description: 'Generate Dark two times',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Burning Stones" (Scenario 37) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_345',
+      number: 345,
+      title: 'Predator and Prey',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.luminary,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Kill two or more enemies in the same turn fifteen times',
+          target: 15,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_346',
+      number: 346,
+      title: 'An Adder Divides',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.hierophant,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Occupy difficult terrain in six different scenarios',
+          target: 6,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Festering Mire" (Scenario 39) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_347',
+      number: 347,
+      title: 'Field Research',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.hierophant,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Poison twenty different types of monsters',
+          target: 20,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_348',
+      number: 348,
+      title: "Conjurer's Hand",
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.spiritCaller,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill ten summoned monsters',
+          target: 10,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_349',
+      number: 349,
+      title: 'No Rest for the Wicked',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.spiritCaller,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Complete ten scenarios where you only performed one type of rest (long or short)',
+          target: 10,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_350',
+      number: 350,
+      title: 'Health First',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.starslinger,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete seven scenarios ending at full health',
+          target: 7,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_351',
+      number: 351,
+      title: 'Limitless Searching',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.starslinger,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Loot thirty money tokens',
+          target: 30,
+        ),
+      ],
+    ),
+    // ── Crimson Scales Add-On Class Quests ──
+    // 6 quests for 3 add-on classes (2 per class), all unlock classes
+    // These use displayNumberOverride for non-numeric card identifiers
+    PersonalQuest(
+      id: 'pq_cs_aa_001',
+      number: 352,
+      displayNumberOverride: 'AA-001',
+      title: 'At All Costs',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.amberAegis,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Experience eight scenarios where you negate damage by losing a card while adjacent to an ally',
+          target: 8,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "The Riches of the Steelsilk" (Scenario AA1) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_aa_002',
+      number: 353,
+      displayNumberOverride: 'AA-002',
+      title: 'The Weight of Failure',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.amberAegis,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Complete eight scenarios without exhausting and with 2 or less HP remaining',
+          target: 8,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Malign Echoes" (Scenario AA2) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_qa_001',
+      number: 354,
+      displayNumberOverride: 'QA-001',
+      title: 'Ingenious Inventor',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.artificer,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Immediately gain Power Modulator (Item QA-01)',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Use this item to kill twelve enemies',
+          target: 12,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Capstone Test" (Scenario QA1) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_qa_002',
+      number: 355,
+      displayNumberOverride: 'QA-002',
+      title: 'Scrap Diver',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.artificer,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Loot two or more money tokens with a single action eight times',
+          target: 8,
+        ),
+        PersonalQuestRequirement(
+          description: 'Loot two treasure tiles',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Mother Lode" (Scenario QA2) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_rm_001',
+      number: 356,
+      displayNumberOverride: 'RM-001',
+      title: 'Brutal Enforcer',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.ruinmaw,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Gain Serrated Edge design (Item RM-01)',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Apply WOUND or RUPTURE to thirteen enemies',
+          target: 13,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Mind Your Manners" (Scenario RM1) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_cs_rm_002',
+      number: 357,
+      displayNumberOverride: 'RM-002',
+      title: 'Apex Predator',
+      edition: PersonalQuestEdition.crimsonScales,
+      unlockClassCode: ClassCodes.ruinmaw,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Experience twenty rounds where during or after you perform an action with a Lost card, an enemy dies',
+          target: 20,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Ruined Colony" (Scenario RM3) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    // ── Trail of Ashes Personal Quests ──
+    // 8 quests (cards 641-648), 2 per class, all unlock classes
+    // Note: Shardrender class has no personal quests (unlocked via campaign)
+    PersonalQuest(
+      id: 'pq_toa_641',
+      number: 641,
+      title: 'Grave Robber',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.incarnate,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Loot fifteen money tokens in scenarios with Living Bones, Living Corpses, or Living Spirits',
+          target: 15,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then unlock "Ternion Tomb" (Scenario 67) and follow it to a conclusion',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_642',
+      number: 642,
+      title: 'Stand as One',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.incarnate,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Add the Battle Standard (Item 115) to the city supply',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Experience your allies killing twelve enemies with abilities granted by you',
+          target: 12,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_643',
+      number: 643,
+      title: 'False Dichotomies',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.rimehearth,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Choose Option A on an event card eight times',
+          target: 8,
+        ),
+        PersonalQuestRequirement(
+          description: 'Choose Option B on an event card eight times',
+          target: 8,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_644',
+      number: 644,
+      title: 'Shared Suffering',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.rimehearth,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Kill thirty enemies while they are adjacent to one or more of their allies',
+          target: 30,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_645',
+      number: 645,
+      title: 'Speed is King',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.tempest,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Kill twenty enemies whose initiative is at least 20 slower than yours that round',
+          target: 20,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_646',
+      number: 646,
+      title: 'Resourceful',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.tempest,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Perform a loot action while adjacent to an enemy at least twice during a scenario in ten different scenarios',
+          target: 10,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_647',
+      number: 647,
+      title: 'Close to Nature',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.thornreaper,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Complete four scenarios that use at least one Bush, Tree, or Thorns overlay tile',
+          target: 4,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_toa_648',
+      number: 648,
+      title: 'In Good Time',
+      edition: PersonalQuestEdition.trailOfAshes,
+      unlockClassCode: ClassCodes.thornreaper,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Declare and then perform a long rest while an enemy is in the same room as you thirteen times',
+          target: 13,
         ),
       ],
     ),
@@ -764,6 +1350,6 @@ class PersonalQuestsRepository {
       quests.firstWhereOrNull((q) => q.id == id);
 
   /// Returns all personal quests for a given edition.
-  static List<PersonalQuest> getByEdition(GameEdition edition) =>
+  static List<PersonalQuest> getByEdition(PersonalQuestEdition edition) =>
       quests.where((q) => q.edition == edition).toList();
 }
