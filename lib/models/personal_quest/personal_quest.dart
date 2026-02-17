@@ -15,7 +15,24 @@ library;
 
 import 'dart:convert';
 
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
+/// The source edition/expansion for a personal quest.
+///
+/// Separate from [GameEdition] which governs game rules (enhancement costs,
+/// starting gold, etc.). This enum is used purely for quest grouping and
+/// display in the quest selector UI.
+enum PersonalQuestEdition {
+  gloomhaven,
+  frosthaven,
+  crimsonScales,
+  trailOfAshes;
+
+  String get displayName => switch (this) {
+    gloomhaven => 'Gloomhaven',
+    frosthaven => 'Frosthaven',
+    crimsonScales => 'Crimson Scales',
+    trailOfAshes => 'Trail of Ashes',
+  };
+}
 
 // Legacy database table/column constants.
 // The PersonalQuestsTable was dropped in v19 — definitions now come from
@@ -36,7 +53,7 @@ class PersonalQuest {
   late String id;
   late int number;
   late String title;
-  late GameEdition edition;
+  late PersonalQuestEdition edition;
   List<PersonalQuestRequirement> requirements;
   String? unlockClassCode;
   String? unlockEnvelope;
@@ -44,6 +61,11 @@ class PersonalQuest {
   /// Secondary card number for editions with dual numbering (e.g., Frosthaven
   /// cards have both an edition-specific number 1-23 and an asset number).
   int? altNumber;
+
+  /// When set, [displayNumber] returns this value instead of the computed
+  /// number string. Used for quests with non-numeric card identifiers
+  /// (e.g., "AA-001" for Crimson Scales add-on classes).
+  String? displayNumberOverride;
 
   PersonalQuest({
     required this.id,
@@ -54,13 +76,14 @@ class PersonalQuest {
     this.unlockClassCode,
     this.unlockEnvelope,
     this.altNumber,
+    this.displayNumberOverride,
   });
 
   PersonalQuest.fromMap(Map<String, dynamic> map) : requirements = const [] {
     id = map[columnPersonalQuestId] as String;
     number = map[columnPersonalQuestNumber] as int;
     title = map[columnPersonalQuestTitle] as String;
-    edition = GameEdition.values.byName(
+    edition = PersonalQuestEdition.values.byName(
       map[columnPersonalQuestEdition] as String,
     );
   }
@@ -74,11 +97,14 @@ class PersonalQuest {
 
   /// Display string for the card number(s).
   ///
-  /// Shows both numbers when [altNumber] is set (e.g., "04 (584)"),
-  /// otherwise just the primary number (e.g., "510").
-  String get displayNumber => altNumber != null
-      ? '${number.toString().padLeft(2, '0')} ($altNumber)'
-      : '$number';
+  /// Returns [displayNumberOverride] if set (e.g., "AA-001"), otherwise
+  /// shows both numbers when [altNumber] is set (e.g., "04 (584)"),
+  /// or just the primary number (e.g., "510").
+  String get displayNumber =>
+      displayNumberOverride ??
+      (altNumber != null
+          ? '${number.toString().padLeft(2, '0')} ($altNumber)'
+          : '$number');
 
   /// Display string combining number(s) and title, e.g., "510 - Seeker of Xorn"
   /// or "01/581 - The Study of Plants".

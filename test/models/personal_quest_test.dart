@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 
 void main() {
@@ -9,7 +8,7 @@ void main() {
         id: 'pq_gh_510',
         number: 510,
         title: 'Seeker of Xorn',
-        edition: GameEdition.gloomhaven,
+        edition: PersonalQuestEdition.gloomhaven,
         unlockClassCode: 'ph',
         requirements: const [
           PersonalQuestRequirement(description: 'Test req', target: 3),
@@ -19,7 +18,7 @@ void main() {
       expect(quest.id, 'pq_gh_510');
       expect(quest.number, 510);
       expect(quest.title, 'Seeker of Xorn');
-      expect(quest.edition, GameEdition.gloomhaven);
+      expect(quest.edition, PersonalQuestEdition.gloomhaven);
       expect(quest.unlockClassCode, 'ph');
       expect(quest.requirements.length, 1);
       expect(quest.unlockEnvelope, isNull);
@@ -30,7 +29,7 @@ void main() {
         id: 'pq_gh_513',
         number: 513,
         title: 'Finding the Cure',
-        edition: GameEdition.gloomhaven,
+        edition: PersonalQuestEdition.gloomhaven,
         unlockEnvelope: 'X',
       );
 
@@ -43,7 +42,7 @@ void main() {
         id: 'pq_gh_510',
         number: 510,
         title: 'Seeker of Xorn',
-        edition: GameEdition.gloomhaven,
+        edition: PersonalQuestEdition.gloomhaven,
       );
 
       expect(quest.displayName, '510 - Seeker of Xorn');
@@ -54,14 +53,17 @@ void main() {
         id: 'pq_gh_510',
         number: 510,
         title: 'Seeker of Xorn',
-        edition: GameEdition.gloomhaven,
+        edition: PersonalQuestEdition.gloomhaven,
       );
 
       final map = quest.toMap();
       expect(map[columnPersonalQuestId], 'pq_gh_510');
       expect(map[columnPersonalQuestNumber], 510);
       expect(map[columnPersonalQuestTitle], 'Seeker of Xorn');
-      expect(map[columnPersonalQuestEdition], GameEdition.gloomhaven.name);
+      expect(
+        map[columnPersonalQuestEdition],
+        PersonalQuestEdition.gloomhaven.name,
+      );
     });
 
     test('fromMap reconstructs quest', () {
@@ -76,7 +78,7 @@ void main() {
       expect(quest.id, 'pq_gh_512');
       expect(quest.number, 512);
       expect(quest.title, 'Greed is Good');
-      expect(quest.edition, GameEdition.gloomhaven);
+      expect(quest.edition, PersonalQuestEdition.gloomhaven);
     });
 
     test('toMap/fromMap round-trip preserves data', () {
@@ -84,7 +86,7 @@ void main() {
         id: 'pq_gh_515',
         number: 515,
         title: 'Lawbringer',
-        edition: GameEdition.gloomhaven,
+        edition: PersonalQuestEdition.gloomhaven,
       );
 
       final roundTripped = PersonalQuest.fromMap(original.toMap());
