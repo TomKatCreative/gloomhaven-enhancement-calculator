@@ -82,6 +82,10 @@ Despite the constants policy in `constants.dart`, several files still use hardco
 
 400+ asset definitions with no way to detect unused assets and no path validation.
 
+### ~~SVG `<style>` Tags~~ — RESOLVED
+
+> **Fixed** (2026-02-16): Four SVG files contained `<style>` elements that `flutter_svg` cannot parse, causing console warnings ("unhandled element `<style/>`"). Removed empty `<style></style>` from `prosperity.svg` and `persist.svg`. Inlined CSS class fills as `fill` attributes in `xp_2.svg` and `shardrender.svg`.
+
 ---
 
 ## Tier 3: Dead Code & Legacy
