@@ -5,7 +5,6 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/enhancer_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
@@ -35,7 +34,7 @@ class _EnhancementCalculatorScreenState
     final themeProvider = context.watch<ThemeProvider>();
     enhancementCalculatorModel.calculateCost(notify: false);
     final darkTheme = themeProvider.useDarkMode;
-    final edition = SharedPrefs().gameEdition;
+    final edition = enhancementCalculatorModel.edition;
 
     return Stack(
       children: [
@@ -185,9 +184,8 @@ class _CardLevelSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final partyBoon = edition.supportsPartyBoon && SharedPrefs().partyBoon;
-    final enhancerLvl3 =
-        edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3;
+    final partyBoon = model.partyBoonApplies;
+    final enhancerLvl3 = model.enhancerLvl3Applies;
     final level = model.cardLevel;
     final baseCost = 25 * level;
     final actualCost = model.cardLevelPenalty(level);
@@ -269,8 +267,7 @@ class _PreviousEnhancementsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final enhancerLvl4 =
-        edition.hasEnhancerLevels && SharedPrefs().enhancerLvl4;
+    final enhancerLvl4 = model.enhancerLvl4Applies;
     final selected = model.previousEnhancements;
     final baseCost = 75 * selected;
     final actualCost = model.previousEnhancementsPenalty(selected);
@@ -358,8 +355,7 @@ class _MultipleTargetsToggle extends StatelessWidget {
           message: Strings.multipleTargetsInfoBody(
             context,
             edition: edition,
-            enhancerLvl2:
-                edition.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
+            enhancerLvl2: model.enhancerLvl2Applies,
             darkMode: darkTheme,
           ),
         ),
@@ -588,11 +584,10 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
           ),
           title: '${AppLocalizations.of(context).scenario114Reward} \u00A7',
           subtitle: AppLocalizations.of(context).forgottenCirclesSpoilers,
-          value: SharedPrefs().partyBoon,
+          value: widget.enhancementCalculatorModel.partyBoon,
           onChanged: (value) {
             setState(() {
-              SharedPrefs().partyBoon = value;
-              widget.enhancementCalculatorModel.calculateCost();
+              widget.enhancementCalculatorModel.partyBoon = value;
             });
             widget.onSettingChanged();
           },
@@ -607,7 +602,7 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
           ),
           title: '${AppLocalizations.of(context).building44} \u002A',
           subtitle: AppLocalizations.of(context).frosthavenSpoilers,
-          value: _hasAnyEnhancerUpgrades(),
+          value: widget.enhancementCalculatorModel.hasAnyEnhancerUpgrades,
           trailingWidget: SizedBox(
             width: 60, // Match Switch width for alignment
             child: Center(
@@ -630,12 +625,6 @@ class _DiscountsGroupCardState extends State<_DiscountsGroupCard> {
       contentPadding: const EdgeInsets.only(bottom: smallPadding),
       child: CalculatorToggleGroupCard(items: items),
     );
-  }
-
-  bool _hasAnyEnhancerUpgrades() {
-    return SharedPrefs().enhancerLvl2 ||
-        SharedPrefs().enhancerLvl3 ||
-        SharedPrefs().enhancerLvl4;
   }
 
   void _showEnhancerDialog(BuildContext context) {

@@ -209,6 +209,24 @@ Larger refactoring opportunities identified during codebase audit. These are non
 
 Extracted into `EnhancementCostCalculator` (`lib/models/enhancement_cost_calculator.dart`). Model delegates cost computation to cached calculator instance.
 
+### ~~Eliminate Direct SharedPrefs Access from UI Files~~ — Partially Done
+
+**Completed:** ~30 `SharedPrefs()` calls eliminated across 10 UI files. All calculator state (gameEdition, partyBoon, enhancerLvl2/3/4), section expansion state (generalExpanded, questAndNotesExpanded, perksAndMasteriesExpanded, townDetailsExpanded, partyDetailsExpanded), and the redundant navigation bar persist call now go through ViewModels.
+
+**Files fully cleaned (SharedPrefs import removed):** `ghc_navigation_bar.dart`, `enhancement_calculator_screen.dart`, `ghc_animated_app_bar.dart`, `enhancer_dialog.dart`, `info_dialog.dart`, `stats_and_resources_card.dart`, `quest_and_notes_card.dart`, `perks_and_masteries_card.dart`, `town_screen.dart`
+
+**Deferred (~34 calls in 7 files):**
+
+| File | Calls | Reason |
+|------|-------|--------|
+| `element_tracker_sheet.dart` | 12 | Purely local widget state, self-contained |
+| `class_selector_screen.dart` | 5 | Needs per-class unlock map in a new model |
+| `gameplay_settings_section.dart` | 8 | Envelope X/V toggles need new model or AppModel expansion |
+| `home.dart` | 1 | One-shot dialog flag, minimal value |
+| `update_450_dialog.dart` | 2 | One-shot flags, minimal value |
+| `custom_class_warning_dialog.dart` | 2 | Dialog-local preference |
+| `restore_dialog.dart` | 4 | Legitimate post-restore sync reads |
+
 ### SharedPrefs Enhancer Level Cascade
 **File:** `lib/shared_prefs.dart`
 

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -24,7 +23,6 @@ class GHCNavigationBar extends StatelessWidget {
           duration: animationDuration,
           curve: Curves.easeInOut,
         );
-        SharedPrefs().initialPage = value;
         final CharactersModel charactersModel = context.read<CharactersModel>();
         charactersModel.isScrolledToTop = true;
         charactersModel.isEditMode = false;

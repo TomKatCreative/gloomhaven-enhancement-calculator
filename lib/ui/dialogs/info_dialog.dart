@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
 class InfoDialog extends StatefulWidget {
   final String? title;
@@ -41,8 +43,8 @@ class _InfoDialogState extends State<InfoDialog> {
   /// Sets [_bodyText], [_titleIcons], and [_eligibleForIcons] based on
   /// the category type. Called once from [initState].
   void _configureForCategory() {
-    final darkTheme = SharedPrefs().darkTheme;
-    final edition = SharedPrefs().gameEdition;
+    final darkTheme = Theme.of(context).brightness == Brightness.dark;
+    final edition = context.read<EnhancementCalculatorModel>().edition;
 
     switch (widget.category) {
       case EnhancementCategory.charPlusOne:

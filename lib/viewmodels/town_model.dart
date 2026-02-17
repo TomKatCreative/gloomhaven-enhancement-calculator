@@ -21,6 +21,14 @@ class TownModel with ChangeNotifier {
   Party? _activeParty;
   bool _isEditMode = false;
 
+  // ── Section expansion state (passthrough to SharedPrefs, no notify) ──
+
+  bool get townDetailsExpanded => SharedPrefs().townDetailsExpanded;
+  set townDetailsExpanded(bool v) => SharedPrefs().townDetailsExpanded = v;
+
+  bool get partyDetailsExpanded => SharedPrefs().partyDetailsExpanded;
+  set partyDetailsExpanded(bool v) => SharedPrefs().partyDetailsExpanded = v;
+
   // ── Getters ──
 
   List<Campaign> get campaigns => List.unmodifiable(_campaigns);

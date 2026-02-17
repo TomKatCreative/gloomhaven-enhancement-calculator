@@ -1007,8 +1007,7 @@ void main() {
 
         expect(model.persistent, isTrue);
 
-        SharedPrefs().gameEdition = GameEdition.gloomhaven;
-        model.gameVersionToggled();
+        model.gameEdition = GameEdition.gloomhaven;
 
         expect(model.persistent, isFalse);
       });
@@ -1023,8 +1022,7 @@ void main() {
 
         expect(model.lostNonPersistent, isTrue);
 
-        SharedPrefs().gameEdition = GameEdition.gloomhaven;
-        model.gameVersionToggled();
+        model.gameEdition = GameEdition.gloomhaven;
 
         expect(model.lostNonPersistent, isFalse);
       });
@@ -1038,8 +1036,7 @@ void main() {
         expect(model.enhancement, isNotNull);
 
         // Switch to GH2E where Disarm is unavailable
-        SharedPrefs().gameEdition = GameEdition.gloomhaven2e;
-        model.gameVersionToggled();
+        model.gameEdition = GameEdition.gloomhaven2e;
 
         expect(model.enhancement, isNull);
       });
@@ -1051,8 +1048,7 @@ void main() {
         model.enhancementSelected(_findEnhancement('Ward'));
         expect(model.enhancement, isNotNull);
 
-        SharedPrefs().gameEdition = GameEdition.gloomhaven;
-        model.gameVersionToggled();
+        model.gameEdition = GameEdition.gloomhaven;
 
         expect(model.enhancement, isNull);
       });
@@ -1063,9 +1059,20 @@ void main() {
         int notifyCount = 0;
         model.addListener(() => notifyCount++);
 
-        model.gameVersionToggled();
+        model.gameEdition = GameEdition.gloomhaven;
 
         expect(notifyCount, greaterThan(0));
+      });
+
+      test('edition getter returns cached value', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.edition, GameEdition.frosthaven);
+
+        model.gameEdition = GameEdition.gloomhaven2e;
+
+        expect(model.edition, GameEdition.gloomhaven2e);
       });
     });
 
@@ -1314,6 +1321,118 @@ void main() {
         expect(model.enhancerLvl2Applies, isFalse);
         expect(model.enhancerLvl3Applies, isFalse);
         expect(model.enhancerLvl4Applies, isFalse);
+      });
+    });
+
+    group('partyBoon getter/setter', () {
+      test('getter returns cached value', () async {
+        await _setupPrefs(partyBoon: true);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.partyBoon, isTrue);
+      });
+
+      test('setter updates cache and recalculates', () async {
+        await _setupPrefs(edition: GameEdition.gloomhaven);
+        final model = EnhancementCalculatorModel();
+        model.cardLevel = 1;
+
+        expect(model.partyBoon, isFalse);
+
+        int notifyCount = 0;
+        model.addListener(() => notifyCount++);
+
+        model.partyBoon = true;
+
+        expect(model.partyBoon, isTrue);
+        expect(notifyCount, greaterThan(0));
+        // With party boon: 25 - 5 = 20
+        expect(model.cardLevelPenalty(1), 20);
+      });
+    });
+
+    group('partyBoonApplies', () {
+      test('true when edition supports it and partyBoon is on', () async {
+        await _setupPrefs(edition: GameEdition.gloomhaven, partyBoon: true);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.partyBoonApplies, isTrue);
+      });
+
+      test('false when edition does not support it', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven, partyBoon: true);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.partyBoonApplies, isFalse);
+      });
+
+      test('false when partyBoon is off', () async {
+        await _setupPrefs(edition: GameEdition.gloomhaven);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.partyBoonApplies, isFalse);
+      });
+    });
+
+    group('enhancerLvl setters', () {
+      test('enhancerLvl2 setter updates cache and recalculates', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        model.enhancerLvl2 = true;
+
+        expect(model.enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl2, isTrue);
+      });
+
+      test('enhancerLvl3 setter cascades to lvl2', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        model.enhancerLvl3 = true;
+
+        expect(model.enhancerLvl3, isTrue);
+        expect(model.enhancerLvl2, isTrue);
+      });
+
+      test('enhancerLvl4 setter cascades to lvl2 and lvl3', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        model.enhancerLvl4 = true;
+
+        expect(model.enhancerLvl4, isTrue);
+        expect(model.enhancerLvl3, isTrue);
+        expect(model.enhancerLvl2, isTrue);
+      });
+
+      test('disabling enhancerLvl2 cascades to clear lvl3 and lvl4', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven, enhancerLvl4: true);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.enhancerLvl4, isTrue);
+
+        model.enhancerLvl2 = false;
+
+        expect(model.enhancerLvl2, isFalse);
+        expect(model.enhancerLvl3, isFalse);
+        expect(model.enhancerLvl4, isFalse);
+      });
+    });
+
+    group('hasAnyEnhancerUpgrades', () {
+      test('false when no enhancer levels', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.hasAnyEnhancerUpgrades, isFalse);
+      });
+
+      test('true when any enhancer level is on', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven, enhancerLvl2: true);
+        final model = EnhancementCalculatorModel();
+
+        expect(model.hasAnyEnhancerUpgrades, isTrue);
       });
     });
 

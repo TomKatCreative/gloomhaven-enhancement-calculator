@@ -5,7 +5,6 @@ import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
@@ -196,6 +195,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     required ColorScheme colorScheme,
     required CharactersModel charactersModel,
     required TownModel townModel,
+    required EnhancementCalculatorModel enhancementCalculatorModel,
   }) {
     Widget content;
     if (kTownSheetEnabled &&
@@ -256,13 +256,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
             label: Text('FH'),
           ),
         ],
-        selected: {SharedPrefs().gameEdition},
+        selected: {enhancementCalculatorModel.edition},
         onSelectionChanged: (Set<GameEdition> selection) {
-          SharedPrefs().gameEdition = selection.first;
-          Provider.of<EnhancementCalculatorModel>(
-            context,
-            listen: false,
-          ).gameVersionToggled();
+          enhancementCalculatorModel.gameEdition = selection.first;
           setState(() {});
         },
       );
@@ -361,6 +357,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
               colorScheme: colorScheme,
               charactersModel: charactersModel,
               townModel: townModel,
+              enhancementCalculatorModel: enhancementCalculatorModel,
             ),
           ),
           actions: <Widget>[

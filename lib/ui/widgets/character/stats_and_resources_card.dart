@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/checkmarks_and_retirements_row.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/party_assignment_row.dart';
@@ -31,7 +30,7 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
   @override
   void initState() {
     super.initState();
-    _isExpanded = SharedPrefs().generalExpanded;
+    _isExpanded = context.read<CharactersModel>().generalExpanded;
   }
 
   @override
@@ -50,7 +49,7 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
       icon: Icons.badge_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
-        SharedPrefs().generalExpanded = value;
+        context.read<CharactersModel>().generalExpanded = value;
         setState(() => _isExpanded = value);
       },
       children: [

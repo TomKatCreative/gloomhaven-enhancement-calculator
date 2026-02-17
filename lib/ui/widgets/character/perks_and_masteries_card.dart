@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
+import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/masteries_section.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/perks_section.dart';
@@ -33,7 +34,7 @@ class _PerksAndMasteriesCardState extends State<PerksAndMasteriesCard> {
   @override
   void initState() {
     super.initState();
-    _isExpanded = SharedPrefs().perksAndMasteriesExpanded;
+    _isExpanded = context.read<CharactersModel>().perksAndMasteriesExpanded;
   }
 
   @override
@@ -52,7 +53,7 @@ class _PerksAndMasteriesCardState extends State<PerksAndMasteriesCard> {
       icon: Icons.workspace_premium_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
-        SharedPrefs().perksAndMasteriesExpanded = value;
+        context.read<CharactersModel>().perksAndMasteriesExpanded = value;
         setState(() => _isExpanded = value);
       },
       trailing: _PerksCountBadge(character: widget.character),

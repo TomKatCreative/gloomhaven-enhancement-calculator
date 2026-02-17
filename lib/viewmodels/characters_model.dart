@@ -104,6 +104,20 @@ class CharactersModel with ChangeNotifier {
   /// Increment the value to signal collapse.
   final ValueNotifier<int> collapseElementSheetNotifier = ValueNotifier<int>(0);
 
+  // ===========================================================================
+  // Section expansion state (passthrough to SharedPrefs, no notify needed)
+  // ===========================================================================
+
+  bool get generalExpanded => SharedPrefs().generalExpanded;
+  set generalExpanded(bool v) => SharedPrefs().generalExpanded = v;
+
+  bool get questAndNotesExpanded => SharedPrefs().questAndNotesExpanded;
+  set questAndNotesExpanded(bool v) => SharedPrefs().questAndNotesExpanded = v;
+
+  bool get perksAndMasteriesExpanded => SharedPrefs().perksAndMasteriesExpanded;
+  set perksAndMasteriesExpanded(bool v) =>
+      SharedPrefs().perksAndMasteriesExpanded = v;
+
   bool get showAllCharacters => _showAllCharacters;
 
   set showAllCharacters(bool value) {

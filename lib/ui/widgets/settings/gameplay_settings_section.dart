@@ -4,6 +4,8 @@ import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/envelope_puzzle_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
+import 'package:provider/provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/settings/settings_section_header.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
@@ -197,7 +199,7 @@ class GameplaySettingsSection extends StatelessWidget {
             title: Strings.generalInfoTitle,
             message: Strings.generalInfoBody(
               context,
-              edition: SharedPrefs().gameEdition,
+              edition: context.read<EnhancementCalculatorModel>().edition,
               darkMode: theme.brightness == Brightness.dark,
             ),
           );

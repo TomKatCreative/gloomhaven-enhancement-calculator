@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_party_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
@@ -49,8 +48,8 @@ class _TownScreenState extends State<TownScreen> {
           child: CollapsibleSectionCard(
             title: campaign.name,
             svgAssetKey: 'PROSPERITY',
-            initiallyExpanded: SharedPrefs().townDetailsExpanded,
-            onExpansionChanged: (v) => SharedPrefs().townDetailsExpanded = v,
+            initiallyExpanded: townModel.townDetailsExpanded,
+            onExpansionChanged: (v) => townModel.townDetailsExpanded = v,
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(
@@ -138,8 +137,8 @@ class _TownScreenState extends State<TownScreen> {
             child: PartySection(
               party: townModel.activeParty!,
               isEditMode: townModel.isEditMode,
-              initiallyExpanded: SharedPrefs().partyDetailsExpanded,
-              onExpansionChanged: (v) => SharedPrefs().partyDetailsExpanded = v,
+              initiallyExpanded: townModel.partyDetailsExpanded,
+              onExpansionChanged: (v) => townModel.partyDetailsExpanded = v,
               onMenuAction: (action) {
                 switch (action) {
                   case PartyAction.rename:

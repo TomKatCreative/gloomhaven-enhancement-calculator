@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/personal_quest_section.dart';
@@ -32,7 +31,7 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
   @override
   void initState() {
     super.initState();
-    _isExpanded = SharedPrefs().questAndNotesExpanded;
+    _isExpanded = context.read<CharactersModel>().questAndNotesExpanded;
   }
 
   @override
@@ -51,7 +50,7 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
       icon: Icons.map_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
-        SharedPrefs().questAndNotesExpanded = value;
+        context.read<CharactersModel>().questAndNotesExpanded = value;
         setState(() => _isExpanded = value);
       },
       children: [

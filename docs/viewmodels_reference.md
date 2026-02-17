@@ -137,6 +137,11 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
+| `_gameEdition` | `GameEdition` | from SharedPrefs | Cached game edition |
+| `_partyBoon` | `bool` | false | Cached party boon state |
+| `_enhancerLvl2` | `bool` | false | Cached enhancer level 2 state |
+| `_enhancerLvl3` | `bool` | false | Cached enhancer level 3 state |
+| `_enhancerLvl4` | `bool` | false | Cached enhancer level 4 state |
 | `_enhancement` | `Enhancement?` | null | Currently selected enhancement |
 | `_cardLevel` | `int` | 0 | Target card level (0-8, displayed as 1-9) |
 | `_previousEnhancements` | `int` | 0 | Count of previous enhancements (0-9) |
@@ -150,38 +155,47 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 | `totalCost` | `int` | 0 | Final calculated cost |
 | `showCost` | `bool` | false | Whether to display cost UI |
 
-### Getters (with documentation in code)
+### Getters and Setters
 
-| Getter | Returns | Description |
-|--------|---------|-------------|
-| `enhancement` | `Enhancement?` | Current enhancement |
+All state properties have getter/setter pairs that write-through to SharedPrefs and trigger `calculateCost()`. UI files should use these instead of accessing SharedPrefs directly.
+
+| Property | Type | Setter behavior |
+|----------|------|-----------------|
+| `edition` / `gameEdition=` | `GameEdition` | Write to SharedPrefs, update cache, run `gameVersionToggled()` |
+| `partyBoon` | `bool` | Write to SharedPrefs, update cache, `calculateCost()` |
+| `enhancerLvl2` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl3/4, `calculateCost()` |
+| `enhancerLvl3` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/4, `calculateCost()` |
+| `enhancerLvl4` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/3, `calculateCost()` |
+| `enhancement` | `Enhancement?` | Current enhancement selection |
 | `cardLevel` | `int` | Card level (0-indexed internally) |
 | `previousEnhancements` | `int` | Previous enhancement count |
 | `multipleTargets` | `bool` | Multi-target state |
-| `lostNonPersistent` | `bool` | Lost modifier state |
-| `persistent` | `bool` | Persistent modifier state |
+| `lostNonPersistent` | `bool` | Lost modifier state (clears persistent) |
+| `persistent` | `bool` | Persistent modifier state (clears lost) |
 | `temporaryEnhancementMode` | `bool` | Temporary mode state |
 | `hailsDiscount` | `bool` | Hail's discount state |
 | `disableMultiTargetsSwitch` | `bool` | Multi-target toggle lock |
 | `isSheetExpanded` | `bool` | Cost chip expansion |
-| `edition` | `GameEdition` | Current game edition from SharedPrefs |
 
-### Enhancer Level Getters
+### Computed Getters
 
-| Getter | Description |
-|--------|-------------|
-| `enhancerLvl2Applies` | Whether Enhancer L2 affects enhancement cost |
-| `enhancerLvl3Applies` | Whether Enhancer L3 affects card level cost |
-| `enhancerLvl4Applies` | Whether Enhancer L4 affects previous enhancements cost |
+| Getter | Returns | Description |
+|--------|---------|-------------|
+| `partyBoonApplies` | `bool` | `edition.supportsPartyBoon && partyBoon` |
+| `hasAnyEnhancerUpgrades` | `bool` | `enhancerLvl2 \|\| enhancerLvl3 \|\| enhancerLvl4` |
+| `enhancerLvl2Applies` | `bool` | Whether Enhancer L2 affects enhancement cost |
+| `enhancerLvl3Applies` | `bool` | Whether Enhancer L3 affects card level cost |
+| `enhancerLvl4Applies` | `bool` | Whether Enhancer L4 affects previous enhancements cost |
 
 ### Core Methods
 
 | Method | Description |
 |--------|-------------|
 | `calculateCost({notify})` | Recalculate total cost, optionally notify listeners |
-| `resetCost()` | Clear all fields and reset to defaults |
+| `resetCost()` | Clear all calculator input fields and reset to defaults |
+| `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore) |
 | `enhancementSelected(Enhancement?)` | Handle enhancement selection with validation |
-| `gameVersionToggled(GameEdition)` | Handle edition change with modifier validation |
+| `gameVersionToggled()` | Handle edition change with modifier validation |
 | `getCalculationBreakdown()` | Generate step-by-step cost breakdown |
 
 ### Cost Calculation Flow
@@ -304,6 +318,16 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `isElementSheetFullExpanded` | `bool` | Full expansion state |
 | `retiredCharactersAreHidden` | `bool` | Inverse of showRetired |
 
+### Section Expansion State (passthrough to SharedPrefs)
+
+These are simple getter/setter pairs that read/write directly to SharedPrefs without calling `notifyListeners()` — widgets manage their own local `_isExpanded` state via `setState`.
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `generalExpanded` | true | Stats & Resources section |
+| `questAndNotesExpanded` | true | Quest & Notes section |
+| `perksAndMasteriesExpanded` | true | Perks & Masteries section |
+
 ### Character CRUD Methods
 
 | Method | Description |
@@ -411,6 +435,13 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 | `activeCampaign` | `Campaign?` | null | Currently selected campaign |
 | `activeParty` | `Party?` | null | Currently selected party |
 | `isEditMode` | `bool` | false | Edit mode state |
+
+### Section Expansion State (passthrough to SharedPrefs)
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `townDetailsExpanded` | true | Town details (prosperity + sanctuary) section |
+| `partyDetailsExpanded` | true | Party details section |
 
 ### Campaign Methods
 

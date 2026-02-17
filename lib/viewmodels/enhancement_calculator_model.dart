@@ -59,9 +59,8 @@ class EnhancementCalculatorModel with ChangeNotifier {
   void _invalidateCalculator() => _cachedCalculator = null;
 
   EnhancementCostCalculator _buildCalculator() {
-    final ed = SharedPrefs().gameEdition;
     return EnhancementCostCalculator(
-      edition: ed,
+      edition: _gameEdition,
       enhancement: _enhancement,
       cardLevel: _cardLevel,
       previousEnhancements: _previousEnhancements,
@@ -70,16 +69,26 @@ class EnhancementCalculatorModel with ChangeNotifier {
       persistent: _persistent,
       temporaryEnhancementMode: _temporaryEnhancementMode,
       hailsDiscount: _hailsDiscount,
-      partyBoon: ed.supportsPartyBoon && SharedPrefs().partyBoon,
-      enhancerLvl2: ed.hasEnhancerLevels && SharedPrefs().enhancerLvl2,
-      enhancerLvl3: ed.hasEnhancerLevels && SharedPrefs().enhancerLvl3,
-      enhancerLvl4: ed.hasEnhancerLevels && SharedPrefs().enhancerLvl4,
+      partyBoon: _gameEdition.supportsPartyBoon && _partyBoon,
+      enhancerLvl2: _gameEdition.hasEnhancerLevels && _enhancerLvl2,
+      enhancerLvl3: _gameEdition.hasEnhancerLevels && _enhancerLvl3,
+      enhancerLvl4: _gameEdition.hasEnhancerLevels && _enhancerLvl4,
     );
   }
 
   // ===========================================================================
   // State fields (persisted via SharedPrefs setters)
   // ===========================================================================
+
+  GameEdition _gameEdition = SharedPrefs().gameEdition;
+
+  bool _partyBoon = SharedPrefs().partyBoon;
+
+  bool _enhancerLvl2 = SharedPrefs().enhancerLvl2;
+
+  bool _enhancerLvl3 = SharedPrefs().enhancerLvl3;
+
+  bool _enhancerLvl4 = SharedPrefs().enhancerLvl4;
 
   int _cardLevel = SharedPrefs().targetCardLvl;
 
@@ -111,23 +120,79 @@ class EnhancementCalculatorModel with ChangeNotifier {
   /// Whether there is any input to display a cost for.
   bool get showCost => _calculator.showCost;
 
-  /// Returns the current game edition from SharedPrefs.
-  GameEdition get edition => SharedPrefs().gameEdition;
+  /// Returns the current game edition.
+  GameEdition get edition => _gameEdition;
+
+  set gameEdition(GameEdition value) {
+    SharedPrefs().gameEdition = value;
+    _gameEdition = value;
+    gameVersionToggled();
+  }
+
+  /// Returns the party boon state.
+  bool get partyBoon => _partyBoon;
+
+  set partyBoon(bool value) {
+    SharedPrefs().partyBoon = value;
+    _partyBoon = value;
+    calculateCost();
+  }
+
+  /// Returns the enhancer level 2 state.
+  bool get enhancerLvl2 => _enhancerLvl2;
+
+  set enhancerLvl2(bool value) {
+    SharedPrefs().enhancerLvl2 = value;
+    _enhancerLvl2 = value;
+    // SharedPrefs cascade may have changed lvl3/4, re-read them
+    _enhancerLvl3 = SharedPrefs().enhancerLvl3;
+    _enhancerLvl4 = SharedPrefs().enhancerLvl4;
+    calculateCost();
+  }
+
+  /// Returns the enhancer level 3 state.
+  bool get enhancerLvl3 => _enhancerLvl3;
+
+  set enhancerLvl3(bool value) {
+    SharedPrefs().enhancerLvl3 = value;
+    _enhancerLvl3 = value;
+    // SharedPrefs cascade may have changed lvl2/4, re-read them
+    _enhancerLvl2 = SharedPrefs().enhancerLvl2;
+    _enhancerLvl4 = SharedPrefs().enhancerLvl4;
+    calculateCost();
+  }
+
+  /// Returns the enhancer level 4 state.
+  bool get enhancerLvl4 => _enhancerLvl4;
+
+  set enhancerLvl4(bool value) {
+    SharedPrefs().enhancerLvl4 = value;
+    _enhancerLvl4 = value;
+    // SharedPrefs cascade may have changed lvl2/3, re-read them
+    _enhancerLvl2 = SharedPrefs().enhancerLvl2;
+    _enhancerLvl3 = SharedPrefs().enhancerLvl3;
+    calculateCost();
+  }
+
+  /// Whether the party boon currently affects cost calculation.
+  bool get partyBoonApplies => _gameEdition.supportsPartyBoon && _partyBoon;
+
+  /// Whether any enhancer building upgrades are active.
+  bool get hasAnyEnhancerUpgrades =>
+      _enhancerLvl2 || _enhancerLvl3 || _enhancerLvl4;
 
   /// Returns true if Enhancer Level 2 affects the enhancement cost.
   bool get enhancerLvl2Applies =>
-      edition.hasEnhancerLevels &&
-      SharedPrefs().enhancerLvl2 &&
-      enhancement != null;
+      _gameEdition.hasEnhancerLevels && _enhancerLvl2 && enhancement != null;
 
   /// Returns true if Enhancer Level 3 affects the card level cost.
   bool get enhancerLvl3Applies =>
-      edition.hasEnhancerLevels && SharedPrefs().enhancerLvl3 && cardLevel > 0;
+      _gameEdition.hasEnhancerLevels && _enhancerLvl3 && cardLevel > 0;
 
   /// Returns true if Enhancer Level 4 affects the previous enhancements cost.
   bool get enhancerLvl4Applies =>
-      edition.hasEnhancerLevels &&
-      SharedPrefs().enhancerLvl4 &&
+      _gameEdition.hasEnhancerLevels &&
+      _enhancerLvl4 &&
       previousEnhancements > 0;
 
   // ===========================================================================
@@ -301,6 +366,11 @@ class EnhancementCalculatorModel with ChangeNotifier {
   /// Call this after a backup restore to sync the model with the
   /// newly imported SharedPreferences values.
   void reloadFromPrefs() {
+    _gameEdition = SharedPrefs().gameEdition;
+    _partyBoon = SharedPrefs().partyBoon;
+    _enhancerLvl2 = SharedPrefs().enhancerLvl2;
+    _enhancerLvl3 = SharedPrefs().enhancerLvl3;
+    _enhancerLvl4 = SharedPrefs().enhancerLvl4;
     _cardLevel = SharedPrefs().targetCardLvl;
     _previousEnhancements = SharedPrefs().previousEnhancements;
 
@@ -324,15 +394,13 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
   /// Handles edition change with modifier validation.
   void gameVersionToggled() {
-    final edition = SharedPrefs().gameEdition;
-
     // Clear persistent if switching to an edition that doesn't support it
-    if (!edition.hasPersistentModifier && persistent) {
+    if (!_gameEdition.hasPersistentModifier && persistent) {
       persistent = false;
     }
 
     // Clear lostNonPersistent if switching to an edition that doesn't support it
-    if (!edition.hasLostModifier && lostNonPersistent) {
+    if (!_gameEdition.hasLostModifier && lostNonPersistent) {
       lostNonPersistent = false;
     }
 
@@ -344,7 +412,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
   /// Handles enhancement selection with edition-specific validation.
   void enhancementSelected(Enhancement selectedEnhancement) {
-    final edition = SharedPrefs().gameEdition;
+    final edition = _gameEdition;
 
     // Handle the case where the user has an enhancement selected that's not
     // available in the current edition (e.g., Disarm in GH2E/FH, Ward in GH,

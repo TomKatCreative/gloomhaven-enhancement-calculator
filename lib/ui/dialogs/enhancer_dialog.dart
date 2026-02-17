@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
 /// Dialog for configuring Enhancer building levels (Frosthaven Building 44).
@@ -47,12 +46,11 @@ class _EnhancerDialogState extends State<EnhancerDialog> {
               _EnhancerLevelTile(
                 level: 2,
                 subtitle: l10n.reduceEnhancementCosts,
-                value: SharedPrefs().enhancerLvl2,
+                value: widget.model.enhancerLvl2,
                 onChanged: (val) {
                   if (val != null) {
                     setState(() {
-                      SharedPrefs().enhancerLvl2 = val;
-                      widget.model.calculateCost();
+                      widget.model.enhancerLvl2 = val;
                     });
                   }
                 },
@@ -60,12 +58,11 @@ class _EnhancerDialogState extends State<EnhancerDialog> {
               _EnhancerLevelTile(
                 level: 3,
                 subtitle: l10n.reduceLevelPenalties,
-                value: SharedPrefs().enhancerLvl3,
+                value: widget.model.enhancerLvl3,
                 onChanged: (val) {
                   if (val != null) {
                     setState(() {
-                      SharedPrefs().enhancerLvl3 = val;
-                      widget.model.calculateCost();
+                      widget.model.enhancerLvl3 = val;
                     });
                   }
                 },
@@ -73,12 +70,11 @@ class _EnhancerDialogState extends State<EnhancerDialog> {
               _EnhancerLevelTile(
                 level: 4,
                 subtitle: l10n.reduceRepeatPenalties,
-                value: SharedPrefs().enhancerLvl4,
+                value: widget.model.enhancerLvl4,
                 onChanged: (val) {
                   if (val != null) {
                     setState(() {
-                      SharedPrefs().enhancerLvl4 = val;
-                      widget.model.calculateCost();
+                      widget.model.enhancerLvl4 = val;
                     });
                   }
                 },
