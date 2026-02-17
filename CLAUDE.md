@@ -374,7 +374,7 @@ ThemedSvg(assetKey: 'MOVE', width: 24)
 ThemedSvg(assetKey: 'ATTACK', width: 24, color: Colors.red)
 
 // With +1 overlay badge (for enhancements)
-ThemedSvgWithPlusOne(assetKey: 'MOVE', width: 24)
+ThemedSvg(assetKey: 'MOVE', width: 24, showPlusOneOverlay: true)
 ```
 
 ### ClassIconSvg Widget (`lib/ui/widgets/class_icon_svg.dart`)

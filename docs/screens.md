@@ -3,8 +3,9 @@
 ## Create Character Screen
 
 > **File**: `lib/ui/screens/create_character_screen.dart`
+> **Extracted widgets**: `lib/ui/widgets/create_character/`
 
-The character creation flow uses a full-page route with `Scaffold` and `AppBar`.
+The character creation flow uses a full-page route with `Scaffold` and `AppBar`. The main file contains form assembly, class/quest/party selectors, and submission logic; extracted sub-widgets handle the edition toggle, name field, and level/prosperity sliders.
 
 ### Invocation Pattern
 
@@ -26,6 +27,14 @@ await CreateCharacterScreen.show(context, charactersModel);
 ### Gold Calculation Display
 
 A real-time gold display (GOLD SVG icon + calculated amount) appears inline with either the level slider (GH) or prosperity slider (GH2E/FH), depending on which parameter drives gold for that edition. Uses `GameEdition.startingGold(level:, prosperityLevel:)` and updates reactively as sliders change.
+
+### Extracted Widgets
+
+| Widget | File | Purpose |
+|--------|------|---------|
+| `EditionToggle` | `lib/ui/widgets/create_character/edition_toggle.dart` | SegmentedButton (GH/GH2E/FH) with info dialog |
+| `NameField` | `lib/ui/widgets/create_character/name_field.dart` | Name text field with faker dice button and retirement counter |
+| `LevelAndProsperitySection` | `lib/ui/widgets/create_character/level_and_prosperity_section.dart` | Prosperity slider + level slider + gold display |
 
 ---
 

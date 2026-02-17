@@ -32,16 +32,6 @@ class Perk {
     this.grouped = false,
   });
 
-  Perk.fromMap(Map<String, dynamic> map) : number = 0 {
-    perkId = map[columnPerkId];
-    classCode = map[columnPerkClass];
-    perkDetails = map[columnPerkDetails];
-    grouped = map[columnPerkIsGrouped] == 1;
-    variant = Variant.values.firstWhere(
-      (element) => element.name == map[columnPerkVariant],
-    );
-  }
-
   Map<String, dynamic> toMap(String index) {
     var map = <String, dynamic>{
       columnPerkId: '${classCode}_${variant.name}_$index',

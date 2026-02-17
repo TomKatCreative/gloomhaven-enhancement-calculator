@@ -24,15 +24,6 @@ class Mastery {
 
   Mastery(this.number, {required this.masteryDetails});
 
-  Mastery.fromMap(Map<String, dynamic> map) : number = 0 {
-    id = map[columnMasteryId];
-    classCode = map[columnMasteryClass];
-    masteryDetails = map[columnMasteryDetails];
-    variant = Variant.values.firstWhere(
-      (element) => element.name == map[columnMasteryVariant],
-    );
-  }
-
   Map<String, dynamic> toMap(String index) {
     var map = <String, dynamic>{
       columnMasteryId: '${classCode}_${variant.name}_$index',

@@ -112,30 +112,3 @@ class ThemedSvg extends StatelessWidget {
     };
   }
 }
-
-/// @Deprecated('Use ThemedSvg with showPlusOneOverlay: true instead')
-///
-/// Temporary alias for backwards compatibility. Will be removed in a future release.
-@Deprecated('Use ThemedSvg(assetKey: key, showPlusOneOverlay: true) instead')
-class ThemedSvgWithPlusOne extends StatelessWidget {
-  final String assetKey;
-  final double? width;
-  final double? height;
-
-  const ThemedSvgWithPlusOne({
-    super.key,
-    required this.assetKey,
-    this.width,
-    this.height,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ThemedSvg(
-      assetKey: assetKey,
-      width: width,
-      height: height,
-      showPlusOneOverlay: true,
-    );
-  }
-}

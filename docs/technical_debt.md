@@ -32,11 +32,11 @@ The highest-impact debt. These files have too many responsibilities, making them
 - `StackedElementToken` directly uses `SvgPicture.asset()` — violates the ThemedSvg-only convention
 - `ParsedWord` has 4+ parsing phases that interact in non-obvious ways
 
-### `create_character_screen.dart` (620 lines)
+### ~~`create_character_screen.dart` (620 lines)~~ — RESOLVED
 
-- 8 `TextEditingController`s and 10+ state variables
-- Form validation mixed with UI layout
-- Random name generation via `faker` package
+> **Refactored** (2026-02-16): Extracted 3 builder methods into separate widgets in `lib/ui/widgets/create_character/`. Removed dead `LabeledTextField` class (renamed file to `section_label.dart`). Fixed buggy `onChanged` on name field. The main file is now ~312 lines containing form assembly, class/quest/party selectors, and submission logic. All 893 tests pass.
+>
+> **New files**: `edition_toggle.dart`, `name_field.dart`, `level_and_prosperity_section.dart`
 
 ### `characters_model.dart` (~470 lines, down from 598) — PARTIALLY RESOLVED
 
@@ -104,9 +104,9 @@ Code that is no longer needed but remains in the repo.
 
 These legacy files are **required for database migration** from older schema versions (v5–v17). They cannot be removed without breaking upgrades for users on older app versions. The migration code references them to populate/transform definition tables before v19 drops those tables.
 
-### Unused `fromMap()` Constructors
+### ~~Unused `fromMap()` Constructors~~ — RESOLVED
 
-`Perk.fromMap()` and `Mastery.fromMap()` both hardcode `number = 0`. These constructors are never called since definitions moved out of the database and are loaded from repositories instead.
+> **Deleted** (2026-02-16): Removed `Perk.fromMap()` and `Mastery.fromMap()`. Both hardcoded `number = 0` and were never called since definitions moved to repositories. `toMap()` methods kept (used by migrations). `LabeledTextField` also removed (dead code) — file renamed to `section_label.dart` containing only the used `SectionLabel` widget.
 
 ---
 
