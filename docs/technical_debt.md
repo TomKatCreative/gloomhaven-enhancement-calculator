@@ -26,11 +26,11 @@ The highest-impact debt. These files have too many responsibilities, making them
 >
 > **Remaining debt**: CRUD for 5+ entities still in one file; table creation and migration orchestration mixed with queries; manual perk/mastery insert loops (no batch).
 
-### `game_text_parser.dart` (648 lines)
+### ~~`game_text_parser.dart` (648 lines)~~ — RESOLVED
 
-- 8+ token classes with complex multi-phase parsing
-- `StackedElementToken` directly uses `SvgPicture.asset()` — violates the ThemedSvg-only convention
-- `ParsedWord` has 4+ parsing phases that interact in non-obvious ways
+> **Refactored** (2026-02-16): Split into 3 files along natural section boundaries. Token classes (7 types) extracted to `game_text_tokens.dart`. `ParsedWord` + `GameTextTokenizer` extracted to `game_text_tokenizer.dart`. The original file is now a slim ~90-line facade with `GameTextRenderer`, `GameTextParser`, and barrel re-exports. `StackedElementToken` refactored from `SvgPicture.asset()` to `ThemedSvg` for proper theme-awareness. All tests pass.
+>
+> **New files**: `game_text_tokens.dart` (~220 lines), `game_text_tokenizer.dart` (~280 lines)
 
 ### ~~`create_character_screen.dart` (620 lines)~~ — RESOLVED
 
@@ -38,16 +38,11 @@ The highest-impact debt. These files have too many responsibilities, making them
 >
 > **New files**: `edition_toggle.dart`, `name_field.dart`, `level_and_prosperity_section.dart`
 
-### `characters_model.dart` (~470 lines, down from 598) — PARTIALLY RESOLVED
+### ~~`characters_model.dart` (~470 lines, down from 598)~~ — RESOLVED
 
 > **Refactored** (2026-02-16): Extracted personal quest logic into `PersonalQuestService` (`lib/data/personal_quest_service.dart`). Moved debug character creation (`createCharactersTest`) to `DebugSettingsSection` where it's actually used. 15 new service tests added. All 894 tests pass.
-
-Remaining responsibilities (tightly coupled, low extraction value):
-- Character CRUD
-- Filtering & pagination with complex index management (`_calculateTargetIndex()` — 50+ lines)
-- Perk/mastery loading & toggling
-- Theme synchronization (`updateThemeForCharacter()` directly calls `themeProvider.updateSeedColor()`)
-- Scroll position tracking via two controllers AND a `ValueNotifier<double>`
+>
+> Remaining responsibilities (CRUD, filtering, perk/mastery toggling, theme sync, scroll tracking) are core to the model's purpose. At ~514 lines with no misplaced logic, further extraction would add indirection without meaningful simplification.
 
 ### ~~`personal_quest_section.dart` (580 lines)~~ — RESOLVED
 

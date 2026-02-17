@@ -6,6 +6,18 @@ The Game Text Parser is a robust, token-based system for parsing and rendering r
 
 ## Architecture
 
+### File Organization
+
+The parser is split across three files:
+
+| File | Contents |
+|------|----------|
+| `game_text_tokens.dart` | Token type definitions (`GameTextToken`, `BoldToken`, `IconToken`, `StackedElementToken`, `ItalicToken`, `PlainTextToken`, `PunctuationToken`) |
+| `game_text_tokenizer.dart` | Parsing logic (`ParsedWord`, `GameTextTokenizer`) |
+| `game_text_parser.dart` | Public API facade (`GameTextRenderer`, `GameTextParser`) + barrel re-exports |
+
+Consumers only need to import `game_text_parser.dart` — it re-exports the token types and tokenizer.
+
 ### Components
 
 1. **GameTextToken** - Abstract base class for all token types
