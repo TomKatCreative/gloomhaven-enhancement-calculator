@@ -12,6 +12,7 @@ import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.d
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_campaign_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/settings_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/character_header_delegates.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/town/campaign_selector.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -85,12 +86,15 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
   void _scrollListener() {
     // Content only scrolls behind the pinned headers after the character
     // header fully collapses. This matches the chip bar's overlapsContent
-    // trigger. Header collapse range: maxHeight(180) − minHeight(56) = 124.
-    // In edit mode the header is fixed-height, so content overlaps immediately.
+    // trigger. In edit mode the header is fixed-height, so content overlaps
+    // immediately.
     final model = context.read<CharactersModel>();
-    final isFixedHeader =
-        model.isEditMode && !(model.currentCharacter?.isRetired ?? true);
-    final collapseRange = isFixedHeader ? 0.0 : 124.0;
+    final character = model.currentCharacter;
+    final isFixedHeader = model.isEditMode && !(character?.isRetired ?? true);
+    final collapseRange = isFixedHeader || character == null
+        ? 0.0
+        : CharacterHeaderDelegate.viewModeMaxHeight(character) -
+              CharacterHeaderDelegate.minHeight;
 
     final isContentBehind = _charScrollOffsetNotifier.value > collapseRange;
     if (isContentBehind == !_isScrolledToTop) return;

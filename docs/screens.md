@@ -460,8 +460,8 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 ### Pinned Header
 
 `CharacterHeaderDelegate` (in `lib/ui/widgets/character/character_header_delegates.dart`) — a `SliverPersistentHeaderDelegate` that:
-- Expands to 180px (name, class info, traits, level badge, faded class icon background)
-- Collapses to 56px (name only) on scroll
+- Expands to a dynamic height based on content: base 172px + 32px for traits + 28px for retired label (via `viewModeMaxHeight()`)
+- Collapses to 56px (name only) on scroll; expanded content wrapped in `OverflowBox` for smooth collapse transitions
 - In edit mode with non-retired character: stays at 90px (name `TextFormField`)
 - Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
 - **Background tint**: Once content scrolls behind the pinned headers (scroll offset > collapse range), the `Material` background transitions from `surface` to an 8% primary tint via `TweenAnimationBuilder` (300ms). Resets instantly on character switch via `ValueKey(character.uuid)`.

@@ -29,17 +29,31 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
   final bool isEditMode;
   final ValueNotifier<double> scrollOffsetNotifier;
 
-  static const double maxHeight = 180.0;
+  static const double baseMaxHeight = 172.0;
   static const double editModeHeight = 90.0;
   static const double minHeight = 56.0;
+
+  // Extra height for optional content rows in the expanded header.
+  static const double _traitsRowHeight = 32.0;
+  static const double _retiredRowHeight = 28.0;
+
+  /// Compute the expanded header height for a character, accounting for
+  /// optional content rows (traits, retired label).
+  static double viewModeMaxHeight(Character character) {
+    double height = baseMaxHeight;
+    if (character.shouldShowTraits) height += _traitsRowHeight;
+    if (character.isRetired) height += _retiredRowHeight;
+    return height;
+  }
 
   // In edit mode (non-retired) the header is fixed-height: maxExtent ==
   // minExtent, so the sliver never collapses. This means overlapsContent
   // snaps immediately on the first scroll pixel — handled by the chip bar's
   // showOpaqueBar logic.
   @override
-  double get maxExtent =>
-      isEditMode && !character.isRetired ? editModeHeight : maxHeight;
+  double get maxExtent => isEditMode && !character.isRetired
+      ? editModeHeight
+      : viewModeMaxHeight(character);
 
   @override
   double get minExtent =>
@@ -95,7 +109,7 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
               Positioned(
                 right: -32,
                 top: -45,
-                height: maxHeight + chipBarHeight + 75,
+                height: maxExtent + chipBarHeight + 75,
                 width: 260,
                 child: Opacity(
                   opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
@@ -122,10 +136,16 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
   Widget _buildContent(BuildContext context, double progress) {
     return Stack(
       children: [
-        // Expanded content fades out
-        Opacity(
-          opacity: (1.0 - progress).clamp(0.0, 1.0),
-          child: _buildExpandedContent(context, progress),
+        // Expanded content fades out. OverflowBox keeps the layout at full
+        // maxExtent during collapse so the Column never overflows. The outer
+        // ClipRect handles visual clipping.
+        OverflowBox(
+          maxHeight: maxExtent,
+          alignment: Alignment.center,
+          child: Opacity(
+            opacity: (1.0 - progress).clamp(0.0, 1.0),
+            child: _buildExpandedContent(context, progress),
+          ),
         ),
         // Collapsed content fades in
         Opacity(
@@ -170,7 +190,6 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
             textAlign: TextAlign.center,
           ),
         if (!isEditMode || character.isRetired) ...[
-          const SizedBox(height: smallPadding),
           // Level + class subtitle
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -213,8 +232,10 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
           ),
         ],
         if (character.isRetired) ...[
-          const SizedBox(height: smallPadding),
-          Text(AppLocalizations.of(context).retired),
+          Text(
+            AppLocalizations.of(context).retired,
+            style: theme.textTheme.titleMedium,
+          ),
         ],
       ],
     );
@@ -316,10 +337,11 @@ class SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     // Opacity follows scroll position directly (no animation delay) so the
     // bar goes transparent as soon as the header starts re-expanding.
     // Tint color still fades in smoothly via TweenAnimationBuilder.
-    // Header collapse range: 180 − 56 = 124. In edit mode (fixed header) = 0.
+    // Header collapse range: maxHeight − 56. In edit mode (fixed header) = 0.
     final headerRange = isEditMode
         ? 0.0
-        : CharacterHeaderDelegate.maxHeight - CharacterHeaderDelegate.minHeight;
+        : CharacterHeaderDelegate.viewModeMaxHeight(character) -
+              CharacterHeaderDelegate.minHeight;
 
     return ValueListenableBuilder<double>(
       valueListenable: scrollOffsetNotifier,

@@ -66,7 +66,9 @@ class _CharacterScreenState extends State<CharacterScreen> {
     // Threshold: max header height + chip bar = the bottom edge of the two
     // pinned headers. Sections whose top is at or above this Y coordinate are
     // considered "scrolled to the top" for scroll-spy purposes.
-    const headerOffset = CharacterHeaderDelegate.maxHeight + chipBarHeight;
+    final headerOffset =
+        CharacterHeaderDelegate.viewModeMaxHeight(widget.character) +
+        chipBarHeight;
 
     // All keys to check: chip section keys + sub-section keys mapped to their
     // parent chip section.
@@ -171,7 +173,10 @@ class _CharacterScreenState extends State<CharacterScreen> {
         Positioned(
           right: -32,
           top: -45,
-          height: CharacterHeaderDelegate.maxHeight + chipBarHeight + 75,
+          height:
+              CharacterHeaderDelegate.viewModeMaxHeight(widget.character) +
+              chipBarHeight +
+              75,
           width: 260,
           child: ListenableBuilder(
             listenable: _scrollOffsetNotifier,
@@ -189,7 +194,7 @@ class _CharacterScreenState extends State<CharacterScreen> {
                 return const Opacity(opacity: 0, child: SizedBox.shrink());
               }
               final range =
-                  CharacterHeaderDelegate.maxHeight -
+                  CharacterHeaderDelegate.viewModeMaxHeight(widget.character) -
                   CharacterHeaderDelegate.minHeight;
               final offset = _scrollOffsetNotifier.value;
               final progress = (offset / range).clamp(0.0, 1.0);
