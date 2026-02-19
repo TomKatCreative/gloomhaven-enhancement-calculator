@@ -333,6 +333,7 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 
 **Current files:**
 - `docs/TODO.md` - Future feature plans and task tracking
+- `docs/releases.md` - Release history with commit references and dates
 - `docs/enhancement_rules.md` - Enhancement cost calculation rules by edition
 - `docs/game_text_parser.md` - Game text parser syntax and usage
 - `docs/perk_format_reference.md` - Perk definition format for perks_repository.dart
