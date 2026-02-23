@@ -1672,7 +1672,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Experience twenty rounds where during or after you perform an action with a Lost card, an enemy dies',
+              'Experience twenty rounds where during or after you perform an action with a LOSS, an enemy dies',
           target: 20,
         ),
         PersonalQuestRequirement(
@@ -1712,7 +1712,8 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.incarnate,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Add the Battle Standard (Item 115) to the city supply',
+          description:
+              'Add the "Battle Standard" (Item 115) to the city supply',
           target: 1,
         ),
         PersonalQuestRequirement(
@@ -1790,7 +1791,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Complete four scenarios that use at least one Bush, Tree, or Thorns overlay tile',
+              'Complete four scenarios that use at least one Bush, Tree, or Thorns overlay tile to set up',
           target: 4,
         ),
       ],
