@@ -406,10 +406,17 @@ class PersonalQuestsRepository {
       edition: PersonalQuestEdition.gloomhaven2e,
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
-        PersonalQuestRequirement(description: 'Gain 30 Votes', target: 30),
         PersonalQuestRequirement(
-          description: 'Then read Section 136.1',
+          description: 'Gain 30 Votes',
+          target: 30,
+          details:
+              'Whenever you gain one or more reputation from any source, gain three votes. Whenever you complete a scenario, gain one vote for each faction reputation item you brought into the scenario.',
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read SECTION 136.1',
           target: 1,
+          details:
+              'While you have at least 30 votes, you may run for City Council by reading scenario 136.1 during the city phase (success is not guaranteed).',
         ),
       ],
     ),
@@ -426,7 +433,7 @@ class PersonalQuestsRepository {
           target: 2,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 112.2',
+          description: 'Then read SECTION 112.2',
           target: 1,
         ),
         PersonalQuestRequirement(
@@ -435,7 +442,7 @@ class PersonalQuestsRepository {
           target: 3,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 112.3',
+          description: 'Then read SECTION 112.3',
           target: 1,
         ),
       ],

@@ -111,28 +111,16 @@ RichText(
 
 ### In Existing Code
 
-Replace your existing `Utils.generateCheckRowDetails` calls with the new parser:
+All call sites use `GameTextParser.parse()` directly:
 
-**Before:**
 ```dart
-final spans = Utils.generateCheckRowDetails(
-  context,
-  perkText,
-  darkTheme,
-);
+RichText(
+  text: TextSpan(
+    style: theme.textTheme.bodyMedium,
+    children: GameTextParser.parse(context, text, isDark),
+  ),
+)
 ```
-
-**After:**
-```dart
-// Utils.generateCheckRowDetails now uses GameTextParser internally
-final spans = Utils.generateCheckRowDetails(
-  context,
-  perkText,
-  darkTheme,
-);
-```
-
-No changes needed! The `Utils.generateCheckRowDetails` method now uses the new parser under the hood.
 
 ## Adding New Features
 
@@ -300,7 +288,7 @@ The old system had these issues:
 ### What Stays the Same
 
 - All existing perk data works without changes
-- `Utils.generateCheckRowDetails` API unchanged
+- All call sites use `GameTextParser.parse()` directly (legacy `Utils.generateCheckRowDetails` wrapper removed)
 - All asset configurations remain the same
 
 ## Performance Considerations

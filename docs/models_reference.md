@@ -567,6 +567,7 @@ A single requirement within a personal quest.
 |-------|------|-------------|
 | `description` | `String` | Requirement text |
 | `target` | `int` | Numeric target count (1 for binary requirements) |
+| `details` | `String?` | Supplemental rules text shown in a bottom sheet (e.g., how to gain Votes) |
 
 ---
 

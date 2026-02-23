@@ -16,7 +16,8 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
-import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
+import 'package:gloomhaven_enhancement_calc/utils/game_text_parser.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/requirement_details_sheet.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 
 class RequirementRow extends StatefulWidget {
@@ -85,6 +86,21 @@ class _RequirementRowState extends State<RequirementRow> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          if (widget.requirement.details != null)
+            GestureDetector(
+              onTap: () => RequirementDetailsSheet.show(
+                context: context,
+                requirement: widget.requirement,
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(right: smallPadding),
+                child: Icon(
+                  Icons.info_outline_rounded,
+                  size: iconSizeSmall,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
@@ -95,7 +111,7 @@ class _RequirementRowState extends State<RequirementRow> {
                   overflow: TextOverflow.ellipsis,
                   text: TextSpan(
                     style: theme.textTheme.bodyMedium,
-                    children: Utils.generateCheckRowDetails(
+                    children: GameTextParser.parse(
                       context,
                       widget.requirement.description,
                       theme.brightness == Brightness.dark,

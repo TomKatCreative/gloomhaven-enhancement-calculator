@@ -118,13 +118,18 @@ class PersonalQuest {
 /// Each requirement has a text [description] and a numeric [target] count.
 /// For binary requirements (e.g., "Complete Scenario 52 chain"), the target
 /// is 1.
+///
+/// Optional [details] provides supplemental rules text (e.g., how to gain
+/// Votes for GH2E quest 537) that can be shown in a bottom sheet.
 class PersonalQuestRequirement {
   final String description;
   final int target;
+  final String? details;
 
   const PersonalQuestRequirement({
     required this.description,
     required this.target,
+    this.details,
   });
 }
 

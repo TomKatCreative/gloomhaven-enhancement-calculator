@@ -520,7 +520,7 @@ Extracted into `lib/ui/widgets/character/`:
 ### Personal Quest Section
 
 > **File**: `lib/ui/widgets/personal_quest_section.dart` (orchestrator)
-> **Sub-widgets**: `character/quest_content.dart`, `character/requirement_row.dart`, `character/retirement_prompt.dart`
+> **Sub-widgets**: `character/quest_content.dart`, `character/requirement_row.dart`, `character/requirement_details_sheet.dart`, `character/retirement_prompt.dart`
 
 Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. Three display states:
 1. **Quest assigned** — `QuestContent` with quest title, unlock icon, requirements list with progress

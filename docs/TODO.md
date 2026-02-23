@@ -269,3 +269,28 @@ All three definition tables (Perks, Masteries, PersonalQuests) were removed in v
 ### ~~Stable Perk/Mastery IDs~~ — Done
 
 Perk and mastery IDs were previously derived from list position, creating silent data corruption risk if definitions were reordered. Now each `Perk` and `Mastery` carries an explicit `number` field used for ID generation. Numbers match the original positional order so existing DB records are unaffected (zero migration cost). Perks are 1-based, masteries are 0-based (legacy inconsistency preserved for DB compatibility). Debug assertions validate uniqueness at runtime; `test/models/repository_id_stability_test.dart` validates all IDs across all classes in CI.
+
+---
+
+## Migrate Dialogs to Bottom Sheets
+
+**Added:** 2026-02-23
+**Status:** Pending
+
+Several dialogs in the app use `AlertDialog` / `showDialog` where a bottom sheet would provide a more natural mobile UX (easier to reach, swipe-to-dismiss, avoids the small centered dialog pattern on phones).
+
+### Candidates for Migration
+
+| Current Dialog | File | Notes |
+|---------------|------|-------|
+| `ConfirmationDialog` | `lib/ui/dialogs/confirmation_dialog.dart` | Generic confirm/cancel — could become a confirmation bottom sheet |
+| `EnhancerDialog` | `lib/ui/dialogs/enhancer_dialog.dart` | Enhancer level picker |
+| `InfoDialog` | `lib/ui/dialogs/info_dialog.dart` | Long scrollable content — good fit for sheet |
+| `BackupDialog` | `lib/ui/dialogs/backup_dialog.dart` | Backup/restore actions |
+| `CustomClassWarningDialog` | `lib/ui/dialogs/custom_class_warning_dialog.dart` | Simple warning |
+
+### Approach
+
+- Migrate one dialog at a time, starting with `InfoDialog` (most content-heavy)
+- Follow the existing `RequirementDetailsSheet` / `ResourceStepperSheet` pattern (static `.show()`, `SafeArea`, `isScrollControlled: true`)
+- Keep `ConfirmationDialog` for last since it's used widely and needs careful testing

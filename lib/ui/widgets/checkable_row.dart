@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/utils/game_text_parser.dart';
 import 'package:gloomhaven_enhancement_calc/utils/utils.dart';
 
 /// Callback that returns the left-side widgets (checkboxes + divider/spacer).
@@ -43,7 +44,7 @@ class _CheckableRowState extends State<CheckableRow> {
               child: RichText(
                 text: TextSpan(
                   style: Theme.of(context).textTheme.bodyLarge,
-                  children: Utils.generateCheckRowDetails(
+                  children: GameTextParser.parse(
                     context,
                     widget.details,
                     Theme.of(context).brightness == Brightness.dark,
