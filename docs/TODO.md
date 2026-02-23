@@ -1,8 +1,8 @@
 # Personal Quests
 
-## Status: Released (v4.5.1)
+## Status: Released (v4.5.1), dev has additional editions
 
-Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are fully shipped.
+Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are shipped in production. Crimson Scales (28 quests), Trail of Ashes (8 quests), and Gloomhaven 2E (22 quests) are on `dev`.
 
 ### Gloomhaven PQs (v4.5.0)
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)

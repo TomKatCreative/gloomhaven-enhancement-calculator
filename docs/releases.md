@@ -6,6 +6,8 @@ Reverse-chronological log of production releases with commit references.
 
 - Added 22 Gloomhaven 2nd Edition personal quests (cards 01-22 / assets 537-558)
 - New `PersonalQuestEdition.gloomhaven2e` edition filter in quest selector
+- Verified and corrected Crimson Scales and Trail of Ashes quest descriptions
+- Raised requirement stepper/text field threshold from 20 to 30
 
 ## v4.5.1 — Frosthaven Personal Quests
 
