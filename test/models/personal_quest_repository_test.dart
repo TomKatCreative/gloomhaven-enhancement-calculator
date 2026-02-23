@@ -6,9 +6,12 @@ import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest
 
 void main() {
   group('PersonalQuestsRepository', () {
-    test('contains 83 total quests (24 GH + 23 FH + 28 CS + 8 TOA)', () {
-      expect(PersonalQuestsRepository.quests.length, 83);
-    });
+    test(
+      'contains 105 total quests (24 GH + 22 GH2E + 23 FH + 28 CS + 8 TOA)',
+      () {
+        expect(PersonalQuestsRepository.quests.length, 105);
+      },
+    );
 
     test('all quest IDs are unique', () {
       final ids = PersonalQuestsRepository.quests.map((q) => q.id).toSet();
@@ -156,6 +159,124 @@ void main() {
           final quest = PersonalQuestsRepository.getById('pq_gh_533');
           expect(quest!.requirements.length, 3);
           expect(quest.unlockClassCode, ClassCodes.plagueherald);
+        });
+      });
+    });
+
+    group('Gloomhaven 2E quests', () {
+      test('contains 22 quests', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        expect(gh2eQuests.length, 22);
+      });
+
+      test('GH2E card numbers range from 1 to 22', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        final numbers = gh2eQuests.map((q) => q.number).toList()..sort();
+        expect(numbers.first, 1);
+        expect(numbers.last, 22);
+        expect(numbers.toSet().length, 22);
+      });
+
+      test('all quest IDs start with pq_gh2e_', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        for (final quest in gh2eQuests) {
+          expect(quest.id, startsWith('pq_gh2e_'));
+        }
+      });
+
+      test('all GH2E quests have altNumber (asset numbers 537-558)', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        final altNumbers = gh2eQuests.map((q) => q.altNumber).toList();
+        for (final alt in altNumbers) {
+          expect(alt, isNotNull);
+        }
+        final sortedAlts = altNumbers.cast<int>().toList()..sort();
+        expect(sortedAlts.first, 537);
+        expect(sortedAlts.last, 558);
+      });
+
+      test('displayNumber shows dual format for GH2E quests', () {
+        final quest = PersonalQuestsRepository.getById('pq_gh2e_537')!;
+        expect(quest.number, 1);
+        expect(quest.altNumber, 537);
+        expect(quest.displayNumber, '01 (537)');
+      });
+
+      test('all GH2E quests unlock classes (no envelope unlocks)', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        for (final quest in gh2eQuests) {
+          expect(
+            quest.unlockClassCode,
+            isNotNull,
+            reason: '${quest.id} should unlock a class',
+          );
+          expect(
+            quest.unlockEnvelope,
+            isNull,
+            reason: '${quest.id} should not unlock an envelope',
+          );
+        }
+      });
+
+      test('each GH2E class has exactly 2 quests (11 classes)', () {
+        final gh2eQuests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        final classCounts = <String, int>{};
+        for (final quest in gh2eQuests) {
+          classCounts[quest.unlockClassCode!] =
+              (classCounts[quest.unlockClassCode!] ?? 0) + 1;
+        }
+        for (final entry in classCounts.entries) {
+          expect(
+            entry.value,
+            2,
+            reason: 'Class ${entry.key} should have exactly 2 quests',
+          );
+        }
+        expect(classCounts.length, 11);
+      });
+
+      group('specific quest data', () {
+        test('01 (537) Political Intrigue unlocks Sunkeeper', () {
+          final quest = PersonalQuestsRepository.getById('pq_gh2e_537');
+          expect(quest, isNotNull);
+          expect(quest!.number, 1);
+          expect(quest.altNumber, 537);
+          expect(quest.title, 'Political Intrigue');
+          expect(quest.requirements.length, 2);
+          expect(quest.requirements[0].target, 30);
+          expect(quest.requirements[1].description, startsWith('Then '));
+          expect(quest.unlockClassCode, ClassCodes.sunkeeper);
+        });
+
+        test(
+          '10 (546) Aberrant Slayer has 7 requirements (6 demons + read)',
+          () {
+            final quest = PersonalQuestsRepository.getById('pq_gh2e_546');
+            expect(quest, isNotNull);
+            expect(quest!.number, 10);
+            expect(quest.requirements.length, 7);
+            expect(quest.unlockClassCode, ClassCodes.elementalist);
+          },
+        );
+
+        test('13 (549) Merchant Class has 6 requirements (5 slots + read)', () {
+          final quest = PersonalQuestsRepository.getById('pq_gh2e_549');
+          expect(quest, isNotNull);
+          expect(quest!.number, 13);
+          expect(quest.requirements.length, 6);
+          expect(quest.unlockClassCode, ClassCodes.quartermaster);
         });
       });
     });
@@ -535,6 +656,13 @@ void main() {
         expect(quest.unlockClassCode, ClassCodes.plagueherald);
       });
 
+      test('returns correct GH2E quest for valid ID', () {
+        final quest = PersonalQuestsRepository.getById('pq_gh2e_537');
+        expect(quest, isNotNull);
+        expect(quest!.title, 'Political Intrigue');
+        expect(quest.edition, PersonalQuestEdition.gloomhaven2e);
+      });
+
       test('returns correct FH quest for valid ID', () {
         final quest = PersonalQuestsRepository.getById('pq_fh_581');
         expect(quest, isNotNull);
@@ -573,6 +701,13 @@ void main() {
         expect(quests.length, 24);
       });
 
+      test('returns 22 quests for gloomhaven2e', () {
+        final quests = PersonalQuestsRepository.getByEdition(
+          PersonalQuestEdition.gloomhaven2e,
+        );
+        expect(quests.length, 22);
+      });
+
       test('returns 23 quests for frosthaven', () {
         final quests = PersonalQuestsRepository.getByEdition(
           PersonalQuestEdition.frosthaven,
@@ -599,6 +734,11 @@ void main() {
       test('GH quest shows number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_gh_510')!;
         expect(quest.displayName, '510 - Seeker of Xorn');
+      });
+
+      test('GH2E quest shows both numbers and title', () {
+        final quest = PersonalQuestsRepository.getById('pq_gh2e_537')!;
+        expect(quest.displayName, '01 (537) - Political Intrigue');
       });
 
       test('FH quest shows both numbers and title', () {

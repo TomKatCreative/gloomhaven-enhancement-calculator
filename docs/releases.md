@@ -2,6 +2,11 @@
 
 Reverse-chronological log of production releases with commit references.
 
+## (Unreleased) — Gloomhaven 2E Personal Quests
+
+- Added 22 Gloomhaven 2nd Edition personal quests (cards 01-22 / assets 537-558)
+- New `PersonalQuestEdition.gloomhaven2e` edition filter in quest selector
+
 ## v4.5.1 — Frosthaven Personal Quests
 
 - **Commit:** `547ccb6` — "Prepare v4.5.1 release: Frosthaven personal quests"

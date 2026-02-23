@@ -1,7 +1,8 @@
 /// Static repository of all Personal Quest definitions.
 ///
-/// Contains 83 quests across 4 editions:
+/// Contains 105 quests across 5 editions:
 /// - 24 base Gloomhaven quests (cards 510-533, second printing values)
+/// - 22 Gloomhaven 2E quests (cards 01-22 / asset 537-558)
 /// - 23 Frosthaven quests (cards 1-23 / asset 505-590)
 /// - 28 Crimson Scales quests (22 core cards 330-351 + 6 add-on class quests)
 /// - 8 Trail of Ashes quests (cards 641-648)
@@ -394,6 +395,470 @@ class PersonalQuestsRepository {
         ),
       ],
     ),
+    // ── Gloomhaven 2E Personal Quests ──
+    // number = GH2E card number (1-22), altNumber = Cephalofair asset number
+    // All 22 quests unlock classes (no envelope unlocks), 2 per class
+    PersonalQuest(
+      id: 'pq_gh2e_537',
+      number: 1,
+      altNumber: 537,
+      title: 'Political Intrigue',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.sunkeeper,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Gain 30 Votes', target: 30),
+        PersonalQuestRequirement(
+          description: 'Then read Section 136.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_538',
+      number: 2,
+      altNumber: 538,
+      title: 'Inn to Hospitality',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.quartermaster,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 2 scenarios where you performed a long rest',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 112.2',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description:
+              'Then complete 3 more scenarios where you performed a long rest',
+          target: 3,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 112.3',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_539',
+      number: 3,
+      altNumber: 539,
+      title: 'Augmented Abilities',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.summoner,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Purchase 4 enhancements',
+          target: 4,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 101.2',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_540',
+      number: 4,
+      altNumber: 540,
+      title: 'The Fall of Man',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.nightshroud,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Kill 15 Lurkers', target: 15),
+        PersonalQuestRequirement(
+          description: 'Then read Section 157.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_541',
+      number: 5,
+      altNumber: 541,
+      title: 'Seeker of Xorn',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.plagueherald,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 3 scenarios with "Crypt" in the name',
+          target: 3,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 69.3',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then complete "Realm of the Voice" (Scenario 43)',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 69.4',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_542',
+      number: 6,
+      altNumber: 542,
+      title: 'Zealot of the Blood God',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.berserker,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Become exhausted 12 times',
+          target: 12,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 164.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_543',
+      number: 7,
+      altNumber: 543,
+      title: 'A Tale to Tell',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.soothsinger,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Experience 2 other characters retiring',
+          target: 2,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 130.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_544',
+      number: 8,
+      altNumber: 544,
+      title: 'Take Back the Trees',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.doomstalker,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 3 scenarios in the Dagger Forest',
+          target: 3,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 142.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_545',
+      number: 9,
+      altNumber: 545,
+      title: 'Finding the Cure',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.sawbones,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Visit 5 of these 7 locations: Gloomhaven, Dagger Forest, Lingering Swamp, Watcher Mountains, Copperneck Mountains, Misty Sea, Serpent\'s Kiss River',
+          target: 5,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 122.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_546',
+      number: 10,
+      altNumber: 546,
+      title: 'Aberrant Slayer',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.elementalist,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Kill 1 Flame Demon', target: 1),
+        PersonalQuestRequirement(description: 'Kill 1 Frost Demon', target: 1),
+        PersonalQuestRequirement(description: 'Kill 1 Wind Demon', target: 1),
+        PersonalQuestRequirement(description: 'Kill 1 Earth Demon', target: 1),
+        PersonalQuestRequirement(description: 'Kill 1 Night Demon', target: 1),
+        PersonalQuestRequirement(description: 'Kill 1 Sun Demon', target: 1),
+        PersonalQuestRequirement(
+          description: 'Then read Section 118.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_547',
+      number: 11,
+      altNumber: 547,
+      title: 'Adoptive Parent',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.beastTyrant,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill 20 different types of monsters',
+          target: 20,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 131.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_548',
+      number: 12,
+      altNumber: 548,
+      title: 'Implement of Light',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.sunkeeper,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill 20 Bandits or Cultists',
+          target: 20,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 36.5',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then complete the linked scenario',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 36.6',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_549',
+      number: 13,
+      altNumber: 549,
+      title: 'Merchant Class',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.quartermaster,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Own 2 Head items', target: 2),
+        PersonalQuestRequirement(description: 'Own 2 Body items', target: 2),
+        PersonalQuestRequirement(description: 'Own 2 Feet items', target: 2),
+        PersonalQuestRequirement(
+          description: 'Own 3 One_Hand or Two_Hand items',
+          target: 3,
+        ),
+        PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
+        PersonalQuestRequirement(
+          description: 'Then read Section 115.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_550',
+      number: 14,
+      altNumber: 550,
+      title: 'Eternal Wanderer',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.summoner,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 15 different scenarios',
+          target: 15,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 150.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_551',
+      number: 15,
+      altNumber: 551,
+      title: 'Escaping the Sin-Ra',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.nightshroud,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 6 side scenarios (scenario number > 51)',
+          target: 6,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 83.2',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then complete the linked scenario',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 83.3',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_552',
+      number: 16,
+      altNumber: 552,
+      title: 'The Perfect Poison',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.plagueherald,
+      requirements: const [
+        PersonalQuestRequirement(description: 'Kill 3 Oozes', target: 3),
+        PersonalQuestRequirement(description: 'Kill 3 Lurkers', target: 3),
+        PersonalQuestRequirement(
+          description: 'Kill 3 Spitting Drakes',
+          target: 3,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 11.3',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_553',
+      number: 17,
+      altNumber: 553,
+      title: 'Living on the Edge',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.berserker,
+      requirements: const [
+        PersonalQuestRequirement(
+          description:
+              'Experience your party members becoming exhausted 15 times',
+          target: 15,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 120.2',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then complete the linked scenario',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 120.3',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_554',
+      number: 18,
+      altNumber: 554,
+      title: 'Battle Legend',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.soothsinger,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Earn 15 GOAL from completed battle goals',
+          target: 15,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 171.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_555',
+      number: 19,
+      altNumber: 555,
+      title: 'Martial Study',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.doomstalker,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete 4 boss scenarios',
+          target: 4,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 98.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_556',
+      number: 20,
+      altNumber: 556,
+      title: 'Piety in All Things',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.sawbones,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Donate 120 gold to the Sanctuary of the Great Oak',
+          target: 120,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 56.2',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_557',
+      number: 21,
+      altNumber: 557,
+      title: 'Pursuit of Proficiency',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.elementalist,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Gloomhaven',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Dagger Forest',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Lingering Swamp',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Watcher Mountains',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Copperneck Mountains',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Complete a scenario in Misty Sea',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 174.1',
+          target: 1,
+        ),
+      ],
+    ),
+    PersonalQuest(
+      id: 'pq_gh2e_558',
+      number: 22,
+      altNumber: 558,
+      title: 'Trophy Hunt',
+      edition: PersonalQuestEdition.gloomhaven2e,
+      unlockClassCode: ClassCodes.beastTyrant,
+      requirements: const [
+        PersonalQuestRequirement(
+          description: 'Kill 20 elite monsters',
+          target: 20,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read Section 67.2',
+          target: 1,
+        ),
+      ],
+    ),
     // ── Frosthaven Personal Quests ──
     // number = FH card number (1-23), altNumber = Cephalofair asset number
     PersonalQuest(
@@ -783,7 +1248,7 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.bombard,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Consume fifteen one-hand or two-hand items',
+          description: 'Consume fifteen One_Hand or Two_Hand items',
           target: 15,
         ),
       ],
@@ -906,7 +1371,7 @@ class PersonalQuestsRepository {
       number: 340,
       title: 'Thy be Blessed',
       edition: PersonalQuestEdition.crimsonScales,
-      unlockClassCode: ClassCodes.mirefoot,
+      unlockClassCode: ClassCodes.hierophant,
       requirements: const [
         PersonalQuestRequirement(
           description: 'Draw a BLESS card twelve times during an attack',
@@ -919,7 +1384,7 @@ class PersonalQuestsRepository {
       number: 341,
       title: 'Spiritual Gains',
       edition: PersonalQuestEdition.crimsonScales,
-      unlockClassCode: ClassCodes.mirefoot,
+      unlockClassCode: ClassCodes.hierophant,
       requirements: const [
         PersonalQuestRequirement(
           description: 'Spend 200 gold on enhancements',
@@ -936,7 +1401,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Experience an ally or enemy dying or becoming exhausted during its own turn thirteen times',
+              'Experience an ally or enemy dying or becoming exhausted during its own turn 13 times',
           target: 13,
         ),
       ],
@@ -950,7 +1415,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Complete ten scenarios during which you kill an enemy who has a negative condition',
+              'Complete 10 scenarios during which you kill an enemy who has a negative condition',
           target: 10,
         ),
       ],
@@ -963,19 +1428,19 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.luminary,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Generate Fire two times',
+          description: 'Generate FIRE two times',
           target: 2,
         ),
         PersonalQuestRequirement(
-          description: 'Generate Ice two times',
+          description: 'Generate ICE two times',
           target: 2,
         ),
         PersonalQuestRequirement(
-          description: 'Generate Light two times',
+          description: 'Generate LIGHT two times',
           target: 2,
         ),
         PersonalQuestRequirement(
-          description: 'Generate Dark two times',
+          description: 'Generate DARK two times',
           target: 2,
         ),
         PersonalQuestRequirement(
@@ -1004,10 +1469,10 @@ class PersonalQuestsRepository {
       number: 346,
       title: 'An Adder Divides',
       edition: PersonalQuestEdition.crimsonScales,
-      unlockClassCode: ClassCodes.hierophant,
+      unlockClassCode: ClassCodes.mirefoot,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Occupy difficult terrain in six different scenarios',
+          description: 'Occupy difficult terrain in 6 different scenarios',
           target: 6,
         ),
         PersonalQuestRequirement(
@@ -1022,7 +1487,7 @@ class PersonalQuestsRepository {
       number: 347,
       title: 'Field Research',
       edition: PersonalQuestEdition.crimsonScales,
-      unlockClassCode: ClassCodes.hierophant,
+      unlockClassCode: ClassCodes.mirefoot,
       requirements: const [
         PersonalQuestRequirement(
           description: 'Poison twenty different types of monsters',
@@ -1033,7 +1498,7 @@ class PersonalQuestsRepository {
     PersonalQuest(
       id: 'pq_cs_348',
       number: 348,
-      title: "Conjurer's Hand",
+      title: 'Conjurers Hand',
       edition: PersonalQuestEdition.crimsonScales,
       unlockClassCode: ClassCodes.spiritCaller,
       requirements: const [
@@ -1096,7 +1561,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Experience eight scenarios where you negate damage by losing a card while adjacent to an ally',
+              'Experience 8 scenarios where you negate damage by losing a card as normal while adjacent to an ally',
           target: 8,
         ),
         PersonalQuestRequirement(
@@ -1135,7 +1600,8 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.artificer,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Immediately gain Power Modulator (Item QA-01)',
+          description:
+              'Immediately gain Power Modulator (Item QA-01 - cannot be sold)',
           target: 1,
         ),
         PersonalQuestRequirement(
@@ -1186,8 +1652,8 @@ class PersonalQuestsRepository {
           target: 1,
         ),
         PersonalQuestRequirement(
-          description: 'Apply WOUND or RUPTURE to thirteen enemies',
-          target: 13,
+          description: 'Apply WOUND or RUPTURE to thirty enemies',
+          target: 30,
         ),
         PersonalQuestRequirement(
           description:

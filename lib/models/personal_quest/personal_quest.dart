@@ -22,12 +22,14 @@ import 'dart:convert';
 /// display in the quest selector UI.
 enum PersonalQuestEdition {
   gloomhaven,
+  gloomhaven2e,
   frosthaven,
   crimsonScales,
   trailOfAshes;
 
   String get displayName => switch (this) {
     gloomhaven => 'Gloomhaven',
+    gloomhaven2e => 'Gloomhaven 2E',
     frosthaven => 'Frosthaven',
     crimsonScales => 'Crimson Scales',
     trailOfAshes => 'Trail of Ashes',

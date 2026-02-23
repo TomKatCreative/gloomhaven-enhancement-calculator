@@ -118,7 +118,7 @@ class _RequirementRowState extends State<RequirementRow> {
                     : (value) =>
                           _updateProgress(context, value == true ? 1 : 0),
               )
-            else if (widget.requirement.target > 20)
+            else if (widget.requirement.target > 30)
               _buildTextField(theme)
             else ...[
               IconButton(

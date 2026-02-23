@@ -34,9 +34,16 @@ Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are fully 
 - Search in PQ selector matches `displayNumber` (padded + alt numbers)
 - Edition filter chips on PQ selector screen
 
+### Gloomhaven 2E PQs
+
+- 22 GH2E quests added to `PersonalQuestsRepository` (105 total: 24 GH + 22 GH2E + 23 FH + 28 CS + 8 TOA)
+- `PersonalQuestEdition.gloomhaven2e` added to enum
+- Dual numbering: card 01-22 / asset 537-558 (same pattern as FH)
+- All 22 quests unlock classes (no envelope unlocks), 2 per class (11 GH unlockable classes)
+- GH2E quests include "Then read Section X" requirements (section book pattern)
+
 ## Remaining Work
 
-- **GH2E quest data** - Add Gloomhaven 2nd Edition quests to repository. Add quests with `edition: GameEdition.gloomhaven2e`, update the "Coming soon" guard in `personal_quest_section.dart` and `create_character_screen.dart`. No DB migration needed — quest definitions live in code, not the DB.
 - **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
 
 ---
