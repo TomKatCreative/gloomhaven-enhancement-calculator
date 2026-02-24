@@ -176,7 +176,7 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Find the Skullbane Axe in the Necormancer\'s Sanctum',
+          description: 'Find the Skullbane Axe in the Necromancer\'s Sanctum',
           target: 1,
         ),
         PersonalQuestRequirement(
@@ -429,20 +429,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.quartermaster,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 2 scenarios where you performed a long rest',
-          target: 2,
+          description: 'Loot 60 money tokens',
+          target: 60,
         ),
         PersonalQuestRequirement(
-          description: 'Then read SECTION 112.2',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description:
-              'Then complete 3 more scenarios where you performed a long rest',
-          target: 3,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read SECTION 112.3',
+          description: 'Then read SECTION 125.4',
           target: 1,
         ),
       ],
@@ -456,11 +447,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.summoner,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Purchase 4 enhancements',
-          target: 4,
+          description: 'Purchase five enhancements',
+          target: 5,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 101.2',
+          description: 'Then read SECTION 71.2',
           target: 1,
         ),
       ],
@@ -473,9 +464,17 @@ class PersonalQuestsRepository {
       edition: PersonalQuestEdition.gloomhaven2e,
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
-        PersonalQuestRequirement(description: 'Kill 15 Lurkers', target: 15),
         PersonalQuestRequirement(
-          description: 'Then read Section 157.1',
+          description:
+              'Gain "Aesther Spyglass" **†**149 now. It cannot be sold',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Use this item 10 times',
+          target: 10,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read SECTION 115.2',
           target: 1,
         ),
       ],
@@ -489,19 +488,18 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.plagueherald,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 3 scenarios with "Crypt" in the name',
-          target: 3,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read Section 69.3',
+          description:
+              'Once you gain a level, unlock Crypt Basement (Scenario 57) and follow it to its conclusion',
           target: 1,
         ),
         PersonalQuestRequirement(
-          description: 'Then complete "Realm of the Voice" (Scenario 43)',
-          target: 1,
+          description:
+              'Then use the item gained in that scenario to gain POISON 7 times',
+          target: 7,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 69.4',
+          description:
+              'Then unlock Palace of Ice (Scenario 58) and follow it to its conclusion',
           target: 1,
         ),
       ],
@@ -515,11 +513,13 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.berserker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Become exhausted 12 times',
-          target: 12,
+          description: 'Survive 10 scenarios with <= half your max hit points',
+          target: 10,
+          details:
+              'End 10 scenarios with your current hit point value equal to half your maximum or less (rounded down) without exhausting',
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 164.1',
+          description: 'Then read SECTION 122.3',
           target: 1,
         ),
       ],
@@ -533,11 +533,12 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Experience 2 other characters retiring',
-          target: 2,
+          description:
+              'Loot or witness your party loot a treasure tile in 10 scenarios',
+          target: 10,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 130.1',
+          description: 'Then read SECTION 12.3',
           target: 1,
         ),
       ],
@@ -551,11 +552,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 3 scenarios in the Dagger Forest',
-          target: 3,
+          description: 'Experience 10 road events with your party',
+          target: 10,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 142.1',
+          description: 'Then read SECTION 64.3',
           target: 1,
         ),
       ],
@@ -569,12 +570,20 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.sawbones,
       requirements: const [
         PersonalQuestRequirement(
-          description:
-              'Visit 5 of these 7 locations: Gloomhaven, Dagger Forest, Lingering Swamp, Watcher Mountains, Copperneck Mountains, Misty Sea, Serpent\'s Kiss River',
+          description: 'Complete scenarios in 5 of the following locations:',
           target: 5,
+          checklistItems: [
+            'Copperneck Mountains',
+            'Corpsewood',
+            'Dagger Forest',
+            'Gloomhaven',
+            'Lingering Swamp',
+            'Misty Sea',
+            'Watcher Mountains',
+          ],
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 122.1',
+          description: 'Then read SECTION 55.3',
           target: 1,
         ),
       ],
@@ -587,14 +596,13 @@ class PersonalQuestsRepository {
       edition: PersonalQuestEdition.gloomhaven2e,
       unlockClassCode: ClassCodes.elementalist,
       requirements: const [
-        PersonalQuestRequirement(description: 'Kill 1 Flame Demon', target: 1),
-        PersonalQuestRequirement(description: 'Kill 1 Frost Demon', target: 1),
-        PersonalQuestRequirement(description: 'Kill 1 Wind Demon', target: 1),
-        PersonalQuestRequirement(description: 'Kill 1 Earth Demon', target: 1),
-        PersonalQuestRequirement(description: 'Kill 1 Night Demon', target: 1),
-        PersonalQuestRequirement(description: 'Kill 1 Sun Demon', target: 1),
         PersonalQuestRequirement(
-          description: 'Then read Section 118.1',
+          description:
+              "Enhance your or an ally's ability card with Wild_Element",
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read SECTION 14.3',
           target: 1,
         ),
       ],
@@ -608,11 +616,12 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 different types of monsters',
-          target: 20,
+          description:
+              'Loot three money tokens dropped by enemies in 10 scenarios',
+          target: 10,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 131.1',
+          description: 'Then read SECTION 122.5',
           target: 1,
         ),
       ],
@@ -626,19 +635,17 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.sunkeeper,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 Bandits or Cultists',
-          target: 20,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read Section 36.5',
+          description:
+              'Unlock Hero\'s Mausoleum (Scenario 67) and follow it to its conclusion',
           target: 1,
         ),
         PersonalQuestRequirement(
-          description: 'Then complete the linked scenario',
-          target: 1,
+          description:
+              'Then use "Shield of the Righteous" **†**148 to negate 10 attacks of DAMAGE 4 or more',
+          target: 10,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 36.6',
+          description: 'Then read SECTION 82.1',
           target: 1,
         ),
       ],
@@ -651,16 +658,16 @@ class PersonalQuestsRepository {
       edition: PersonalQuestEdition.gloomhaven2e,
       unlockClassCode: ClassCodes.quartermaster,
       requirements: const [
-        PersonalQuestRequirement(description: 'Own 2 Head items', target: 2),
-        PersonalQuestRequirement(description: 'Own 2 Body items', target: 2),
-        PersonalQuestRequirement(description: 'Own 2 Feet items', target: 2),
+        PersonalQuestRequirement(description: 'Own 3 Head items', target: 3),
+        PersonalQuestRequirement(description: 'Own 3 Body items', target: 3),
+        PersonalQuestRequirement(description: 'Own 3 Feet items', target: 3),
         PersonalQuestRequirement(
-          description: 'Own 3 One_Hand or Two_Hand items',
-          target: 3,
+          description: 'Own 5 One_Hand or Two_Hand items',
+          target: 5,
         ),
-        PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
+        PersonalQuestRequirement(description: 'Own 5 Pocket items', target: 5),
         PersonalQuestRequirement(
-          description: 'Then read Section 115.1',
+          description: 'Then read SECTION 129.1',
           target: 1,
         ),
       ],
@@ -674,11 +681,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.summoner,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 15 different scenarios',
-          target: 15,
+          description: 'Complete 12 different scenarios',
+          target: 12,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 150.1',
+          description: 'Then read SECTION 52.2',
           target: 1,
         ),
       ],
@@ -692,19 +699,15 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.nightshroud,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 6 side scenarios (scenario number > 51)',
+          description: 'Gain "Black Card" **†**113 now. It cannot be sold',
+          target: 1,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then complete 6 side scenarios (scenario number > 56)',
           target: 6,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 83.2',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then complete the linked scenario',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read Section 83.3',
+          description: 'Then read SECTION 128.2',
           target: 1,
         ),
       ],
@@ -717,14 +720,17 @@ class PersonalQuestsRepository {
       edition: PersonalQuestEdition.gloomhaven2e,
       unlockClassCode: ClassCodes.plagueherald,
       requirements: const [
-        PersonalQuestRequirement(description: 'Kill 3 Oozes', target: 3),
-        PersonalQuestRequirement(description: 'Kill 3 Lurkers', target: 3),
         PersonalQuestRequirement(
-          description: 'Kill 3 Spitting Drakes',
-          target: 3,
+          description: 'Gain "Poison Dagger" **†**007 now',
+          target: 1,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 11.3',
+          description:
+              'Then use it to apply POISON to an enemy that does not already have POISON 30 times',
+          target: 30,
+        ),
+        PersonalQuestRequirement(
+          description: 'Then read SECTION 8.3',
           target: 1,
         ),
       ],
@@ -738,20 +744,15 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.berserker,
       requirements: const [
         PersonalQuestRequirement(
-          description:
-              'Experience your party members becoming exhausted 15 times',
-          target: 15,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read Section 120.2',
+          description: 'Gain "Experimental Armor" **†**150 now',
           target: 1,
         ),
         PersonalQuestRequirement(
-          description: 'Then complete the linked scenario',
-          target: 1,
+          description: 'Then use it to cause 20 enemies to suffer DAMAGE',
+          target: 20,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 120.3',
+          description: 'Then read SECTION 47.4',
           target: 1,
         ),
       ],
@@ -765,11 +766,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.soothsinger,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Earn 15 GOAL from completed battle goals',
-          target: 15,
+          description: 'Earn 12 GOAL from completed battle goals',
+          target: 12,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 171.1',
+          description: 'Then read SECTION 23.3',
           target: 1,
         ),
       ],
@@ -783,11 +784,12 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.doomstalker,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete 4 boss scenarios',
-          target: 4,
+          description:
+              'Use 8 different One_Hand or Two_Hand items during scenarios',
+          target: 8,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 98.1',
+          description: 'Then read SECTION 67.2',
           target: 1,
         ),
       ],
@@ -801,11 +803,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.sawbones,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Donate 120 gold to the Sanctuary of the Great Oak',
+          description: 'Donate 120 gold to the Temple of the Great Oak',
           target: 120,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 56.2',
+          description: 'Then read SECTION 51.5',
           target: 1,
         ),
       ],
@@ -819,31 +821,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.elementalist,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Complete a scenario in Gloomhaven',
-          target: 1,
+          description: 'Gain 120 XP from ability cards',
+          target: 120,
         ),
         PersonalQuestRequirement(
-          description: 'Complete a scenario in Dagger Forest',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Complete a scenario in Lingering Swamp',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Complete a scenario in Watcher Mountains',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Complete a scenario in Copperneck Mountains',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Complete a scenario in Misty Sea',
-          target: 1,
-        ),
-        PersonalQuestRequirement(
-          description: 'Then read Section 174.1',
+          description: 'Then read SECTION 17.2',
           target: 1,
         ),
       ],
@@ -857,11 +839,11 @@ class PersonalQuestsRepository {
       unlockClassCode: ClassCodes.beastTyrant,
       requirements: const [
         PersonalQuestRequirement(
-          description: 'Kill 20 elite monsters',
+          description: 'Kill 20 different types of monsters',
           target: 20,
         ),
         PersonalQuestRequirement(
-          description: 'Then read Section 67.2',
+          description: 'Then read SECTION 21.1',
           target: 1,
         ),
       ],

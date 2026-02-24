@@ -3,8 +3,8 @@
 /// Displays the requirement description and progress controls. In edit mode,
 /// renders one of three interaction variants based on the requirement's target:
 /// - **Binary** (target = 1): Checkbox
-/// - **Low target** (2–20): +/- buttons with progress counter
-/// - **High target** (>20): Text field with target denominator
+/// - **Low target** (2–60): +/- buttons with progress counter
+/// - **High target** (>60): Text field with target denominator
 ///
 /// In view mode, shows a read-only checkbox or progress text.
 library;
@@ -77,6 +77,13 @@ class _RequirementRowState extends State<RequirementRow> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.requirement.checklistItems != null) {
+      return _buildChecklist(context);
+    }
+    return _buildStandardRow(context);
+  }
+
+  Widget _buildStandardRow(BuildContext context) {
     final theme = Theme.of(context);
     final isComplete = widget.progress >= widget.requirement.target;
     final isDimmed = isComplete || widget.isLocked;
@@ -86,38 +93,13 @@ class _RequirementRowState extends State<RequirementRow> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (widget.requirement.details != null)
-            GestureDetector(
-              onTap: () => RequirementDetailsSheet.show(
-                context: context,
-                requirement: widget.requirement,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.only(right: smallPadding),
-                child: Icon(
-                  Icons.info_outline_rounded,
-                  size: iconSizeSmall,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ),
+          if (widget.requirement.details != null) _buildInfoIcon(theme),
           Expanded(
             child: Align(
               alignment: Alignment.centerLeft,
               child: Opacity(
                 opacity: isDimmed ? theme.disabledColor.a : 1.0,
-                child: RichText(
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(
-                    style: theme.textTheme.bodyMedium,
-                    children: GameTextParser.parse(
-                      context,
-                      widget.requirement.description,
-                      theme.brightness == Brightness.dark,
-                    ),
-                  ),
-                ),
+                child: _buildDescription(theme),
               ),
             ),
           ),
@@ -134,17 +116,25 @@ class _RequirementRowState extends State<RequirementRow> {
                     : (value) =>
                           _updateProgress(context, value == true ? 1 : 0),
               )
-            else if (widget.requirement.target > 30)
+            else if (widget.requirement.target > 60)
               _buildTextField(theme)
+            else if (widget.isLocked)
+              Padding(
+                padding: const EdgeInsets.only(right: mediumPadding),
+                child: Text(
+                  '${widget.progress}/${widget.requirement.target}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.disabledColor,
+                  ),
+                ),
+              )
             else ...[
               IconButton(
                 iconSize: iconSizeSmall,
                 constraints: const BoxConstraints(),
                 padding: const EdgeInsets.all(tinyPadding),
                 icon: const Icon(Icons.remove_circle_outline),
-                onPressed: widget.isLocked
-                    ? null
-                    : widget.progress > 0
+                onPressed: widget.progress > 0
                     ? () => _updateProgress(context, widget.progress - 1)
                     : null,
               ),
@@ -175,9 +165,7 @@ class _RequirementRowState extends State<RequirementRow> {
                 constraints: const BoxConstraints(),
                 padding: const EdgeInsets.all(tinyPadding),
                 icon: const Icon(Icons.add_circle_outline),
-                onPressed: widget.isLocked
-                    ? null
-                    : widget.progress < widget.requirement.target
+                onPressed: widget.progress < widget.requirement.target
                     ? () => _updateProgress(context, widget.progress + 1)
                     : null,
               ),
@@ -207,6 +195,119 @@ class _RequirementRowState extends State<RequirementRow> {
               ),
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildChecklist(BuildContext context) {
+    final theme = Theme.of(context);
+    final items = widget.requirement.checklistItems!;
+    final checked = widget.requirement.checkedCount(widget.progress);
+    final isComplete = checked >= widget.requirement.target;
+    final isDimmed = isComplete || widget.isLocked;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: tinyPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: description + progress counter
+          Row(
+            children: [
+              if (widget.requirement.details != null) _buildInfoIcon(theme),
+              Expanded(
+                child: Opacity(
+                  opacity: isDimmed ? theme.disabledColor.a : 1.0,
+                  child: _buildDescription(theme),
+                ),
+              ),
+              const SizedBox(width: smallPadding),
+              Padding(
+                padding: const EdgeInsets.only(right: mediumPadding),
+                child: Text(
+                  '$checked/${widget.requirement.target}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isComplete
+                        ? theme
+                              .extension<AppThemeExtension>()!
+                              .contrastedPrimary
+                        : widget.isLocked
+                        ? theme.disabledColor
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          // Checklist items
+          ...List.generate(items.length, (i) {
+            final isItemChecked = (widget.progress >> i) & 1 == 1;
+            final isItemDimmed = isDimmed || isItemChecked;
+            return Padding(
+              padding: const EdgeInsets.only(left: largePadding),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Opacity(
+                      opacity: isItemDimmed ? theme.disabledColor.a : 1.0,
+                      child: Text(items[i], style: theme.textTheme.bodyMedium),
+                    ),
+                  ),
+                  Checkbox(
+                    value: isItemChecked,
+                    activeColor: theme
+                        .extension<AppThemeExtension>()!
+                        .contrastedPrimary,
+                    onChanged:
+                        widget.isEditMode &&
+                            !widget.isLocked &&
+                            (isItemChecked || !isComplete)
+                        ? (value) {
+                            final newProgress = value == true
+                                ? widget.progress | (1 << i)
+                                : widget.progress & ~(1 << i);
+                            _updateProgress(context, newProgress);
+                          }
+                        : null,
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoIcon(ThemeData theme) {
+    return GestureDetector(
+      onTap: () => RequirementDetailsSheet.show(
+        context: context,
+        requirement: widget.requirement,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(right: smallPadding),
+        child: Icon(
+          Icons.info_outline_rounded,
+          size: iconSizeSmall,
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDescription(ThemeData theme) {
+    return RichText(
+      maxLines: 3,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: theme.textTheme.bodyMedium,
+        children: GameTextParser.parse(
+          context,
+          widget.requirement.description,
+          theme.brightness == Brightness.dark,
+          iconSize: iconSizeSmall,
+        ),
       ),
     );
   }

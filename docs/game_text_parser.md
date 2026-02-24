@@ -103,6 +103,14 @@ final spans = GameTextParser.parse(
   darkTheme: true,
 );
 
+// Parse with custom icon size (optional — defaults to iconSizeMedium)
+final smallSpans = GameTextParser.parse(
+  context,
+  'Gain ATTACK and MOVE',
+  darkTheme: true,
+  iconSize: iconSizeSmall,
+);
+
 // Display in a RichText widget
 RichText(
   text: TextSpan(children: spans),
@@ -117,7 +125,7 @@ All call sites use `GameTextParser.parse()` directly:
 RichText(
   text: TextSpan(
     style: theme.textTheme.bodyMedium,
-    children: GameTextParser.parse(context, text, isDark),
+    children: GameTextParser.parse(context, text, isDark), // optional: iconSize: iconSizeSmall
   ),
 )
 ```

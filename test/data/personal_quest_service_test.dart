@@ -170,5 +170,36 @@ void main() {
 
       expect(PersonalQuestService.isComplete(character), isTrue);
     });
+
+    test('returns true for checklist requirement with enough bits set', () {
+      final character = TestData.createCharacter();
+      // pq_gh2e_545: req 0 = checklist (target 5, 7 items), req 1 = binary
+      character.personalQuestId = 'pq_gh2e_545';
+      // 5 bits set (items 0,1,2,3,4) = 0b11111 = 31, plus "Then" done
+      character.personalQuestProgress = [0x1F, 1];
+
+      expect(PersonalQuestService.isComplete(character), isTrue);
+    });
+
+    test('returns false for checklist requirement with too few bits set', () {
+      final character = TestData.createCharacter();
+      character.personalQuestId = 'pq_gh2e_545';
+      // 4 bits set (items 0,2,4,6) = 0b1010101 = 85 (high raw value, only 4 checked)
+      character.personalQuestProgress = [0x55, 1];
+
+      expect(PersonalQuestService.isComplete(character), isFalse);
+    });
+
+    test(
+      'returns false for checklist complete but "Then" requirement not met',
+      () {
+        final character = TestData.createCharacter();
+        character.personalQuestId = 'pq_gh2e_545';
+        // 5 bits set but "Then read" not done
+        character.personalQuestProgress = [0x1F, 0];
+
+        expect(PersonalQuestService.isComplete(character), isFalse);
+      },
+    );
   });
 }

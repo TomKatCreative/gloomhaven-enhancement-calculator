@@ -40,6 +40,22 @@ void main() {
       }
     });
 
+    test('checklist requirements have more items than target', () {
+      for (final quest in PersonalQuestsRepository.quests) {
+        for (final req in quest.requirements) {
+          if (req.checklistItems != null) {
+            expect(
+              req.checklistItems!.length,
+              greaterThanOrEqualTo(req.target),
+              reason:
+                  '${quest.id}: checklist has ${req.checklistItems!.length} '
+                  'items but target is ${req.target}',
+            );
+          }
+        }
+      }
+    });
+
     test('all requirements have non-empty descriptions', () {
       for (final quest in PersonalQuestsRepository.quests) {
         for (final req in quest.requirements) {
@@ -203,11 +219,11 @@ void main() {
         expect(sortedAlts.last, 558);
       });
 
-      test('displayNumber shows dual format for GH2E quests', () {
+      test('displayNumber shows zero-padded number for GH2E quests', () {
         final quest = PersonalQuestsRepository.getById('pq_gh2e_537')!;
         expect(quest.number, 1);
         expect(quest.altNumber, 537);
-        expect(quest.displayNumber, '01 (537)');
+        expect(quest.displayNumber, '01');
       });
 
       test('all GH2E quests unlock classes (no envelope unlocks)', () {
@@ -248,7 +264,7 @@ void main() {
       });
 
       group('specific quest data', () {
-        test('01 (537) Political Intrigue unlocks Sunkeeper', () {
+        test('01 Political Intrigue unlocks Sunkeeper', () {
           final quest = PersonalQuestsRepository.getById('pq_gh2e_537');
           expect(quest, isNotNull);
           expect(quest!.number, 1);
@@ -260,18 +276,28 @@ void main() {
           expect(quest.unlockClassCode, ClassCodes.sunkeeper);
         });
 
-        test(
-          '10 (546) Aberrant Slayer has 7 requirements (6 demons + read)',
-          () {
-            final quest = PersonalQuestsRepository.getById('pq_gh2e_546');
-            expect(quest, isNotNull);
-            expect(quest!.number, 10);
-            expect(quest.requirements.length, 7);
-            expect(quest.unlockClassCode, ClassCodes.elementalist);
-          },
-        );
+        test('09 Finding the Cure has checklist requirement', () {
+          final quest = PersonalQuestsRepository.getById('pq_gh2e_545');
+          expect(quest, isNotNull);
+          expect(quest!.number, 9);
+          expect(quest.requirements.length, 2);
+          final checklist = quest.requirements[0];
+          expect(checklist.target, 5);
+          expect(checklist.checklistItems, isNotNull);
+          expect(checklist.checklistItems!.length, 7);
+          expect(quest.requirements[1].description, startsWith('Then '));
+          expect(quest.unlockClassCode, ClassCodes.sawbones);
+        });
 
-        test('13 (549) Merchant Class has 6 requirements (5 slots + read)', () {
+        test('10 Aberrant Slayer has 2 requirements (enhance + read)', () {
+          final quest = PersonalQuestsRepository.getById('pq_gh2e_546');
+          expect(quest, isNotNull);
+          expect(quest!.number, 10);
+          expect(quest.requirements.length, 2);
+          expect(quest.unlockClassCode, ClassCodes.elementalist);
+        });
+
+        test('13 Merchant Class has 6 requirements (5 slots + read)', () {
           final quest = PersonalQuestsRepository.getById('pq_gh2e_549');
           expect(quest, isNotNull);
           expect(quest!.number, 13);
@@ -312,11 +338,11 @@ void main() {
         }
       });
 
-      test('displayNumber shows both numbers for FH quests', () {
+      test('displayNumber shows zero-padded number for FH quests', () {
         final quest = PersonalQuestsRepository.getById('pq_fh_581')!;
         expect(quest.number, 1);
         expect(quest.altNumber, 581);
-        expect(quest.displayNumber, '01 (581)');
+        expect(quest.displayNumber, '01');
       });
 
       test('all quest IDs start with pq_fh_', () {
@@ -361,7 +387,7 @@ void main() {
       });
 
       group('specific quest data', () {
-        test('FH #3 (583) Merchant Class has 5 item slot requirements', () {
+        test('FH #3 Merchant Class has 5 item slot requirements', () {
           final quest = PersonalQuestsRepository.getById('pq_fh_583');
           expect(quest, isNotNull);
           expect(quest!.number, 3);
@@ -370,14 +396,14 @@ void main() {
           expect(quest.unlockEnvelope, '37/74');
         });
 
-        test('FH #14 (519) Eternal Wanderer has 5 region requirements', () {
+        test('FH #14 Eternal Wanderer has 5 region requirements', () {
           final quest = PersonalQuestsRepository.getById('pq_fh_519');
           expect(quest, isNotNull);
           expect(quest!.number, 14);
           expect(quest.requirements.length, 5);
         });
 
-        test('FH #8 (588) Dangerous Game has 3 kill requirements', () {
+        test('FH #8 Dangerous Game has 3 kill requirements', () {
           final quest = PersonalQuestsRepository.getById('pq_fh_588');
           expect(quest, isNotNull);
           expect(quest!.number, 8);
@@ -385,14 +411,14 @@ void main() {
           expect(quest.unlockEnvelope, '44/88');
         });
 
-        test('FH #23 (543) The Chosen One unlocks Envelope A', () {
+        test('FH #23 The Chosen One unlocks Envelope A', () {
           final quest = PersonalQuestsRepository.getById('pq_fh_543');
           expect(quest, isNotNull);
           expect(quest!.number, 23);
           expect(quest.unlockEnvelope, 'A');
         });
 
-        test('FH #9 (589) Life Lessons has high target (150)', () {
+        test('FH #9 Life Lessons has high target (150)', () {
           final quest = PersonalQuestsRepository.getById('pq_fh_589');
           expect(quest, isNotNull);
           expect(quest!.number, 9);
@@ -538,7 +564,7 @@ void main() {
           final quest = PersonalQuestsRepository.getById('pq_cs_aa_001');
           expect(quest, isNotNull);
           expect(quest!.displayNumber, 'AA-001');
-          expect(quest.displayName, 'AA-001 - At All Costs');
+          expect(quest.displayName, 'AA-001: At All Costs');
           expect(quest.unlockClassCode, ClassCodes.amberAegis);
         });
 
@@ -733,28 +759,70 @@ void main() {
     group('displayName', () {
       test('GH quest shows number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_gh_510')!;
-        expect(quest.displayName, '510 - Seeker of Xorn');
+        expect(quest.displayName, '510: Seeker of Xorn');
       });
 
-      test('GH2E quest shows both numbers and title', () {
+      test('GH2E quest shows padded number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_gh2e_537')!;
-        expect(quest.displayName, '01 (537) - Political Intrigue');
+        expect(quest.displayName, '01: Political Intrigue');
       });
 
-      test('FH quest shows both numbers and title', () {
+      test('FH quest shows padded number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_fh_581')!;
-        expect(quest.displayName, '01 (581) - The Study of Plants');
+        expect(quest.displayName, '01: The Study of Plants');
       });
 
       test('CS quest shows number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_cs_330')!;
-        expect(quest.displayName, '330 - Protect and Serve');
+        expect(quest.displayName, '330: Protect and Serve');
       });
 
       test('TOA quest shows number and title', () {
         final quest = PersonalQuestsRepository.getById('pq_toa_641')!;
-        expect(quest.displayName, '641 - Grave Robber');
+        expect(quest.displayName, '641: Grave Robber');
       });
+    });
+  });
+
+  group('PersonalQuestRequirement.checkedCount', () {
+    test('returns raw progress for standard requirements', () {
+      const req = PersonalQuestRequirement(
+        description: 'Kill 15 enemies',
+        target: 15,
+      );
+      expect(req.checkedCount(0), 0);
+      expect(req.checkedCount(7), 7);
+      expect(req.checkedCount(15), 15);
+    });
+
+    test('counts set bits for checklist requirements', () {
+      const req = PersonalQuestRequirement(
+        description: 'Visit 3 locations:',
+        target: 3,
+        checklistItems: ['A', 'B', 'C', 'D', 'E'],
+      );
+      // No items checked
+      expect(req.checkedCount(0), 0);
+      // Item 0 checked (bit 0)
+      expect(req.checkedCount(0x01), 1);
+      // Items 0 and 2 checked (bits 0, 2)
+      expect(req.checkedCount(0x05), 2);
+      // Items 0, 1, 2 checked (bits 0, 1, 2)
+      expect(req.checkedCount(0x07), 3);
+      // All 5 items checked (bits 0-4)
+      expect(req.checkedCount(0x1F), 5);
+    });
+
+    test('non-contiguous bits are counted correctly', () {
+      const req = PersonalQuestRequirement(
+        description: 'Visit 5 locations:',
+        target: 5,
+        checklistItems: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+      );
+      // Items 0, 2, 4, 5, 6 checked = 5 items
+      expect(req.checkedCount(0x75), 5);
+      // Items 1, 3, 5 checked = 3 items
+      expect(req.checkedCount(0x2A), 3);
     });
   });
 }

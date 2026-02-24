@@ -35,121 +35,106 @@ class QuestContent extends StatelessWidget {
     final theme = Theme.of(context);
     final isEditMode = model.isEditMode && !character.isRetired;
 
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: largePadding,
-        right: mediumPadding,
-        bottom: largePadding,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Quest title row
-          Row(
-            children: [
-              Expanded(
-                child: Text.rich(
-                  TextSpan(
-                    style: theme.textTheme.titleMedium,
-                    children: [
-                      TextSpan(text: '${quest.displayNumber}: ${quest.title}'),
-                      if (quest.unlockClassCode != null) ...[
-                        const TextSpan(text: ' · '),
-                        WidgetSpan(
-                          alignment: PlaceholderAlignment.middle,
-                          child: SizedBox(
-                            width: iconSizeMedium,
-                            height: iconSizeMedium,
-                            child: ClassIconSvg(
-                              playerClass: PlayerClasses.playerClasses
-                                  .firstWhere(
-                                    (c) => c.classCode == quest.unlockClassCode,
-                                  ),
-                              color: theme.colorScheme.onSurfaceVariant,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Quest title row
+        Row(
+          children: [
+            if (isEditMode)
+              SizedBox(width: (extraLargePadding * 2) - (tinyPadding / 2)),
+            Expanded(
+              child: Text.rich(
+                textAlign: TextAlign.center,
+                TextSpan(
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontFamily: pirataOne,
+                    letterSpacing: 1,
+                  ),
+                  children: [
+                    TextSpan(text: '${quest.displayNumber}: ${quest.title} · '),
+                    if (quest.unlockClassCode != null)
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: SizedBox(
+                          width: iconSizeSmall,
+                          height: iconSizeSmall,
+                          child: ClassIconSvg(
+                            playerClass: PlayerClasses.playerClasses.firstWhere(
+                              (c) => c.classCode == quest.unlockClassCode,
                             ),
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                      ] else if (quest.unlockEnvelope != null) ...[
-                        const TextSpan(text: ' · '),
-                        if (quest.unlockEnvelope!.length == 1)
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: Text(
-                              quest.unlockEnvelope!,
-                              style: TextStyle(
-                                fontFamily: 'PirataOne',
-                                fontWeight: FontWeight.normal,
-                                fontSize: iconSizeMedium,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          )
-                        else ...[
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: ThemedSvg(
-                              assetKey: 'ENVELOPE',
-                              width: iconSizeSmall,
-                            ),
-                          ),
-                          envelopeTextSpan(
-                            ' ${quest.unlockEnvelope}',
-                            theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ],
+                      )
+                    else if (quest.unlockEnvelope!.length == 1)
+                      TextSpan(text: quest.unlockEnvelope!)
+                    else ...[
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: ThemedSvg(
+                          assetKey: 'ENVELOPE',
+                          width: iconSizeSmall,
+                        ),
+                      ),
+                      envelopeTextSpan(
+                        ' ${quest.unlockEnvelope}',
+                        theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ],
-                  ),
+                  ],
                 ),
               ),
-              if (isEditMode)
-                IconButton(
-                  iconSize: iconSizeSmall,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(tinyPadding),
-                  icon: Icon(
-                    Icons.swap_horiz_rounded,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                  onPressed: () => _changeQuest(context),
-                ),
-            ],
-          ),
-          const SizedBox(height: mediumPadding),
-          // Requirements list
-          ...List.generate(quest.requirements.length, (index) {
-            final req = quest.requirements[index];
-            final progress = index < character.personalQuestProgress.length
-                ? character.personalQuestProgress[index]
-                : 0;
-            final isLocked =
-                index > 0 &&
-                req.description.startsWith('Then ') &&
-                quest.requirements
-                    .take(index)
-                    .indexed
-                    .any(
-                      (pair) => pair.$1 < character.personalQuestProgress.length
-                          ? character.personalQuestProgress[pair.$1] <
-                                pair.$2.target
-                          : true,
-                    );
-            return RequirementRow(
-              requirement: req,
-              progress: progress,
-              index: index,
-              character: character,
-              model: model,
-              isEditMode: isEditMode,
-              isLocked: isLocked,
-              onQuestCompleted: () =>
-                  showRetirementSnackBar(context, character, model),
-            );
-          }),
-        ],
-      ),
+            ),
+            isEditMode
+                ? IconButton(
+                    iconSize: iconSizeSmall,
+                    constraints: const BoxConstraints(),
+                    icon: Icon(
+                      Icons.swap_horiz_rounded,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    onPressed: () => _changeQuest(context),
+                  )
+                : SizedBox(width: tinyPadding),
+          ],
+        ),
+        const SizedBox(height: smallPadding),
+        // Requirements list
+        ...List.generate(quest.requirements.length, (index) {
+          final req = quest.requirements[index];
+          final progress = index < character.personalQuestProgress.length
+              ? character.personalQuestProgress[index]
+              : 0;
+          final isLocked =
+              index > 0 &&
+              req.description.startsWith('Then ') &&
+              quest.requirements
+                  .take(index)
+                  .indexed
+                  .any(
+                    (pair) => pair.$1 < character.personalQuestProgress.length
+                        ? pair.$2.checkedCount(
+                                character.personalQuestProgress[pair.$1],
+                              ) <
+                              pair.$2.target
+                        : true,
+                  );
+          return RequirementRow(
+            requirement: req,
+            progress: progress,
+            index: index,
+            character: character,
+            model: model,
+            isEditMode: isEditMode,
+            isLocked: isLocked,
+            onQuestCompleted: () =>
+                showRetirementSnackBar(context, character, model),
+          );
+        }),
+      ],
     );
   }
 

@@ -45,7 +45,7 @@ void main() {
         edition: PersonalQuestEdition.gloomhaven,
       );
 
-      expect(quest.displayName, '510 - Seeker of Xorn');
+      expect(quest.displayName, '510: Seeker of Xorn');
     });
 
     test('toMap produces correct map', () {

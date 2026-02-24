@@ -359,7 +359,7 @@ All project documentation (plans, reference docs, TODOs) lives in the `/docs` di
 
 - Class icons: `images/class_icons/*.svg`
 - Attack modifiers: `images/attack_modifiers/`
-- Custom fonts: PirataOne (headers), HighTower, Nyala, Roboto, OpenSans, Inter
+- Custom fonts: PirataOne (headers), Nyala, Roboto, OpenSans, Inter
 
 ## SVG Theming
 

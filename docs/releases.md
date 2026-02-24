@@ -2,12 +2,20 @@
 
 Reverse-chronological log of production releases with commit references.
 
-## (Unreleased) — Gloomhaven 2E Personal Quests
+## v4.5.2 — All Personal Quests
 
-- Added 22 Gloomhaven 2nd Edition personal quests (cards 01-22 / assets 537-558)
-- New `PersonalQuestEdition.gloomhaven2e` edition filter in quest selector
+- Added Gloomhaven 2nd Edition personal quests (22 quests, cards 01-22 / assets 537-558)
+- Added Crimson Scales personal quests (28 quests)
+- Added Trail of Ashes personal quests (8 quests)
+- All 5 editions now included: 105 quests total (24 GH + 22 GH2E + 23 FH + 28 CS + 8 TOA)
+- New `PersonalQuestEdition` enum with edition filter chips in quest selector
+- Requirement details bottom sheet for quests with supplemental rules text
+- Checklist requirements with bitmask-based progress tracking
+- Locked class names in class selector now show blurred text instead of "???" with animated reveal
+- Doc comments on all design constants for IDE hover tooltips
+- Quest display name separator changed from " - " to ": " (e.g., "510: Seeker of Xorn")
+- Neutral `onSurface` colored class icons in personal quest selector
 - Verified and corrected Crimson Scales and Trail of Ashes quest descriptions
-- Raised requirement stepper/text field threshold from 20 to 30
 
 ## v4.5.1 — Frosthaven Personal Quests
 

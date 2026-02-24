@@ -52,9 +52,12 @@ class GameTextRenderer {
   static List<InlineSpan> render(
     BuildContext context,
     List<GameTextToken> tokens,
-    bool darkTheme,
-  ) {
-    return tokens.map((token) => token.toSpan(context, darkTheme)).toList();
+    bool darkTheme, {
+    double? iconSize,
+  }) {
+    return tokens
+        .map((token) => token.toSpan(context, darkTheme, iconSize: iconSize))
+        .toList();
   }
 }
 
@@ -82,9 +85,15 @@ class GameTextParser {
   static List<InlineSpan> parse(
     BuildContext context,
     String text,
-    bool darkTheme,
-  ) {
+    bool darkTheme, {
+    double? iconSize,
+  }) {
     final tokens = GameTextTokenizer.tokenize(text, darkTheme);
-    return GameTextRenderer.render(context, tokens, darkTheme);
+    return GameTextRenderer.render(
+      context,
+      tokens,
+      darkTheme,
+      iconSize: iconSize,
+    );
   }
 }

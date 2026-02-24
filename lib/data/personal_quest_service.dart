@@ -67,7 +67,9 @@ class PersonalQuestService {
       return false;
     }
     for (int i = 0; i < quest.requirements.length; i++) {
-      if (character.personalQuestProgress[i] < quest.requirements[i].target) {
+      final req = quest.requirements[i];
+      final progress = req.checkedCount(character.personalQuestProgress[i]);
+      if (progress < req.target) {
         return false;
       }
     }

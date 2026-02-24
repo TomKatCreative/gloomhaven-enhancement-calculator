@@ -12,8 +12,11 @@ import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 abstract class GameTextToken {
   const GameTextToken();
 
-  /// Convert this token to an InlineSpan for rendering
-  InlineSpan toSpan(BuildContext context, bool darkTheme);
+  /// Convert this token to an InlineSpan for rendering.
+  ///
+  /// When [iconSize] is provided, icon tokens use it as their base size
+  /// instead of the default [iconSizeMedium].
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize});
 }
 
 /// Token for bold text wrapped in square brackets [like this]
@@ -23,7 +26,7 @@ class BoldToken extends GameTextToken {
   const BoldToken(this.text);
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
     return TextSpan(
       text: text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -56,8 +59,8 @@ class IconToken extends GameTextToken {
   });
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
-    final baseSize = iconSizeMedium;
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
+    final baseSize = iconSize ?? iconSizeMedium;
     final onSurface = Theme.of(context).colorScheme.onSurface;
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
@@ -178,12 +181,16 @@ class StackedElementToken extends GameTextToken {
   const StackedElementToken(this.element1, this.element2);
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
+    final baseSize = iconSize ?? iconSizeMedium;
+    // Scale container and sub-icons proportionally from base size
+    final containerSize = baseSize * (iconSizeLarge / iconSizeMedium);
+    final subIconSize = baseSize * (iconSizeSmall / iconSizeMedium);
     return WidgetSpan(
       alignment: PlaceholderAlignment.middle,
       child: SizedBox(
-        height: iconSizeLarge,
-        width: iconSizeLarge,
+        height: containerSize,
+        width: containerSize,
         child: Stack(
           children: [
             Positioned(
@@ -191,8 +198,8 @@ class StackedElementToken extends GameTextToken {
               left: 0,
               child: ThemedSvg(
                 assetKey: element1,
-                width: iconSizeSmall,
-                height: iconSizeSmall,
+                width: subIconSize,
+                height: subIconSize,
               ),
             ),
             Positioned(
@@ -200,8 +207,8 @@ class StackedElementToken extends GameTextToken {
               right: 0,
               child: ThemedSvg(
                 assetKey: element2,
-                width: iconSizeSmall,
-                height: iconSizeSmall,
+                width: subIconSize,
+                height: subIconSize,
               ),
             ),
           ],
@@ -218,7 +225,7 @@ class ItalicToken extends GameTextToken {
   const ItalicToken(this.text);
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
     return TextSpan(
       text: text,
       style: Theme.of(
@@ -235,7 +242,7 @@ class PlainTextToken extends GameTextToken {
   const PlainTextToken(this.text);
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
     return TextSpan(text: text);
   }
 }
@@ -247,7 +254,7 @@ class PunctuationToken extends GameTextToken {
   const PunctuationToken(this.punctuation);
 
   @override
-  InlineSpan toSpan(BuildContext context, bool darkTheme) {
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
     return TextSpan(text: punctuation);
   }
 }

@@ -1,8 +1,8 @@
 # Personal Quests
 
-## Status: Released (v4.5.1), dev has additional editions
+## Status: Released (v4.5.2)
 
-Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are shipped in production. Crimson Scales (28 quests), Trail of Ashes (8 quests), and Gloomhaven 2E (22 quests) are on `dev`.
+Personal quests for all current game editions are shipped: Gloomhaven (24), Gloomhaven 2E (22), Frosthaven (23), Crimson Scales (28), and Trail of Ashes (8) — 105 quests total.
 
 ### Gloomhaven PQs (v4.5.0)
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
@@ -24,14 +24,14 @@ Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are shippe
 - 23 Frosthaven quests added to `PersonalQuestsRepository` (47 total: 24 GH + 23 FH)
 - DB migration v19: drops Perks, Masteries, and PersonalQuests definition tables (loaded from repositories)
 - Dual numbering: `altNumber` field on `PersonalQuest` for FH cards (e.g., card #1 / asset 581)
-- `displayNumber` getter: `"01 (581)"` for FH, `"510"` for GH
+- `displayNumber` getter: `"01"` for FH/GH2E (zero-padded), `"510"` for GH
 - FH quests all unlock envelopes (no class unlocks); envelope values shown in UI
 - Envelope display: PirataOne for single-letter (X, A), ENVELOPE SVG + styled text for numbered envelopes (alt number in `#1D5678`)
 - Scenario SVG assets (boat, climbing_gear, sled) for FH quest descriptions
 - Checkbox UI for binary (target=1) requirements: edit mode (interactive), view mode (disabled)
 - Removed circle status icons from requirement rows (dimming + primary color conveys state)
 - Edit-mode stepper counter uses `contrastedPrimary` when complete
-- Search in PQ selector matches `displayNumber` (padded + alt numbers)
+- Search in PQ selector matches `displayNumber` (padded numbers)
 - Edition filter chips on PQ selector screen
 
 ### Gloomhaven 2E PQs
@@ -44,7 +44,7 @@ Personal quests for Gloomhaven (24 quests) and Frosthaven (23 quests) are shippe
 
 ## Remaining Work
 
-- **Spoiler protection** - Consider hiding unlock class name/icon behind a spoiler toggle for players who don't want to know what class they'll unlock.
+- ~~**Spoiler protection**~~ — Done. Locked classes in `ClassSelectorScreen` now show the real name with an animated blur effect (replacing "???"). Eye icon toggles reveal.
 
 ---
 

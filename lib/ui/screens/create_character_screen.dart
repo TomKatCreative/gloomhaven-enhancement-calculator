@@ -185,8 +185,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: mediumPadding),
             child: SizedBox(
-              width: iconSizeXL,
-              height: iconSizeXL,
+              width: iconSizeLarge,
+              height: iconSizeLarge,
               child: ClassIconSvg(
                 playerClass: _selectedClass!,
                 color: ColorUtils.ensureContrast(

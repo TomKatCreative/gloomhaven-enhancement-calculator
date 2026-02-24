@@ -65,7 +65,7 @@ class _PerksAndMasteriesCardState extends State<PerksAndMasteriesCard> {
             // Perks content
             Padding(
               padding: const EdgeInsets.fromLTRB(
-                largePadding,
+                smallPadding,
                 0,
                 largePadding,
                 largePadding,
@@ -106,7 +106,7 @@ class _PerksAndMasteriesCardState extends State<PerksAndMasteriesCard> {
               // Masteries content
               Padding(
                 padding: const EdgeInsets.fromLTRB(
-                  largePadding,
+                  smallPadding,
                   0,
                   largePadding,
                   largePadding,

@@ -170,8 +170,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // "X" should be in the header row (styled with PirataOne font)
-        expect(find.text('X'), findsOneWidget);
+        // "X" should be in the header row as part of the quest title rich text
+        expect(find.textContaining('X'), findsOneWidget);
       });
     });
 

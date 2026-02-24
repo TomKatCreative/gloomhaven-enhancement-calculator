@@ -545,8 +545,8 @@ Represents a personal quest card with retirement requirements.
 
 | Getter | Type | Description |
 |--------|------|-------------|
-| `displayNumber` | `String` | `"510"` for single-numbered, `"01 (581)"` for dual-numbered (padded to 2 digits) |
-| `displayName` | `String` | `"510 - Seeker of Xorn"` or `"01 (581) - The Study of Plants"` |
+| `displayNumber` | `String` | `"510"` for GH, `"01"` for FH/GH2E (zero-padded when `altNumber` set) |
+| `displayName` | `String` | `"510: Seeker of Xorn"` or `"01: The Study of Plants"` |
 
 ### Serialization
 
@@ -568,6 +568,13 @@ A single requirement within a personal quest.
 | `description` | `String` | Requirement text |
 | `target` | `int` | Numeric target count (1 for binary requirements) |
 | `details` | `String?` | Supplemental rules text shown in a bottom sheet (e.g., how to gain Votes) |
+| `checklistItems` | `List<String>?` | Optional sub-items rendered as individual checkboxes. Progress stored as bitmask. |
+
+### Methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `checkedCount(int rawProgress)` | `int` | For checklist requirements, counts set bits in bitmask. For standard requirements, returns `rawProgress` unchanged. |
 
 ---
 

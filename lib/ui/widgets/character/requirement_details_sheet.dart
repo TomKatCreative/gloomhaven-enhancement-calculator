@@ -34,45 +34,45 @@ class RequirementDetailsSheet extends StatelessWidget {
 
     return SafeArea(
       child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                largePadding,
-                largePadding,
-                largePadding,
-                smallPadding,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              largePadding,
+              largePadding,
+              largePadding,
+              smallPadding,
+            ),
+            child: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: theme.textTheme.titleMedium,
+                children: GameTextParser.parse(
+                  context,
+                  requirement.description,
+                  isDark,
+                ),
               ),
+            ),
+          ),
+          const Divider(height: dividerThickness),
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(largePadding),
               child: RichText(
-                textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: theme.textTheme.titleMedium,
+                  style: theme.textTheme.bodyMedium,
                   children: GameTextParser.parse(
                     context,
-                    requirement.description,
+                    requirement.details!,
                     isDark,
                   ),
                 ),
               ),
             ),
-            const Divider(height: dividerThickness),
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(largePadding),
-                child: RichText(
-                  text: TextSpan(
-                    style: theme.textTheme.bodyMedium,
-                    children: GameTextParser.parse(
-                      context,
-                      requirement.details!,
-                      isDark,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
+          ),
+        ],
+      ),
+    );
   }
 }

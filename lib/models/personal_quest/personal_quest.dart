@@ -97,20 +97,18 @@ class PersonalQuest {
     columnPersonalQuestEdition: edition.name,
   };
 
-  /// Display string for the card number(s).
+  /// Display string for the card number.
   ///
   /// Returns [displayNumberOverride] if set (e.g., "AA-001"), otherwise
-  /// shows both numbers when [altNumber] is set (e.g., "04 (584)"),
-  /// or just the primary number (e.g., "510").
+  /// zero-pads when [altNumber] is set (e.g., "04"), or just the primary
+  /// number (e.g., "510").
   String get displayNumber =>
       displayNumberOverride ??
-      (altNumber != null
-          ? '${number.toString().padLeft(2, '0')} ($altNumber)'
-          : '$number');
+      (altNumber != null ? number.toString().padLeft(2, '0') : '$number');
 
-  /// Display string combining number(s) and title, e.g., "510 - Seeker of Xorn"
-  /// or "01/581 - The Study of Plants".
-  String get displayName => '$displayNumber - $title';
+  /// Display string combining number and title, e.g., "510: Seeker of Xorn"
+  /// or "03: Merchant Class".
+  String get displayName => '$displayNumber: $title';
 }
 
 /// A single requirement within a personal quest.
@@ -121,16 +119,39 @@ class PersonalQuest {
 ///
 /// Optional [details] provides supplemental rules text (e.g., how to gain
 /// Votes for GH2E quest 537) that can be shown in a bottom sheet.
+///
+/// When [checklistItems] is provided, the requirement is rendered as a list
+/// of checkboxes (one per item). Progress is stored as a bitmask — each bit
+/// corresponds to one item. The requirement is complete when the number of
+/// checked items ([checkedCount]) reaches [target].
 class PersonalQuestRequirement {
   final String description;
   final int target;
   final String? details;
+  final List<String>? checklistItems;
 
   const PersonalQuestRequirement({
     required this.description,
     required this.target,
     this.details,
+    this.checklistItems,
   });
+
+  /// Returns the effective progress value for completion checks.
+  ///
+  /// For checklist requirements, counts the number of set bits in
+  /// [rawProgress] (each bit = one checked item). For standard
+  /// requirements, returns [rawProgress] unchanged.
+  int checkedCount(int rawProgress) {
+    if (checklistItems == null) return rawProgress;
+    var count = 0;
+    var bits = rawProgress;
+    while (bits > 0) {
+      count += bits & 1;
+      bits >>= 1;
+    }
+    return count;
+  }
 }
 
 /// Encodes personal quest progress as a JSON string for database storage.

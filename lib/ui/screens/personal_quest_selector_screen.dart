@@ -251,7 +251,13 @@ class _PersonalQuestSelectorScreenState
       selectedTileColor: theme.colorScheme.primaryContainer.withValues(
         alpha: 0.3,
       ),
-      title: Text(quest.title, style: theme.textTheme.bodyLarge),
+      title: Text(
+        quest.title,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          fontFamily: pirataOne,
+          letterSpacing: 1,
+        ),
+      ),
       subtitle: Text(quest.displayNumber),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
@@ -322,7 +328,10 @@ class _PersonalQuestSelectorScreenState
       return SizedBox(
         width: iconSizeMedium,
         height: iconSizeMedium,
-        child: ClassIconSvg(playerClass: playerClass),
+        child: ClassIconSvg(
+          playerClass: playerClass,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       );
     }
     if (quest.unlockEnvelope != null) {

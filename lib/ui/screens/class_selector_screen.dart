@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
@@ -343,22 +345,17 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
       child: ListTile(
         leading: ClassIconSvg(
           playerClass: playerClass,
-          width: iconSizeXL,
-          height: iconSizeXL,
+          width: iconSizeLarge,
+          height: iconSizeLarge,
           color: ColorUtils.ensureContrast(
             Color(playerClass.primaryColor),
             theme.colorScheme.surface,
           ),
         ),
-        title: Text(
-          isUnlocked || !playerClass.locked
-              ? playerClass.getCombinedDisplayNames()
-              : '???',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: isUnlocked || !playerClass.locked
-                ? null
-                : theme.disabledColor,
-          ),
+        title: _buildClassName(
+          playerClass: playerClass,
+          isUnlocked: isUnlocked,
+          theme: theme,
         ),
         subtitleTextStyle: theme.textTheme.titleMedium?.copyWith(
           color: theme.disabledColor,
@@ -391,6 +388,32 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
           }
         },
       ),
+    );
+  }
+
+  Widget _buildClassName({
+    required PlayerClass playerClass,
+    required bool isUnlocked,
+    required ThemeData theme,
+  }) {
+    final nameText = Text(
+      playerClass.getCombinedDisplayNames(),
+      style: theme.textTheme.bodyLarge?.copyWith(
+        color: isUnlocked || !playerClass.locked ? null : theme.disabledColor,
+      ),
+    );
+
+    if (!playerClass.locked) return nameText;
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: isUnlocked ? 0 : 6),
+      duration: animationDuration,
+      curve: Curves.easeOut,
+      builder: (context, sigma, child) => ImageFiltered(
+        imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+        child: child,
+      ),
+      child: nameText,
     );
   }
 

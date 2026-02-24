@@ -78,6 +78,7 @@ Full-page screen for selecting a player class during character creation.
 - Search filters by class name or variant names (e.g., "Bruiser" finds Brute)
 - Category filter chips for game editions
 - "Hide locked classes" toggle
+- Locked class names shown blurred (real name visible but obscured); tapping the eye icon animates the blur away via `TweenAnimationBuilder` + `ImageFiltered` (same pattern as `EnhancerDialog`)
 - Sticky section headers group classes by `ClassCategory` (pinned via `SliverPersistentHeader`)
 - Variant selection dialog for multi-edition classes
 - Custom class warning dialog for community content
@@ -151,7 +152,7 @@ Full-page screen for selecting a personal quest for a character.
 ```
 
 **Features:**
-- Edition filter chips (Gloomhaven, Frosthaven) narrow results by game edition
+- Edition filter chips narrow results by game edition
 - Search filters by quest title or display number (including padded and alt numbers)
 - Sticky section headers group quests by `GameEdition.displayName` (pinned via `SliverPersistentHeader`)
 - Highlights currently assigned quest with `selectedTileColor`
@@ -496,7 +497,7 @@ Controlled by `charactersModel.isEditMode`:
 | Traits | Visible | Hidden |
 | XP/Gold | Inline display (gold struck through if retired) | Text fields + add/subtract buttons |
 | Checkmarks/Retirements | Hidden | Visible with +/- controls |
-| Personal Quest | Progress text (e.g., "12/20") | +/- buttons per requirement, swap quest |
+| Personal Quest | Progress text (e.g., "12/20") | +/- buttons (2–60), text field (>60), checklist checkboxes, swap quest |
 | Resources | Read-only cards | Cards with +/- callbacks |
 | Notes | Plain text | Multiline text field |
 | Chip Nav Bar | Transparent → opaque on scroll | Always opaque (fixed-height header) |
@@ -526,6 +527,17 @@ Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. T
 1. **Quest assigned** — `QuestContent` with quest title, unlock icon, requirements list with progress
 2. **No quest + not retired** — `OutlinedButton` "Select a Personal Quest" prompt
 3. **No quest + retired** — `SizedBox.shrink()` (hidden)
+
+**Requirement row variants** (`requirement_row.dart`):
+
+| Target | Edit Mode | View Mode |
+|--------|-----------|-----------|
+| Binary (target = 1) | Checkbox | Disabled checkbox |
+| Low (2–60) | +/- stepper with counter | Progress text (e.g., "3/5") |
+| High (>60) | Text field with `/target` | Progress text |
+| Checklist (`checklistItems`) | Checkbox per item with counter | Disabled checkboxes with counter |
+
+**Locked "Then" requirements**: When a sequential requirement is waiting on its predecessor, stepper buttons are hidden entirely — only a disabled-color counter is shown. Checklist and binary checkboxes are disabled via `onChanged: null`. Checklist items that are already checked get individual dimming, and once target is met (e.g., 5/5), remaining unchecked items are disabled.
 
 **Retirement flow** (on PQ completion, in `retirement_prompt.dart`):
 1. `updatePersonalQuestProgress` returns `true` when quest transitions from incomplete → complete

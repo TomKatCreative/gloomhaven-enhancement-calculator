@@ -60,7 +60,15 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
           children: [
             // Quest section
             if (showQuestSection)
-              PersonalQuestSection(character: widget.character),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  largePadding,
+                  mediumPadding,
+                  mediumPadding,
+                  smallPadding,
+                ),
+                child: PersonalQuestSection(character: widget.character),
+              ),
             // Notes section
             if (hasNotes) ...[
               if (showQuestSection) const GHCDivider(indent: true),
@@ -100,7 +108,7 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
                 padding: const EdgeInsets.fromLTRB(
                   largePadding,
                   0,
-                  largePadding,
+                  mediumPadding,
                   largePadding,
                 ),
                 child: _NotesSection(character: widget.character),

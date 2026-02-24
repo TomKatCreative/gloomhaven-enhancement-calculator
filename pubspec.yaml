@@ -1,7 +1,7 @@
 name: gloomhaven_enhancement_calc
 description: Character sheet and enhancement calculator
 
-version: 4.5.1+322
+version: 4.5.2+322
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
