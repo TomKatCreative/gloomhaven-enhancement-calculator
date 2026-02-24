@@ -36,6 +36,15 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.5.2',
+              date: '2026-02-23',
+              changes: [
+                'Added Gloomhaven 2nd Edition, Crimson Scales, and Trail of Ashes personal quests. All editions now included (105 quests total).',
+                'Locked class names now show blurred text with animated reveal instead of "???".',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.5.1',
               date: '2026-02-16',
               changes: ['Added Frosthaven personal quests.'],
