@@ -20,19 +20,20 @@
 /// ## Cost Calculation Flow
 ///
 /// 1. **Base Enhancement Cost** - From [Enhancement.cost]
-///    - Apply Enhancer L2 discount (FH)
-///    - Apply Hail's discount (-5g)
 /// 2. **Multipliers** - Applied to base cost
 ///    - Multiple Targets (×2)
 ///    - Lost/Non-Persistent (×0.5) - GH2E/FH
 ///    - Persistent (×3) - FH only
-/// 3. **Card Level Penalty** - 25g × level
+/// 3. **Discounts** - Applied after multipliers
+///    - Enhancer L2 discount (-10g, FH)
+///    - Hail's discount (-5g)
+/// 4. **Card Level Penalty** - 25g × level
 ///    - Apply Party Boon discount (GH/GH2E)
 ///    - Apply Enhancer L3 discount (FH)
-/// 4. **Previous Enhancements Penalty** - 75g × count
+/// 5. **Previous Enhancements Penalty** - 75g × count
 ///    - Apply Enhancer L4 discount (FH)
-/// 5. **Temporary Enhancement Mode** - -20g + ×0.8
-/// 6. **Final** - max(0, total)
+/// 6. **Temporary Enhancement Mode** - -20g + ×0.8
+/// 7. **Final** - max(0, total)
 ///
 /// See also:
 /// - [Enhancement] for enhancement definitions

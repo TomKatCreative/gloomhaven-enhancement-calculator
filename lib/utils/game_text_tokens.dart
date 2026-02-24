@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
 import 'package:gloomhaven_enhancement_calc/utils/asset_config.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
@@ -231,6 +232,24 @@ class ItalicToken extends GameTextToken {
       style: Theme.of(
         context,
       ).textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
+    );
+  }
+}
+
+/// Token for strikethrough text wrapped in ~~tildes~~
+class StrikethroughToken extends GameTextToken {
+  final String text;
+
+  const StrikethroughToken(this.text);
+
+  @override
+  InlineSpan toSpan(BuildContext context, bool darkTheme, {double? iconSize}) {
+    return WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: StrikethroughText(
+        text,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
     );
   }
 }

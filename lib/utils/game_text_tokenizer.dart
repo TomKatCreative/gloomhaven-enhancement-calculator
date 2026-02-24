@@ -139,6 +139,8 @@ class GameTextTokenizer {
         tokens.add(BoldToken(segment.text));
       } else if (segment.format == _TextFormat.italic) {
         tokens.add(ItalicToken(segment.text));
+      } else if (segment.format == _TextFormat.strikethrough) {
+        tokens.add(StrikethroughToken(segment.text));
       } else {
         // Plain text: tokenize by words
         tokens.addAll(_tokenizeWords(segment.text, darkTheme));
@@ -152,8 +154,9 @@ class GameTextTokenizer {
   static List<_TextSegment> _splitByFormattedSections(String text) {
     final segments = <_TextSegment>[];
 
-    // Match **bold** or *italic* - IMPORTANT: **bold** must come first!
-    final formatRegex = RegExp(r'\*\*([^*]+)\*\*|\*([^*]+)\*');
+    // Match **bold**, *italic*, or ~~strikethrough~~
+    // IMPORTANT: **bold** must come before *italic*!
+    final formatRegex = RegExp(r'\*\*([^*]+)\*\*|\*([^*]+)\*|~~([^~]+)~~');
     int lastIndex = 0;
 
     for (final match in formatRegex.allMatches(text)) {
@@ -165,13 +168,18 @@ class GameTextTokenizer {
         }
       }
 
-      // Determine if this is bold or italic based on which group matched
+      // Determine format based on which group matched
       if (match.group(1) != null) {
         // Group 1 = **bold**
         segments.add(_TextSegment(match.group(1)!, format: _TextFormat.bold));
       } else if (match.group(2) != null) {
         // Group 2 = *italic*
         segments.add(_TextSegment(match.group(2)!, format: _TextFormat.italic));
+      } else if (match.group(3) != null) {
+        // Group 3 = ~~strikethrough~~
+        segments.add(
+          _TextSegment(match.group(3)!, format: _TextFormat.strikethrough),
+        );
       }
 
       lastIndex = match.end;
@@ -305,7 +313,7 @@ class GameTextTokenizer {
 }
 
 /// Helper enum for text formatting types
-enum _TextFormat { plain, bold, italic }
+enum _TextFormat { plain, bold, italic, strikethrough }
 
 /// Helper class for text segments with formatting
 class _TextSegment {

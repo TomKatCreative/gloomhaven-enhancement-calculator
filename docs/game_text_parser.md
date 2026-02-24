@@ -12,7 +12,7 @@ The parser is split across three files:
 
 | File | Contents |
 |------|----------|
-| `game_text_tokens.dart` | Token type definitions (`GameTextToken`, `BoldToken`, `IconToken`, `StackedElementToken`, `ItalicToken`, `PlainTextToken`, `PunctuationToken`) |
+| `game_text_tokens.dart` | Token type definitions (`GameTextToken`, `BoldToken`, `IconToken`, `StackedElementToken`, `ItalicToken`, `StrikethroughToken`, `PlainTextToken`, `PunctuationToken`) |
 | `game_text_tokenizer.dart` | Parsing logic (`ParsedWord`, `GameTextTokenizer`) |
 | `game_text_parser.dart` | Public API facade (`GameTextRenderer`, `GameTextParser`) + barrel re-exports |
 
@@ -79,6 +79,14 @@ ELEMENT&ELEMENT
 **Examples:**
 - `*potion*` → *potion*
 - `*Reviving Ether*` → *Reviving Ether*
+
+### Strikethrough Text
+```
+~~Text within double tildes gets a strikethrough~~
+```
+**Examples:**
+- `~~67~~` → ~~67~~ (struck-through number)
+- `Scenario ~~67~~ 65` → Scenario ~~67~~ 65 (corrected value with old value struck through)
 
 ### Text Replacements
 ```

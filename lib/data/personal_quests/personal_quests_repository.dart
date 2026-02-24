@@ -636,7 +636,7 @@ class PersonalQuestsRepository {
       requirements: const [
         PersonalQuestRequirement(
           description:
-              'Unlock Hero\'s Mausoleum (Scenario 67) and follow it to its conclusion',
+              'Unlock Hero\'s Mausoleum (Scenario ~~67~~ 65) and follow it to its conclusion',
           target: 1,
         ),
         PersonalQuestRequirement(
