@@ -29,7 +29,7 @@ enum PersonalQuestEdition {
 
   String get displayName => switch (this) {
     gloomhaven => 'Gloomhaven',
-    gloomhaven2e => 'Gloomhaven 2E',
+    gloomhaven2e => 'Gloomhaven 2e',
     frosthaven => 'Frosthaven',
     crimsonScales => 'Crimson Scales',
     trailOfAshes => 'Trail of Ashes',

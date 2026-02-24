@@ -2,7 +2,7 @@
 
 ## Status: Released (v4.5.2)
 
-Personal quests for all current game editions are shipped: Gloomhaven (24), Gloomhaven 2E (22), Frosthaven (23), Crimson Scales (28), and Trail of Ashes (8) — 105 quests total.
+Personal quests for all current game editions are shipped: Gloomhaven (24), Gloomhaven 2e (22), Frosthaven (23), Crimson Scales (28), and Trail of Ashes (8) — 105 quests total.
 
 ### Gloomhaven PQs (v4.5.0)
 - `PersonalQuest` model and `PersonalQuestsRepository` (second printing values)
@@ -34,7 +34,7 @@ Personal quests for all current game editions are shipped: Gloomhaven (24), Gloo
 - Search in PQ selector matches `displayNumber` (padded numbers)
 - Edition filter chips on PQ selector screen
 
-### Gloomhaven 2E PQs
+### Gloomhaven 2e PQs
 
 - 22 GH2E quests added to `PersonalQuestsRepository` (105 total: 24 GH + 22 GH2E + 23 FH + 28 CS + 8 TOA)
 - `PersonalQuestEdition.gloomhaven2e` added to enum

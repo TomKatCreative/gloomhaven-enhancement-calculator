@@ -65,7 +65,7 @@ Reverse-chronological log of production releases with commit references.
 - **Tag:** `v4.3.1`
 - **Commit:** `aa82326` — "Increase app version to 4.3.1"
 - **Android:** 2026-01-17
-- Gloomhaven 2E enhancement calculator mode
+- Gloomhaven 2e enhancement calculator mode
 - Moved scenario 114 / building 44 settings to enhancement calc screen
 - Device info included in support emails
 - Icon fixes (consume perk, Satha, spent/spent_light)
@@ -87,7 +87,7 @@ Reverse-chronological log of production releases with commit references.
 - **Tag:** `v4.2.2`
 - **Commit:** `c3934a1` — "Release ready. Update to version 4.2.2, increase database schema to 13, minor fixes"
 - **Android:** 2025-10-07
-- Gloomhaven 2E variant support (Brute/Bruiser etc.)
+- Gloomhaven 2e variant support (Brute/Bruiser etc.)
 - Dome, Skitterclaw, and CORE classes
 - Cragheart and Mindthief classes
 - Silent Knife class

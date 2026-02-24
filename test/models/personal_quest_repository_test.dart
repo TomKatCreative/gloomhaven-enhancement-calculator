@@ -179,7 +179,7 @@ void main() {
       });
     });
 
-    group('Gloomhaven 2E quests', () {
+    group('Gloomhaven 2e quests', () {
       test('contains 22 quests', () {
         final gh2eQuests = PersonalQuestsRepository.getByEdition(
           PersonalQuestEdition.gloomhaven2e,

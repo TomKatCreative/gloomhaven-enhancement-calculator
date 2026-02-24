@@ -476,7 +476,7 @@ Enum representing game editions with edition-specific rules.
 | Edition | Max Starting Level | Starting Gold Formula |
 |---------|-------------------|----------------------|
 | Gloomhaven | Prosperity Level | 15 × (L + 1) |
-| Gloomhaven 2E | Prosperity / 2 (rounded up) | 10 × P + 15 |
+| Gloomhaven 2e | Prosperity / 2 (rounded up) | 10 × P + 15 |
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
 
 Where L = starting level, P = prosperity level.

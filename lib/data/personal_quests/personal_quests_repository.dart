@@ -2,7 +2,7 @@
 ///
 /// Contains 105 quests across 5 editions:
 /// - 24 base Gloomhaven quests (cards 510-533, second printing values)
-/// - 22 Gloomhaven 2E quests (cards 01-22 / asset 537-558)
+/// - 22 Gloomhaven 2e quests (cards 01-22 / asset 537-558)
 /// - 23 Frosthaven quests (cards 1-23 / asset 505-590)
 /// - 28 Crimson Scales quests (22 core cards 330-351 + 6 add-on class quests)
 /// - 8 Trail of Ashes quests (cards 641-648)
@@ -395,7 +395,7 @@ class PersonalQuestsRepository {
         ),
       ],
     ),
-    // ── Gloomhaven 2E Personal Quests ──
+    // ── Gloomhaven 2e Personal Quests ──
     // number = GH2E card number (1-22), altNumber = Cephalofair asset number
     // All 22 quests unlock classes (no envelope unlocks), 2 per class
     PersonalQuest(

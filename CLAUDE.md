@@ -174,7 +174,7 @@ Some classes have different names/perks across game editions:
 ```dart
 enum Variant { base, frosthavenCrossover, gloomhaven2E, v2, v3, v4 }
 ```
-Example: "Brute" in base game → "Bruiser" in Gloomhaven 2E
+Example: "Brute" in base game → "Bruiser" in Gloomhaven 2e
 
 ### Character Data Flow
 1. `PlayerClass` - Static class definition (race, name, classCode, perks)
@@ -191,7 +191,7 @@ enum GameEdition { gloomhaven, gloomhaven2e, frosthaven }
 | Edition | Max Starting Level | Starting Gold Formula |
 |---------|-------------------|----------------------|
 | Gloomhaven | Prosperity Level | 15 × (L + 1) |
-| Gloomhaven 2E | Prosperity / 2 (rounded up) | 10 × P + 15 |
+| Gloomhaven 2e | Prosperity / 2 (rounded up) | 10 × P + 15 |
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
 
 Where L = starting level, P = prosperity level.

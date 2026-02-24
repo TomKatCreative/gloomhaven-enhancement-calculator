@@ -207,7 +207,7 @@ One-time flags to show update dialogs on first launch after update.
 
 ## Element Tracker State
 
-Element states for the Gloomhaven 2E+ element tracker sheet.
+Element states for the Gloomhaven 2e+ element tracker sheet.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|

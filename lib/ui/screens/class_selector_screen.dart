@@ -345,8 +345,8 @@ class _ClassSelectorScreenState extends State<ClassSelectorScreen> {
       child: ListTile(
         leading: ClassIconSvg(
           playerClass: playerClass,
-          width: iconSizeLarge,
-          height: iconSizeLarge,
+          width: iconSizeMedium,
+          height: iconSizeMedium,
           color: ColorUtils.ensureContrast(
             Color(playerClass.primaryColor),
             theme.colorScheme.surface,

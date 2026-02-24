@@ -219,7 +219,7 @@ ClassCodes.className: [
     Perk('**Named Perk:** Special ability description'),
   ], variant: Variant.frosthavenCrossover),
 
-  // Gloomhaven 2E version
+  // Gloomhaven 2e version
   Perks([
     Perk('Replace one -2 card with one +0 card'),
     Perk('Once each scenario, during your turn, you may perform: HEAL 2, Self'),
