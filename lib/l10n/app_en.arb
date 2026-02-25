@@ -29,6 +29,14 @@
   "retired": "(retired)",
   "previousRetirements": "Previous retirements",
   "retirements": "Retirements",
+  "handSizeCount": "Hand size: {count}",
+  "@handSizeCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pocketItemsAllowed": "{count} pocket item{count, plural, =1{} other{s}} allowed",
   "@pocketItemsAllowed": {
     "placeholders": {

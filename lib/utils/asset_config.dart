@@ -821,8 +821,12 @@ const Map<String, AssetConfig> assets = {
     'equipment_slots/one_handed.svg',
     themeMode: CurrentColorTheme(),
   ),
-  'Pocket': AssetConfig(
+  'POCKET': AssetConfig(
     'equipment_slots/pocket.svg',
+    themeMode: CurrentColorTheme(),
+  ),
+  'POCKET_SOLID': AssetConfig(
+    'equipment_slots/pocket_solid.svg',
     themeMode: CurrentColorTheme(),
   ),
   'Two_Hand': AssetConfig(

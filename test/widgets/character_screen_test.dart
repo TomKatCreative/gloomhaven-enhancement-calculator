@@ -5,8 +5,11 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/character_screen.dart';
@@ -297,6 +300,44 @@ void main() {
       expect(battleGoalsTooltip, findsOneWidget);
 
       expect(find.text('2/3'), findsOneWidget);
+    });
+
+    testWidgets('view mode shows hand size when class has handSize', (
+      tester,
+    ) async {
+      // Default test character uses Brute (handSize: 10)
+      final character = TestData.createCharacter(xp: 0);
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final handSizeTooltip = find.byWidgetPredicate(
+        (w) => w is Tooltip && w.message == 'Hand size: 10',
+      );
+      expect(handSizeTooltip, findsOneWidget);
+    });
+
+    testWidgets('view mode shows variant hand size for GH2E', (tester) async {
+      // Quartermaster: base handSize 9, GH2E handSize 11
+      final qm = PlayerClasses.playerClassByClassCode(ClassCodes.quartermaster);
+      final character = TestData.createCharacter(
+        playerClass: qm,
+        variant: Variant.gloomhaven2E,
+      );
+      final model = await setupModel(character: character, isEditMode: false);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final handSizeTooltip = find.byWidgetPredicate(
+        (w) => w is Tooltip && w.message == 'Hand size: 11',
+      );
+      expect(handSizeTooltip, findsOneWidget);
     });
 
     testWidgets('view mode shows pocket items tooltip', (tester) async {

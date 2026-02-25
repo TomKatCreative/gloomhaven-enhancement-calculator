@@ -11,6 +11,7 @@ class PlayerClasses {
       classCode: ClassCodes.brute,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xff4e7ec1,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.intimidating,
@@ -23,6 +24,7 @@ class PlayerClasses {
       classCode: ClassCodes.tinkerer,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xffc5b58d,
+      handSize: 12,
       traits: [
         CharacterTraits.educated,
         CharacterTraits.nimble,
@@ -35,6 +37,7 @@ class PlayerClasses {
       classCode: ClassCodes.spellweaver,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xffb578b3,
+      handSize: 8,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.educated,
@@ -48,6 +51,7 @@ class PlayerClasses {
       classCode: ClassCodes.scoundrel,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xffa5d166,
+      handSize: 9,
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.nimble,
@@ -60,6 +64,7 @@ class PlayerClasses {
       classCode: ClassCodes.cragheart,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xff899538,
+      handSize: 11,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.outcast,
@@ -72,6 +77,7 @@ class PlayerClasses {
       classCode: ClassCodes.mindthief,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xff647c9d,
+      handSize: 10,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.outcast,
@@ -85,6 +91,7 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xfff3c338,
+      handSize: 11,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.nimble,
@@ -98,6 +105,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffd98926,
+      handSize: 9,
+      variantHandSizes: {Variant.gloomhaven2E: 11},
       traits: [
         CharacterTraits.armored,
         CharacterTraits.resourceful,
@@ -112,6 +121,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffeb6ea3,
+      handSize: 9,
+      variantHandSizes: {Variant.gloomhaven2E: 12},
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.chaotic,
@@ -125,6 +136,7 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xff9f9fcf,
+      handSize: 9,
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.intimidating,
@@ -138,6 +150,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xff74c7bb,
+      handSize: 11,
+      variantHandSizes: {Variant.gloomhaven2E: 10},
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.intimidating,
@@ -151,6 +165,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffd14e4e,
+      handSize: 10,
+      variantHandSizes: {Variant.gloomhaven2E: 9},
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.intimidating,
@@ -164,6 +180,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffdf7e7a,
+      handSize: 9,
+      variantHandSizes: {Variant.gloomhaven2E: 11},
       traits: [
         CharacterTraits.educated,
         CharacterTraits.nimble,
@@ -177,6 +195,8 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xff38c3f1,
+      handSize: 12,
+      variantHandSizes: {Variant.gloomhaven2E: 11},
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.intimidating,
@@ -190,6 +210,7 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffdfddcb,
+      handSize: 10,
       traits: [
         CharacterTraits.educated,
         CharacterTraits.persuasive,
@@ -203,6 +224,7 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xff9e9d9d,
+      handSize: 8,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.educated,
@@ -217,6 +239,7 @@ class PlayerClasses {
       category: ClassCategory.gloomhaven,
       locked: true,
       primaryColor: 0xffad745c,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.outcast,
@@ -230,6 +253,7 @@ class PlayerClasses {
       classCode: ClassCodes.bladeswarm,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xffae5a4d,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.intimidating,
@@ -243,6 +267,7 @@ class PlayerClasses {
       classCode: ClassCodes.diviner,
       category: ClassCategory.gloomhaven,
       primaryColor: 0xff8bc5d3,
+      handSize: 9,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.outcast,
@@ -256,6 +281,7 @@ class PlayerClasses {
       classCode: ClassCodes.demolitionist,
       category: ClassCategory.jawsOfTheLion,
       primaryColor: 0xffe65c18,
+      handSize: 9,
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.nimble,
@@ -268,6 +294,7 @@ class PlayerClasses {
       classCode: ClassCodes.hatchet,
       category: ClassCategory.jawsOfTheLion,
       primaryColor: 0xff78a1ad,
+      handSize: 10,
       traits: [
         CharacterTraits.intimidating,
         CharacterTraits.resourceful,
@@ -280,6 +307,7 @@ class PlayerClasses {
       classCode: ClassCodes.redGuard,
       category: ClassCategory.jawsOfTheLion,
       primaryColor: 0xffe3393b,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.outcast,
@@ -292,6 +320,7 @@ class PlayerClasses {
       classCode: ClassCodes.voidwarden,
       category: ClassCategory.jawsOfTheLion,
       primaryColor: 0xffd9d9d9,
+      handSize: 11,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.educated,
@@ -305,6 +334,7 @@ class PlayerClasses {
       classCode: ClassCodes.drifter,
       category: ClassCategory.frosthaven,
       primaryColor: 0xff92887f,
+      handSize: 12,
       traits: [
         CharacterTraits.outcast,
         CharacterTraits.resourceful,
@@ -317,6 +347,7 @@ class PlayerClasses {
       classCode: ClassCodes.blinkBlade,
       category: ClassCategory.frosthaven,
       primaryColor: 0xff00a8cf,
+      handSize: 10,
       traits: [
         CharacterTraits.educated,
         CharacterTraits.nimble,
@@ -329,6 +360,7 @@ class PlayerClasses {
       classCode: ClassCodes.bannerSpear,
       category: ClassCategory.frosthaven,
       primaryColor: 0xfffdd072,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.persuasive,
@@ -341,6 +373,7 @@ class PlayerClasses {
       classCode: ClassCodes.deathwalker,
       category: ClassCategory.frosthaven,
       primaryColor: 0xffacc8ed,
+      handSize: 11,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.outcast,
@@ -353,6 +386,7 @@ class PlayerClasses {
       classCode: ClassCodes.boneshaper,
       category: ClassCategory.frosthaven,
       primaryColor: 0xff6cbe4c,
+      handSize: 12,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.educated,
@@ -365,6 +399,7 @@ class PlayerClasses {
       classCode: ClassCodes.geminate,
       category: ClassCategory.frosthaven,
       primaryColor: 0xffab1c54,
+      handSize: 7,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.chaotic,
@@ -378,6 +413,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xff7bc144,
+      handSize: 11,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.educated,
@@ -391,6 +427,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffff4a1d,
+      handSize: 10,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.chaotic,
@@ -404,6 +441,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffc2c5c9,
+      handSize: 10,
       traits: [
         CharacterTraits.educated,
         CharacterTraits.outcast,
@@ -417,6 +455,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffd1b38d,
+      handSize: 9,
       traits: [
         CharacterTraits.nimble,
         CharacterTraits.outcast,
@@ -430,6 +469,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffbec5e4,
+      handSize: 10,
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.intimidating,
@@ -443,6 +483,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xff7cd1e7,
+      handSize: 11,
       traits: [
         CharacterTraits.chaotic,
         CharacterTraits.nimble,
@@ -456,6 +497,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xff88bee7,
+      handSize: 8,
       traits: [
         CharacterTraits.intimidating,
         CharacterTraits.persuasive,
@@ -469,6 +511,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffecb633,
+      handSize: 11,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.educated,
@@ -482,6 +525,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffddb586,
+      handSize: 9,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.resourceful,
@@ -495,6 +539,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xffac427d,
+      handSize: 10,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.intimidating,
@@ -508,6 +553,7 @@ class PlayerClasses {
       category: ClassCategory.frosthaven,
       locked: true,
       primaryColor: 0xff59c0a1,
+      handSize: 12,
       traits: [
         CharacterTraits.armored,
         CharacterTraits.chaotic,
@@ -522,6 +568,7 @@ class PlayerClasses {
       classCode: ClassCodes.anaphi,
       category: ClassCategory.mercenaryPacks,
       primaryColor: 0xffe7768d, // TODO: Confirm colour once available
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.aesther,
@@ -530,6 +577,7 @@ class PlayerClasses {
       classCode: ClassCodes.cassandra,
       category: ClassCategory.mercenaryPacks,
       primaryColor: 0xff8bc5d3, // TODO: Confirm colour once available
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.aesther,
@@ -538,6 +586,7 @@ class PlayerClasses {
       classCode: ClassCodes.hail,
       category: ClassCategory.mercenaryPacks,
       primaryColor: 0xffca7e64, // TODO: Confirm colour once available
+      handSize: 9,
     ),
     PlayerClass(
       race: CharacterRaces.human,
@@ -546,6 +595,7 @@ class PlayerClasses {
       classCode: ClassCodes.satha,
       category: ClassCategory.mercenaryPacks,
       primaryColor: 0xff21546e, // TODO: Confirm colour once available
+      handSize: 10,
     ),
     // CRIMSON SCALES
     PlayerClass(
@@ -555,6 +605,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffeb880d,
       secondaryColor: 0xfffff600,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.quatryl,
@@ -563,6 +614,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff477ca6,
       secondaryColor: 0xff8ccee5,
+      handSize: 9,
     ),
     PlayerClass(
       race: CharacterRaces.quatryl,
@@ -571,6 +623,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff948572,
       secondaryColor: 0xff8c683b,
+      handSize: 9,
     ),
     PlayerClass(
       race: CharacterRaces.human,
@@ -579,6 +632,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffcaad2e,
       secondaryColor: 0xffc49a3d,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.inox,
@@ -587,6 +641,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffce6d30,
       secondaryColor: 0xff1e1d1d,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.orchid,
@@ -595,6 +650,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff76c6c3,
       secondaryColor: 0xff5e7574,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.valrath,
@@ -603,6 +659,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffd52229,
       secondaryColor: 0xfff25424,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.human,
@@ -611,6 +668,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffddde8a,
       secondaryColor: 0xffa9a5ad,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.savvas,
@@ -619,6 +677,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffa765a9,
       secondaryColor: 0xff310f33,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.inox,
@@ -627,6 +686,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffc63072,
       secondaryColor: 0xff70d686,
+      handSize: 11,
       traits: [
         CharacterTraits.arcane,
         CharacterTraits.persuasive,
@@ -640,6 +700,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffb28abf,
       secondaryColor: 0xffa43287,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.quatryl,
@@ -648,6 +709,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffef6b26,
       secondaryColor: 0xff4b732e,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.savvas,
@@ -656,6 +718,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff61d4e8,
       secondaryColor: 0xffd62d2a,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.vermling,
@@ -664,6 +727,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffdb332d,
       secondaryColor: 0xffdb332d,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.orchid,
@@ -672,6 +736,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xffffd04f,
       secondaryColor: 0xffffaa23,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.vermling,
@@ -680,6 +745,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff63bd57,
       secondaryColor: 0xffa6ce39,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.aesther,
@@ -688,6 +754,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff4f57a6,
       secondaryColor: 0xffa3aacc,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.orchid,
@@ -696,6 +763,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xff66c9fc,
       secondaryColor: 0xff109de0,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.orchid,
@@ -704,6 +772,7 @@ class PlayerClasses {
       category: ClassCategory.crimsonScales,
       primaryColor: 0xfffbff96,
       secondaryColor: 0xff80995a,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.valrath,
@@ -713,6 +782,7 @@ class PlayerClasses {
       locked: false,
       primaryColor: 0xffd3423e,
       secondaryColor: 0xffbdbdbd,
+      handSize: 9,
     ),
     // CUSTOM
     PlayerClass(
@@ -721,6 +791,7 @@ class PlayerClasses {
       classCode: ClassCodes.brewmaster,
       category: ClassCategory.custom,
       primaryColor: 0xffe2c22b,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.orchid,
@@ -728,6 +799,7 @@ class PlayerClasses {
       classCode: ClassCodes.frostborn,
       category: ClassCategory.custom,
       primaryColor: 0xffb0e0ea,
+      handSize: 9,
     ),
     // This class is still in beta. Its perks are in version 3.7.0
     // TODO: when bringing it back, show it in Search Delegate
@@ -737,6 +809,7 @@ class PlayerClasses {
       classCode: ClassCodes.rootwhisperer,
       category: ClassCategory.custom,
       primaryColor: 0xff7bd071,
+      handSize: 10,
     ),
     PlayerClass(
       race: CharacterRaces.harrower,
@@ -744,6 +817,7 @@ class PlayerClasses {
       classCode: ClassCodes.vimthreader,
       category: ClassCategory.custom,
       primaryColor: 0xffc26969,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.unfettered,
@@ -751,6 +825,7 @@ class PlayerClasses {
       classCode: ClassCodes.core,
       category: ClassCategory.custom,
       primaryColor: 0xffff7700,
+      handSize: 9,
     ),
     PlayerClass(
       race: CharacterRaces.unfettered,
@@ -758,6 +833,7 @@ class PlayerClasses {
       classCode: ClassCodes.dome,
       category: ClassCategory.custom,
       primaryColor: 0xff95B7E1,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.vermling,
@@ -765,6 +841,7 @@ class PlayerClasses {
       classCode: ClassCodes.skitterclaw,
       category: ClassCategory.custom,
       primaryColor: 0xffDDAC82,
+      handSize: 11,
     ),
     PlayerClass(
       race: CharacterRaces.quatryl,
@@ -773,6 +850,7 @@ class PlayerClasses {
       category: ClassCategory.custom,
       primaryColor: 0xff3fd49b,
       secondaryColor: 0xfffbf679,
+      handSize: 10,
     ),
   ];
 

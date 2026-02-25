@@ -105,7 +105,7 @@ class PerkTextConstants {
 
   // Equipment slots
   static const body = 'Body';
-  static const pocket = 'Pocket';
+  static const pocket = 'POCKET';
   // static const head = 'Head';
   static const oneHand = 'One_Hand';
   static const twoHand = 'Two_Hand';

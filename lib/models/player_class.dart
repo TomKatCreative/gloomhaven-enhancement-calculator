@@ -78,6 +78,8 @@ class PlayerClass {
   final int? secondaryColor;
   final bool locked;
   final List<String> traits;
+  final int handSize;
+  final Map<Variant, int>? variantHandSizes;
 
   PlayerClass({
     required this.race,
@@ -85,11 +87,13 @@ class PlayerClass {
     required this.classCode,
     required this.category,
     required this.primaryColor,
+    required this.handSize,
     this.title,
     this.variantNames,
     this.secondaryColor = 0xff4e7ec1,
     this.locked = false,
     this.traits = const [],
+    this.variantHandSizes,
   }) : assert(
          (category == ClassCategory.mercenaryPacks) == (title != null),
          'title must be non-null if and only if category is mercenaryPacks',
@@ -121,6 +125,14 @@ class PlayerClass {
   /// Check if this class has a custom name for the given variant
   bool hasVariantName(Variant variant) {
     return variantNames?.containsKey(variant) ?? false;
+  }
+
+  /// Get the hand size for a specific variant, falling back to [handSize].
+  int getHandSize(Variant variant) {
+    if (variantHandSizes != null && variantHandSizes!.containsKey(variant)) {
+      return variantHandSizes![variant]!;
+    }
+    return handSize;
   }
 
   /// Get a combined display name for search/selection (e.g., "Brute/Bruiser")

@@ -167,6 +167,8 @@ Defines a character class with its attributes, colors, and variant support.
 | `secondaryColor` | `int?` | null | Optional secondary color |
 | `locked` | `bool` | true | Whether class is locked/spoiler |
 | `traits` | `List<String>` | [] | Class traits (e.g., "Tank", "Support") |
+| `handSize` | `int` | **required** | Base hand size (number of ability cards) |
+| `variantHandSizes` | `Map<Variant, int>?` | null | Variant-specific hand size overrides |
 
 ### Methods
 
@@ -174,6 +176,7 @@ Defines a character class with its attributes, colors, and variant support.
 |--------|---------|-------------|
 | `getDisplayName(Variant)` | `String` | Variant override name or base name |
 | `getFullDisplayName(Variant)` | `String` | "Race - ClassName" or just title for merc packs |
+| `getHandSize(Variant)` | `int` | Variant hand size, falling back to base `handSize` |
 | `hasVariantName(Variant)` | `bool` | Whether variant has an override name |
 | `getCombinedDisplayNames()` | `String` | All unique variant names joined |
 

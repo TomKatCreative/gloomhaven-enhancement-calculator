@@ -219,95 +219,146 @@ class _StatsSectionState extends State<StatsSection> {
     }
 
     // View mode: Original inline layout
+    final handSize = widget.character.playerClass.getHandSize(
+      widget.character.variant,
+    );
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
-        Tooltip(
-          message: AppLocalizations.of(context).xp,
-          child: Row(
-            children: <Widget>[
-              ThemedSvg(assetKey: 'XP', width: iconSizeMedium),
-              const SizedBox(width: smallPadding),
-              Text(
-                widget.character.xp.toString(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Consumer<CharactersModel>(
-                builder: (_, charactersModel, _) => Text(
-                  ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+        Expanded(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Tooltip(
+              message: AppLocalizations.of(context).xp,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ThemedSvg(assetKey: 'XP', width: iconSizeMedium),
+                  const SizedBox(width: smallPadding),
+                  Text(
+                    widget.character.xp.toString(),
+                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Tooltip(
-          message: AppLocalizations.of(context).gold,
-          child: Row(
-            children: <Widget>[
-              ThemedSvg(assetKey: 'GOLD', width: iconSizeMedium),
-              const SizedBox(width: smallPadding),
-              if (widget.character.isRetired && widget.character.gold > 0)
-                StrikethroughText(
-                  '${widget.character.gold}',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                )
-              else
-                Text(
-                  '${widget.character.gold}',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-            ],
-          ),
-        ),
-        Tooltip(
-          message: AppLocalizations.of(context).battleGoals,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              ThemedSvg(assetKey: 'GOAL', width: iconSizeMedium),
-              SizedBox(width: smallPadding),
-              Text(
-                '${widget.character.checkMarkProgress.toString()}/3',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyLarge?.copyWith(letterSpacing: 2),
-              ),
-            ],
-          ),
-        ),
-        Tooltip(
-          message: AppLocalizations.of(
-            context,
-          ).pocketItemsAllowed(widget.character.pocketItemsAllowed),
-          child: Stack(
-            alignment: AlignmentDirectional.bottomCenter,
-            children: <Widget>[
-              ThemedSvg(assetKey: 'Pocket', width: iconSizeLarge),
-              Transform.translate(
-                offset: Offset(
-                  0,
-                  switch (widget.character.pocketItemsAllowed) {
-                    1 || 2 => 3,
-                    _ => 2,
-                  }.toDouble(),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 3.5),
-                  child: Text(
-                    '${widget.character.pocketItemsAllowed}',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.surface,
+                  Consumer<CharactersModel>(
+                    builder: (_, charactersModel, _) => Text(
+                      ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Tooltip(
+              message: AppLocalizations.of(context).gold,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ThemedSvg(assetKey: 'GOLD', width: iconSizeMedium),
+                  const SizedBox(width: smallPadding),
+                  if (widget.character.isRetired && widget.character.gold > 0)
+                    StrikethroughText(
+                      '${widget.character.gold}',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    )
+                  else
+                    Text(
+                      '${widget.character.gold}',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Tooltip(
+              message: AppLocalizations.of(context).battleGoals,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  // One-time exception to using constants for icon size
+                  ThemedSvg(assetKey: 'GOAL', width: 23, height: 23),
+                  SizedBox(width: smallPadding),
+                  Text(
+                    '${widget.character.checkMarkProgress.toString()}/3',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(letterSpacing: 2),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Tooltip(
+              message: AppLocalizations.of(context).handSizeCount(handSize),
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: <Widget>[
+                  ThemedSvg(assetKey: 'HAND_SIZE', width: iconSizeLarge),
+                  Transform.translate(
+                    offset: const Offset(-2, -1),
+                    child: Transform.rotate(
+                      angle: -0.075,
+                      child: Text(
+                        '$handSize',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.surface,
+                          fontFamily: pirataOne,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Tooltip(
+              message: AppLocalizations.of(
+                context,
+              ).pocketItemsAllowed(widget.character.pocketItemsAllowed),
+              child: Stack(
+                children: <Widget>[
+                  ThemedSvg(assetKey: 'POCKET_SOLID', width: iconSizeLarge),
+                  Positioned(
+                    left: 3,
+                    right: 0,
+                    top: 2.5,
+                    child: Center(
+                      child: Text(
+                        '${widget.character.pocketItemsAllowed}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.surface,
+                          fontFamily: pirataOne,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],

@@ -272,6 +272,12 @@ abstract class AppLocalizations {
   /// **'Retirements'**
   String get retirements;
 
+  /// No description provided for @handSizeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand size: {count}'**
+  String handSizeCount(int count);
+
   /// No description provided for @pocketItemsAllowed.
   ///
   /// In en, this message translates to:

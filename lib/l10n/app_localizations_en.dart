@@ -96,6 +96,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get retirements => 'Retirements';
 
   @override
+  String handSizeCount(int count) {
+    return 'Hand size: $count';
+  }
+
+  @override
   String pocketItemsAllowed(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,

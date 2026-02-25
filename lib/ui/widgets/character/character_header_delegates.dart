@@ -429,19 +429,12 @@ class _LevelBadge extends StatelessWidget {
       children: [
         ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL + tinyPadding),
         Padding(
-          padding: EdgeInsets.only(
-            top: switch (Character.level(character.xp)) {
-              1 || 2 || 8 => tinyPadding,
-              5 => 3,
-              6 => 4,
-              _ => 0.0,
-            },
-          ),
+          padding: EdgeInsets.only(top: 8),
           child: Text(
             '${Character.level(character.xp)}',
-            style: theme.textTheme.titleLarge?.copyWith(
+            style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.surface,
-              fontWeight: FontWeight.bold,
+              fontFamily: pirataOne,
             ),
           ),
         ),

@@ -508,7 +508,7 @@ Controlled by `charactersModel.isEditMode`:
 Extracted into `lib/ui/widgets/character/`:
 
 - **`StatsAndResourcesCard`** (`stats_and_resources_card.dart`) — Collapsible card owning expansion state; contains `StatsSection`, `CheckmarksAndRetirementsRow`, `PartyAssignmentRow`, Resources header, and `ResourcesContent`
-- **`StatsSection`** (`stats_section.dart`) — XP, gold (with `StrikethroughText` for retired), battle goals, pocket items
+- **`StatsSection`** (`stats_section.dart`) — XP, gold (with `StrikethroughText` for retired), battle goals, hand size (card icon with overlaid number, hidden when null), pocket items. View-mode uses `Row` with `Expanded` + `FittedBox(scaleDown)` children; text items get `flex: 3`, icon-only items (hand size, pocket) get `flex: 2`
 - **`CheckmarksAndRetirementsRow`** (`checkmarks_and_retirements_row.dart`) — edit-mode only row with +/- controls
 - **`ResourcesContent`** (`stats_section.dart`) — 9 `ResourceCard` inventory-slot cells; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
 - **`QuestAndNotesCard`** (`quest_and_notes_card.dart`) — Collapsible card with `PersonalQuestSection` and notes

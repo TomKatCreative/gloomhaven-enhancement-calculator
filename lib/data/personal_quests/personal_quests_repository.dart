@@ -58,7 +58,7 @@ class PersonalQuestsRepository {
           description: 'Own 3 One_Hand or Two_Hand items',
           target: 3,
         ),
-        PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
+        PersonalQuestRequirement(description: 'Own 4 POCKET items', target: 4),
       ],
     ),
     PersonalQuest(
@@ -665,7 +665,7 @@ class PersonalQuestsRepository {
           description: 'Own 5 One_Hand or Two_Hand items',
           target: 5,
         ),
-        PersonalQuestRequirement(description: 'Own 5 Pocket items', target: 5),
+        PersonalQuestRequirement(description: 'Own 5 POCKET items', target: 5),
         PersonalQuestRequirement(
           description: 'Then read SECTION 129.1',
           target: 1,
@@ -899,7 +899,7 @@ class PersonalQuestsRepository {
           description: 'Own 3 One_Hand and/or Two_Hand items',
           target: 3,
         ),
-        PersonalQuestRequirement(description: 'Own 4 Pocket items', target: 4),
+        PersonalQuestRequirement(description: 'Own 4 POCKET items', target: 4),
       ],
     ),
     PersonalQuest(

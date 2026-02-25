@@ -29,6 +29,7 @@
   "retired": "(aposentado)",
   "previousRetirements": "Aposentadorias anteriores",
   "retirements": "Aposentadorias",
+  "handSizeCount": "Tamanho da mão: {count}",
   "pocketItemsAllowed": "{count, plural, =1{1 item de bolso permitido} other{{count} itens de bolso permitidos}}",
   "battleGoals": "Objetivo de batalha",
   "cardLevel": "Nível da carta",
