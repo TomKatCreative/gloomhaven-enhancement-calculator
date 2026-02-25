@@ -36,6 +36,15 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.5.3',
+              date: '2026-02-24',
+              changes: [
+                'Added hand size icon in Stats section.',
+                'Gloomhaven 2nd Edition FAQ errata fix for personal quest 12.',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.5.2',
               date: '2026-02-23',
               changes: [

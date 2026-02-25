@@ -2,6 +2,17 @@
 
 Reverse-chronological log of production releases with commit references.
 
+## v4.5.3 — Hand Size Display
+
+- **Date:** 2026-02-24
+- Hand size icon added to character stats section (shows class hand size with variant support)
+- Frosthaven FAQ errata: corrected Scenario 67 to Scenario 65 in personal quest 12
+- Strikethrough text support added to game text parser (`~~text~~` syntax)
+- Improved stats row layout with responsive scaling (Expanded + FittedBox)
+- New solid pocket icon for pocket items display
+- Level badge font updated to PirataOne for consistency
+- Dependency bumps: uuid ^4.5.3, syncfusion_flutter_sliders ^32.2.7
+
 ## v4.5.2 — All Personal Quests
 
 - Added Gloomhaven 2nd Edition personal quests (22 quests, cards 01-22 / assets 537-558)
