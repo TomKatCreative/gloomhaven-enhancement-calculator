@@ -32,6 +32,9 @@ class _StatsSectionState extends State<StatsSection> {
   late TextEditingController _xpController;
   late TextEditingController _goldController;
   Timer? _persistTimer;
+  // Cached so dispose()/didUpdateWidget can flush without context.read,
+  // which is unsafe once the ancestor Provider may already be unmounted.
+  CharactersModel? _charactersModel;
 
   @override
   void initState() {
@@ -45,15 +48,34 @@ class _StatsSectionState extends State<StatsSection> {
   }
 
   @override
-  void dispose() {
-    // Flush any pending persist before tearing down.
-    if (_persistTimer?.isActive == true) {
-      _persistTimer!.cancel();
-      context.read<CharactersModel>().updateCharacter(widget.character);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _charactersModel = context.read<CharactersModel>();
+  }
+
+  @override
+  void didUpdateWidget(covariant StatsSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If this State is reused for a different character, flush the pending
+    // write against the OLD character before its keystroke edits are lost.
+    if (oldWidget.character.id != widget.character.id) {
+      _flushPending(oldWidget.character);
     }
+  }
+
+  @override
+  void dispose() {
+    _flushPending(widget.character);
     _xpController.dispose();
     _goldController.dispose();
     super.dispose();
+  }
+
+  void _flushPending(Character target) {
+    if (_persistTimer?.isActive == true) {
+      _persistTimer!.cancel();
+      _charactersModel?.updateCharacter(target);
+    }
   }
 
   void _schedulePersist(CharactersModel charactersModel) {
@@ -158,6 +180,8 @@ class _StatsSectionState extends State<StatsSection> {
                         ),
                       );
                       if (value != null) {
+                        // Drop any in-flight debounced write — about to overwrite.
+                        _persistTimer?.cancel();
                         final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
                           widget.character..xp = clampedValue,
@@ -220,6 +244,8 @@ class _StatsSectionState extends State<StatsSection> {
                         ),
                       );
                       if (value != null) {
+                        // Drop any in-flight debounced write — about to overwrite.
+                        _persistTimer?.cancel();
                         final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
                           widget.character..gold = clampedValue,
