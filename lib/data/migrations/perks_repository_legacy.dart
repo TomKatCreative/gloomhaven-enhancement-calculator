@@ -1,10 +1,14 @@
+// MIGRATION-ONLY. Do not modify or import outside `database_migrations.dart`.
+// Used by DB migrations v5–v17 to populate/transform the (now-dropped)
+// definition tables before v19. Cannot be deleted without breaking upgrades
+// from older app versions.
+
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/perk_and_mastery_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/legacy_perk.dart'
     as legacy;
 
 class PerksRepositoryLegacy {
-  // Keep this to allow for a database migration
   static final List<legacy.Perk> legacyPerks = [
     // BRUTE
     legacy.Perk(
