@@ -4,6 +4,7 @@ Reverse-chronological log of production releases with commit references.
 
 ## v4.5.3 — Hand Size Display
 
+- **Commit:** `efa29ff` — "Prepare v4.5.3 release: hand size display and FAQ errata"
 - **Date:** 2026-02-24
 - Hand size icon added to character stats section (shows class hand size with variant support)
 - Frosthaven FAQ errata: corrected Scenario 67 to Scenario 65 in personal quest 12
@@ -15,6 +16,7 @@ Reverse-chronological log of production releases with commit references.
 
 ## v4.5.2 — All Personal Quests
 
+- **Commit:** `9c7dbd2` — "Prepare v4.5.2 release: all personal quest editions"
 - Added Gloomhaven 2nd Edition personal quests (22 quests, cards 01-22 / assets 537-558)
 - Added Crimson Scales personal quests (28 quests)
 - Added Trail of Ashes personal quests (8 quests)
