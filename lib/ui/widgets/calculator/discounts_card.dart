@@ -23,10 +23,10 @@ class DiscountsGroupCard extends StatefulWidget {
   });
 
   @override
-  State<DiscountsGroupCard> createState() => DiscountsGroupCardState();
+  State<DiscountsGroupCard> createState() => _DiscountsGroupCardState();
 }
 
-class DiscountsGroupCardState extends State<DiscountsGroupCard> {
+class _DiscountsGroupCardState extends State<DiscountsGroupCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
