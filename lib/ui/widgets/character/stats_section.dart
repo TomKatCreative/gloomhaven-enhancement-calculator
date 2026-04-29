@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -23,8 +25,13 @@ class StatsSection extends StatefulWidget {
 }
 
 class _StatsSectionState extends State<StatsSection> {
+  /// Debounce window for persisting numeric field edits (xp, gold).
+  /// Avoids hitting SQLite + notifying listeners on every keystroke.
+  static const _persistDebounce = Duration(milliseconds: 300);
+
   late TextEditingController _xpController;
   late TextEditingController _goldController;
+  Timer? _persistTimer;
 
   @override
   void initState() {
@@ -39,9 +46,21 @@ class _StatsSectionState extends State<StatsSection> {
 
   @override
   void dispose() {
+    // Flush any pending persist before tearing down.
+    if (_persistTimer?.isActive == true) {
+      _persistTimer!.cancel();
+      context.read<CharactersModel>().updateCharacter(widget.character);
+    }
     _xpController.dispose();
     _goldController.dispose();
     super.dispose();
+  }
+
+  void _schedulePersist(CharactersModel charactersModel) {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(_persistDebounce, () {
+      charactersModel.updateCharacter(widget.character);
+    });
   }
 
   @override
@@ -67,10 +86,10 @@ class _StatsSectionState extends State<StatsSection> {
                       controller: _xpController,
                       enableInteractiveSelection: false,
                       onChanged: (String value) {
-                        charactersModel.updateCharacter(
-                          widget.character
-                            ..xp = value == '' ? 0 : int.parse(value),
-                        );
+                        widget.character.xp = value == ''
+                            ? 0
+                            : int.parse(value);
+                        _schedulePersist(charactersModel);
                       },
                       textAlign: TextAlign.end,
                       inputFormatters: [
@@ -161,11 +180,12 @@ class _StatsSectionState extends State<StatsSection> {
                     child: TextField(
                       controller: _goldController,
                       enableInteractiveSelection: false,
-                      onChanged: (String value) =>
-                          charactersModel.updateCharacter(
-                            widget.character
-                              ..gold = value == '' ? 0 : int.parse(value),
-                          ),
+                      onChanged: (String value) {
+                        widget.character.gold = value == ''
+                            ? 0
+                            : int.parse(value);
+                        _schedulePersist(charactersModel);
+                      },
                       textAlign: TextAlign.start,
                       inputFormatters: [
                         FilteringTextInputFormatter.deny(
