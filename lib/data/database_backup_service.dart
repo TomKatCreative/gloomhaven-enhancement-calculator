@@ -137,14 +137,20 @@ class DatabaseBackupService {
   }
 
   Future _clearAllTables() async {
-    try {
-      Database dbs = await _getDatabase();
-      for (String table in _tables) {
-        await dbs.delete(table);
-        await dbs.rawQuery('DELETE FROM sqlite_sequence where name="$table"');
+    Database dbs = await _getDatabase();
+    for (String table in _tables) {
+      await dbs.delete(table);
+      // Single-quote the literal and parameterize. Strict SQL parsers
+      // (sqlite3) treat `"Characters"` as a column identifier, not a string.
+      // sqlite_sequence may not exist until an AUTOINCREMENT insert has
+      // happened, so swallow the "no such table" error.
+      try {
+        await dbs.rawDelete('DELETE FROM sqlite_sequence WHERE name = ?', [
+          table,
+        ]);
+      } on DatabaseException catch (e) {
+        if (!e.isNoSuchTableError('sqlite_sequence')) rethrow;
       }
-    } catch (e) {
-      rethrow;
     }
   }
 }
