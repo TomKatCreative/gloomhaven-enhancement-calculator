@@ -1,71 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gloomhaven_enhancement_calc/models/element_state.dart';
 import 'package:gloomhaven_enhancement_calc/utils/asset_config.dart';
+import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 
-// ============================================================================
-// ANIMATED ELEMENT ICON - CONFIG-DRIVEN IMPLEMENTATION
-// ============================================================================
-//
-// ## Overview
-// This widget renders the 6 Gloomhaven elements (FIRE, ICE, AIR, EARTH, LIGHT,
-// DARK) with animated glowing effects based on their state. Used in the element
-// tracker bottom sheet on the Characters screen.
-//
-// ## Design Architecture
-//
-// ### 1. Animation Controllers
-// - Each element uses 2-3 AnimationControllers at different speeds for organic feel
-// - Controllers: base (slow), secondary (faster), optional tertiary (fastest - FIRE only)
-// - Controllers are combined using `Listenable.merge` in AnimatedBuilder
-// - 250ms crossfade for all state transitions (hardcoded, not configurable)
-//
-// ### 2. Glow Layer Structure
-// Every element uses a 3-layer glow stack (bottom to top):
-// 1. Outer glow - BoxShadow, largest radius, lowest intensity
-// 2. Middle glow - BoxShadow, medium radius
-// 3. Inner core - RadialGradient, smallest, highest intensity
-// 4. Icon - The SVG on top
-//
-// ### 3. Configuration System
-// ElementAnimationConfig centralizes all configurable parameters:
-// - Timing: baseDuration, secondaryDuration, tertiaryDuration
-// - Colors: outerGlowColor, middleGlowColor, innerGradientColors
-// - Sizes: outerSizeOffset, middleSizeOffset, blur radii
-// - Intensity: baseIntensity, intensityVariation, sizeVariation
-//
-// ### 4. Animation Styles (Named Presets)
-// Each style encapsulates its unique math/behavior:
-// | Style | Character                | Key Math Behavior                        |
-// |-------|--------------------------|------------------------------------------|
-// | fire  | Breathing, warm          | Eased sine waves, 3 layers combined      |
-// | ice   | Crystalline, sharp       | Multi-freq (4x,7x,11x) with abs()        |
-// | air   | Flowing, gentle          | Cosine undulation, minimal variation     |
-// | earth | Tremor, crunchy          | High-freq (11x,17x,23x) + threshold      |
-// | light | Steady, radiant          | Smooth breathing, no lens flare          |
-// | dark  | Drifting, eerie          | Horizontal cosine drift for cloud effect |
-//
-// ### 5. Waning State Derivation
-// Waning state is automatically computed from strong config:
-// - Same colors and animation math (preserves element character)
-// - intensityMultiplier: 0.85 (slightly dimmer)
-// - sizeMultiplier: 0.6 (smaller size variation)
-//
-// ## Element States
-// Each element cycles through 3 states when tapped: gone → strong → waning → gone
-// - gone: Dimmed icon (30% opacity), no glow
-// - strong: Full animated glow effect (element-specific colors/behavior)
-// - waning: Bisected appearance - top half dim, bottom half glowing
-//
-// ## Crossfade Transitions
-// - _fadeController handles fade in/out (250ms)
-// - Transitions trigger in didUpdateWidget when state changes
-// - _wrapWithFade crossfades between static fallback and animated glow
-// - _buildFadeToGone handles fading to gone state
-//
-// ============================================================================
+// Animated element icon for the 6 Gloomhaven elements (FIRE, ICE, AIR, EARTH,
+// LIGHT, DARK). Config-driven; see `docs/element_tracker.md` for the animation
+// architecture, layer structure, and per-element style descriptions.
 
 /// Animation style presets - each element has its own named style
 enum ElementAnimationStyle { fire, ice, air, earth, light, dark }
@@ -1199,20 +1141,17 @@ class _AnimatedElementIconState extends State<AnimatedElementIcon>
     );
   }
 
-  /// Builds the SVG widget with proper theming
+  /// Builds the SVG widget with proper theming.
+  ///
+  /// Delegates to [ThemedSvg] so the asset-key indirection rule is honored
+  /// (see CLAUDE.md "SVG Theming"). The `fullPath` and `assetConfig` params
+  /// are unused here but kept on the signature because callers compute them
+  /// once for animation/gradient decisions and pass them down.
   Widget _buildSvg(String fullPath, bool darkTheme, AssetConfig assetConfig) {
-    if (assetConfig.usesCurrentColor) {
-      return SvgPicture(
-        SvgAssetLoader(
-          fullPath,
-          theme: SvgTheme(
-            currentColor: darkTheme ? Colors.white : Colors.black,
-          ),
-        ),
-        width: widget.size,
-        height: widget.size,
-      );
-    }
-    return SvgPicture.asset(fullPath, width: widget.size, height: widget.size);
+    return ThemedSvg(
+      assetKey: widget.assetKey,
+      width: widget.size,
+      height: widget.size,
+    );
   }
 }

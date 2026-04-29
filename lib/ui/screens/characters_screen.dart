@@ -22,15 +22,6 @@ class _CharactersScreenState extends State<CharactersScreen>
     super.build(context);
     CharactersModel charactersModel = context.read<CharactersModel>();
     return _buildContent(context, charactersModel);
-    // TODO: consider returning this in a later release
-    // return Stack(
-    //   children: [
-    //     // Main content (empty state or character PageView)
-    //     _buildContent(context, charactersModel),
-    //     // Element tracker sheet
-    //     const ElementTrackerSheet(),
-    //   ],
-    // );
   }
 
   Widget _buildContent(BuildContext context, CharactersModel charactersModel) {
@@ -77,13 +68,6 @@ class _CharactersScreenState extends State<CharactersScreen>
         ),
       );
     } else {
-      // TODO: Performance improvements to investigate if swiping is still not smooth:
-      // 1. Add `allowImplicitScrolling: true` to PageView.builder to preload adjacent pages
-      // 2. Change `context.watch<CharactersModel>()` on line 37 to more targeted selectors
-      //    or move it to child widgets to reduce unnecessary rebuilds
-      // 3. Consider wrapping entire CharacterScreen in RepaintBoundary if needed
-      // 4. Profile with Flutter DevTools Performance overlay to identify actual jank
-      // 5. Consider caching the rasterized class icon background image
       return PageView.builder(
         controller: charactersModel.pageController,
         onPageChanged: (index) {
