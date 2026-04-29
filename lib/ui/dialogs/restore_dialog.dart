@@ -81,7 +81,7 @@ class RestoreDialog {
   }
 
   static Future<void> _handleFilePicker(BuildContext context) async {
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowMultiple: false,
       allowedExtensions: ['json', 'txt'],

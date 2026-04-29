@@ -120,7 +120,7 @@ class _BackupDialogState extends State<BackupDialog> {
           .generateBackup();
       final bytes = Uint8List.fromList(utf8.encode(value));
 
-      final savedPath = await FilePicker.saveFile(
+      final savedPath = await FilePicker.platform.saveFile(
         fileName: _fileName,
         type: FileType.custom,
         allowedExtensions: ['json'],

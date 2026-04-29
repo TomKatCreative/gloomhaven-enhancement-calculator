@@ -17,7 +17,11 @@ dependencies:
   path_provider: ^2.1.1
   provider: ^6.1.1
   flutter_svg: ^2.2.3
-  file_picker: ^11.0.2
+  # Pinned at 10.3.10: file_picker 11.0.2's Android plugin skips applying the
+  # Kotlin plugin when AGP 9 is detected (relies on a propagation that doesn't
+  # happen), causing GeneratedPluginRegistrant to fail with "cannot find
+  # symbol FilePickerPlugin" at compile time. Revisit when 11.0.3+ ships.
+  file_picker: 10.3.10
   intl: any
   smooth_page_indicator: ^2.0.1
   permission_handler: ^12.0.0
