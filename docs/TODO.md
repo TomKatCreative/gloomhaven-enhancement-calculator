@@ -101,7 +101,7 @@ These came out of the codebase audit on 2026-04-29 — see `docs/technical_debt.
 - **Add `DatabaseBackupService` unit tests** — round-trip, version validation, SharedPrefs sync, error paths.
 - **Add `test/utils/` coverage** — `game_text_tokenizer`, `themed_svg`, `color_utils`.
 - **Add dialog widget tests** — restore, info, enhancer (only backup is currently covered).
-- **Theme cache invalidation** — verify `AppThemeBuilder.clearCache()` is called when seed/character colors change; if not, wire it up.
+- ~~**Theme cache invalidation**~~ — Verified 2026-04-29: the cache is content-addressed by `ThemeConfig.hashCode` (immutable, defines `==` over all theme inputs), so it cannot go stale. Removed the unused `clearCache()` method and added a regression test (`test/theme/app_theme_builder_test.dart`) that locks the contract in place.
 - **Element color theming** — replace raw `Colors.deepOrange` etc. in `animated_element_icon.dart` with theme-aware element palette.
 - **Marker rendering DRY** — extract `CostMarkerBuilder` shared by `info_dialog.dart` and `enhancement_calculator_screen.dart` for `†‡§*` markers.
 - **Refactor oversized files** — `info_dialog.dart` (403 lines, 9 `_configure*` methods), `enhancement_calculator_screen.dart` (639 lines, 9 file-scoped `_…Card` classes), `animated_element_icon.dart` (1,218 lines, per-element configs).

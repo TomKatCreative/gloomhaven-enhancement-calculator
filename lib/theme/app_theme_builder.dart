@@ -8,39 +8,27 @@ class AppThemeBuilder {
   /// The dark surface color for the Android system navigation bar.
   /// Note: This matches M3's default dark surface color.
   static const Color darkSurface = Color(0xff1c1b1f);
-  // Cache themes to avoid rebuilding
+
+  // Content-addressed theme cache. The key is `ThemeConfig.hashCode`, and
+  // ThemeConfig is immutable with `==` defined over all theme inputs
+  // (seedColor, useDarkMode, useDefaultFonts). A given config always
+  // produces the same theme, so the cache cannot go stale — no
+  // invalidation API is needed.
   static final Map<int, ThemeData> _lightThemeCache = {};
   static final Map<int, ThemeData> _darkThemeCache = {};
 
   static ThemeData buildLightTheme(ThemeConfig config) {
-    final cacheKey = config.hashCode;
-
-    if (_lightThemeCache.containsKey(cacheKey)) {
-      return _lightThemeCache[cacheKey]!;
-    }
-
-    final theme = _buildTheme(config: config, brightness: Brightness.light);
-
-    _lightThemeCache[cacheKey] = theme;
-    return theme;
+    return _lightThemeCache.putIfAbsent(
+      config.hashCode,
+      () => _buildTheme(config: config, brightness: Brightness.light),
+    );
   }
 
   static ThemeData buildDarkTheme(ThemeConfig config) {
-    final cacheKey = config.hashCode;
-
-    if (_darkThemeCache.containsKey(cacheKey)) {
-      return _darkThemeCache[cacheKey]!;
-    }
-
-    final theme = _buildTheme(config: config, brightness: Brightness.dark);
-
-    _darkThemeCache[cacheKey] = theme;
-    return theme;
-  }
-
-  static void clearCache() {
-    _lightThemeCache.clear();
-    _darkThemeCache.clear();
+    return _darkThemeCache.putIfAbsent(
+      config.hashCode,
+      () => _buildTheme(config: config, brightness: Brightness.dark),
+    );
   }
 
   static ThemeData _buildTheme({
