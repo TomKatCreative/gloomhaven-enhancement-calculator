@@ -233,22 +233,16 @@ class _CardLevelSection extends StatelessWidget {
               config: CostDisplayConfig(
                 baseCost: baseCost,
                 discountedCost: actualCost != baseCost ? actualCost : null,
-                marker: _buildMarker(partyBoon),
+                marker: costMarker({
+                  '\u00A7': partyBoon, // §
+                  '*': model.enhancerLvl3Applies,
+                }),
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  /// Builds the marker string for card level cost.
-  /// Combines Party Boon § and Building 44 * markers.
-  String? _buildMarker(bool partyBoon) {
-    final markers = <String>[];
-    if (partyBoon) markers.add('\u00A7'); // §
-    if (model.enhancerLvl3Applies) markers.add('*');
-    return markers.isEmpty ? null : markers.join();
   }
 }
 
@@ -315,22 +309,16 @@ class _PreviousEnhancementsSection extends StatelessWidget {
               config: CostDisplayConfig(
                 baseCost: baseCost,
                 discountedCost: actualCost != baseCost ? actualCost : null,
-                marker: _buildMarker(),
+                marker: costMarker({
+                  '\u2020': model.temporaryEnhancementMode, // †
+                  '*': model.enhancerLvl4Applies,
+                }),
               ),
             ),
           ),
         ],
       ),
     );
-  }
-
-  /// Builds the marker string for previous enhancements cost.
-  /// Combines temp † and Building 44 * markers.
-  String? _buildMarker() {
-    final markers = <String>[];
-    if (model.temporaryEnhancementMode) markers.add('\u2020'); // †
-    if (model.enhancerLvl4Applies) markers.add('*');
-    return markers.isEmpty ? null : markers.join();
   }
 }
 
@@ -465,15 +453,6 @@ class _EnhancementTypeCard extends StatelessWidget {
 
   const _EnhancementTypeCard({required this.edition, required this.model});
 
-  /// Builds the marker string for enhancement type cost.
-  /// Combines Hail's ‡ and Building 44 * markers.
-  String? _buildEnhancementTypeMarker(EnhancementCalculatorModel model) {
-    final markers = <String>[];
-    if (model.hailsDiscount) markers.add('\u2021'); // ‡
-    if (model.enhancerLvl2Applies) markers.add('*');
-    return markers.isEmpty ? null : markers.join();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -506,7 +485,10 @@ class _EnhancementTypeCard extends StatelessWidget {
                   ? CostDisplayConfig(
                       baseCost: enhancement.cost(edition: edition),
                       discountedCost: model.enhancementCost(enhancement),
-                      marker: _buildEnhancementTypeMarker(model),
+                      marker: costMarker({
+                        '\u2021': model.hailsDiscount, // ‡
+                        '*': model.enhancerLvl2Applies,
+                      }),
                     )
                   : null,
             ),
