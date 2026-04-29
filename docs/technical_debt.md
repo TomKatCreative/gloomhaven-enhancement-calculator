@@ -1,14 +1,14 @@
 # Technical Debt Analysis
 
-Last updated: 2026-02-15
+Last updated: 2026-04-29
 
 A consolidated analysis of technical debt across the codebase, organized by impact tier.
 
 ---
 
-## Tier 1: God Files
+## Tier 1: God Files (Resolved)
 
-The highest-impact debt. These files have too many responsibilities, making them hard to test, navigate, and modify safely.
+Originally the highest-impact debt — files with too many responsibilities. All have been refactored. Kept here for historical reference; the corresponding files are now in good shape.
 
 ### ~~`character_screen.dart` (1,699 lines)~~ — RESOLVED
 
@@ -68,15 +68,9 @@ Patterns that aren't single-file problems but affect the codebase broadly.
 
 60+ direct `SharedPrefs().xxx` calls scattered across UI files and ViewModels instead of being encapsulated in ViewModels. Screens should not directly read/write SharedPrefs.
 
-### Hardcoded Magic Numbers (~40 violations)
+### ~~Hardcoded Magic Numbers~~ — RESOLVED
 
-Despite the constants policy in `constants.dart`, several files still use hardcoded values:
-
-| File | Examples | Count |
-|------|----------|-------|
-| ~~`character_screen.dart`~~ | ~~`0.85`, `82.0`, `180.0`~~ | ~~resolved~~ |
-| `element_tracker_sheet.dart` | `0.065`, `0.14`, `100.0` | ~10 |
-| `expandable_cost_chip.dart` | `56.0`, `468.0`, `100.0` | ~8 |
+> **Audited 2026-04-29**: The values flagged previously in `element_tracker_sheet.dart` and `expandable_cost_chip.dart` (`0.065`, `0.14`, `100.0`, `56.0`, `468.0`, etc.) are now defined as named file-private `static const` fields with semantic names (e.g., `_collapsedSize`, `_cardMaxWidth`, `_blurFadeThreshold`, `_chipHeight`). These satisfy the constants policy — local naming is the correct encapsulation for widget-specific values.
 
 ### `asset_config.dart` (995 lines)
 
