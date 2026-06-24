@@ -104,6 +104,9 @@ local.properties
 **/ios/**/.symlinks/
 **/ios/**/profile
 **/ios/**/xcuserdata
+# Swift Package Manager artifacts injected by the Flutter tool. This project
+# builds with CocoaPods; these regenerate on every flutter run.
+**/ios/**/xcshareddata/swiftpm/
 **/ios/.generated/
 **/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework
