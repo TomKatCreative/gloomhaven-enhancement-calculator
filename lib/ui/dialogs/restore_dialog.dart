@@ -66,13 +66,7 @@ class RestoreDialog {
             ),
             TextButton(
               child: Text(l10n.continue_),
-              onPressed: () async {
-                if (!await getStoragePermission()) {
-                  return;
-                }
-                if (!context.mounted) return;
-                Navigator.of(context).pop(true);
-              },
+              onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
         );
