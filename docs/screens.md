@@ -461,7 +461,7 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 ### Pinned Header
 
 `CharacterHeaderDelegate` (in `lib/ui/widgets/character/character_header_delegates.dart`) — a `SliverPersistentHeaderDelegate` that:
-- Expands to a dynamic height based on content: base 172px + 32px for traits + 28px for retired label (via `viewModeMaxHeight()`)
+- Expands to a dynamic height based on content: base 172px + 32px for the traits row (or the italic "Jaws of the Lion" label that replaces it for JotL characters — view mode only) + 28px for retired label (via `viewModeMaxHeight()`)
 - Collapses to 56px (name only) on scroll; expanded content wrapped in `OverflowBox` for smooth collapse transitions
 - In edit mode with non-retired character: stays at 90px (name `TextFormField`)
 - Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
