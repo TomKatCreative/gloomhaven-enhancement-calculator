@@ -103,6 +103,11 @@ class DatabaseBackupService {
           json[1][i][k][columnResourceSnowthistle] ??= 0;
           json[1][i][k][columnCharacterPersonalQuestId] ??= '';
           json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
+          // ShowResources and IsJawsOfTheLion were both added in v20. Default
+          // to shown / not-JotL so older backups restore cleanly into a fresh
+          // install (whose columns have no DEFAULT, unlike the ALTER path).
+          json[1][i][k][columnShowResources] ??= 1;
+          json[1][i][k][columnIsJawsOfTheLion] ??= 0;
           if (kTownSheetEnabled) {
             // PartyId is nullable, no default needed — just ensure key exists
             json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);

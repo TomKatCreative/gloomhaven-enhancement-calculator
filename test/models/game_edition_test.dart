@@ -85,6 +85,32 @@ void main() {
       test('Frosthaven', () {
         expect(GameEdition.frosthaven.displayName, 'Frosthaven');
       });
+
+      test('Jaws of the Lion', () {
+        expect(GameEdition.jawsOfTheLion.displayName, 'Jaws of the Lion');
+      });
+    });
+
+    group('Jaws of the Lion (no enhancement features)', () {
+      test('supportsPartyBoon is false', () {
+        expect(GameEdition.jawsOfTheLion.supportsPartyBoon, isFalse);
+      });
+
+      test('hasLostModifier is false', () {
+        expect(GameEdition.jawsOfTheLion.hasLostModifier, isFalse);
+      });
+
+      test('hasPersistentModifier is false', () {
+        expect(GameEdition.jawsOfTheLion.hasPersistentModifier, isFalse);
+      });
+
+      test('hasEnhancerLevels is false', () {
+        expect(GameEdition.jawsOfTheLion.hasEnhancerLevels, isFalse);
+      });
+
+      test('multiTargetAppliesToAll is false', () {
+        expect(GameEdition.jawsOfTheLion.multiTargetAppliesToAll, isFalse);
+      });
     });
 
     group('maxStartingLevel', () {
@@ -112,6 +138,11 @@ void main() {
         expect(GameEdition.frosthaven.maxStartingLevel(5), 3);
         expect(GameEdition.frosthaven.maxStartingLevel(9), 5);
       });
+
+      test('Jaws of the Lion is uncapped (no prosperity)', () {
+        expect(GameEdition.jawsOfTheLion.maxStartingLevel(1), 9);
+        expect(GameEdition.jawsOfTheLion.maxStartingLevel(9), 9);
+      });
     });
 
     group('startingGold', () {
@@ -134,6 +165,15 @@ void main() {
         expect(GameEdition.frosthaven.startingGold(prosperityLevel: 1), 30);
         expect(GameEdition.frosthaven.startingGold(prosperityLevel: 4), 60);
         expect(GameEdition.frosthaven.startingGold(prosperityLevel: 9), 110);
+      });
+
+      test('Jaws of the Lion: 15 * (level + 1), prosperity-independent', () {
+        expect(GameEdition.jawsOfTheLion.startingGold(level: 1), 30);
+        expect(GameEdition.jawsOfTheLion.startingGold(level: 5), 90);
+        expect(
+          GameEdition.jawsOfTheLion.startingGold(level: 3, prosperityLevel: 9),
+          60, // 15 * (3 + 1), prosperity ignored
+        );
       });
 
       test('uses default parameter values', () {

@@ -38,12 +38,15 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final model = context.watch<CharactersModel>();
+    final canEdit = model.isEditMode && !widget.character.isRetired;
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,
       title: kTownSheetEnabled
           ? l10n.general
-          : _isExpanded
+          : _isExpanded ||
+                !widget.character.showResources ||
+                widget.character.isJawsOfTheLion
           ? l10n.stats
           : l10n.statsAndResources,
       icon: Icons.badge_rounded,
@@ -67,34 +70,70 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
                 const Divider(height: largePadding * 2),
               ],
               StatsSection(character: widget.character),
-              if (model.isEditMode && !widget.character.isRetired) ...[
+              if (canEdit) ...[
                 SizedBox(height: largePadding),
                 CheckmarksAndRetirementsRow(character: widget.character),
               ],
-              const Divider(height: largePadding * 2),
-              Padding(
-                padding: const EdgeInsets.only(bottom: smallPadding),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.inventory_2_rounded,
-                      size: iconSizeSmall,
-                      color: theme.contrastedPrimary,
-                    ),
-                    const SizedBox(width: smallPadding),
-                    Expanded(
-                      child: Text(
-                        l10n.resources,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: theme.contrastedPrimary,
+              // Resources is a Frosthaven concept, so it can be hidden
+              // per-character. Hiding never clears the stored counts, and an
+              // "add" button restores it from edit mode. JotL has no resources
+              // at all, so the section (and its add button) are never offered.
+              if (widget.character.isJawsOfTheLion)
+                const SizedBox.shrink()
+              else if (widget.character.showResources) ...[
+                const Divider(height: largePadding * 2),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: smallPadding),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.inventory_2_rounded,
+                        size: iconSizeSmall,
+                        color: theme.contrastedPrimary,
+                      ),
+                      const SizedBox(width: smallPadding),
+                      Expanded(
+                        child: Text(
+                          l10n.resources,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: theme.contrastedPrimary,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      if (canEdit)
+                        IconButton(
+                          icon: const Icon(Icons.close_rounded),
+                          iconSize: iconSizeSmall,
+                          color: theme.contrastedPrimary,
+                          tooltip: l10n.removeResources,
+                          onPressed: () {
+                            widget.character.showResources = false;
+                            context.read<CharactersModel>().updateCharacter(
+                              widget.character,
+                            );
+                          },
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: smallPadding),
-              ResourcesContent(character: widget.character),
+                const SizedBox(height: smallPadding),
+                ResourcesContent(character: widget.character),
+              ] else if (canEdit) ...[
+                const Divider(height: largePadding * 2),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.add_rounded),
+                    label: Text(l10n.addResources),
+                    onPressed: () {
+                      widget.character.showResources = true;
+                      context.read<CharactersModel>().updateCharacter(
+                        widget.character,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ],
           ),
         ),

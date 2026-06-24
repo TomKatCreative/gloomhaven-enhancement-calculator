@@ -301,6 +301,8 @@ class CharactersModel with ChangeNotifier {
     Variant variant = Variant.base,
     String? personalQuestId,
     String? partyId,
+    bool showResources = true,
+    bool jawsOfTheLionEdition = false,
   }) async {
     final pqId = personalQuestId ?? '';
     final pqProgress = personalQuestId != null
@@ -326,6 +328,8 @@ class CharactersModel with ChangeNotifier {
       personalQuestId: pqId,
       personalQuestProgress: pqProgress,
       partyId: partyId,
+      showResources: showResources,
+      jawsOfTheLionEdition: jawsOfTheLionEdition,
     );
     character.id = await databaseHelper.insertCharacter(character);
     character.characterPerks = await _loadPerks(character);

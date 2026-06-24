@@ -68,6 +68,22 @@ void main() {
 
       expect(character.isRetired, isTrue);
     });
+
+    test('showResources defaults to true', () {
+      final character = Character(
+        uuid: 'test',
+        name: 'Test',
+        playerClass: TestData.brute,
+      );
+
+      expect(character.showResources, isTrue);
+    });
+
+    test('showResources can be set to false in constructor', () {
+      final character = TestData.createCharacter(showResources: false);
+
+      expect(character.showResources, isFalse);
+    });
   });
 
   group('Character Model - Database Serialization', () {
@@ -87,6 +103,54 @@ void main() {
 
         expect(character.isRetired, isFalse);
       });
+
+      test('parses ShowResources=1 as true', () {
+        final map = _createCharacterMap(showResources: 1);
+
+        final character = Character.fromMap(map);
+
+        expect(character.showResources, isTrue);
+      });
+
+      test('parses ShowResources=0 as false', () {
+        final map = _createCharacterMap(showResources: 0);
+
+        final character = Character.fromMap(map);
+
+        expect(character.showResources, isFalse);
+      });
+
+      test(
+        'defaults showResources to true when column is absent (pre-v20)',
+        () {
+          final map = _createCharacterMap();
+          map.remove(columnShowResources);
+
+          final character = Character.fromMap(map);
+
+          expect(character.showResources, isTrue);
+        },
+      );
+
+      test('parses IsJawsOfTheLion=1 as true', () {
+        final map = _createCharacterMap(isJawsOfTheLion: 1);
+
+        final character = Character.fromMap(map);
+
+        expect(character.jawsOfTheLionEdition, isTrue);
+      });
+
+      test(
+        'defaults jawsOfTheLionEdition to false when column is absent (pre-v20)',
+        () {
+          final map = _createCharacterMap();
+          map.remove(columnIsJawsOfTheLion);
+
+          final character = Character.fromMap(map);
+
+          expect(character.jawsOfTheLionEdition, isFalse);
+        },
+      );
 
       test('deserializes all core fields correctly', () {
         final map = _createCharacterMap(
@@ -161,6 +225,30 @@ void main() {
         expect(map[columnIsRetired], equals(0));
       });
 
+      test('serializes showResources=true as 1', () {
+        final character = TestData.createCharacter(showResources: true);
+
+        final map = character.toMap();
+
+        expect(map[columnShowResources], equals(1));
+      });
+
+      test('serializes showResources=false as 0', () {
+        final character = TestData.createCharacter(showResources: false);
+
+        final map = character.toMap();
+
+        expect(map[columnShowResources], equals(0));
+      });
+
+      test('serializes jawsOfTheLionEdition=true as 1', () {
+        final character = TestData.createCharacter(jawsOfTheLionEdition: true);
+
+        final map = character.toMap();
+
+        expect(map[columnIsJawsOfTheLion], equals(1));
+      });
+
       test('serializes all core fields correctly', () {
         final character = TestData.createCharacter(
           uuid: 'serial-test',
@@ -197,6 +285,8 @@ void main() {
         checkMarks: 12,
         previousRetirements: 1,
         isRetired: true,
+        showResources: false,
+        jawsOfTheLionEdition: true,
       );
       original.id = 5;
       original.notes = 'Round trip notes';
@@ -216,6 +306,11 @@ void main() {
         equals(original.previousRetirements),
       );
       expect(restored.isRetired, equals(original.isRetired));
+      expect(restored.showResources, equals(original.showResources));
+      expect(
+        restored.jawsOfTheLionEdition,
+        equals(original.jawsOfTheLionEdition),
+      );
       expect(restored.variant, equals(original.variant));
       expect(
         restored.playerClass.classCode,
@@ -492,6 +587,49 @@ void main() {
     });
   });
 
+  group('Character Model - isJawsOfTheLion (game-mode driven)', () {
+    test('true when created under the JotL game mode, regardless of class', () {
+      // The JotL game mode hides PQ/prosperity/resources for ANY class.
+      final brute = TestData.createCharacter(
+        playerClass: TestData.brute,
+        jawsOfTheLionEdition: true,
+      );
+      final demo = TestData.createCharacter(
+        playerClass: TestData.demolitionist,
+        jawsOfTheLionEdition: true,
+      );
+
+      expect(brute.isJawsOfTheLion, isTrue);
+      expect(demo.isJawsOfTheLion, isTrue);
+    });
+
+    test('false for a JotL class created under another game mode', () {
+      // A Demolitionist played in e.g. Frosthaven is a normal FH character and
+      // shows all the usual fields — the class does not make it "JotL".
+      final character = TestData.createCharacter(
+        playerClass: TestData.demolitionist,
+        jawsOfTheLionEdition: false,
+      );
+
+      expect(character.isJawsOfTheLion, isFalse);
+    });
+
+    test('false for a non-JotL class without the JotL game mode', () {
+      final character = TestData.createCharacter(playerClass: TestData.brute);
+
+      expect(character.isJawsOfTheLion, isFalse);
+    });
+
+    test('mastery visibility is class-based, independent of game mode', () {
+      // Demolitionist has no masteries regardless of which mode it's played in.
+      final character = TestData.createCharacter(
+        playerClass: TestData.demolitionist,
+      );
+
+      expect(character.shouldShowMasteries, isFalse);
+    });
+  });
+
   group('Character Model - Personal Quest', () {
     test('personalQuestId defaults to empty string', () {
       final character = TestData.createCharacter();
@@ -575,6 +713,8 @@ Map<String, dynamic> _createCharacterMap({
   String notes = '',
   int checkMarks = 0,
   int isRetired = 0,
+  int showResources = 1,
+  int isJawsOfTheLion = 0,
   String variant = 'base',
   String personalQuestId = '',
   String personalQuestProgress = '[]',
@@ -590,6 +730,8 @@ Map<String, dynamic> _createCharacterMap({
     columnCharacterNotes: notes,
     columnCharacterCheckMarks: checkMarks,
     columnIsRetired: isRetired,
+    columnShowResources: showResources,
+    columnIsJawsOfTheLion: isJawsOfTheLion,
     columnVariant: variant,
     columnResourceHide: 0,
     columnResourceMetal: 0,

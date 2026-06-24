@@ -56,6 +56,8 @@ void main() {
       columnCharacterNotes: '',
       columnCharacterCheckMarks: 0,
       columnIsRetired: 0,
+      columnShowResources: 1,
+      columnIsJawsOfTheLion: 0,
       columnResourceHide: 0,
       columnResourceMetal: 0,
       columnResourceLumber: 0,
@@ -76,12 +78,12 @@ void main() {
     await SharedPrefs().init();
     db = await databaseFactory.openDatabase(
       inMemoryDatabasePath,
-      options: OpenDatabaseOptions(version: 19),
+      options: OpenDatabaseOptions(version: 20),
     );
 
-    // Manually build the v19 schema (a subset matching what generateBackup
-    // walks). Mirrors DatabaseHelper._createTables and
-    // DatabaseMigrations.createMetaDataTable.
+    // Manually build the current schema (a subset matching what generateBackup
+    // walks). Mirrors DatabaseHelper._createTables (fresh install — NOT NULL
+    // with no DEFAULT) and DatabaseMigrations.createMetaDataTable.
     await db.execute('''
       CREATE TABLE $tableCharacters (
         $columnCharacterId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,6 +96,8 @@ void main() {
         $columnCharacterNotes TEXT NOT NULL,
         $columnCharacterCheckMarks INTEGER NOT NULL,
         $columnIsRetired BOOL NOT NULL,
+        $columnShowResources BOOL NOT NULL,
+        $columnIsJawsOfTheLion BOOL NOT NULL,
         $columnResourceHide INTEGER NOT NULL,
         $columnResourceMetal INTEGER NOT NULL,
         $columnResourceLumber INTEGER NOT NULL,
@@ -402,6 +406,62 @@ void main() {
         expect(rows, hasLength(1));
         expect(rows.first[columnCharacterPersonalQuestId], '');
         expect(rows.first[columnCharacterPersonalQuestProgress], '[]');
+      },
+    );
+
+    test(
+      'older backups missing ShowResources/IsJawsOfTheLion get defaults',
+      () async {
+        // A pre-v20 character row: no ShowResources or IsJawsOfTheLion columns
+        // (both added in v20). Restoring into the current NOT NULL schema must
+        // patch them, otherwise the insert violates the NOT NULL constraint.
+        final char = {
+          columnCharacterUuid: 'uuid-pre-v20',
+          columnCharacterName: 'Pre-Resources',
+          columnCharacterClassCode: 'br',
+          columnPreviousRetirements: 0,
+          columnCharacterXp: 0,
+          columnCharacterGold: 0,
+          columnCharacterNotes: '',
+          columnCharacterCheckMarks: 0,
+          columnIsRetired: 0,
+          columnResourceHide: 0,
+          columnResourceMetal: 0,
+          columnResourceLumber: 0,
+          columnResourceArrowvine: 0,
+          columnResourceAxenut: 0,
+          columnResourceRockroot: 0,
+          columnResourceFlamefruit: 0,
+          columnResourceCorpsecap: 0,
+          columnResourceSnowthistle: 0,
+          columnVariant: 'base',
+          columnCharacterPersonalQuestId: '',
+          columnCharacterPersonalQuestProgress: '[]',
+          // No ShowResources / IsJawsOfTheLion
+        };
+
+        final backup = convert.jsonEncode([
+          [tableCharacters, DatabaseHelper.tableMetaData],
+          [
+            [char],
+            [
+              {
+                DatabaseHelper.columnDatabaseVersion: 19,
+                DatabaseHelper.columnAppVersion: '4.5.3',
+                DatabaseHelper.columnAppBuildNumber: '1',
+              },
+            ],
+          ],
+          {},
+        ]);
+
+        await service.restoreBackup(backup);
+
+        final rows = await db.query(tableCharacters);
+        expect(rows, hasLength(1));
+        // Defaults: resources shown, not a JotL character.
+        expect(rows.first[columnShowResources], 1);
+        expect(rows.first[columnIsJawsOfTheLion], 0);
       },
     );
   });

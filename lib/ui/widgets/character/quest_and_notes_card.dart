@@ -41,12 +41,19 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
     final l10n = AppLocalizations.of(context);
     final model = context.watch<CharactersModel>();
     final hasQuestAssigned = widget.character.personalQuest != null;
-    final showQuestSection = hasQuestAssigned || !widget.character.isRetired;
+    // JotL has no personal quests — show only the notes section.
+    final showQuestSection =
+        !widget.character.isJawsOfTheLion &&
+        (hasQuestAssigned || !widget.character.isRetired);
     final hasNotes = widget.character.notes.isNotEmpty || model.isEditMode;
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,
-      title: _isExpanded ? l10n.personalQuest : l10n.questAndNotes,
+      title: widget.character.isJawsOfTheLion
+          ? l10n.notes
+          : _isExpanded
+          ? l10n.personalQuest
+          : l10n.questAndNotes,
       icon: Icons.map_rounded,
       initiallyExpanded: _isExpanded,
       onExpansionChanged: (value) {
@@ -72,42 +79,48 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
             // Notes section
             if (hasNotes) ...[
               if (showQuestSection) const GHCDivider(indent: true),
-              // Notes header (only when PQ section is visible above)
-              Padding(
-                key: widget.notesKey,
-                padding: const EdgeInsets.fromLTRB(
-                  largePadding,
-                  mediumPadding,
-                  mediumPadding,
-                  smallPadding,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: smallPadding),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.book_rounded,
-                        size: iconSizeSmall,
-                        color: primaryColor,
-                      ),
-                      const SizedBox(width: smallPadding),
-                      Expanded(
-                        child: Text(
-                          l10n.notes,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: primaryColor,
+              // Notes header — omitted for JotL characters, where the card
+              // title already reads "Notes", so it isn't written twice (mirrors
+              // the Stats card dropping its header when only stats are shown).
+              if (!widget.character.isJawsOfTheLion)
+                Padding(
+                  key: widget.notesKey,
+                  padding: const EdgeInsets.fromLTRB(
+                    largePadding,
+                    mediumPadding,
+                    mediumPadding,
+                    smallPadding,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: smallPadding),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.book_rounded,
+                          size: iconSizeSmall,
+                          color: primaryColor,
+                        ),
+                        const SizedBox(width: smallPadding),
+                        Expanded(
+                          child: Text(
+                            l10n.notes,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: primaryColor,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              // Notes content
+              // Notes content. When the header above is hidden (JotL), this
+              // becomes the top of the section, so it takes the scroll key and
+              // the header's top spacing.
               Padding(
-                padding: const EdgeInsets.fromLTRB(
+                key: widget.character.isJawsOfTheLion ? widget.notesKey : null,
+                padding: EdgeInsets.fromLTRB(
                   largePadding,
-                  0,
+                  widget.character.isJawsOfTheLion ? mediumPadding : 0,
                   mediumPadding,
                   largePadding,
                 ),

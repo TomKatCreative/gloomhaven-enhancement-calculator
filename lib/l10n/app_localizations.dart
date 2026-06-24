@@ -248,6 +248,24 @@ abstract class AppLocalizations {
   /// **'Resources'**
   String get resources;
 
+  /// No description provided for @showResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Show resources'**
+  String get showResources;
+
+  /// No description provided for @addResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Add resources'**
+  String get addResources;
+
+  /// No description provided for @removeResources.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove resources'**
+  String get removeResources;
+
   /// No description provided for @notes.
   ///
   /// In en, this message translates to:
@@ -686,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Frosthaven'**
   String get frosthaven;
 
+  /// No description provided for @jawsOfTheLion.
+  ///
+  /// In en, this message translates to:
+  /// **'Jaws of the Lion'**
+  String get jawsOfTheLion;
+
   /// No description provided for @crimsonScales.
   ///
   /// In en, this message translates to:
@@ -781,6 +805,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Personal quest'**
   String get personalQuest;
+
+  /// No description provided for @currentPersonalQuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Current quest'**
+  String get currentPersonalQuest;
 
   /// No description provided for @selectPersonalQuest.
   ///

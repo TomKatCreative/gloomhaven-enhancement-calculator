@@ -241,6 +241,29 @@ class DatabaseMigrations {
     );
   }
 
+  /// v20: Adds the [columnShowResources] flag to the Characters table.
+  ///
+  /// Existing characters default to `1` (shown) so the Resources section is
+  /// not hidden out from under anyone on upgrade. The column is NOT NULL, so a
+  /// DEFAULT is required for the ALTER to succeed against existing rows.
+  static Future<void> addShowResourcesColumn(Transaction txn) async {
+    await txn.rawInsert(
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnShowResources ${DatabaseHelper.boolType} DEFAULT 1',
+    );
+  }
+
+  /// v20: Adds the [columnIsJawsOfTheLion] flag to the Characters table.
+  ///
+  /// Persists the Jaws of the Lion edition choice from character creation.
+  /// Existing characters default to `0` (not created under JotL); JotL-class
+  /// characters are still recognised via their class category. The column is
+  /// NOT NULL, so a DEFAULT is required for the ALTER against existing rows.
+  static Future<void> addJawsOfTheLionColumn(Transaction txn) async {
+    await txn.rawInsert(
+      'ALTER TABLE $tableCharacters ADD COLUMN $columnIsJawsOfTheLion ${DatabaseHelper.boolType} DEFAULT 0',
+    );
+  }
+
   static Future<void> createMetaDataTable(Transaction txn, int version) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     await txn.execute('''

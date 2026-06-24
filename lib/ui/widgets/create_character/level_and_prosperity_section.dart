@@ -31,8 +31,12 @@ class LevelAndProsperitySection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildProsperitySlider(context),
-        const SizedBox(height: formFieldSpacing),
+        // JotL has no prosperity/town system, so the prosperity slider is
+        // hidden and gold is shown alongside the level slider instead.
+        if (edition != GameEdition.jawsOfTheLion) ...[
+          _buildProsperitySlider(context),
+          const SizedBox(height: formFieldSpacing),
+        ],
         _buildLevelSlider(context),
       ],
     );
@@ -126,7 +130,9 @@ class LevelAndProsperitySection extends StatelessWidget {
                 ),
               ),
             ],
-            if (edition == GameEdition.gloomhaven) ..._buildGoldDisplay(theme),
+            if (edition == GameEdition.gloomhaven ||
+                edition == GameEdition.jawsOfTheLion)
+              ..._buildGoldDisplay(theme),
           ],
         ),
         const SizedBox(height: smallPadding),

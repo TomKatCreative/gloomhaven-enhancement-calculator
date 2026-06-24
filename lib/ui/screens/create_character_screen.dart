@@ -62,6 +62,13 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
   String? _selectedPersonalQuestId;
   String? _selectedPartyId;
 
+  // Resources are a Frosthaven concept, so the section defaults on for
+  // Frosthaven and off otherwise (initial edition is Gloomhaven → off). It
+  // follows the edition toggle until the user sets it manually, after which
+  // their choice is preserved.
+  bool _showResources = false;
+  bool _showResourcesManuallySet = false;
+
   @override
   void dispose() {
     _nameTextFieldController.dispose();
@@ -102,7 +109,18 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             EditionToggle(
               selectedEdition: _selectedEdition,
               onEditionChanged: (edition) {
-                setState(() => _selectedEdition = edition);
+                setState(() {
+                  _selectedEdition = edition;
+                  if (edition == GameEdition.jawsOfTheLion) {
+                    // JotL has no resources or personal quests.
+                    _showResources = false;
+                    _selectedPersonalQuestId = null;
+                    _personalQuestTextFieldController.clear();
+                  } else if (!_showResourcesManuallySet) {
+                    // Follow the edition's default until the user overrides it.
+                    _showResources = edition == GameEdition.frosthaven;
+                  }
+                });
               },
             ),
             const SizedBox(height: formFieldSpacing),
@@ -116,8 +134,11 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
             ),
             const SizedBox(height: formFieldSpacing),
             _buildClassSelector(context, theme),
-            const SizedBox(height: formFieldSpacing),
-            _buildPersonalQuestSelector(context),
+            // JotL has no personal quests.
+            if (_selectedEdition != GameEdition.jawsOfTheLion) ...[
+              const SizedBox(height: formFieldSpacing),
+              _buildPersonalQuestSelector(context),
+            ],
             if (kTownSheetEnabled) ...[
               const SizedBox(height: formFieldSpacing),
               _buildPartySelector(context),
@@ -134,6 +155,25 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 setState(() => _selectedProsperityLevel = value);
               },
             ),
+            // JotL has no Frosthaven-style resources.
+            if (_selectedEdition != GameEdition.jawsOfTheLion) ...[
+              const SizedBox(height: formFieldSpacing),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                secondary: Icon(
+                  Icons.inventory_2_rounded,
+                  color: theme.contrastedPrimary,
+                ),
+                title: Text(AppLocalizations.of(context).showResources),
+                value: _showResources,
+                onChanged: (value) {
+                  setState(() {
+                    _showResources = value;
+                    _showResourcesManuallySet = true;
+                  });
+                },
+              ),
+            ],
             const SizedBox(height: formFieldSpacing),
           ],
         ),
@@ -304,6 +344,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
         variant: _variant,
         personalQuestId: _selectedPersonalQuestId,
         partyId: kTownSheetEnabled ? _selectedPartyId : null,
+        showResources: _showResources,
+        jawsOfTheLionEdition: _selectedEdition == GameEdition.jawsOfTheLion,
       );
       if (!mounted) return;
       Navigator.pop(context, true);

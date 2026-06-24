@@ -60,6 +60,8 @@ const String columnResourceFlamefruit = 'ResourceFlameFruit';
 const String columnResourceCorpsecap = 'ResourceCorpseCap';
 const String columnResourceSnowthistle = 'ResourceSnowThistle';
 const String columnIsRetired = 'IsRetired';
+const String columnShowResources = 'ShowResources';
+const String columnIsJawsOfTheLion = 'IsJawsOfTheLion';
 const String columnVariant = 'Variant';
 const String columnCharacterPersonalQuestId = 'PersonalQuestId';
 const String columnCharacterPersonalQuestProgress = 'PersonalQuestProgress';
@@ -106,6 +108,21 @@ class Character {
   late int resourceCorpsecap;
   late int resourceSnowthistle;
   bool isRetired = false;
+
+  /// Whether the Resources section is shown on this character's sheet.
+  ///
+  /// Resources are a Frosthaven concept, so this defaults to `true` for
+  /// Frosthaven characters and `false` otherwise (set at creation based on the
+  /// selected [GameEdition]). It can be toggled per-character afterwards.
+  /// Hiding the section never clears the stored resource counts.
+  bool showResources = true;
+
+  /// Whether this character was created under the Jaws of the Lion edition.
+  ///
+  /// JotL has no personal quests, prosperity, or resources. This persists the
+  /// edition choice so those sections stay hidden even when the chosen class
+  /// isn't a [ClassCategory.jawsOfTheLion] class (see [isJawsOfTheLion]).
+  bool jawsOfTheLionEdition = false;
   Variant variant = Variant.base;
   String personalQuestId = '';
   List<int> personalQuestProgress = [];
@@ -134,6 +151,8 @@ class Character {
     this.resourceCorpsecap = 0,
     this.resourceSnowthistle = 0,
     this.isRetired = false,
+    this.showResources = true,
+    this.jawsOfTheLionEdition = false,
     this.variant = Variant.base,
     this.personalQuestId = '',
     this.personalQuestProgress = const [],
@@ -163,6 +182,10 @@ class Character {
     resourceCorpsecap = map[columnResourceCorpsecap] ?? 0;
     resourceSnowthistle = map[columnResourceSnowthistle] ?? 0;
     isRetired = map[columnIsRetired] == 1;
+    // Defaults to shown when the column is absent (pre-v20 reads).
+    showResources = (map[columnShowResources] ?? 1) == 1;
+    // Defaults to false when the column is absent (pre-v20 reads).
+    jawsOfTheLionEdition = (map[columnIsJawsOfTheLion] ?? 0) == 1;
     variant = Variant.values.firstWhere(
       (variant) => variant.name == map[columnVariant],
     );
@@ -193,6 +216,8 @@ class Character {
     columnResourceCorpsecap: resourceCorpsecap,
     columnResourceSnowthistle: resourceSnowthistle,
     columnIsRetired: isRetired ? 1 : 0,
+    columnShowResources: showResources ? 1 : 0,
+    columnIsJawsOfTheLion: jawsOfTheLionEdition ? 1 : 0,
     columnVariant: variant.name,
     columnCharacterPersonalQuestId: personalQuestId,
     columnCharacterPersonalQuestProgress: encodeProgress(personalQuestProgress),
@@ -276,6 +301,17 @@ class Character {
   // TODO: modify this to include Custom and Crimson Scales once they have masteries
   // for now, have to manually add the Custom Classes that have masteries but aren't
   // yet Frosthaven Crossover versions
+  /// Whether this character should be treated as a Jaws of the Lion character.
+  ///
+  /// Determined solely by the game mode chosen at creation
+  /// ([jawsOfTheLionEdition]) — NOT by the class. The game mode is
+  /// authoritative: a JotL class (e.g. Demolitionist) created under another
+  /// mode (GH/GH2e/FH) is a normal character of that mode and shows all the
+  /// usual fields (resources default on for FH). JotL mode is a simplified
+  /// game with no personal quests, prosperity, or resources, so those sections
+  /// are hidden on the sheet.
+  bool get isJawsOfTheLion => jawsOfTheLionEdition;
+
   bool get shouldShowMasteries =>
       playerClass.classCode == ClassCodes.vimthreader ||
       playerClass.classCode == ClassCodes.core ||

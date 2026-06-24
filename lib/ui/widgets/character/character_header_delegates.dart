@@ -322,12 +322,25 @@ class SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // Chip labels mirror the section card titles: drop "resources"/"quest"
+    // when those sections aren't shown (e.g. JotL characters, or resources
+    // toggled off) so the chips don't name content that isn't there.
+    final showsResources =
+        !character.isJawsOfTheLion && character.showResources;
     final sections = [
       (
         CharacterSection.general,
-        kTownSheetEnabled ? l10n.general : l10n.statsAndResources,
+        kTownSheetEnabled
+            ? l10n.general
+            : showsResources
+            ? l10n.statsAndResources
+            : l10n.stats,
       ),
-      if (hasQuestOrNotes) (CharacterSection.questAndNotes, l10n.questAndNotes),
+      if (hasQuestOrNotes)
+        (
+          CharacterSection.questAndNotes,
+          character.isJawsOfTheLion ? l10n.notes : l10n.questAndNotes,
+        ),
       (
         CharacterSection.perksAndMasteries,
         hasMasteries ? l10n.perksAndMasteries : l10n.perks,

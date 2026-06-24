@@ -84,6 +84,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get resources => 'Resources';
 
   @override
+  String get showResources => 'Show resources';
+
+  @override
+  String get addResources => 'Add resources';
+
+  @override
+  String get removeResources => 'Remove resources';
+
+  @override
   String get notes => 'Notes';
 
   @override
@@ -327,6 +336,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get frosthaven => 'Frosthaven';
 
   @override
+  String get jawsOfTheLion => 'Jaws of the Lion';
+
+  @override
   String get crimsonScales => 'Crimson Scales';
 
   @override
@@ -379,6 +391,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get personalQuest => 'Personal quest';
+
+  @override
+  String get currentPersonalQuest => 'Current quest';
 
   @override
   String get selectPersonalQuest => 'Select personal quest...';

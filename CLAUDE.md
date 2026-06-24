@@ -96,7 +96,7 @@ Example: "Brute" in base game → "Bruiser" in Gloomhaven 2e.
 The enhancement calculator and character creation use `GameEdition` to apply edition-specific rules:
 
 ```dart
-enum GameEdition { gloomhaven, gloomhaven2e, frosthaven }
+enum GameEdition { gloomhaven, gloomhaven2e, frosthaven, jawsOfTheLion }
 ```
 
 **Starting Character Rules by Edition:**
@@ -106,8 +106,15 @@ enum GameEdition { gloomhaven, gloomhaven2e, frosthaven }
 | Gloomhaven | Prosperity Level | 15 × (L + 1) |
 | Gloomhaven 2e | Prosperity / 2 (rounded up) | 10 × P + 15 |
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
+| Jaws of the Lion | 9 (no prosperity) | 15 × (L + 1) |
 
 Where L = starting level, P = prosperity level.
+
+**Jaws of the Lion (JotL):** A simplified standalone **game mode**. It has **no personal quests, no prosperity/town, and no Frosthaven-style resources** — those inputs are hidden in character creation when the JotL game mode is selected, and the corresponding sections are hidden on the sheet via `Character.isJawsOfTheLion`.
+
+**Game mode is authoritative, not class.** `isJawsOfTheLion` reflects only the persisted `jawsOfTheLionEdition` flag (the game mode chosen at creation) — it does **not** look at the class. Any class can be created under any game mode: a JotL class (e.g. Demolitionist) created under GH/GH2e/FH is a normal character of that mode and shows all the usual fields (resources default on for FH). Conversely, picking the JotL mode with any class hides the PQ/prosperity/resources fields. (Mastery visibility is a separate, class-based concern via `shouldShowMasteries`.)
+
+JotL is **not** part of the enhancement calculator (it has no enhancement system), so it is intentionally absent from the calculator's edition picker — only the character-creation `EditionToggle` offers it.
 
 **Enhancement Calculator Differences:**
 - **Gloomhaven**: Multi-target multiplier applies to all enhancement types including Target and elements.

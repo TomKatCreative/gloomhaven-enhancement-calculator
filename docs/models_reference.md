@@ -67,6 +67,8 @@ Represents a player's character instance with stats, resources, and progression.
 | `notes` | `String` | '' | User-editable notes |
 | `checkMarks` | `int` | 0 | Check marks earned (0-18, every 3 = 1 perk) |
 | `isRetired` | `bool` | false | Retirement status |
+| `showResources` | `bool` | true | Whether the Resources section is shown on the sheet (set by edition at creation; toggleable per-character; hiding never clears counts) |
+| `jawsOfTheLionEdition` | `bool` | false | Whether the character was created under the JotL game mode. Drives `isJawsOfTheLion` (game-mode driven, **not** class-driven — a JotL class created under another mode behaves normally), which hides the PQ/prosperity/resources sections |
 | `variant` | `Variant` | base | Class variant (affects perks/masteries) |
 | `partyId` | `String?` | null | FK to Party (nullable — unassigned characters have null) |
 

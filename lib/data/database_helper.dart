@@ -23,7 +23,7 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 19;
+  static const _databaseVersion = 20;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -102,6 +102,8 @@ class DatabaseHelper implements IDatabaseHelper {
       '$columnCharacterNotes $textType',
       '$columnCharacterCheckMarks $integerType',
       '$columnIsRetired $boolType',
+      '$columnShowResources $boolType',
+      '$columnIsJawsOfTheLion $boolType',
       '$columnResourceHide $integerType',
       '$columnResourceMetal $integerType',
       '$columnResourceLumber $integerType',
@@ -249,6 +251,15 @@ class DatabaseHelper implements IDatabaseHelper {
         await txn.execute('DROP TABLE IF EXISTS PerksTable');
         await txn.execute('DROP TABLE IF EXISTS MasteriesTable');
         await txn.execute('DROP TABLE IF EXISTS PersonalQuestsTable');
+      },
+      // v20: Add per-character flags — ShowResources (toggles the Resources
+      // section) and IsJawsOfTheLion (persists the JotL edition choice).
+      // Existing characters default to resources-shown / not-JotL, so nothing
+      // is hidden on upgrade; JotL-class characters are recognised via class
+      // category regardless.
+      19: () async {
+        await DatabaseMigrations.addShowResourcesColumn(txn);
+        await DatabaseMigrations.addJawsOfTheLionColumn(txn);
       },
     };
 
