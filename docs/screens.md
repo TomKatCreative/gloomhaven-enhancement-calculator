@@ -16,25 +16,25 @@ await CreateCharacterScreen.show(context, charactersModel);
 
 ### Form Fields (top to bottom)
 
-1. **Game Edition** — 3-way `SegmentedButton` (GH / GH2E / FH) with info button. Placed at top since it affects other fields' behavior.
-2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right.
+1. **Game Edition** — 4-way `SegmentedButton` (GH / GH2e / FH / JotL) with info button. Placed at top since it affects other fields' behavior. Selecting JotL hides the Personal Quest, Prosperity, Resources, and Retirements fields and locks the character to level 1.
+2. **Name** — Text field with random name generator (faker dice icon). Inline **Retirements** +/- counter (0–99) to the right — hidden for JotL, which has no retirement mechanic.
 3. **Class** — Read-only field that opens `ClassSelectorScreen`. Shows class icon to the right. Create button is disabled until a class is selected (no form validator needed). Create button uses `theme.contrastedPrimary` for contrast-aware coloring.
 4. **Personal Quest** — Read-only field that opens `PersonalQuestSelectorScreen`. Clear button appears when a quest is selected.
 5. **Party** — *(gated by `kTownSheetEnabled`)* Read-only field that opens party assignment bottom sheet. Hidden when no active campaign exists.
 6. **Prosperity** — `SfSlider` (1–9) with `PROSPERITY` SVG icon via `SectionLabel`. Shows real-time gold display (GOLD SVG + amount) for GH2E and Frosthaven editions.
-7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition.
+7. **Starting Level** — `SfSlider` (1–9) with `LEVEL` SVG icon. Shows warning icon when level exceeds `edition.maxStartingLevel(prosperity)`. Shows real-time gold display for Gloomhaven edition. Hidden for JotL (always level 1) — replaced by a fixed "Starting gold: 30" row.
 
 ### Gold Calculation Display
 
-A real-time gold display (GOLD SVG icon + calculated amount) appears inline with either the level slider (GH) or prosperity slider (GH2E/FH), depending on which parameter drives gold for that edition. Uses `GameEdition.startingGold(level:, prosperityLevel:)` and updates reactively as sliders change.
+A real-time gold display (GOLD SVG icon + calculated amount) appears inline with either the level slider (GH) or prosperity slider (GH2E/FH), depending on which parameter drives gold for that edition. Uses `GameEdition.startingGold(level:, prosperityLevel:)` and updates reactively as sliders change. JotL has no sliders, so its gold is shown as a standalone "Starting gold" row at the fixed level-1 amount (30).
 
 ### Extracted Widgets
 
 | Widget | File | Purpose |
 |--------|------|---------|
-| `EditionToggle` | `lib/ui/widgets/create_character/edition_toggle.dart` | SegmentedButton (GH/GH2E/FH) with info dialog |
-| `NameField` | `lib/ui/widgets/create_character/name_field.dart` | Name text field with faker dice button and retirement counter |
-| `LevelAndProsperitySection` | `lib/ui/widgets/create_character/level_and_prosperity_section.dart` | Prosperity slider + level slider + gold display |
+| `EditionToggle` | `lib/ui/widgets/create_character/edition_toggle.dart` | SegmentedButton (GH/GH2e/FH/JotL) with info dialog |
+| `NameField` | `lib/ui/widgets/create_character/name_field.dart` | Name text field with faker dice button and retirement counter (`showRetirements` flag hides the counter for JotL) |
+| `LevelAndProsperitySection` | `lib/ui/widgets/create_character/level_and_prosperity_section.dart` | Prosperity slider + level slider + gold display (JotL: fixed "Starting gold" row only, both sliders hidden) |
 
 ---
 
@@ -496,7 +496,7 @@ Controlled by `charactersModel.isEditMode`:
 | Name | AutoSizeText | Editable TextFormField |
 | Traits | Visible | Hidden |
 | XP/Gold | Inline display (gold struck through if retired) | Text fields + add/subtract buttons |
-| Checkmarks/Retirements | Hidden | Visible with +/- controls |
+| Checkmarks/Retirements | Hidden | Visible with +/- controls (JotL: Battle Goals only — no Retirements column) |
 | Personal Quest | Progress text (e.g., "12/20") | +/- buttons (2–60), text field (>60), checklist checkboxes, swap quest |
 | Resources | Read-only cards | Cards with +/- callbacks |
 | Notes | Plain text | Multiline text field |
@@ -509,7 +509,7 @@ Extracted into `lib/ui/widgets/character/`:
 
 - **`StatsAndResourcesCard`** (`stats_and_resources_card.dart`) — Collapsible card owning expansion state; contains `StatsSection`, `CheckmarksAndRetirementsRow`, `PartyAssignmentRow`, Resources header, and `ResourcesContent`
 - **`StatsSection`** (`stats_section.dart`) — XP, gold (with `StrikethroughText` for retired), battle goals, hand size (card icon with overlaid number, hidden when null), pocket items. View-mode uses `Row` with `Expanded` + `FittedBox(scaleDown)` children; text items get `flex: 3`, icon-only items (hand size, pocket) get `flex: 2`
-- **`CheckmarksAndRetirementsRow`** (`checkmarks_and_retirements_row.dart`) — edit-mode only row with +/- controls
+- **`CheckmarksAndRetirementsRow`** (`checkmarks_and_retirements_row.dart`) — edit-mode only row with +/- controls; for JotL it renders only the Battle Goals column (no Previous Retirements), since JotL has no retirement mechanic
 - **`ResourcesContent`** (`stats_section.dart`) — 9 `ResourceCard` inventory-slot cells; uses `LayoutBuilder`-based dynamic icon sizing (50% of cell height). Tap in edit mode opens `ResourceStepperSheet` bottom sheet with +/- buttons and direct numeric input
 - **`QuestAndNotesCard`** (`quest_and_notes_card.dart`) — Collapsible card with `PersonalQuestSection` and notes
 - **`PerksAndMasteriesCard`** (`perks_and_masteries_card.dart`) — Collapsible card with `PerksSection`, `MasteriesSection`, and `_PerksCountBadge`

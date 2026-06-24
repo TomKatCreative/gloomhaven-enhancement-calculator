@@ -764,6 +764,12 @@ abstract class AppLocalizations {
   /// **'Starting level'**
   String get startingLevel;
 
+  /// No description provided for @startingGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting gold'**
+  String get startingGold;
+
   /// No description provided for @levelExceedsProsperity.
   ///
   /// In en, this message translates to:

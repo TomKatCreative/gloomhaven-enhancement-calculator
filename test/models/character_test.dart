@@ -380,6 +380,24 @@ void main() {
       expect(perksWithRetirements - perksNoRetirements, equals(2));
     });
 
+    test('excludes retirements for JotL (no retirement mechanic)', () {
+      // JotL has no personal quests → no retirements, so a stored retirement
+      // count must never grant extra perks.
+      final jotlNoRetirements = TestData.createCharacter(
+        previousRetirements: 0,
+        jawsOfTheLionEdition: true,
+      );
+      final jotlWithRetirements = TestData.createCharacter(
+        previousRetirements: 2,
+        jawsOfTheLionEdition: true,
+      );
+
+      expect(
+        Character.maximumPerks(jotlWithRetirements),
+        equals(Character.maximumPerks(jotlNoRetirements)),
+      );
+    });
+
     test('includes achieved masteries in calculation', () {
       final masteries = [
         TestData.createCharacterMastery(characterMasteryAchieved: true),

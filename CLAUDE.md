@@ -106,11 +106,11 @@ enum GameEdition { gloomhaven, gloomhaven2e, frosthaven, jawsOfTheLion }
 | Gloomhaven | Prosperity Level | 15 × (L + 1) |
 | Gloomhaven 2e | Prosperity / 2 (rounded up) | 10 × P + 15 |
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
-| Jaws of the Lion | 9 (no prosperity) | 15 × (L + 1) |
+| Jaws of the Lion | 1 (locked) | 15 × (L + 1) = 30 |
 
 Where L = starting level, P = prosperity level.
 
-**Jaws of the Lion (JotL):** A simplified standalone **game mode**. It has **no personal quests, no prosperity/town, and no Frosthaven-style resources** — those inputs are hidden in character creation when the JotL game mode is selected, and the corresponding sections are hidden on the sheet via `Character.isJawsOfTheLion`.
+**Jaws of the Lion (JotL):** A simplified standalone **game mode**. It has **no personal quests, no prosperity/town, no Frosthaven-style resources, and no retirement mechanic** — those inputs are hidden in character creation when the JotL game mode is selected, and the corresponding sections are hidden on the sheet via `Character.isJawsOfTheLion`. JotL characters always **start at level 1**: the level slider is hidden in character creation (replaced by a fixed "Starting gold: 30" row). JotL still has battle-goal checkmarks and level-up perks; only retirement-granted perks are removed — `Character.maximumPerks` excludes `previousRetirements` for JotL.
 
 **Game mode is authoritative, not class.** `isJawsOfTheLion` reflects only the persisted `jawsOfTheLionEdition` flag (the game mode chosen at creation) — it does **not** look at the class. Any class can be created under any game mode: a JotL class (e.g. Demolitionist) created under GH/GH2e/FH is a normal character of that mode and shows all the usual fields (resources default on for FH). Conversely, picking the JotL mode with any class hides the PQ/prosperity/resources fields. (Mastery visibility is a separate, class-based concern via `shouldShowMasteries`.)
 

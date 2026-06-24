@@ -120,10 +120,13 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
                 ResourcesContent(character: widget.character),
               ] else if (canEdit) ...[
                 const Divider(height: largePadding * 2),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.add_rounded),
+                Center(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.contrastedPrimary,
+                      side: BorderSide(color: theme.contrastedPrimary),
+                    ),
+                    icon: const Icon(Icons.add_rounded, size: iconSizeSmall),
                     label: Text(l10n.addResources),
                     onPressed: () {
                       widget.character.showResources = true;

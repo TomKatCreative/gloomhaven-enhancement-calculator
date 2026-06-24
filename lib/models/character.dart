@@ -250,11 +250,16 @@ class Character {
   /// Calculates the maximum number of perks available for a character.
   ///
   /// Formula: (level - 1) + (checkMarks / 3) + retirements + achievedMasteries
+  ///
+  /// Retirements are excluded for JotL — it has no retirement mechanic (no
+  /// personal quests → no retirements), so they never grant extra perks.
   static int maximumPerks(Character character) {
     int sum = 0;
     sum += level(character.xp) - 1;
     sum += ((character.checkMarks - 1) / 3).round();
-    sum += character.previousRetirements;
+    if (!character.isJawsOfTheLion) {
+      sum += character.previousRetirements;
+    }
     sum += character.characterMasteries.fold(
       0,
       (previousValue, mastery) =>

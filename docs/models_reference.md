@@ -61,7 +61,7 @@ Represents a player's character instance with stats, resources, and progression.
 | `uuid` | `String` | generated | Unique identifier (UUID v4) |
 | `name` | `String` | required | Character's display name |
 | `playerClass` | `PlayerClass` | required | Reference to the class definition |
-| `previousRetirements` | `int` | 0 | Cumulative retirement count (affects max perks) |
+| `previousRetirements` | `int` | 0 | Cumulative retirement count (adds to max perks, except for JotL — no retirement mechanic) |
 | `xp` | `int` | 0 | Experience points (determines level) |
 | `gold` | `int` | varies | Current gold (starting amount varies by edition) |
 | `notes` | `String` | '' | User-editable notes |
@@ -119,7 +119,7 @@ Represents a player's character instance with stats, resources, and progression.
 |--------|---------|-------------|
 | `level(int xp)` | `int` | Convert XP to level using thresholds |
 | `xpForNextLevel(int currentLevel)` | `int?` | XP needed for next level |
-| `maximumPerks(level, checkMarks, retirements, masteries)` | `int` | Max perks available |
+| `maximumPerks(level, checkMarks, retirements, masteries)` | `int` | Max perks available: `(level - 1) + (checkMarks / 3) + retirements + achievedMasteries`. The `retirements` term is excluded for JotL (no retirement mechanic) |
 
 ### Level Thresholds
 
@@ -473,8 +473,8 @@ Enum representing game editions with edition-specific rules.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `maxStartingLevel(int prosperityLevel)` | `int` | Max starting level for a given prosperity. GH: prosperity level directly. GH2E/FH: `(prosperity / 2).ceil()` |
-| `startingGold({int level, int prosperityLevel})` | `int` | Starting gold for a new character. GH: `15 × (level + 1)`. GH2E: `10 × prosperity + 15`. FH: `10 × prosperity + 20` |
+| `maxStartingLevel(int prosperityLevel)` | `int` | Max starting level for a given prosperity. GH: prosperity level directly. GH2E/FH: `(prosperity / 2).ceil()`. JotL: returns 9 (no prosperity cap), but unused — the create screen locks JotL characters to level 1 |
+| `startingGold({int level, int prosperityLevel})` | `int` | Starting gold for a new character. GH: `15 × (level + 1)`. GH2E: `10 × prosperity + 15`. FH: `10 × prosperity + 20`. JotL: `15 × (level + 1)` (same as GH; always level 1 → 30) |
 
 ### Starting Character Rules
 
@@ -483,8 +483,9 @@ Enum representing game editions with edition-specific rules.
 | Gloomhaven | Prosperity Level | 15 × (L + 1) |
 | Gloomhaven 2e | Prosperity / 2 (rounded up) | 10 × P + 15 |
 | Frosthaven | Prosperity / 2 (rounded up) | 10 × P + 20 |
+| Jaws of the Lion | 1 (locked) | 15 × (L + 1) = 30 |
 
-Where L = starting level, P = prosperity level.
+Where L = starting level, P = prosperity level. JotL characters always start at level 1 — the create screen hides the level slider and shows a fixed starting-gold amount (30).
 
 ---
 

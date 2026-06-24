@@ -153,6 +153,7 @@
     }
   },
   "startingLevel": "Starting level",
+  "startingGold": "Starting gold",
   "levelExceedsProsperity": "Max starting level at this prosperity is {maxLevel}",
   "@levelExceedsProsperity": {
     "placeholders": {

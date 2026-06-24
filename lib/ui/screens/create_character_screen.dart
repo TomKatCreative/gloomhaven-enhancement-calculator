@@ -112,7 +112,10 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                 setState(() {
                   _selectedEdition = edition;
                   if (edition == GameEdition.jawsOfTheLion) {
-                    // JotL has no resources or personal quests.
+                    // JotL characters always start at level 1 and have no
+                    // resources, personal quests, or retirement mechanic.
+                    _selectedLevel = 1;
+                    _previousRetirements = 0;
                     _showResources = false;
                     _selectedPersonalQuestId = null;
                     _personalQuestTextFieldController.clear();
@@ -128,6 +131,8 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
               key: _nameFieldKey,
               nameController: _nameTextFieldController,
               previousRetirements: _previousRetirements,
+              // JotL has no retirement mechanic, so hide the counter for it.
+              showRetirements: _selectedEdition != GameEdition.jawsOfTheLion,
               onRetirementChanged: (value) {
                 setState(() => _previousRetirements = value);
               },

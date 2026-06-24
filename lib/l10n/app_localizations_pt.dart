@@ -370,6 +370,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get startingLevel => 'Nível inicial';
 
   @override
+  String get startingGold => 'Ouro inicial';
+
+  @override
   String levelExceedsProsperity(int maxLevel) {
     return 'Nível inicial máximo nesta prosperidade é $maxLevel';
   }

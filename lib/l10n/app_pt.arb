@@ -111,6 +111,7 @@
   "class_": "Classe",
   "classWithVariant": "Classe ({variant})",
   "startingLevel": "Nível inicial",
+  "startingGold": "Ouro inicial",
   "levelExceedsProsperity": "Nível inicial máximo nesta prosperidade é {maxLevel}",
   "prosperityLevel": "Prosperidade",
   "createCharacter": "Criar personagem",
