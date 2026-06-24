@@ -166,63 +166,71 @@ class _CollapsibleSectionCardState extends State<CollapsibleSectionCard> {
     return Container(
       key: widget.sectionKey,
       constraints: effectiveConstraints,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerLow,
         border: Border.all(color: theme.colorScheme.outlineVariant),
         borderRadius: BorderRadius.circular(borderRadiusMedium),
       ),
-      child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          onExpansionChanged: (value) {
-            widget.onExpansionChanged(value);
-            setState(() => _isExpanded = value);
-          },
-          initiallyExpanded: _isExpanded,
-          iconColor: primaryColor,
-          trailing: widget.trailing != null
-              ? Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    widget.trailing!,
-                    AnimatedRotation(
-                      turns: _isExpanded ? 0.5 : 0,
-                      duration: animationDuration,
-                      child: Icon(
-                        Icons.expand_more,
-                        color: _isExpanded ? primaryColor : null,
+      // The ExpansionTile header is a ListTile; without a Material ancestor
+      // inside the decorated Container, Flutter asserts that the Container's
+      // background would hide the tap ink. A transparent Material gives the
+      // ink somewhere to paint while keeping the surfaceContainerLow fill.
+      child: Material(
+        type: MaterialType.transparency,
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            onExpansionChanged: (value) {
+              widget.onExpansionChanged(value);
+              setState(() => _isExpanded = value);
+            },
+            initiallyExpanded: _isExpanded,
+            iconColor: primaryColor,
+            trailing: widget.trailing != null
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      widget.trailing!,
+                      AnimatedRotation(
+                        turns: _isExpanded ? 0.5 : 0,
+                        duration: animationDuration,
+                        child: Icon(
+                          Icons.expand_more,
+                          color: _isExpanded ? primaryColor : null,
+                        ),
                       ),
-                    ),
-                  ],
-                )
-              : null,
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.icon != null) ...[
-                Icon(widget.icon, size: iconSizeSmall, color: primaryColor),
-                const SizedBox(width: smallPadding),
-              ] else if (widget.svgAssetKey != null) ...[
-                ThemedSvg(
-                  assetKey: widget.svgAssetKey!,
-                  width: iconSizeSmall,
-                  color: primaryColor,
+                    ],
+                  )
+                : null,
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (widget.icon != null) ...[
+                  Icon(widget.icon, size: iconSizeSmall, color: primaryColor),
+                  const SizedBox(width: smallPadding),
+                ] else if (widget.svgAssetKey != null) ...[
+                  ThemedSvg(
+                    assetKey: widget.svgAssetKey!,
+                    width: iconSizeSmall,
+                    color: primaryColor,
+                  ),
+                  const SizedBox(width: smallPadding),
+                ],
+                Flexible(
+                  child:
+                      widget.titleWidget ??
+                      Text(
+                        widget.title,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: primaryColor,
+                        ),
+                      ),
                 ),
-                const SizedBox(width: smallPadding),
               ],
-              Flexible(
-                child:
-                    widget.titleWidget ??
-                    Text(
-                      widget.title,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: primaryColor,
-                      ),
-                    ),
-              ),
-            ],
+            ),
+            children: widget.children,
           ),
-          children: widget.children,
         ),
       ),
     );
