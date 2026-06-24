@@ -4,26 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-/// Requests storage permission on iOS. Android returns true immediately.
-///
-/// Returns true if permission is granted, false otherwise.
-Future<bool> getStoragePermission() async {
-  if (Platform.isAndroid) {
-    return true;
-  }
-  PermissionStatus permissionStatus = await Permission.storage.request();
-  if (permissionStatus.isGranted) {
-    return true;
-  } else if (permissionStatus.isPermanentlyDenied) {
-    await openAppSettings();
-  } else if (permissionStatus.isDenied) {
-    return false;
-  }
-  return false;
-}
 
 /// Shows a loading dialog with a progress indicator during restore operations.
 void showLoaderDialog(BuildContext context) {
