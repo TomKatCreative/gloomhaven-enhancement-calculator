@@ -5,7 +5,7 @@ Reverse-chronological log of production releases with commit references.
 ## v4.6.0 — Jaws of the Lion Game Mode
 
 - **Tag:** `v4.6.0`
-- **Commit:** `e490973` — "Prepare v4.6.0 release: Jaws of the Lion game mode and Resources toggle"
+- **Commit:** `e36f1bd` — "Prepare v4.6.0 release: Jaws of the Lion game mode and Resources toggle"
 - **Date:** 2026-06-24
 - Jaws of the Lion game mode in character creation: locks characters to level 1 (fixed 30 starting gold), hides personal quests / prosperity / resources, and excludes the retirement mechanic (hidden in creation + on the sheet, excluded from `maximumPerks`)
 - Game mode is authoritative, not class: persisted via `IsJawsOfTheLion`. A JotL class (e.g. Demolitionist) created under GH/GH2e/FH is a normal character of that mode. JotL is excluded from the enhancement calculator
