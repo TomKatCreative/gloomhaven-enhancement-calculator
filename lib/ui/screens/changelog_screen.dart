@@ -36,6 +36,17 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.6.0',
+              date: '2026-06-24',
+              changes: [
+                'Added Jaws of the Lion as a character creation game mode. JotL characters start at level 1, skip personal quests, prosperity, and resources, and have no retirements.',
+                'Added a per-character toggle to show or hide the Resources section (on by default for Frosthaven). Hiding it never clears your saved resource counts.',
+                'The selected personal quest now stays pinned above the quest list so it is always visible.',
+                'Various UI polishes and behind-the-scenes fixes and improvements.',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.5.3',
               date: '2026-02-24',
               changes: [
