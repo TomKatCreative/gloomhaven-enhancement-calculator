@@ -142,8 +142,10 @@ void main() {
     });
 
     group('maxProsperityLevel', () {
-      test('is 9 for all editions', () {
-        for (final edition in GameEdition.values) {
+      test('is 9 for all campaign editions', () {
+        // Campaigns/prosperity exist only for GH/GH2e/FH — Jaws of the Lion
+        // has no prosperity system and is not a valid campaign edition.
+        for (final edition in prosperityThresholds.keys) {
           final campaign = TestData.createCampaign(edition: edition);
           expect(campaign.maxProsperityLevel, 9);
         }

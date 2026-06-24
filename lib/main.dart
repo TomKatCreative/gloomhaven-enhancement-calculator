@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:device_region/device_region.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
@@ -24,23 +23,11 @@ Future<void> main() async {
     SharedPrefs().clearSharedPrefs = false;
   }
   if (Platform.isAndroid) {
-    try {
-      // device_region: tries SIM first, falls back to network on Android
-      final simOrNetwork = await DeviceRegion.getSIMCountryCode().timeout(
-        const Duration(seconds: 3),
-      );
-
-      // Flutter's locale from device settings
-      final deviceLocale = PlatformDispatcher.instance.locale.countryCode;
-
-      SharedPrefs().isUSRegion =
-          simOrNetwork?.toUpperCase() == 'US' ||
-          deviceLocale?.toUpperCase() == 'US';
-    } catch (e) {
-      // Fallback: still check locale even if device_region fails
-      final deviceLocale = PlatformDispatcher.instance.locale.countryCode;
-      SharedPrefs().isUSRegion = deviceLocale?.toUpperCase() == 'US';
-    }
+    // Gate the optional "Buy Me a Coffee" button by region. The device locale
+    // is sufficient here; the old device_region plugin (SIM country) is
+    // unmaintained, and SIM-country APIs are deprecated on iOS anyway.
+    final country = PlatformDispatcher.instance.locale.countryCode;
+    SharedPrefs().isUSRegion = country?.toUpperCase() == 'US';
   }
 
   runApp(

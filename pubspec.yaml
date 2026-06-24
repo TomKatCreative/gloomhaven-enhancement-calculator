@@ -1,7 +1,7 @@
 name: gloomhaven_enhancement_calc
 description: Character sheet and enhancement calculator
 
-version: 4.5.3+322
+version: 4.6.0+322
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -17,25 +17,27 @@ dependencies:
   path_provider: ^2.1.1
   provider: ^6.1.1
   flutter_svg: ^2.2.3
-  # Temporarily pinned to avoid breaking change
+  # Pinned at 10.3.10: file_picker 11.0.2's Android plugin skips applying the
+  # Kotlin plugin when AGP 9 is detected (relies on a propagation that doesn't
+  # happen), causing GeneratedPluginRegistrant to fail with "cannot find
+  # symbol FilePickerPlugin" at compile time. Revisit when 11.0.3+ ships.
   file_picker: 10.3.10
   intl: any
   smooth_page_indicator: ^2.0.1
   permission_handler: ^12.0.0
   # problems?
   uuid: ^4.5.3
-  package_info_plus: ^9.0.0
-  device_info_plus: ^12.3.0
+  # *_plus 10.x/13.x require win32 ^6 which conflicts with file_picker 11
+  package_info_plus: ^9.0.1
+  device_info_plus: ^12.4.0
   url_launcher: ^6.2.1
   faker: ^2.2.0
-  syncfusion_flutter_sliders: ^32.2.7
+  syncfusion_flutter_sliders: ^33.2.4
   path: ^1.8.3
-  # maybe URL launcher is problematic
-  font_awesome_flutter: ^10.6.0
+  font_awesome_flutter: ^11.0.0
   material_design_icons_flutter: ^7.0.7296
-  share_plus: ^12.0.1
+  share_plus: ^12.0.2
   collection: ^1.19.0
-  device_region: ^1.4.0
 
   cupertino_icons: ^1.0.8
   confetti: 0.8.0
@@ -47,6 +49,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   mockito: ^5.4.4
   build_runner: ^2.4.8
+  # In-memory SQLite for backup/restore service tests (no platform plugin needed)
+  sqflite_common_ffi: ^2.3.3
 
 flutter_launcher_icons: # dart run flutter_launcher_icons
   android: true

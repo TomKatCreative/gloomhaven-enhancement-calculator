@@ -25,6 +25,9 @@
   "xp": "XP",
   "gold": "Gold",
   "resources": "Resources",
+  "showResources": "Show resources",
+  "addResources": "Add resources",
+  "removeResources": "Remove resources",
   "notes": "Notes",
   "retired": "(retired)",
   "previousRetirements": "Previous retirements",
@@ -126,6 +129,7 @@
   "createAll": "Create all",
   "gloomhaven": "Gloomhaven",
   "frosthaven": "Frosthaven",
+  "jawsOfTheLion": "Jaws of the Lion",
   "crimsonScales": "Crimson Scales",
   "custom": "Custom",
   "andVariants": "& variants",
@@ -149,6 +153,7 @@
     }
   },
   "startingLevel": "Starting level",
+  "startingGold": "Starting gold",
   "levelExceedsProsperity": "Max starting level at this prosperity is {maxLevel}",
   "@levelExceedsProsperity": {
     "placeholders": {
@@ -163,6 +168,7 @@
   "selectClass": "Select class...",
   "addNotes": "Add notes...",
   "personalQuest": "Personal quest",
+  "currentPersonalQuest": "Current quest",
   "selectPersonalQuest": "Select personal quest...",
   "selectAPersonalQuest": "Select a personal quest",
   "changePersonalQuest": "Change personal quest?",

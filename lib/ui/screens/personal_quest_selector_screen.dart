@@ -8,8 +8,11 @@
 /// - **Edition filter chips**: Narrow results by edition/expansion
 /// - **Search**: Filters quests by title or number
 /// - **Section headers**: Groups quests by [PersonalQuestEdition.displayName]
-/// - **Current quest highlight**: Shows selected quest with highlight styling
-/// - **Remove action**: Remove button on selected quest's tile
+/// - **Pinned current quest**: When a quest is already assigned, it appears in
+///   its own "Current quest" section at the top (and is omitted from the
+///   grouped list below so it never shows twice), making it obvious which
+///   quest is active and how to remove it
+/// - **Remove action**: Remove button on the current quest's tile
 ///
 /// ## Layout
 /// ```
@@ -18,9 +21,10 @@
 /// ├─────────────────────────────────────┤
 /// │ [Gloomhaven] [Frosthaven]          │  ← Edition filter chips
 /// ├─────────────────────────────────────┤
-/// │ ──────── Gloomhaven ────────        │  ← Section header
-/// │ Seeker of Xorn           [PH] [⊖]  │  ← selected quest with remove
+/// │ ──────── Current quest ────────     │  ← pinned (only if assigned)
+/// │ Seeker of Xorn           [PH] [⊖]  │  ← current quest with remove
 /// │ 510                                 │  ← subtitle
+/// │ ──────── Gloomhaven ────────        │  ← Section header
 /// │ Merchant Class                [QM]  │
 /// │ 511                                 │
 /// │ ...                                 │
@@ -97,8 +101,16 @@ class _PersonalQuestSelectorScreenState
   final Set<PersonalQuestEdition> _selectedEditions = {};
 
   /// Returns quests filtered by edition and search query.
+  ///
+  /// The currently-active quest is excluded here because it is shown in its
+  /// own pinned section at the top of the list, so it never appears twice.
   List<PersonalQuest> get _filteredQuests {
     var available = PersonalQuestsRepository.quests;
+
+    final currentId = widget.currentQuest?.id;
+    if (currentId != null) {
+      available = available.where((q) => q.id != currentId).toList();
+    }
 
     if (_selectedEditions.isNotEmpty) {
       available = available
@@ -152,6 +164,8 @@ class _PersonalQuestSelectorScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: GHCSearchAppBar(
         controller: _searchController,
@@ -184,6 +198,21 @@ class _PersonalQuestSelectorScreenState
                 ],
               ),
             ),
+            // Keep the active quest fixed above the scrolling list (rather than
+            // inside it) so it stays visible while browsing — making it clear
+            // which quest is assigned and how to remove it.
+            if (widget.currentQuest case final currentQuest?)
+              Material(
+                color: theme.colorScheme.surface,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SearchSectionHeader(title: l10n.currentPersonalQuest),
+                    _buildQuestTile(context, currentQuest, isSelected: true),
+                    Divider(height: 0, color: theme.dividerTheme.color),
+                  ],
+                ),
+              ),
             Expanded(
               child: CustomScrollView(
                 controller: _scrollController,

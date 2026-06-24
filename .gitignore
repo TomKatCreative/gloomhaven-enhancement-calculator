@@ -104,6 +104,9 @@ local.properties
 **/ios/**/.symlinks/
 **/ios/**/profile
 **/ios/**/xcuserdata
+# Swift Package Manager lockfile (Package.resolved). Gitignored for parity
+# with pubspec.lock; the Flutter tool regenerates it on every run.
+**/ios/**/xcshareddata/swiftpm/
 **/ios/.generated/
 **/ios/Flutter/.last_build_id
 **/ios/Flutter/App.framework

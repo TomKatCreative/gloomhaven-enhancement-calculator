@@ -2,8 +2,25 @@
 
 Reverse-chronological log of production releases with commit references.
 
+## v4.6.0 — Jaws of the Lion Game Mode
+
+- **Tag:** `v4.6.0`
+- **Commit:** `e36f1bd` — "Prepare v4.6.0 release: Jaws of the Lion game mode and Resources toggle"
+- **Date:** 2026-06-24
+- Jaws of the Lion game mode in character creation: locks characters to level 1 (fixed 30 starting gold), hides personal quests / prosperity / resources, and excludes the retirement mechanic (hidden in creation + on the sheet, excluded from `maximumPerks`)
+- Game mode is authoritative, not class: persisted via `IsJawsOfTheLion`. A JotL class (e.g. Demolitionist) created under GH/GH2e/FH is a normal character of that mode. JotL is excluded from the enhancement calculator
+- Non-interactive italic "Jaws of the Lion" label added to the character header for JotL characters
+- Per-character Resources show/hide toggle (`ShowResources`): defaults on for Frosthaven, off otherwise; hiding never clears stored resource counts. "Add resources" button restyled and centered to match the personal-quest button
+- Personal quest selector now pins the active quest in a fixed band above the scrolling list
+- Database schema v20: adds `ShowResources` and `IsJawsOfTheLion` columns to Characters (single append-only migration; existing rows default to shown / not-JotL). Backup/restore patches pre-v20 backups on import
+- Fixed a ListTile ink-splash assertion in `CollapsibleSectionCard` (also unblocked 57 widget tests)
+- Replaced the unmaintained `device_region` plugin with the built-in device locale for region detection
+- Adopted Swift Package Manager for iOS; fully removed CocoaPods integration (Podfile, build phases, xcconfig includes, workspace ref)
+- Internal: enhancement calculator screen split into thematic component files, `InfoDialog` refactored to a data-driven category resolver, animated element configs extracted, character XP/gold writes debounced, dependency upgrades, and a large test backfill (test count ~954 → 1045)
+
 ## v4.5.3 — Hand Size Display
 
+- **Commit:** `efa29ff` — "Prepare v4.5.3 release: hand size display and FAQ errata"
 - **Date:** 2026-02-24
 - Hand size icon added to character stats section (shows class hand size with variant support)
 - Frosthaven FAQ errata: corrected Scenario 67 to Scenario 65 in personal quest 12
@@ -15,6 +32,7 @@ Reverse-chronological log of production releases with commit references.
 
 ## v4.5.2 — All Personal Quests
 
+- **Commit:** `9c7dbd2` — "Prepare v4.5.2 release: all personal quest editions"
 - Added Gloomhaven 2nd Edition personal quests (22 quests, cards 01-22 / assets 537-558)
 - Added Crimson Scales personal quests (28 quests)
 - Added Trail of Ashes personal quests (8 quests)

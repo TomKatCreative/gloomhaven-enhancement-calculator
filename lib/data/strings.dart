@@ -533,6 +533,13 @@ A **main** ability is an ability that is written in larger font, whereas a **non
             "For example, if the city is at Prosperity Level 3, you could start a character at "
             "level 1 or 2, and would be alloted 50 gold. This gold must be spent immediately "
             "on items in the available purchasable supply, and any unspent gold is forfeited.";
+      case GameEdition.jawsOfTheLion:
+        return "Jaws of the Lion is a simplified, standalone game. It has no prosperity, no "
+            "personal quests, and no resource crafting, so those options are hidden.\n\n"
+            "Characters normally start at level 1, but you can set any starting level here for "
+            "tracking. You are alloted an amount of gold equal to **15x(L+1)**, where 'L' is "
+            "your character's starting level.\n\n"
+            "For example, a level 1 character is alloted 30 gold.";
     }
   }
 

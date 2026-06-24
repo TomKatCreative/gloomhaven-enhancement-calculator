@@ -340,6 +340,42 @@ void main() {
       expect(handSizeTooltip, findsOneWidget);
     });
 
+    testWidgets('edit mode hides hand size tooltip', (tester) async {
+      // In edit mode the stats row shows only XP and Gold inputs, so the
+      // hand-size widget (with its tooltip) should not be present.
+      final character = TestData.createCharacter();
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final handSizeTooltip = find.byWidgetPredicate(
+        (w) => w is Tooltip && (w.message?.startsWith('Hand size') ?? false),
+      );
+      expect(handSizeTooltip, findsNothing);
+    });
+
+    testWidgets('retired character shows hand size (no edit mode)', (
+      tester,
+    ) async {
+      // Retired characters always use the view layout regardless of
+      // isEditMode, so hand size remains visible.
+      final character = TestData.createCharacter(isRetired: true);
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final handSizeTooltip = find.byWidgetPredicate(
+        (w) => w is Tooltip && w.message == 'Hand size: 10',
+      );
+      expect(handSizeTooltip, findsOneWidget);
+    });
+
     testWidgets('view mode shows pocket items tooltip', (tester) async {
       final character = TestData.createCharacter(xp: 0);
       final model = await setupModel(character: character, isEditMode: false);
@@ -477,6 +513,43 @@ void main() {
 
       // No TextFields
       expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('XP keystrokes update the in-memory character immediately and '
+        'persist after a 300 ms debounce', (tester) async {
+      // Regression test for the per-keystroke SQLite write that was
+      // replaced with a debounced persist (see commit 16cacb2).
+      final character = TestData.createCharacter(xp: 0, notes: '');
+      final model = await setupModel(character: character, isEditMode: true);
+
+      await tester.pumpWidget(
+        buildTestWidget(model: model, character: character),
+      );
+      await tester.pumpAndSettle();
+
+      final xpField = tester
+          .widgetList<TextField>(find.byType(TextField))
+          .firstWhere((tf) => tf.keyboardType == TextInputType.number);
+
+      final priorUpdates = fakeDb.updateCalls.length;
+
+      // Simulate three quick keystrokes within the debounce window.
+      xpField.onChanged?.call('1');
+      xpField.onChanged?.call('12');
+      xpField.onChanged?.call('123');
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // In-memory value is updated immediately on each keystroke so the
+      // UI never shows stale data.
+      expect(character.xp, 123);
+
+      // No persist has fired yet — the timer is still pending.
+      expect(fakeDb.updateCalls.length, priorUpdates);
+
+      // Let the debounce window elapse.
+      await tester.pump(const Duration(milliseconds: 350));
+
+      expect(fakeDb.updateCalls.length, priorUpdates + 1);
     });
   });
 

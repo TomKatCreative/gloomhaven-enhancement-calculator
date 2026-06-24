@@ -29,11 +29,40 @@ class LevelAndProsperitySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // JotL has no prosperity/town system and characters always start at
+    // level 1, so both sliders are hidden and only the fixed starting gold
+    // (15 × (1 + 1) = 30) is shown.
+    if (edition == GameEdition.jawsOfTheLion) {
+      return _buildStartingGoldRow(context);
+    }
+
     return Column(
       children: [
         _buildProsperitySlider(context),
         const SizedBox(height: formFieldSpacing),
         _buildLevelSlider(context),
+      ],
+    );
+  }
+
+  Widget _buildStartingGoldRow(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    return Row(
+      children: [
+        ThemedSvg(
+          assetKey: 'GOLD',
+          width: iconSizeMedium,
+          color: colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: smallPadding),
+        Text(
+          '${AppLocalizations.of(context).startingGold}: '
+          '${edition.startingGold(level: level)}',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
@@ -126,7 +155,9 @@ class LevelAndProsperitySection extends StatelessWidget {
                 ),
               ),
             ],
-            if (edition == GameEdition.gloomhaven) ..._buildGoldDisplay(theme),
+            if (edition == GameEdition.gloomhaven ||
+                edition == GameEdition.jawsOfTheLion)
+              ..._buildGoldDisplay(theme),
           ],
         ),
         const SizedBox(height: smallPadding),

@@ -54,11 +54,12 @@ class _ElementPosition {
   });
 
   Widget toPositioned(double scale) {
+    double? scaled(double? v) => v == null ? null : v * scale;
     return Positioned(
-      top: top != null ? top! * scale : null,
-      right: right != null ? right! * scale : null,
-      bottom: bottom != null ? bottom! * scale : null,
-      left: left != null ? left! * scale : null,
+      top: scaled(top),
+      right: scaled(right),
+      bottom: scaled(bottom),
+      left: scaled(left),
       child: ThemedSvg(assetKey: assetKey, width: width * scale),
     );
   }

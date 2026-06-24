@@ -103,6 +103,11 @@ class DatabaseBackupService {
           json[1][i][k][columnResourceSnowthistle] ??= 0;
           json[1][i][k][columnCharacterPersonalQuestId] ??= '';
           json[1][i][k][columnCharacterPersonalQuestProgress] ??= '[]';
+          // ShowResources and IsJawsOfTheLion were both added in v20. Default
+          // to shown / not-JotL so older backups restore cleanly into a fresh
+          // install (whose columns have no DEFAULT, unlike the ALTER path).
+          json[1][i][k][columnShowResources] ??= 1;
+          json[1][i][k][columnIsJawsOfTheLion] ??= 0;
           if (kTownSheetEnabled) {
             // PartyId is nullable, no default needed — just ensure key exists
             json[1][i][k].putIfAbsent(columnCharacterPartyId, () => null);
@@ -137,14 +142,20 @@ class DatabaseBackupService {
   }
 
   Future _clearAllTables() async {
-    try {
-      Database dbs = await _getDatabase();
-      for (String table in _tables) {
-        await dbs.delete(table);
-        await dbs.rawQuery('DELETE FROM sqlite_sequence where name="$table"');
+    Database dbs = await _getDatabase();
+    for (String table in _tables) {
+      await dbs.delete(table);
+      // Single-quote the literal and parameterize. Strict SQL parsers
+      // (sqlite3) treat `"Characters"` as a column identifier, not a string.
+      // sqlite_sequence may not exist until an AUTOINCREMENT insert has
+      // happened, so swallow the "no such table" error.
+      try {
+        await dbs.rawDelete('DELETE FROM sqlite_sequence WHERE name = ?', [
+          table,
+        ]);
+      } on DatabaseException catch (e) {
+        if (!e.isNoSuchTableError('sqlite_sequence')) rethrow;
       }
-    } catch (e) {
-      rethrow;
     }
   }
 }

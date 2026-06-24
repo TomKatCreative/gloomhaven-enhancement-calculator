@@ -35,6 +35,10 @@ class TestData {
     (c) => c.classCode == ClassCodes.hail,
   );
 
+  /// Returns the Demolitionist player class (Jaws of the Lion starting class).
+  static PlayerClass get demolitionist => PlayerClasses.playerClasses
+      .firstWhere((c) => c.classCode == ClassCodes.demolitionist);
+
   /// Creates a test character with sensible defaults.
   ///
   /// Parameters:
@@ -58,6 +62,8 @@ class TestData {
     int gold = 0,
     int checkMarks = 0,
     String? notes,
+    bool showResources = true,
+    bool jawsOfTheLionEdition = false,
     Variant variant = Variant.base,
     List<CharacterMastery>? characterMasteries,
     List<CharacterPerk>? characterPerks,
@@ -71,6 +77,8 @@ class TestData {
       xp: xp,
       gold: gold,
       checkMarks: checkMarks,
+      showResources: showResources,
+      jawsOfTheLionEdition: jawsOfTheLionEdition,
       variant: variant,
     );
     if (notes != null) {

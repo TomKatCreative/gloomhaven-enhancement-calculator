@@ -5,16 +5,21 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 
 /// Name text field with random name generator and retirement counter.
+///
+/// The retirement counter is hidden when [showRetirements] is false — JotL
+/// has no retirement mechanic (no personal quests → no retirements).
 class NameField extends StatefulWidget {
   final TextEditingController nameController;
   final int previousRetirements;
   final ValueChanged<int> onRetirementChanged;
+  final bool showRetirements;
 
   const NameField({
     super.key,
     required this.nameController,
     required this.previousRetirements,
     required this.onRetirementChanged,
+    this.showRetirements = true,
   });
 
   @override
@@ -87,56 +92,57 @@ class NameFieldState extends State<NameField> {
             });
           },
         ),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  iconSize: iconSizeSmall,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(tinyPadding),
-                  icon: const Icon(Icons.remove_circle_outline),
-                  onPressed: widget.previousRetirements > 0
-                      ? () => widget.onRetirementChanged(
-                          widget.previousRetirements - 1,
-                        )
-                      : null,
-                ),
-                IntrinsicWidth(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      const Opacity(opacity: 0, child: Text('66')),
-                      Text(
-                        '${widget.previousRetirements}',
-                        style: theme.textTheme.bodyMedium,
-                      ),
-                    ],
+        if (widget.showRetirements)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    iconSize: iconSizeSmall,
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(tinyPadding),
+                    icon: const Icon(Icons.remove_circle_outline),
+                    onPressed: widget.previousRetirements > 0
+                        ? () => widget.onRetirementChanged(
+                            widget.previousRetirements - 1,
+                          )
+                        : null,
                   ),
-                ),
-                IconButton(
-                  iconSize: iconSizeSmall,
-                  constraints: const BoxConstraints(),
-                  padding: const EdgeInsets.all(tinyPadding),
-                  icon: const Icon(Icons.add_circle_outline),
-                  onPressed: widget.previousRetirements < 99
-                      ? () => widget.onRetirementChanged(
-                          widget.previousRetirements + 1,
-                        )
-                      : null,
-                ),
-              ],
-            ),
-            Text(
-              l10n.retirements,
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                  IntrinsicWidth(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        const Opacity(opacity: 0, child: Text('66')),
+                        Text(
+                          '${widget.previousRetirements}',
+                          style: theme.textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    iconSize: iconSizeSmall,
+                    constraints: const BoxConstraints(),
+                    padding: const EdgeInsets.all(tinyPadding),
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: widget.previousRetirements < 99
+                        ? () => widget.onRetirementChanged(
+                            widget.previousRetirements + 1,
+                          )
+                        : null,
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
+              Text(
+                l10n.retirements,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
       ],
     );
   }

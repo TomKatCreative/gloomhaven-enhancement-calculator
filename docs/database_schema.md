@@ -7,7 +7,7 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 19
+- **Current Schema Version**: 20
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
@@ -46,6 +46,8 @@ Core character data storage.
 | `CharacterNotes` | TEXT | NOT NULL | User notes |
 | `CharacterCheckMarks` | INTEGER | NOT NULL | Check marks (0-18, every 3 = 1 perk) |
 | `IsRetired` | BOOL | NOT NULL | Retirement status |
+| `ShowResources` | BOOL | NOT NULL (DEFAULT 1) | Whether the Resources section is shown (added v20; defaults on for existing characters) |
+| `IsJawsOfTheLion` | BOOL | NOT NULL (DEFAULT 0) | Whether the character was created under the JotL edition (added v20; hides PQ/resources even for non-JotL classes) |
 | `Variant` | TEXT | NOT NULL | Class variant name |
 
 **Frosthaven Resources** (added v7):
@@ -268,6 +270,7 @@ Accessed via `DatabaseHelper.instance.backupService`.
 | v17 | Rename item_minus_one icon |
 | v18 | Personal Quests table (24 GH quests), PQ columns on Characters |
 | v19 | Drop all definition tables (Perks, Masteries, PersonalQuests) — loaded from repositories |
+| v20 | Add `ShowResources` (toggles Resources section, default shown) and `IsJawsOfTheLion` (persists JotL edition choice, default 0) flags to Characters |
 
 ### Critical Migrations
 

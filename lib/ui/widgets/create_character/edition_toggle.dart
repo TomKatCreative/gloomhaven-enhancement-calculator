@@ -5,7 +5,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 
-/// Edition selector toggle (GH / GH2E / FH) with info button.
+/// Edition selector toggle (GH / GH2E / FH / JotL) with info button.
 class EditionToggle extends StatelessWidget {
   final GameEdition selectedEdition;
   final ValueChanged<GameEdition> onEditionChanged;
@@ -76,6 +76,11 @@ class EditionToggle extends StatelessWidget {
                 value: GameEdition.frosthaven,
                 label: const Text('FH'),
                 tooltip: l10n.frosthaven,
+              ),
+              ButtonSegment(
+                value: GameEdition.jawsOfTheLion,
+                label: const Text('JotL'),
+                tooltip: l10n.jawsOfTheLion,
               ),
             ],
             selected: {selectedEdition},

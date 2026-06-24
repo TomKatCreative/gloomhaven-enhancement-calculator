@@ -333,7 +333,7 @@ These are simple getter/setter pairs that read/write directly to SharedPrefs wit
 | Method | Description |
 |--------|-------------|
 | `loadCharacters()` | Load all characters from database with perks/masteries |
-| `createCharacter(name, class, {initialLevel, previousRetirements, edition, prosperityLevel, variant, personalQuestId, partyId})` | Create new character with gold calculated via `edition.startingGold()` |
+| `createCharacter(name, class, {initialLevel, previousRetirements, edition, prosperityLevel, variant, personalQuestId, partyId, showResources, jawsOfTheLionEdition})` | Create new character with gold calculated via `edition.startingGold()`. `showResources` (default `true`) seeds the Resources-section visibility flag — the create screen defaults it to `true` for Frosthaven, `false` otherwise. `jawsOfTheLionEdition` (default `false`) persists the JotL edition choice so PQ/resources stay hidden on the sheet even for non-JotL classes |
 | `updateCharacter(Character)` | Save character changes to database |
 | `deleteCurrentCharacter()` | Delete current character and navigate |
 | `retireCurrentCharacter()` | Toggle retirement status |

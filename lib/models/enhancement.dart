@@ -19,6 +19,9 @@ class Enhancement {
   int cost({required GameEdition edition}) {
     switch (edition) {
       case GameEdition.gloomhaven:
+      // JotL has no enhancement system and never reaches the calculator;
+      // fall back to Gloomhaven costs for exhaustiveness.
+      case GameEdition.jawsOfTheLion:
         return ghCost;
       case GameEdition.gloomhaven2e:
         // GH2E costs mostly match FH, fall back to GH if neither specified

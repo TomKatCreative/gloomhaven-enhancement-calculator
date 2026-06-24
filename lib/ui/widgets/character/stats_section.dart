@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -23,8 +25,16 @@ class StatsSection extends StatefulWidget {
 }
 
 class _StatsSectionState extends State<StatsSection> {
+  /// Debounce window for persisting numeric field edits (xp, gold).
+  /// Avoids hitting SQLite + notifying listeners on every keystroke.
+  static const _persistDebounce = Duration(milliseconds: 300);
+
   late TextEditingController _xpController;
   late TextEditingController _goldController;
+  Timer? _persistTimer;
+  // Cached so dispose()/didUpdateWidget can flush without context.read,
+  // which is unsafe once the ancestor Provider may already be unmounted.
+  CharactersModel? _charactersModel;
 
   @override
   void initState() {
@@ -38,10 +48,41 @@ class _StatsSectionState extends State<StatsSection> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _charactersModel = context.read<CharactersModel>();
+  }
+
+  @override
+  void didUpdateWidget(covariant StatsSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If this State is reused for a different character, flush the pending
+    // write against the OLD character before its keystroke edits are lost.
+    if (oldWidget.character.id != widget.character.id) {
+      _flushPending(oldWidget.character);
+    }
+  }
+
+  @override
   void dispose() {
+    _flushPending(widget.character);
     _xpController.dispose();
     _goldController.dispose();
     super.dispose();
+  }
+
+  void _flushPending(Character target) {
+    if (_persistTimer?.isActive == true) {
+      _persistTimer!.cancel();
+      _charactersModel?.updateCharacter(target);
+    }
+  }
+
+  void _schedulePersist(CharactersModel charactersModel) {
+    _persistTimer?.cancel();
+    _persistTimer = Timer(_persistDebounce, () {
+      charactersModel.updateCharacter(widget.character);
+    });
   }
 
   @override
@@ -67,10 +108,10 @@ class _StatsSectionState extends State<StatsSection> {
                       controller: _xpController,
                       enableInteractiveSelection: false,
                       onChanged: (String value) {
-                        charactersModel.updateCharacter(
-                          widget.character
-                            ..xp = value == '' ? 0 : int.parse(value),
-                        );
+                        widget.character.xp = value == ''
+                            ? 0
+                            : int.parse(value);
+                        _schedulePersist(charactersModel);
                       },
                       textAlign: TextAlign.end,
                       inputFormatters: [
@@ -139,6 +180,8 @@ class _StatsSectionState extends State<StatsSection> {
                         ),
                       );
                       if (value != null) {
+                        // Drop any in-flight debounced write — about to overwrite.
+                        _persistTimer?.cancel();
                         final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
                           widget.character..xp = clampedValue,
@@ -161,11 +204,12 @@ class _StatsSectionState extends State<StatsSection> {
                     child: TextField(
                       controller: _goldController,
                       enableInteractiveSelection: false,
-                      onChanged: (String value) =>
-                          charactersModel.updateCharacter(
-                            widget.character
-                              ..gold = value == '' ? 0 : int.parse(value),
-                          ),
+                      onChanged: (String value) {
+                        widget.character.gold = value == ''
+                            ? 0
+                            : int.parse(value);
+                        _schedulePersist(charactersModel);
+                      },
                       textAlign: TextAlign.start,
                       inputFormatters: [
                         FilteringTextInputFormatter.deny(
@@ -200,6 +244,8 @@ class _StatsSectionState extends State<StatsSection> {
                         ),
                       );
                       if (value != null) {
+                        // Drop any in-flight debounced write — about to overwrite.
+                        _persistTimer?.cancel();
                         final clampedValue = value.clamp(0, 999);
                         charactersModel.updateCharacter(
                           widget.character..gold = clampedValue,
