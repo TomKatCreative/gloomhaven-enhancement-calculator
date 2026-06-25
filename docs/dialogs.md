@@ -78,21 +78,17 @@ Dialog for creating and exporting database backups.
 
 **Usage:**
 ```dart
-final result = await BackupDialog.show(context: context);
-
-if (result?.action == BackupAction.saved) {
-  // Show success message with result.savedFilename
-}
+await BackupDialog.show(context: context);
 ```
 
 **Features:**
 - Filename input with validation (filters special characters, shows `.json` suffix)
 - Default filename: `ghc_backup`
-- Two export options:
-  - **Save**: Opens the platform-native save picker (SAF on Android, file saver
-    on iOS) to let the user choose where to save
-  - **Share**: Opens the platform share sheet to send via email, cloud, messaging
-- Returns `BackupResult` with action type and saved path (for Save action)
+- **Share/Export**: Opens the platform share sheet (`share_plus`) to send the
+  backup via email, cloud, messaging, or iOS "Save to Files". Uses only the
+  share/document APIs — no media-picker SDK — so no camera/photo/location
+  privacy permissions are required.
+- Returns `BackupResult` with action type (`shared` or `cancelled`)
 
 ## RestoreDialog
 
@@ -106,8 +102,7 @@ await RestoreDialog.show(context: context);
 
 **Features:**
 - Confirmation warning before proceeding
-- Storage permission request (iOS)
-- File picker for .txt backup files
+- Document picker (`file_selector`) for `.json`/`.txt` backup files
 - Progress indicator during restore
 - Error dialog with copy-to-clipboard option
 - Automatic navigation after success

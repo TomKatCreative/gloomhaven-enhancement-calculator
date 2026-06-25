@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -15,10 +13,7 @@ class BackupResult {
   /// The type of backup action performed.
   final BackupAction action;
 
-  /// The user-entered filename (only for [BackupAction.saved]).
-  final String? savedFilename;
-
-  const BackupResult({required this.action, this.savedFilename});
+  const BackupResult({required this.action});
 }
 
 /// The type of backup action the user chose.
@@ -26,32 +21,21 @@ enum BackupAction {
   /// User cancelled the dialog.
   cancelled,
 
-  /// User saved the backup to device storage.
-  saved,
-
-  /// User shared the backup via the share sheet.
+  /// User exported the backup via the share sheet.
   shared,
 }
 
 /// A dialog for creating and exporting database backups.
 ///
-/// Offers two export options:
-/// - **Save**: Opens the platform-native save picker (SAF on Android, file
-///   saver on iOS) to let the user choose where to save. Supports cloud
-///   storage providers if installed.
-/// - **Share**: Opens the platform share sheet to send the file via email,
-///   cloud storage, messaging, etc.
+/// Exports the backup through the platform share sheet (share_plus), which on
+/// iOS includes "Save to Files" and on Android offers save/share targets. This
+/// relies only on the document/share APIs — no media-picker SDK — so the app
+/// requires no camera/photo/location privacy permissions.
 ///
 /// ## Example Usage
 ///
 /// ```dart
-/// final result = await BackupDialog.show(context: context);
-///
-/// if (result?.action == BackupAction.saved) {
-///   ScaffoldMessenger.of(context).showSnackBar(
-///     SnackBar(content: Text('Saved ${result.savedFilename}')),
-///   );
-/// }
+/// await BackupDialog.show(context: context);
 /// ```
 class BackupDialog extends StatefulWidget {
   const BackupDialog({super.key});
@@ -74,10 +58,9 @@ class BackupDialog extends StatefulWidget {
 class _BackupDialogState extends State<BackupDialog> {
   late final TextEditingController _fileNameController;
   String? _filenameError;
-  bool _isSaving = false;
   bool _isSharing = false;
 
-  bool get _isBusy => _isSaving || _isSharing;
+  bool get _isBusy => _isSharing;
 
   @override
   void initState() {
@@ -109,40 +92,6 @@ class _BackupDialogState extends State<BackupDialog> {
     final file = File('${tempDir.path}/$_fileName');
     await file.writeAsString(value);
     return file.path;
-  }
-
-  Future<void> _handleSave() async {
-    if (!_validateFilename()) return;
-
-    setState(() => _isSaving = true);
-    try {
-      final value = await DatabaseHelper.instance.backupService
-          .generateBackup();
-      final bytes = Uint8List.fromList(utf8.encode(value));
-
-      final savedPath = await FilePicker.platform.saveFile(
-        fileName: _fileName,
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-        bytes: bytes,
-      );
-
-      if (savedPath == null || !mounted) {
-        if (mounted) setState(() => _isSaving = false);
-        return;
-      }
-      Navigator.of(
-        context,
-      ).pop(BackupResult(action: BackupAction.saved, savedFilename: _fileName));
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context).backupError)),
-        );
-    }
   }
 
   Future<void> _handleShare() async {
@@ -228,15 +177,6 @@ class _BackupDialogState extends State<BackupDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Text(l10n.share),
-        ),
-        TextButton(
-          onPressed: _isBusy ? null : _handleSave,
-          child: _isSaving
-              ? const SizedBox.square(
-                  dimension: iconSizeSmall,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(l10n.save),
         ),
       ],
     );

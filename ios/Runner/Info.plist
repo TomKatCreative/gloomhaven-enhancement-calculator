@@ -33,12 +33,6 @@
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>This permission is required by the file picker used to import and export backups. The app does not capture photos or video.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This permission is required by the file picker used to import and export backups. The app does not record audio.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This permission is required by the file picker used to import and export backups. The app does not access your photo library directly.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -24,7 +24,7 @@ class BackupSettingsSection extends StatelessWidget {
           leading: const Icon(Icons.download_rounded),
           title: Text(l10n.backup),
           subtitle: Text(l10n.backupDescription),
-          onTap: () => _handleBackup(context, l10n),
+          onTap: () => BackupDialog.show(context: context),
         ),
         ListTile(
           leading: const Icon(Icons.upload_rounded),
@@ -34,23 +34,5 @@ class BackupSettingsSection extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  Future<void> _handleBackup(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) async {
-    final result = await BackupDialog.show(context: context);
-
-    if (result == null) return;
-
-    if (result.action == BackupAction.saved && result.savedFilename != null) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(content: Text(l10n.saved(result.savedFilename!))),
-        );
-    }
   }
 }
