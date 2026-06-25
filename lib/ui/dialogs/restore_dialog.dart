@@ -1,6 +1,4 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -75,19 +73,20 @@ class RestoreDialog {
   }
 
   static Future<void> _handleFilePicker(BuildContext context) async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowMultiple: false,
-      allowedExtensions: ['json', 'txt'],
+    const XTypeGroup typeGroup = XTypeGroup(
+      label: 'backups',
+      extensions: <String>['json', 'txt'],
+      mimeTypes: <String>['application/json', 'text/plain'],
+      uniformTypeIdentifiers: <String>['public.json', 'public.plain-text'],
     );
 
-    if (result == null) return;
+    final XFile? file = await openFile(
+      acceptedTypeGroups: <XTypeGroup>[typeGroup],
+    );
 
-    String? path = result.files.single.path;
-    if (path == null) return;
+    if (file == null) return;
 
-    File file = File(path);
-    String contents = file.readAsStringSync();
+    final String contents = await file.readAsString();
 
     if (!context.mounted) return;
     await _performRestore(context, contents);

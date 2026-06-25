@@ -7,8 +7,8 @@ import '../helpers/test_helpers.dart';
 /// Tests for the [RestoreDialog] confirmation flow.
 ///
 /// We deliberately do NOT exercise the file-picker / restore code path —
-/// `FilePicker.pickFiles()` needs platform channels that aren't available in
-/// unit tests. The confirmation dialog
+/// file_selector's `openFile()` needs platform channels that aren't available
+/// in unit tests. The confirmation dialog
 /// itself is the most likely regression surface (button labels, warning
 /// text), and that's what these tests cover.
 void main() {

@@ -29,7 +29,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('renders filename field, Cancel, Share, and Save buttons', (
+    testWidgets('renders filename field, Cancel, and Share buttons', (
       tester,
     ) async {
       await openDialog(tester);
@@ -37,7 +37,7 @@ void main() {
       expect(find.byType(TextField), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
       expect(find.text('Share'), findsOneWidget);
-      expect(find.text('Save'), findsOneWidget);
+      expect(find.text('Save'), findsNothing);
     });
 
     testWidgets('default filename is ghc_backup', (tester) async {
@@ -60,8 +60,8 @@ void main() {
       await tester.enterText(find.byType(TextField), '');
       await tester.pumpAndSettle();
 
-      // Tap Save
-      await tester.tap(find.text('Save'));
+      // Tap Share
+      await tester.tap(find.text('Share'));
       await tester.pumpAndSettle();
 
       expect(find.text('Cannot be empty'), findsOneWidget);
@@ -73,7 +73,7 @@ void main() {
       // Trigger validation error
       await tester.enterText(find.byType(TextField), '');
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Save'));
+      await tester.tap(find.text('Share'));
       await tester.pumpAndSettle();
       expect(find.text('Cannot be empty'), findsOneWidget);
 
@@ -107,38 +107,15 @@ void main() {
       final shareButton = tester.widget<TextButton>(
         find.widgetWithText(TextButton, 'Share'),
       );
-      final saveButton = tester.widget<TextButton>(
-        find.widgetWithText(TextButton, 'Save'),
-      );
 
       expect(cancelButton.onPressed, isNotNull);
       expect(shareButton.onPressed, isNotNull);
-      expect(saveButton.onPressed, isNotNull);
     });
 
     testWidgets('no loading indicator is shown initially', (tester) async {
       await openDialog(tester);
 
       expect(find.byType(CircularProgressIndicator), findsNothing);
-    });
-
-    testWidgets('empty filename does not show loading indicator on Save tap', (
-      tester,
-    ) async {
-      await openDialog(tester);
-
-      await tester.enterText(find.byType(TextField), '');
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Save'));
-      await tester.pump();
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      // Buttons should remain enabled since validation failed
-      final saveButton = tester.widget<TextButton>(
-        find.widgetWithText(TextButton, 'Save'),
-      );
-      expect(saveButton.onPressed, isNotNull);
     });
 
     testWidgets('empty filename does not show loading indicator on Share tap', (
@@ -186,7 +163,6 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.action, BackupAction.cancelled);
-      expect(result!.savedFilename, isNull);
     });
   });
 }

@@ -17,15 +17,15 @@ dependencies:
   path_provider: ^2.1.1
   provider: ^6.1.1
   flutter_svg: ^2.2.3
-  # Pinned at 10.3.10: file_picker 11.0.2's Android plugin skips applying the
-  # Kotlin plugin when AGP 9 is detected (relies on a propagation that doesn't
-  # happen), causing GeneratedPluginRegistrant to fail with "cannot find
-  # symbol FilePickerPlugin" at compile time. Revisit when 11.0.3+ ships.
-  file_picker: 10.3.10
+  # file_selector (document picker only) instead of file_picker: file_picker
+  # bundles DKImagePickerController under SPM with no opt-out, dragging in
+  # camera/photo/location/motion APIs that fail App Store validation (90683).
+  # The app only opens .json/.txt backups (restore); backup export uses the
+  # share sheet (share_plus), so no save-dialog package is needed.
+  file_selector: ^1.0.0
   intl: any
   smooth_page_indicator: ^2.0.1
   uuid: ^4.5.3
-  # *_plus 10.x/13.x require win32 ^6 which conflicts with file_picker 11
   package_info_plus: ^9.0.1
   device_info_plus: ^12.4.0
   url_launcher: ^6.2.1
