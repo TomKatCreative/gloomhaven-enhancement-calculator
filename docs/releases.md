@@ -5,7 +5,7 @@ Reverse-chronological log of production releases with commit references.
 ## v4.6.1 — Blank-Screen Crash Fix
 
 - **Tag:** `v4.6.1`
-- **Commit:** _backfilled after the release commit (see v4.6.0 precedent `7195383`)_
+- **Commit:** `0b1c120` — "Prepare v4.6.1 release: blank-screen launch crash fix"
 - **Date:** 2026-07-12
 - Fixed a launch crash that could show a blank grey screen (no app bar) after updating. `EnhancementCalculatorModel` read the persisted enhancement selection with `EnhancementData.enhancements[index]` without bounds-checking; the enhancement list shrank across versions (now 40 items), so an index saved by an older build could exceed the list and throw a `RangeError` during provider construction — which, because the provider is built above the app's `Scaffold`, surfaced as a whole-screen crash. Selection is now read through a bounds-checked `_enhancementFromPrefs()` helper used by both the field initializer and `reloadFromPrefs()`
 - Added on-screen crash diagnostics (the app previously had none): `main()` now wraps startup in `runZonedGuarded`, installs an `ErrorWidget.builder` and a guarded `SharedPrefs().init()`, and the `MultiProvider` was extracted into a new `GloomhavenApp` root widget so build-phase / provider-construction exceptions render the new `DiagnosticErrorView` (a dependency-free, screenshot-able error screen) instead of a blank grey rectangle
