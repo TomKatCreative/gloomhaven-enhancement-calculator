@@ -97,6 +97,41 @@ void main() {
       });
     });
 
+    group('Persisted enhancement index resilience', () {
+      // Regression: an old app version shipped a longer enhancement list, so an
+      // index persisted then can exceed the current list after an update.
+      // Constructing the model must not throw — it is built above the app's
+      // Scaffold, so a RangeError here surfaces as a blank/grey screen.
+      test(
+        'constructs without throwing when persisted index is out of range',
+        () async {
+          SharedPreferences.setMockInitialValues({
+            'enhancementType': EnhancementData.enhancements.length + 5,
+          });
+          await SharedPrefs().init();
+
+          final model = EnhancementCalculatorModel();
+
+          expect(model.enhancement, isNull);
+          expect(model.showCost, isFalse);
+        },
+      );
+
+      test(
+        'reloadFromPrefs tolerates an out-of-range persisted index',
+        () async {
+          await _setupPrefs();
+          final model = EnhancementCalculatorModel();
+          SharedPrefs().enhancementTypeIndex =
+              EnhancementData.enhancements.length + 3;
+
+          model.reloadFromPrefs();
+
+          expect(model.enhancement, isNull);
+        },
+      );
+    });
+
     group('enhancementCost() - Base Cost', () {
       test('returns 0 when enhancement is null', () async {
         await _setupPrefs();
