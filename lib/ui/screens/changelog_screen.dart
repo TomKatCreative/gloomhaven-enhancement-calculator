@@ -36,6 +36,15 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             const _VersionSection(
+              version: '4.6.1',
+              date: '2026-07-12',
+              changes: [
+                'Fixed a crash that could show a blank screen on launch after updating.',
+                'Various behind-the-scenes fixes and improvements.',
+              ],
+            ),
+            SizedBox(height: extraLargePadding),
+            const _VersionSection(
               version: '4.6.0',
               date: '2026-06-24',
               changes: [

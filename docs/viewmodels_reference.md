@@ -46,6 +46,16 @@ final theme = context.watch<ThemeProvider>();
 final model = context.read<CharactersModel>();
 ```
 
+### App Entry & Startup Guard
+
+`main()` (in `main.dart`) is a synchronous function that wraps the whole startup in `runZonedGuarded`:
+
+- **`ErrorWidget.builder`** is replaced with `DiagnosticErrorView` (`lib/ui/widgets/diagnostic_error_view.dart`) — a dependency-free, screenshot-able error screen (no `Theme`/`MediaQuery`/providers, since any of those may be the failure). Any build-phase exception now renders the actual error + stack trace instead of the default blank/grey rectangle.
+- **`SharedPrefs().init()`** and the startup side effects run inside a `try/catch`; a failure shows `DiagnosticErrorView` via a minimal `MaterialApp` rather than leaving a blank screen before `runApp()`.
+- The `MultiProvider` was extracted out of `main()` into a **`GloomhavenApp`** root `StatelessWidget`, so an exception thrown while a provider is *constructed* (e.g. `EnhancementCalculatorModel` reading a bad persisted value) happens during build and is caught by `ErrorWidget.builder`.
+
+The five models are still declared inside `GloomhavenApp.build()`; the dependency tree above is unchanged.
+
 ---
 
 ## ThemeProvider
@@ -142,7 +152,7 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 | `_enhancerLvl2` | `bool` | false | Cached enhancer level 2 state |
 | `_enhancerLvl3` | `bool` | false | Cached enhancer level 3 state |
 | `_enhancerLvl4` | `bool` | false | Cached enhancer level 4 state |
-| `_enhancement` | `Enhancement?` | null | Currently selected enhancement |
+| `_enhancement` | `Enhancement?` | null | Currently selected enhancement. Read from SharedPrefs via the bounds-checked `_enhancementFromPrefs()` helper — an out-of-range persisted index (older builds shipped a longer list) yields `null` instead of throwing a `RangeError` during construction |
 | `_cardLevel` | `int` | 0 | Target card level (0-8, displayed as 1-9) |
 | `_previousEnhancements` | `int` | 0 | Count of previous enhancements (0-9) |
 | `_multipleTargets` | `bool` | false | Multi-target multiplier enabled |
@@ -193,7 +203,7 @@ All state properties have getter/setter pairs that write-through to SharedPrefs 
 |--------|-------------|
 | `calculateCost({notify})` | Recalculate total cost, optionally notify listeners |
 | `resetCost()` | Clear all calculator input fields and reset to defaults |
-| `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore) |
+| `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore); enhancement selection is read through the bounds-checked `_enhancementFromPrefs()` helper (tolerates an out-of-range persisted index) |
 | `enhancementSelected(Enhancement?)` | Handle enhancement selection with validation |
 | `gameVersionToggled()` | Handle edition change with modifier validation |
 | `getCalculationBreakdown()` | Generate step-by-step cost breakdown |
