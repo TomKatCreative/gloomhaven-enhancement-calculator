@@ -279,11 +279,15 @@ This ensures one-time automatic migration for users upgrading from older app ver
 ### Example Usage
 
 ```dart
-// In main.dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await SharedPrefs().init();
-  runApp(MyApp());
+// In main.dart — SharedPrefs().init() is awaited inside runZonedGuarded with a
+// try/catch, so a failure shows DiagnosticErrorView instead of a blank screen.
+// See main.dart for the full startup guard.
+void main() {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await SharedPrefs().init();
+    runApp(const GloomhavenApp());
+  }, (error, stack) => debugPrint('$error\n$stack'));
 }
 
 // In widgets

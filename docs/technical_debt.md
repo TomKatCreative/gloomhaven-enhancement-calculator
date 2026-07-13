@@ -80,6 +80,12 @@ Patterns that aren't single-file problems but affect the codebase broadly.
 
 > **Fixed** (2026-02-16): Four SVG files contained `<style>` elements that `flutter_svg` cannot parse, causing console warnings ("unhandled element `<style/>`"). Removed empty `<style></style>` from `prosperity.svg` and `persist.svg`. Inlined CSS class fills as `fill` attributes in `xp_2.svg` and `shardrender.svg`.
 
+### Observability — No Remote Crash Reporting
+
+The app has **no remote crash/error reporting** (no Sentry/Crashlytics/Firebase). Field failures are invisible unless a user manually reports and screenshots them — the v4.6.x launch crash (an unbounded `EnhancementData.enhancements[index]` read from SharedPrefs that threw during provider construction, above the `Scaffold`) shipped undetected and could only be diagnosed after a user described the symptom.
+
+> **Partially mitigated (v4.6.1, 2026-07-12)**: `main()` now installs `ErrorWidget.builder` + `runZonedGuarded` + a guarded `SharedPrefs().init()` and renders an on-screen, screenshot-able `DiagnosticErrorView` instead of a blank grey screen (see `docs/viewmodels_reference.md` → "App Entry & Startup Guard"). **Remaining gap**: no automatic/remote capture (a field crash still requires the user to send a screenshot), and `DiagnosticErrorView` itself has no widget test.
+
 ---
 
 ## Tier 3: Dead Code & Legacy
