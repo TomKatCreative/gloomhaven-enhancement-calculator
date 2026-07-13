@@ -47,6 +47,23 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _invalidateCalculator();
   }
 
+  /// Reads the persisted enhancement selection, guarding against a stored index
+  /// that is out of range for the current [EnhancementData.enhancements] list.
+  ///
+  /// Older app versions shipped a longer enhancement list, so an index
+  /// persisted back then can exceed the current list length after an update.
+  /// Indexing directly would throw a `RangeError` while this model is
+  /// constructed — and since the model is built above the app's [Scaffold],
+  /// that surfaces as a blank/grey screen with no app bar. Returns null (no
+  /// selection) for a missing or out-of-range index, matching a fresh state.
+  static Enhancement? _enhancementFromPrefs() {
+    final index = SharedPrefs().enhancementTypeIndex;
+    if (index > 0 && index < EnhancementData.enhancements.length) {
+      return EnhancementData.enhancements[index];
+    }
+    return null;
+  }
+
   // ===========================================================================
   // Cached calculator
   // ===========================================================================
@@ -94,9 +111,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
   int _previousEnhancements = SharedPrefs().previousEnhancements;
 
-  Enhancement? _enhancement = SharedPrefs().enhancementTypeIndex != 0
-      ? EnhancementData.enhancements[SharedPrefs().enhancementTypeIndex]
-      : null;
+  Enhancement? _enhancement = _enhancementFromPrefs();
 
   bool _multipleTargets = SharedPrefs().multipleTargetsSwitch;
 
@@ -374,13 +389,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _cardLevel = SharedPrefs().targetCardLvl;
     _previousEnhancements = SharedPrefs().previousEnhancements;
 
-    final enhancementIndex = SharedPrefs().enhancementTypeIndex;
-    if (enhancementIndex > 0 &&
-        enhancementIndex < EnhancementData.enhancements.length) {
-      _enhancement = EnhancementData.enhancements[enhancementIndex];
-    } else {
-      _enhancement = null;
-    }
+    _enhancement = _enhancementFromPrefs();
 
     _multipleTargets = SharedPrefs().multipleTargetsSwitch;
     _lostNonPersistent = SharedPrefs().lostNonPersistent;

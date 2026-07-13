@@ -2,6 +2,17 @@
 
 Reverse-chronological log of production releases with commit references.
 
+## v4.6.1 — Blank-Screen Crash Fix
+
+- **Tag:** `v4.6.1`
+- **Commit:** `0b1c120` — "Prepare v4.6.1 release: blank-screen launch crash fix"
+- **Date:** 2026-07-12
+- Fixed a launch crash that could show a blank grey screen (no app bar) after updating. `EnhancementCalculatorModel` read the persisted enhancement selection with `EnhancementData.enhancements[index]` without bounds-checking; the enhancement list shrank across versions (now 40 items), so an index saved by an older build could exceed the list and throw a `RangeError` during provider construction — which, because the provider is built above the app's `Scaffold`, surfaced as a whole-screen crash. Selection is now read through a bounds-checked `_enhancementFromPrefs()` helper used by both the field initializer and `reloadFromPrefs()`
+- Added on-screen crash diagnostics (the app previously had none): `main()` now wraps startup in `runZonedGuarded`, installs an `ErrorWidget.builder` and a guarded `SharedPrefs().init()`, and the `MultiProvider` was extracted into a new `GloomhavenApp` root widget so build-phase / provider-construction exceptions render the new `DiagnosticErrorView` (a dependency-free, screenshot-able error screen) instead of a blank grey rectangle
+- iOS App Store fixes (internal): replaced `file_picker` with `file_selector` and added the missing privacy purpose strings so the build passes App Store validation — v4.6.0 was rejected on upload, so v4.6.1 is the first build that both uploads cleanly and fixes the crash. Backup export is now share-sheet only (the device "Save" button was removed), which also drops the camera/photo/location privacy requirements
+- Database schema unchanged (still v20)
+- Regression tests added under "Persisted enhancement index resilience" in `test/viewmodels/enhancement_calculator_model_test.dart`
+
 ## v4.6.0 — Jaws of the Lion Game Mode
 
 - **Tag:** `v4.6.0`
