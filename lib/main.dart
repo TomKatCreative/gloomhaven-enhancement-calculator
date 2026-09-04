@@ -135,7 +135,12 @@ class GloomhavenApp extends StatelessWidget {
                 themeMode: themeProvider.themeMode,
                 darkTheme: themeProvider.darkTheme,
                 theme: themeProvider.lightTheme,
-                themeAnimationDuration: const Duration(milliseconds: 500),
+                // Every frame of this cross-fade rebuilds each
+                // Theme.of(context) dependent in the tree, so its length is a
+                // direct multiplier on the cost of a character colour change.
+                // The character colour changes mid-swipe, where the page
+                // motion masks the transition, so it snaps instead of fading.
+                themeAnimationDuration: Duration.zero,
                 themeAnimationCurve: Curves.easeInOut,
               );
             },

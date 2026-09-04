@@ -966,6 +966,7 @@ void main() {
 
       model.onPageChanged(1);
 
+      expect(model.currentCharacter?.uuid, equals('test-2'));
       expect(mockTheme.lastSeedColor, isNotNull);
       expect(
         mockTheme.lastSeedColor,
