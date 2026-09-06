@@ -18,7 +18,8 @@ class CharacterScreen extends StatefulWidget {
   State<CharacterScreen> createState() => _CharacterScreenState();
 }
 
-class _CharacterScreenState extends State<CharacterScreen> {
+class _CharacterScreenState extends State<CharacterScreen>
+    with AutomaticKeepAliveClientMixin {
   // Section keys for scroll-to and scroll-spy (one per chip)
   final _sectionKeys = {
     for (final s in CharacterSection.values) s: GlobalKey(),
@@ -147,7 +148,11 @@ class _CharacterScreenState extends State<CharacterScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final model = context.watch<CharactersModel>();
     final isSheetExpanded = model.isElementSheetExpanded;
     final screenHeight = MediaQuery.of(context).size.height;
