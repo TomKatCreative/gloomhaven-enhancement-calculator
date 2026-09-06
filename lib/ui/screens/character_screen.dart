@@ -147,6 +147,8 @@ class _CharacterScreenState extends State<CharacterScreen>
     _isScrollSpyEnabled = true;
   }
 
+  // Without this, PageView disposes/rebuilds this page's whole subtree
+  // (including perk checkboxes) on every swipe past the cache extent.
   @override
   bool get wantKeepAlive => true;
 
