@@ -152,7 +152,7 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 | `_enhancerLvl2` | `bool` | false | Cached enhancer level 2 state |
 | `_enhancerLvl3` | `bool` | false | Cached enhancer level 3 state |
 | `_enhancerLvl4` | `bool` | false | Cached enhancer level 4 state |
-| `_enhancement` | `Enhancement?` | null | Currently selected enhancement. Read from SharedPrefs via the bounds-checked `_enhancementFromPrefs()` helper — an out-of-range persisted index (older builds shipped a longer list) yields `null` instead of throwing a `RangeError` during construction |
+| `_enhancement` | `Enhancement?` | null | Currently selected enhancement. Persisted as `Enhancement.key` (`enhancementKey` pref) and read via `_enhancementFromPrefs()`; an unknown key yields `null`. Falls back to the legacy `enhancementType` index (bounds-checked — an out-of-range index from older builds yields `null` instead of a `RangeError` during construction) and migrates it to a key. `resetCost()` and unavailable-in-edition selections clear both formats |
 | `_cardLevel` | `int` | 0 | Target card level (0-8, displayed as 1-9) |
 | `_previousEnhancements` | `int` | 0 | Count of previous enhancements (0-9) |
 | `_multipleTargets` | `bool` | false | Multi-target multiplier enabled |
@@ -250,7 +250,7 @@ All state properties have getter/setter pairs that write-through to SharedPrefs 
 
 All calculator state is persisted via SharedPrefs:
 - `gameEdition` - Selected edition
-- `enhancementType` - Selected enhancement index
+- `enhancementKey` - Selected enhancement (`Enhancement.key`; legacy `enhancementType` index is migrated on first read)
 - `targetCardLvl` - Card level
 - `enhancementsOnTargetAction` - Previous enhancements count
 - `multipleTargetsSelected` - Multi-target toggle

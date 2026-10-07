@@ -12,6 +12,12 @@ Sections:
 
 ## Active
 
+### Code Quality (CQ) roadmap
+
+**Added:** 2026-10-07 · **Status:** In progress (Phase 1 done)
+
+Findings from the 2026-10-07 codebase review are tracked by ID (CQ-1 … CQ-28) in [`code_quality_roadmap.md`](code_quality_roadmap.md). Start with Phase 1 (correctness bugs).
+
 ### Convert `_build*` methods to proper widgets
 
 **Added:** 2026-02-04 · **Status:** Pending (audited 2026-04-29 — 53 occurrences remain across `lib/ui/`)

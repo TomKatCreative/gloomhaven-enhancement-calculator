@@ -249,6 +249,7 @@ Represents an enhancement option for the calculator.
 | Getter | Type | Description |
 |--------|------|-------------|
 | `cost` | `int` | Edition-specific cost with fallback |
+| `key` | `String` | Stable persistence ID, `'<category>:<name>'` (e.g. `charPlusOne:Move`). Survives reordering of `EnhancementData.enhancements`; look it up with `EnhancementData.byKey(key)` (null if unknown) |
 
 ### EnhancementCategory Enum
 
@@ -473,8 +474,8 @@ Enum representing game editions with edition-specific rules.
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `maxStartingLevel(int prosperityLevel)` | `int` | Max starting level for a given prosperity. GH: prosperity level directly. GH2E/FH: `(prosperity / 2).ceil()`. JotL: returns 9 (no prosperity cap), but unused — the create screen locks JotL characters to level 1 |
-| `startingGold({int level, int prosperityLevel})` | `int` | Starting gold for a new character. GH: `15 × (level + 1)`. GH2E: `10 × prosperity + 15`. FH: `10 × prosperity + 20`. JotL: `15 × (level + 1)` (same as GH; always level 1 → 30) |
+| `maxStartingLevel(int prosperityLevel)` | `int` | Max starting level for a given prosperity. GH: prosperity level directly. GH2E/FH: `(prosperity / 2).ceil()`. JotL: always 1 (JotL characters are locked to level 1; the create screen reads this when JotL is selected) |
+| `startingGold({int level, int prosperityLevel})` | `int` | Starting gold for a new character. GH: `15 × (level + 1)`. GH2E: `10 × prosperity + 15`. FH: `10 × prosperity + 20`. JotL: always 30 (the GH rule at the locked level 1) |
 
 ### Starting Character Rules
 

@@ -31,19 +31,11 @@ git diff lib/ui/screens/file.dart --stat
 
 ### State Management: Provider + ChangeNotifier
 
-Five models registered in `main.dart`:
-
-```
-ThemeProvider              → Theme colors, dark mode, font preferences
-AppModel                   → Page navigation, app-level UI state
-EnhancementCalculatorModel → Calculator page state
-TownModel                  → Campaign/party CRUD, prosperity, reputation
-CharactersModel            → Character CRUD, perk/mastery state (via ProxyProvider)
-```
+Models are registered in `main.dart` (`CharactersModel` via ProxyProvider).
 
 ### Data Persistence
 
-- **SQLite** (`sqflite`) — Characters, perks, masteries, campaigns, parties (schema v19; see Feature Flags).
+- **SQLite** (`sqflite`) — Characters, perks, masteries, campaigns, parties (schema v20; see Feature Flags).
 - **SharedPreferences** — App settings, theme, calculator state. Singleton wrapper at `lib/shared_prefs.dart`.
 
 ### Feature Flags
@@ -58,46 +50,17 @@ const bool kTownSheetEnabled = false;
 |------|---------------|
 | `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page index mapping (characters=0→1, calculator=1→2) |
 
-**Database versioning**: Production schema is v19 (Personal Quests with 24 GH + 23 FH quests; Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
+**Database versioning**: Production schema is v20 (v19: Personal Quests with 24 GH + 23 FH quests, Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories; v20: `ShowResources` and `IsJawsOfTheLion` columns on Characters). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
 ## Key Domain Concepts
 
-### Game Editions (ClassCategory)
-
-```dart
-enum ClassCategory {
-  gloomhaven,      // Original Gloomhaven
-  jawsOfTheLion,   // Starter set
-  frosthaven,      // Sequel
-  crimsonScales,   // Fan expansion
-  custom,          // User-created
-  mercenaryPacks,  // Standalone character packs
-}
-```
-
 ### Class Variants
 
-Some classes have different names/perks across game editions:
-
-```dart
-enum Variant { base, frosthavenCrossover, gloomhaven2E, v2, v3, v4 }
-```
-
-Example: "Brute" in base game → "Bruiser" in Gloomhaven 2e.
-
-### Character Data Flow
-
-1. `PlayerClass` — Static class definition (race, name, classCode, perks).
-2. `Character` — Instance of a class (name, level, XP, gold, retirements).
-3. `CharacterPerk` / `CharacterMastery` — Join tables tracking which perks/masteries are checked.
+Some classes have different names/perks across game editions (`Variant` enum). Example: "Brute" in base game → "Bruiser" in Gloomhaven 2e.
 
 ### Game Editions (GameEdition)
 
-The enhancement calculator and character creation use `GameEdition` to apply edition-specific rules:
-
-```dart
-enum GameEdition { gloomhaven, gloomhaven2e, frosthaven, jawsOfTheLion }
-```
+`ClassCategory` groups classes by release; `GameEdition` (used by the enhancement calculator and character creation) applies edition-specific rules:
 
 **Starting Character Rules by Edition:**
 
@@ -187,13 +150,6 @@ Class icons use `ClassCodes` constants as keys, never string literals like `'br'
 ## Localization (i18n)
 
 Flutter's `gen_l10n` system. Currently English (default) and Portuguese.
-
-```dart
-import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
-
-Text(AppLocalizations.of(context).close)
-Text(AppLocalizations.of(context).pocketItemsAllowed(count))  // with parameters
-```
 
 To add a string: edit `lib/l10n/app_en.arb` (template), translate in `app_pt.arb`, run `flutter gen-l10n`.
 

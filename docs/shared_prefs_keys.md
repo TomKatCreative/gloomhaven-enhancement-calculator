@@ -71,7 +71,8 @@ prefs.setPlayerClassIsUnlocked('br', true);
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | `gameEdition` | int | 0 | Selected game edition (enum index) |
-| `enhancementType` | int | 0 | Selected enhancement type index |
+| `enhancementKey` | String? | null | Selected enhancement as `Enhancement.key` (`'<category>:<name>'`, e.g. `charPlusOne:Move`) |
+| `enhancementType` | int | 0 | **Legacy.** Selected enhancement as a list index (0 = no selection). Read once, migrated to `enhancementKey`, then removed |
 | `enhancementsOnTargetAction` | int | 0 | Previous enhancement count (0-9) |
 | `targetCardLvl` | int | 0 | Card level (0-indexed, displayed as 1-9) |
 
@@ -326,7 +327,7 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | Category | Keys |
 |----------|------|
 | `settings` | darkTheme, useDefaultFonts, primaryClassColor, showRetiredCharacters, showAllCharacters, hideCustomClassesWarningMessage, envelopeX, envelopeV |
-| `calculator` | gameEdition, enhancementType, enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
+| `calculator` | gameEdition, enhancementKey (legacy backups: enhancementType), enhancementsOnTargetAction, targetCardLvl, disableMultiTargetsSwitch, multipleTargetsSelected, temporaryEnhancementMode, partyBoon, lostNonPersistent, persistent, hailsDiscount |
 | `enhancerLevels` | enhancerLvl1, enhancerLvl2, enhancerLvl3, enhancerLvl4 |
 | `classUnlocks` | Dynamic keys (class codes) for locked classes only |
 | `town` | activeCampaignId, activePartyId |
