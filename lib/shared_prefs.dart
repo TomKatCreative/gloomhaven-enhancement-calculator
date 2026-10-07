@@ -152,6 +152,20 @@ class SharedPrefs {
   set previousEnhancements(int value) =>
       _sharedPrefs.setInt('enhancementsOnTargetAction', value);
 
+  /// Selected enhancement as an [Enhancement.key]; null means no selection.
+  String? get enhancementKey => _sharedPrefs.getString('enhancementKey');
+
+  set enhancementKey(String? value) {
+    if (value == null) {
+      _sharedPrefs.remove('enhancementKey');
+    } else {
+      _sharedPrefs.setString('enhancementKey', value);
+    }
+  }
+
+  /// Legacy selection stored as a list index, superseded by [enhancementKey].
+  /// Still read so existing users and old backups keep their selection; index
+  /// 0 was ambiguous (Move or no selection) and is treated as no selection.
   int get enhancementTypeIndex => _sharedPrefs.getInt('enhancementType') ?? 0;
 
   set enhancementTypeIndex(int value) =>
@@ -332,7 +346,7 @@ class SharedPrefs {
         },
       'calculator': {
         'gameEdition': gameEdition.index,
-        'enhancementType': enhancementTypeIndex,
+        'enhancementKey': enhancementKey,
         'enhancementsOnTargetAction': previousEnhancements,
         'targetCardLvl': targetCardLvl,
         'disableMultiTargetsSwitch': disableMultiTargetSwitch,
@@ -403,8 +417,14 @@ class SharedPrefs {
           gameEdition = GameEdition.values[idx];
         }
       }
-      if (c.containsKey('enhancementType')) {
+      // Each format clears the other so the restored selection always wins:
+      // the key takes precedence over the legacy index when both are present.
+      if (c.containsKey('enhancementKey')) {
+        enhancementKey = c['enhancementKey'] as String?;
+        remove('enhancementType');
+      } else if (c.containsKey('enhancementType')) {
         enhancementTypeIndex = c['enhancementType'] as int;
+        enhancementKey = null;
       }
       if (c.containsKey('enhancementsOnTargetAction')) {
         previousEnhancements = c['enhancementsOnTargetAction'] as int;

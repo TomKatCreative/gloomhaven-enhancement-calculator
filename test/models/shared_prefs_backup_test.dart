@@ -24,7 +24,7 @@ void main() {
           'envelopeX': true,
           'envelopeV': false,
           'gameEdition': GameEdition.frosthaven.index,
-          'enhancementType': 3,
+          'enhancementKey': 'charPlusOne:Attack',
           'enhancementsOnTargetAction': 2,
           'targetCardLvl': 4,
           'disableMultiTargetsSwitch': true,
@@ -61,7 +61,8 @@ void main() {
         // Verify calculator
         final calculator = result['calculator'] as Map<String, dynamic>;
         expect(calculator['gameEdition'], GameEdition.frosthaven.index);
-        expect(calculator['enhancementType'], 3);
+        expect(calculator['enhancementKey'], 'charPlusOne:Attack');
+        expect(calculator.containsKey('enhancementType'), isFalse);
         expect(calculator['enhancementsOnTargetAction'], 2);
         expect(calculator['targetCardLvl'], 4);
         expect(calculator['disableMultiTargetsSwitch'], isTrue);
@@ -102,7 +103,7 @@ void main() {
 
         final calculator = result['calculator'] as Map<String, dynamic>;
         expect(calculator['gameEdition'], GameEdition.gloomhaven.index);
-        expect(calculator['enhancementType'], 0);
+        expect(calculator['enhancementKey'], isNull);
       });
     });
 
@@ -123,7 +124,7 @@ void main() {
           },
           'calculator': {
             'gameEdition': GameEdition.gloomhaven2e.index,
-            'enhancementType': 5,
+            'enhancementKey': 'charPlusOne:Range',
             'enhancementsOnTargetAction': 3,
             'targetCardLvl': 2,
             'disableMultiTargetsSwitch': true,
@@ -157,7 +158,7 @@ void main() {
 
         // Calculator
         expect(prefs.gameEdition, GameEdition.gloomhaven2e);
-        expect(prefs.enhancementTypeIndex, 5);
+        expect(prefs.enhancementKey, 'charPlusOne:Range');
         expect(prefs.previousEnhancements, 3);
         expect(prefs.targetCardLvl, 2);
         expect(prefs.disableMultiTargetSwitch, isTrue);
@@ -182,6 +183,34 @@ void main() {
         );
       });
 
+      test(
+        'legacy enhancementType replaces a current enhancementKey',
+        () async {
+          // Backups made before enhancementKey existed carry only the index.
+          await _initPrefs({'enhancementKey': 'charPlusOne:Move'});
+          final prefs = SharedPrefs();
+
+          prefs.importFromBackup({
+            'calculator': {'enhancementType': 5},
+          });
+
+          expect(prefs.enhancementTypeIndex, 5);
+          expect(prefs.enhancementKey, isNull);
+        },
+      );
+
+      test('enhancementKey clears a stale legacy enhancementType', () async {
+        await _initPrefs({'enhancementType': 5});
+        final prefs = SharedPrefs();
+
+        prefs.importFromBackup({
+          'calculator': {'enhancementKey': 'charPlusOne:Attack'},
+        });
+
+        expect(prefs.enhancementKey, 'charPlusOne:Attack');
+        expect(prefs.enhancementTypeIndex, 0);
+      });
+
       test('round-trip preserves all values', () async {
         await _initPrefs({
           'darkTheme': true,
@@ -192,7 +221,7 @@ void main() {
           'envelopeX': true,
           'envelopeV': false,
           'gameEdition': GameEdition.frosthaven.index,
-          'enhancementType': 7,
+          'enhancementKey': 'charPlusOne:Move',
           'enhancementsOnTargetAction': 1,
           'targetCardLvl': 3,
           'disableMultiTargetsSwitch': false,
@@ -215,7 +244,7 @@ void main() {
         // Modify prefs to different values
         prefs.darkTheme = false;
         prefs.gameEdition = GameEdition.gloomhaven;
-        prefs.enhancementTypeIndex = 0;
+        prefs.enhancementKey = null;
         prefs.targetCardLvl = 0;
         prefs.hailsDiscount = false;
         prefs.setPlayerClassIsUnlocked(ClassCodes.sunkeeper, false);
@@ -226,7 +255,7 @@ void main() {
         // Verify original values restored
         expect(prefs.darkTheme, isTrue);
         expect(prefs.gameEdition, GameEdition.frosthaven);
-        expect(prefs.enhancementTypeIndex, 7);
+        expect(prefs.enhancementKey, 'charPlusOne:Move');
         expect(prefs.targetCardLvl, 3);
         expect(prefs.hailsDiscount, isTrue);
         expect(prefs.getPlayerClassIsUnlocked(ClassCodes.sunkeeper), isTrue);

@@ -97,6 +97,71 @@ void main() {
       });
     });
 
+    group('Persisted enhancement key', () {
+      // Regression: the selection used to be stored as a list index, and Move
+      // is index 0 — the same value as "no selection" — so it was dropped.
+      test('Move selection survives a relaunch', () async {
+        await _setupPrefs();
+        final move = _findEnhancementByCategory(
+          'Move',
+          EnhancementCategory.charPlusOne,
+        );
+        EnhancementCalculatorModel().enhancementSelected(move);
+
+        final relaunched = EnhancementCalculatorModel();
+
+        expect(relaunched.enhancement, same(move));
+      });
+
+      test('unknown key loads as no selection', () async {
+        SharedPreferences.setMockInitialValues({
+          'enhancementKey': 'charPlusOne:Removed',
+        });
+        await SharedPrefs().init();
+
+        expect(EnhancementCalculatorModel().enhancement, isNull);
+      });
+
+      test('migrates a legacy index to a key', () async {
+        SharedPreferences.setMockInitialValues({'enhancementType': 1});
+        await SharedPrefs().init();
+
+        final model = EnhancementCalculatorModel();
+
+        expect(model.enhancement, same(EnhancementData.enhancements[1]));
+        expect(
+          SharedPrefs().enhancementKey,
+          EnhancementData.enhancements[1].key,
+        );
+        expect(SharedPrefs().enhancementTypeIndex, 0);
+      });
+
+      test('key takes precedence over a legacy index', () async {
+        SharedPreferences.setMockInitialValues({
+          'enhancementKey': EnhancementData.enhancements[2].key,
+          'enhancementType': 1,
+        });
+        await SharedPrefs().init();
+
+        expect(
+          EnhancementCalculatorModel().enhancement,
+          same(EnhancementData.enhancements[2]),
+        );
+      });
+
+      test('resetCost clears both key and legacy index', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+        model.enhancementSelected(EnhancementData.enhancements[1]);
+        SharedPrefs().enhancementTypeIndex = 3;
+
+        model.resetCost();
+
+        expect(SharedPrefs().enhancementKey, isNull);
+        expect(SharedPrefs().enhancementTypeIndex, 0);
+      });
+    });
+
     group('Persisted enhancement index resilience', () {
       // Regression: an old app version shipped a longer enhancement list, so an
       // index persisted then can exceed the current list after an update.
@@ -1074,6 +1139,9 @@ void main() {
         model.gameEdition = GameEdition.gloomhaven2e;
 
         expect(model.enhancement, isNull);
+        // The stale key is cleared too, so a relaunch doesn't restore it.
+        expect(SharedPrefs().enhancementKey, isNull);
+        expect(EnhancementCalculatorModel().enhancement, isNull);
       });
 
       test('Ward cleared when switching to GH', () async {
@@ -1086,6 +1154,9 @@ void main() {
         model.gameEdition = GameEdition.gloomhaven;
 
         expect(model.enhancement, isNull);
+        // The stale key is cleared too, so a relaunch doesn't restore it.
+        expect(SharedPrefs().enhancementKey, isNull);
+        expect(EnhancementCalculatorModel().enhancement, isNull);
       });
 
       test('calls notifyListeners', () async {
@@ -1522,7 +1593,7 @@ void main() {
         expect(model.totalCost, 0);
       });
 
-      test('handles enhancementTypeIndex of 0 (no selection)', () async {
+      test('handles a cleared enhancementKey (no selection)', () async {
         await _setupPrefs();
         final model = EnhancementCalculatorModel();
 
@@ -1533,7 +1604,7 @@ void main() {
         expect(model.enhancement, isNotNull);
 
         // Reset via prefs
-        SharedPrefs().enhancementTypeIndex = 0;
+        SharedPrefs().enhancementKey = null;
         model.reloadFromPrefs();
 
         expect(model.enhancement, isNull);

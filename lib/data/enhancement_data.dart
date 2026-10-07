@@ -48,6 +48,15 @@ enum EnhancementCategory {
 }
 
 class EnhancementData {
+  /// Returns the enhancement whose [Enhancement.key] is [key], or null if no
+  /// enhancement matches (e.g. it was removed in a later app version).
+  static Enhancement? byKey(String key) {
+    for (final enhancement in enhancements) {
+      if (enhancement.key == key) return enhancement;
+    }
+    return null;
+  }
+
   static final List<Enhancement> enhancements = [
     // Character +1 stats
     Enhancement(

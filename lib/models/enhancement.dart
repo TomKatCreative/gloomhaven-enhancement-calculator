@@ -16,6 +16,10 @@ class Enhancement {
     this.fhCost,
   });
 
+  /// Stable identifier used to persist the selection. Unlike a position in
+  /// [EnhancementData.enhancements], it survives reordering of that list.
+  String get key => '${category.name}:$name';
+
   int cost({required GameEdition edition}) {
     switch (edition) {
       case GameEdition.gloomhaven:

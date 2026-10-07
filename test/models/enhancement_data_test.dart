@@ -3,6 +3,20 @@ import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 
 void main() {
+  group('Enhancement keys', () {
+    test('are unique so a persisted key finds one enhancement', () {
+      final keys = EnhancementData.enhancements.map((e) => e.key).toList();
+      expect(keys.toSet(), hasLength(keys.length));
+    });
+
+    test('byKey round-trips every enhancement and rejects unknown keys', () {
+      for (final enhancement in EnhancementData.enhancements) {
+        expect(EnhancementData.byKey(enhancement.key), same(enhancement));
+      }
+      expect(EnhancementData.byKey('charPlusOne:Nope'), isNull);
+    });
+  });
+
   group('EnhancementData', () {
     group('enhancements list', () {
       test('has correct total count', () {

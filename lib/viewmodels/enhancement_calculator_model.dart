@@ -47,21 +47,33 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _invalidateCalculator();
   }
 
-  /// Reads the persisted enhancement selection, guarding against a stored index
-  /// that is out of range for the current [EnhancementData.enhancements] list.
+  /// Reads the persisted enhancement selection by its stable
+  /// [Enhancement.key], returning null for a missing or unknown key.
   ///
-  /// Older app versions shipped a longer enhancement list, so an index
-  /// persisted back then can exceed the current list length after an update.
-  /// Indexing directly would throw a `RangeError` while this model is
-  /// constructed — and since the model is built above the app's [Scaffold],
-  /// that surfaces as a blank/grey screen with no app bar. Returns null (no
-  /// selection) for a missing or out-of-range index, matching a fresh state.
+  /// Falls back to the legacy `enhancementType` list index for users who
+  /// haven't run this version yet, and migrates it to a key. The index is
+  /// range-checked: older app versions shipped a longer enhancement list, and
+  /// indexing directly would throw a `RangeError` while this model is
+  /// constructed — since the model is built above the app's [Scaffold], that
+  /// surfaces as a blank/grey screen with no app bar.
   static Enhancement? _enhancementFromPrefs() {
+    final key = SharedPrefs().enhancementKey;
+    if (key != null) return EnhancementData.byKey(key);
+
     final index = SharedPrefs().enhancementTypeIndex;
+    SharedPrefs().remove('enhancementType');
     if (index > 0 && index < EnhancementData.enhancements.length) {
-      return EnhancementData.enhancements[index];
+      final enhancement = EnhancementData.enhancements[index];
+      SharedPrefs().enhancementKey = enhancement.key;
+      return enhancement;
     }
     return null;
+  }
+
+  /// Clears the persisted selection in both the current and legacy formats.
+  static void _clearPersistedEnhancement() {
+    SharedPrefs().enhancementKey = null;
+    SharedPrefs().remove('enhancementType');
   }
 
   // ===========================================================================
@@ -250,9 +262,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
 
   set enhancement(Enhancement? enhancement) {
     if (enhancement != null) {
-      SharedPrefs().enhancementTypeIndex = EnhancementData.enhancements.indexOf(
-        enhancement,
-      );
+      SharedPrefs().enhancementKey = enhancement.key;
     }
     _enhancement = enhancement;
   }
@@ -366,7 +376,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _persistent = false;
     SharedPrefs().remove('targetCardLvl');
     SharedPrefs().remove('enhancementsOnTargetAction');
-    SharedPrefs().remove('enhancementType');
+    _clearPersistedEnhancement();
     SharedPrefs().remove('disableMultiTargetsSwitch');
     SharedPrefs().remove('multipleTargetsSelected');
     SharedPrefs().remove('enhancementCost');
@@ -428,7 +438,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     // Regenerate in GH2E)
     if (!EnhancementData.isAvailableInEdition(selectedEnhancement, edition)) {
       _enhancement = null;
-      SharedPrefs().remove('enhancementType');
+      _clearPersistedEnhancement();
       notifyListeners();
       return;
     }
