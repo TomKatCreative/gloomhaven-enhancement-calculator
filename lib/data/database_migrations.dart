@@ -28,6 +28,10 @@ class DatabaseMigrations {
   /// Kept for historical migration compatibility (v9-v17).
   /// The Perks and Masteries tables were dropped in v19 — definitions now
   /// come from [PerksRepository] and [MasteriesRepository] directly.
+  ///
+  /// Unlike the v8 perk migration, reading the live repositories here is safe:
+  /// these steps only rebuild definition tables that v19 drops, and never
+  /// read or rewrite the character perk/mastery IDs.
   static Future<void> regeneratePerksAndMasteriesTables(Transaction txn) async {
     await regeneratePerksTable(txn);
     await _regenerateMasteriesTable(txn);
@@ -394,11 +398,15 @@ class DatabaseMigrations {
     final List<Character?> characters = charactersMaps
         .map((e) => Character.fromMap(e))
         .toList();
+    final legacyLayout = _legacyPerkIdLayout();
     await Future.forEach(PerksRepository.perksMap.entries, (entry) async {
       final classKey = entry.key;
       final perkLists = entry.value.where(
         (element) => element.variant == Variant.base,
       );
+      final legacyRange = legacyLayout[classKey];
+      // Position of the current perk check within this class's base perks.
+      int ordinal = 0;
 
       for (Perks list in perkLists) {
         for (Perk perk in list.perks) {
@@ -410,14 +418,19 @@ class DatabaseMigrations {
           for (int i = 0; i < perk.quantity; i++) {
             String suffix = '$index${indexToLetter(i)}';
 
-            int id = await txn.insert(tempTablePerks, perk.toMap(suffix));
-            // This handles for a mistake when first defining the Infuser perks
-            // One perk that has two checks was only given one
-            // All perks after 726 (the last Infuser perk) should reference an
-            // index one lower than the perk id
-            if (id >= 726) {
-              id--;
+            await txn.insert(tempTablePerks, perk.toMap(suffix));
+
+            // The legacy integer ID is taken from the frozen v7 layout, never
+            // from this insert's rowid: the live map's class order has changed
+            // since v8, so rowids no longer line up with legacy IDs. Classes
+            // added after v7 have no legacy perks. Infuser has one more check
+            // than its legacy rows (a legacy definition mistake); its extra
+            // check has no legacy row and is handled by the 724/725 fix below.
+            final int checkOrdinal = ordinal++;
+            if (legacyRange == null || checkOrdinal >= legacyRange.count) {
+              continue;
             }
+            final int id = legacyRange.firstId + checkOrdinal;
             // MatchingCharacterPerk should be a list. There can be more than 1
             List<CharacterPerk> matchingCharacterPerks = [];
 
@@ -496,6 +509,26 @@ class DatabaseMigrations {
         }
       }
     });
+  }
+
+  /// Maps each class code to the integer perk IDs it occupied in the v7
+  /// (pre-variant) Perks table: a contiguous run starting at `firstId`.
+  ///
+  /// Derived from [PerksRepositoryLegacy.legacyPerks], which is frozen and
+  /// produced that table (one autoincrement row per perk check, starting at 1).
+  static Map<String, ({int firstId, int count})> _legacyPerkIdLayout() {
+    final layout = <String, ({int firstId, int count})>{};
+    int id = 0;
+    for (final legacy.Perk perk in PerksRepositoryLegacy.legacyPerks) {
+      for (int i = 0; i < perk.numOfPerks; i++) {
+        id++;
+        final existing = layout[perk.perkClassCode];
+        layout[perk.perkClassCode] = existing == null
+            ? (firstId: id, count: 1)
+            : (firstId: existing.firstId, count: existing.count + 1);
+      }
+    }
+    return layout;
   }
 
   static Future<void> _handleRemainingVariantPerks(
