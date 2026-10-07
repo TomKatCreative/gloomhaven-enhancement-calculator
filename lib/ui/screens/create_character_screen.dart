@@ -114,7 +114,9 @@ class CreateCharacterScreenState extends State<CreateCharacterScreen> {
                   if (edition == GameEdition.jawsOfTheLion) {
                     // JotL characters always start at level 1 and have no
                     // resources, personal quests, or retirement mechanic.
-                    _selectedLevel = 1;
+                    _selectedLevel = edition.maxStartingLevel(
+                      _selectedProsperityLevel,
+                    );
                     _previousRetirements = 0;
                     _showResources = false;
                     _selectedPersonalQuestId = null;

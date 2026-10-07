@@ -139,9 +139,9 @@ void main() {
         expect(GameEdition.frosthaven.maxStartingLevel(9), 5);
       });
 
-      test('Jaws of the Lion is uncapped (no prosperity)', () {
-        expect(GameEdition.jawsOfTheLion.maxStartingLevel(1), 9);
-        expect(GameEdition.jawsOfTheLion.maxStartingLevel(9), 9);
+      test('Jaws of the Lion is locked to level 1', () {
+        expect(GameEdition.jawsOfTheLion.maxStartingLevel(1), 1);
+        expect(GameEdition.jawsOfTheLion.maxStartingLevel(9), 1);
       });
     });
 
@@ -167,12 +167,12 @@ void main() {
         expect(GameEdition.frosthaven.startingGold(prosperityLevel: 9), 110);
       });
 
-      test('Jaws of the Lion: 15 * (level + 1), prosperity-independent', () {
+      test('Jaws of the Lion: always 30', () {
         expect(GameEdition.jawsOfTheLion.startingGold(level: 1), 30);
-        expect(GameEdition.jawsOfTheLion.startingGold(level: 5), 90);
+        expect(GameEdition.jawsOfTheLion.startingGold(level: 5), 30);
         expect(
           GameEdition.jawsOfTheLion.startingGold(level: 3, prosperityLevel: 9),
-          60, // 15 * (3 + 1), prosperity ignored
+          30,
         );
       });
 

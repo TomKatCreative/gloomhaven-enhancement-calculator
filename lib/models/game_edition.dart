@@ -30,8 +30,7 @@ enum GameEdition {
   ///
   /// - Gloomhaven: prosperity level
   /// - Gloomhaven 2e / Frosthaven: prosperity / 2 (rounded up)
-  /// - Jaws of the Lion: no prosperity system, so starting level is
-  ///   unconstrained (any level 1–9).
+  /// - Jaws of the Lion: always 1 (characters are locked to level 1).
   int maxStartingLevel(int prosperityLevel) {
     switch (this) {
       case GameEdition.gloomhaven:
@@ -40,7 +39,7 @@ enum GameEdition {
       case GameEdition.frosthaven:
         return (prosperityLevel / 2).ceil();
       case GameEdition.jawsOfTheLion:
-        return 9;
+        return 1;
     }
   }
 
@@ -49,12 +48,13 @@ enum GameEdition {
   /// - Gloomhaven: 15 × (L + 1), where L is starting level
   /// - Gloomhaven 2e: 10 × P + 15, where P is prosperity level
   /// - Frosthaven: 10 × P + 20, where P is prosperity level
-  /// - Jaws of the Lion: 15 × (L + 1) (Gloomhaven rule, prosperity-independent)
+  /// - Jaws of the Lion: always 30 (the Gloomhaven rule at the locked level 1)
   int startingGold({int level = 1, int prosperityLevel = 0}) {
     switch (this) {
       case GameEdition.gloomhaven:
-      case GameEdition.jawsOfTheLion:
         return 15 * (level + 1);
+      case GameEdition.jawsOfTheLion:
+        return 30;
       case GameEdition.gloomhaven2e:
         return 10 * prosperityLevel + 15;
       case GameEdition.frosthaven:
