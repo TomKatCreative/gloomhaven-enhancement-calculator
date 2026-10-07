@@ -420,7 +420,10 @@ class ResourcesContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final charactersModel = context.read<CharactersModel>();
-    final canEdit = charactersModel.isEditMode && !character.isRetired;
+    final isEditMode = context.select<CharactersModel, bool>(
+      (m) => m.isEditMode,
+    );
+    final canEdit = isEditMode && !character.isRetired;
     final iconColor = ColorUtils.ensureContrast(
       theme.extension<AppThemeExtension>()!.characterPrimary,
       theme.colorScheme.surfaceContainerHigh,

@@ -160,7 +160,7 @@ class Character {
   });
 
   Character.fromMap(Map<String, dynamic> map) {
-    id = map[columnCharacterId] ?? '';
+    id = map[columnCharacterId] as int?;
     // This handles for legacy characters that don't have a uuid
     uuid = map[columnCharacterUuid] ?? map[columnCharacterId].toString();
     name = map[columnCharacterName];

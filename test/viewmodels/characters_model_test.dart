@@ -46,6 +46,39 @@ void main() {
     );
   }
 
+  group('loadCharacters', () {
+    // Regression: the list was assigned inside the per-character loop, so an
+    // empty database (e.g. restoring a backup with no characters) never
+    // replaced the previously loaded characters.
+    test('clears characters when the database is empty', () async {
+      fakeDb.characters = [TestData.createCharacter()];
+      final model = createModel();
+      await model.loadCharacters();
+      expect(model.characters, hasLength(1));
+
+      fakeDb.characters = [];
+      await model.loadCharacters();
+
+      expect(model.characters, isEmpty);
+      expect(model.currentCharacter, isNull);
+    });
+
+    test('notifies listeners once regardless of character count', () async {
+      fakeDb.characters = [
+        TestData.createCharacter(uuid: 'a'),
+        TestData.createCharacter(uuid: 'b'),
+        TestData.createCharacter(uuid: 'c'),
+      ];
+      final model = createModel();
+      int notifyCount = 0;
+      model.addListener(() => notifyCount++);
+
+      await model.loadCharacters();
+
+      expect(notifyCount, 1);
+    });
+  });
+
   group('retireCurrentCharacter', () {
     test('toggles isRetired from false to true', () async {
       final character = TestData.createCharacter(isRetired: false);

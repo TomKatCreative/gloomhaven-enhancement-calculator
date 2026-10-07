@@ -82,7 +82,9 @@ class FakeDatabaseHelper implements IDatabaseHelper {
     // Auto-generate CharacterPerk records from PerksRepository
     // (matching what the real database does on insert)
     _generateCharacterPerks(character);
-    _generateCharacterMasteries(character);
+    if (character.shouldShowMasteries) {
+      _generateCharacterMasteries(character);
+    }
 
     return id;
   }

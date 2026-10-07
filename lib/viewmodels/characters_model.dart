@@ -274,8 +274,8 @@ class CharactersModel with ChangeNotifier {
     for (Character character in loadedCharacters) {
       character.characterPerks = await _loadPerks(character);
       character.characterMasteries = await _loadMasteries(character);
-      characters = loadedCharacters;
     }
+    _characters = loadedCharacters;
 
     _setCurrentCharacter(index: SharedPrefs().currentCharacterIndex);
     notifyListeners();

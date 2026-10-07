@@ -56,9 +56,6 @@ class PerksRepository {
       }());
 
       for (final perk in perksGroup.perks) {
-        perk.variant = perksGroup.variant;
-        perk.classCode = classCode;
-
         final paddedIndex = perk.number.toString().padLeft(2, '0');
         for (int i = 0; i < perk.quantity; i++) {
           // Create a copy so each entry gets its own ID
