@@ -33,11 +33,9 @@ dependencies:
   syncfusion_flutter_sliders: ^33.2.4
   path: ^1.8.3
   font_awesome_flutter: ^11.0.0
-  material_design_icons_flutter: ^7.0.7296
   share_plus: ^13.3.0
   collection: ^1.19.0
 
-  cupertino_icons: ^1.0.8
   confetti: 0.8.0
 
 dev_dependencies:
@@ -45,8 +43,6 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
-  mockito: ^5.4.4
-  build_runner: ^2.4.8
   # In-memory SQLite for backup/restore service tests (no platform plugin needed)
   sqflite_common_ffi: ^2.3.3
 
