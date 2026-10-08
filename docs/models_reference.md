@@ -179,7 +179,6 @@ Defines a character class with its attributes, colors, and variant support.
 | `getDisplayName(Variant)` | `String` | Variant override name or base name |
 | `getFullDisplayName(Variant)` | `String` | "Race - ClassName" or just title for merc packs |
 | `getHandSize(Variant)` | `int` | Variant hand size, falling back to base `handSize` |
-| `hasVariantName(Variant)` | `bool` | Whether variant has an override name |
 | `getCombinedDisplayNames()` | `String` | All unique variant names joined |
 
 ### ClassCategory Enum
@@ -205,7 +204,7 @@ Defines a character class with its attributes, colors, and variant support.
 | `base` | Original version |
 | `frosthavenCrossover` | Frosthaven crossover rules |
 | `gloomhaven2E` | Gloomhaven 2nd Edition |
-| `v2`, `v3`, `v4` | Additional version variants |
+| `v2`, `v3` | Additional version variants |
 
 ### Example: Variant Names
 
@@ -557,8 +556,8 @@ Represents a personal quest card with retirement requirements.
 
 ### Serialization
 
-- `toMap()` / `fromMap()` for SQLite persistence
-- Requirements, unlock class, and unlock envelope stored in `PersonalQuestsRepository`, not in DB
+- `toMap()` only, used by the v18 migration to seed the legacy `PersonalQuestsTable` (dropped in v19)
+- Definitions (requirements, unlock class, unlock envelope) come from `PersonalQuestsRepository`, not the DB
 
 ---
 

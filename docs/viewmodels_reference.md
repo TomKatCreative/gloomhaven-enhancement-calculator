@@ -105,14 +105,8 @@ Handles app-level navigation state and page management.
 |----------|------|---------|-------------|
 | `pageController` | `PageController` | created | Controls PageView navigation |
 | `page` | `int` | from SharedPrefs | Current page index (0=Town, 1=Characters, 2=Enhancements) |
-| `themeMode` | `ThemeMode` | from SharedPrefs (light/dark) | Theme mode (delegated to ThemeProvider) |
-| `useDefaultFonts` | `bool` | false | Font preference (delegated to ThemeProvider) |
 
-### Methods
-
-| Method | Description |
-|--------|-------------|
-| `updateTheme({ThemeMode? themeMode})` | Update theme with optional notification |
+Theme mode and font preference are owned by `ThemeProvider`, not `AppModel`.
 
 ### State Persistence
 
@@ -288,7 +282,6 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 - Perk and mastery state updates
 - Personal quest management (via PersonalQuestService)
 - Theme synchronization with character color
-- Element sheet expansion state
 - Scroll state tracking
 
 ### Dependencies
@@ -312,14 +305,12 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `showRetired` | `bool` | from prefs | Show/hide retired characters |
 | `_isEditMode` | `bool` | false | Edit mode state |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
-| `_showAllCharacters` | `bool` | from prefs | Filter characters by active party |
 
 ### Getters
 
 | Getter | Returns | Description |
 |--------|---------|-------------|
-| `characters` | `List<Character>` | Filtered list (respects showRetired and party filter) |
-| `showAllCharacters` | `bool` | Whether to show all characters or filter by party |
+| `characters` | `List<Character>` | Filtered list (respects showRetired) |
 | `isEditMode` | `bool` | Current edit mode state |
 | `retiredCharactersAreHidden` | `bool` | Inverse of showRetired |
 
@@ -400,7 +391,6 @@ When toggling `showRetired`, the model calculates the correct navigation target:
 ### State Persistence
 
 - `showRetiredCharacters` key in SharedPrefs
-- `showAllCharacters` key in SharedPrefs
 
 ---
 

@@ -60,7 +60,7 @@ prefs.setPlayerClassIsUnlocked('br', true);
 |-----|------|---------|-------------|
 | `activeCampaignId` | String? | null | UUID of the currently active campaign |
 | `activePartyId` | String? | null | UUID of the currently active party |
-| `showAllCharacters` | bool | true | Show all characters vs filter by active party |
+| `showAllCharacters` | bool | true | Reserved for the Town party filter; not currently read. Still included in backups |
 
 ---
 
@@ -169,7 +169,6 @@ This ensures users can only have contiguous levels (can't have L3 without L1-L2)
 | `initialPage` | int | 0 | Home screen tab on app launch |
 | `currentCharacterIndex` | int | 0 | Selected character page index |
 | `generalExpanded` | bool | true | General section expansion |
-| `personalQuestExpanded` | bool | false | Personal Quest section expansion |
 | `questAndNotesExpanded` | bool | true | Quest & Notes section expansion |
 | `perksAndMasteriesExpanded` | bool | true | Perks & Masteries section expansion |
 | `townDetailsExpanded` | bool | true | Town details section expansion |
@@ -316,7 +315,6 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `clearOldPrefs` | Legacy cleanup flag, not user state |
 | `initialPage` | Transient navigation state |
 | `generalExpanded` | Transient UI state |
-| `personalQuestExpanded` | Transient UI state |
 | `questAndNotesExpanded` | Transient UI state |
 | `perksAndMasteriesExpanded` | Transient UI state |
 | `townDetailsExpanded` | Transient UI state |

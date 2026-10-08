@@ -182,7 +182,7 @@ CQ-15 is its own branch. CQ-16 – CQ-18 are best done as one branch after it, s
 
 **Done:** The sheet had not been mounted since `6575f58` ("Code audit cleanup"), so the expansion flags were always `false` and the removal changes nothing visible. Also removed `sheetExpandedSize`, which only the tracker and the character-screen padding ternary used. The six `element*State` prefs keys are left orphaned on existing installs. They are harmless and were never part of backups, so there is no cleanup migration.
 
-### CQ-16 ⬜ Dead Dart members
+### CQ-16 ✅ Dead Dart members
 
 - **`AppModel`:** `themeMode` and `useDefaultFonts` (plus setters) are only used by tests, since `ThemeProvider` owns this state. `updateTheme()` is a bare `notifyListeners()` called from `ghc_animated_app_bar.dart:122` and `retirement_prompt.dart:95`. Remove all four, both call sites, the tests and the doc entries.
 - **Theme:** `AppThemeBuilder.darkSurface`, `ColorUtils.readableTextColor` and `ColorSchemeContrast.contrastedPrimary` (its doc promises contrast adjustment but it returns `primary`). In `AppThemeExtension`, `characterSecondary`, `characterAccent` and `isRetiredCharacter` are never read, and `_adjustColor` exists only to feed them.
@@ -191,13 +191,17 @@ CQ-15 is its own branch. CQ-16 – CQ-18 are best done as one branch after it, s
 - **`blurBarHeight`** (`constants.dart:116`): use it in `expandable_cost_chip.dart:161` instead of the hardcoded `100`. This overlaps CQ-25.
 - **`_lerpDouble`** in `expandable_cost_chip.dart:479` duplicates `dart:ui`'s `lerpDouble`.
 
-### CQ-17 ⬜ Unused l10n keys
+**Done:** Removed everything listed, with two corrections. Only the `ColorSchemeContrast` extension on `ColorScheme` was dead. The `ThemeData.contrastedPrimary` getter and the `AppThemeExtension.contrastedPrimary` field are used throughout the UI and do real contrast adjustment, so they stay. `_darken` went with `_adjustColor`. `PersonalQuest.toMap` stays because the v18 migration uses it. The party filter was removed from `CharactersModel` only: `SharedPrefs.showAllCharacters` and its backup entry stay, so the backup format is unchanged and Town can wire the filter back in. Removing `updateTheme()` is safe because `retireCurrentCharacter()` already notifies `CharactersModel` listeners.
+
+### CQ-17 ✅ Unused l10n keys
 
 Remove from both `app_en.arb` and `app_pt.arb`, then run `flutter gen-l10n`: `appTitleIOS`, `appTitleAndroid`, `enhancementType`, `enhancementCalculator`, `generalGuidelines`, `lossNonPersistent`, `saved`, `filenameRequired`, `comingSoon`, `noPersonalQuest`, `checkmarks`.
 
 **Keep for Town (decide later):** `renameCampaign`, `notAssignedToParty`.
 
-### CQ-18 ⬜ Unused dependencies and assets
+**Done:** All 11 keys removed from both ARB files and regenerated.
+
+### CQ-18 ✅ Unused dependencies and assets
 
 - **Dependencies:** `material_design_icons_flutter` (runtime bloat), `mockito`, `build_runner` and `cupertino_icons`.
 - **Assets:**
@@ -208,6 +212,8 @@ Remove from both `app_en.arb` and `app_pt.arb`, then run `flutter gen-l10n`: `ap
   - `images/status_effects/empower_major.svg`, `enfeeble_major.svg` and `immune.svg`
   - `images/ui/xp_2.svg`
 - Check that `.DS_Store` is gitignored inside the asset directories.
+
+**Done:** All four packages removed. **Decision (2026-10-07): the assets stay** in case they are needed later, so they and the `images/titles/` entry are unchanged. `.DS_Store` was already gitignored, and none were tracked.
 
 ---
 

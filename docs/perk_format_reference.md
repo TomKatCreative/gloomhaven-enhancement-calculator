@@ -31,7 +31,7 @@ Each class can have multiple variants:
 - `Variant.base` - Original version
 - `Variant.frosthavenCrossover` - Frosthaven crossover version
 - `Variant.gloomhaven2E` - Gloomhaven 2nd Edition version
-- `Variant.v2`, `Variant.v3`, `Variant.v4` - For classes with multiple versions
+- `Variant.v2`, `Variant.v3` - For classes with multiple versions
 
 ## Inline Icon Keywords
 
