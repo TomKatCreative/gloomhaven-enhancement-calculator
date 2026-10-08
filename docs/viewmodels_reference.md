@@ -311,10 +311,7 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `charScrollOffsetNotifier` | `ValueNotifier<double>` | 0 | Character screen scroll offset (drives app bar & header tint) |
 | `showRetired` | `bool` | from prefs | Show/hide retired characters |
 | `_isEditMode` | `bool` | false | Edit mode state |
-| `_isElementSheetExpanded` | `bool` | false | Element tracker partial expansion |
-| `_isElementSheetFullExpanded` | `bool` | false | Element tracker full expansion |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
-| `collapseElementSheetNotifier` | `ValueNotifier<int>` | 0 | Signal to collapse element sheet |
 | `_showAllCharacters` | `bool` | from prefs | Filter characters by active party |
 
 ### Getters
@@ -324,8 +321,6 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `characters` | `List<Character>` | Filtered list (respects showRetired and party filter) |
 | `showAllCharacters` | `bool` | Whether to show all characters or filter by party |
 | `isEditMode` | `bool` | Current edit mode state |
-| `isElementSheetExpanded` | `bool` | Partial expansion state |
-| `isElementSheetFullExpanded` | `bool` | Full expansion state |
 | `retiredCharactersAreHidden` | `bool` | Inverse of showRetired |
 
 ### Section Expansion State (passthrough to SharedPrefs)
@@ -390,13 +385,6 @@ These are simple getter/setter pairs that read/write directly to SharedPrefs wit
 | Method | Description |
 |--------|-------------|
 | `setEditMode(bool)` | Enable/disable edit mode |
-
-### Element Sheet State
-
-| Method | Description |
-|--------|-------------|
-| `setElementSheetExpanded(bool)` | Set partial expansion |
-| `setElementSheetFullExpanded(bool)` | Set full expansion |
 
 ### Toggle Retired Visibility Logic
 

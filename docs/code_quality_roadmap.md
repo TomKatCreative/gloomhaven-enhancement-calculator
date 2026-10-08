@@ -154,7 +154,7 @@ Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFr
 
 CQ-15 is its own branch. CQ-16 – CQ-18 are best done as one branch after it, since CQ-15 deletes some of the same code. Verify each removal with grep before deleting.
 
-### CQ-15 ⬜ Remove the element tracker feature entirely
+### CQ-15 ✅ Remove the element tracker feature entirely
 
 **Decision (2026-10-07):** The element tracker will not be used, so the whole feature goes: the tracker sheet, the animated element icons, element state tracking and persistence, and the sheet's interactions with navigation and the character screen.
 
@@ -179,6 +179,8 @@ CQ-15 is its own branch. CQ-16 – CQ-18 are best done as one branch after it, s
 **Docs to update:** `docs/shared_prefs_keys.md` (Element Tracker State section and the transient-state table), `docs/viewmodels_reference.md`, `docs/TODO.md`, `docs/technical_debt.md` and the CLAUDE.md docs list (`element_tracker.md`).
 
 **Supersedes:** the earlier `animated_element_icon.dart` simplification item, the element-icon fallback removal, the ring-padding duplicate, and the element-tracker entries in CQ-25.
+
+**Done:** The sheet had not been mounted since `6575f58` ("Code audit cleanup"), so the expansion flags were always `false` and the removal changes nothing visible. Also removed `sheetExpandedSize`, which only the tracker and the character-screen padding ternary used. The six `element*State` prefs keys are left orphaned on existing installs. They are harmless and were never part of backups, so there is no cleanup migration.
 
 ### CQ-16 ⬜ Dead Dart members
 

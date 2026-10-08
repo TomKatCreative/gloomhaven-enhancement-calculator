@@ -8,11 +8,10 @@ Standard Flutter workflow — see `pubspec.yaml` for dependencies, `flutter test
 
 ## Git Branching Strategy
 
-**IMPORTANT:** Always start new development work by branching from `dev`, not `master`.
+**IMPORTANT:** Commit development work directly to `dev`, never `master`. Don't create feature branches.
 
 - **`master`** - Production-ready code only. Only merge in when preparing a production release.
 - **`dev`** - Main development branch. Pushes auto-deploy to Google Play's internal testing track via `.github/workflows/deploy-internal.yml`.
-- **Feature branches** - Branch from `dev`, merge back to `dev` when complete.
 
 ### Common Git Commands
 
@@ -162,7 +161,7 @@ Project docs live in `/docs`. Key reference files:
 - `docs/technical_debt.md` — current debt landscape, refactor history.
 - `docs/database_schema.md`, `docs/models_reference.md`, `docs/viewmodels_reference.md`, `docs/shared_prefs_keys.md` — code references.
 - `docs/enhancement_rules.md`, `docs/perk_format_reference.md`, `docs/game_text_parser.md` — domain rules.
-- `docs/element_tracker.md`, `docs/calculator_widgets.md`, `docs/dialogs.md`, `docs/screens.md`, `docs/theme_system.md` — feature/widget docs.
+- `docs/calculator_widgets.md`, `docs/dialogs.md`, `docs/screens.md`, `docs/theme_system.md` — feature/widget docs.
 - `docs/TODO.md` — task tracking.
 - `docs/releases.md` — release history.
 
@@ -171,7 +170,7 @@ When creating new docs: place in `/docs`, use `snake_case.md`. `README.md` and `
 ## Tips for AI Assistants
 
 1. **NEVER commit or push without explicit instructions.** No `git commit`, `git push`, or PRs unless asked.
-2. **Branch from `dev`**, not `master`. Pushes to `dev` auto-deploy to internal testing.
+2. **Work directly on `dev`**, not `master`, with no feature branches. Pushes to `dev` auto-deploy to internal testing.
 3. **Push back on bad ideas.** If a request isn't technically sound, suggest a better approach instead of just executing.
 4. **Run `dart format .` and `flutter test`** after code changes. Run targeted tests for the area touched (`test/models/`, `test/viewmodels/`, `test/widgets/`).
 5. **Pre-push doc & test audit.** Before pushing to `dev`, check that modified models/methods are reflected in `docs/models_reference.md` and `docs/viewmodels_reference.md`, and that tests cover new/changed methods. Flag gaps.

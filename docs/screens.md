@@ -276,7 +276,6 @@ The FAB visibility and action changes based on context:
 |------|-----------|----------|--------|
 | Town (0) | No campaigns exist | Hidden | - |
 | Town (0) | Campaigns exist | Visible | Toggle edit mode |
-| Characters (1) | Element sheet fully expanded | Hidden | - |
 | Characters (1) | No characters exist | Visible | Create character |
 | Characters (1) | Characters exist | Visible | Toggle edit mode |
 | Calculator (2) | Cost sheet expanded OR no cost | Hidden | - |
@@ -286,7 +285,7 @@ The FAB visibility and action changes based on context:
 
 When switching pages:
 - Edit mode is disabled (both Characters and Town)
-- Element sheet expansion states are reset
+- The calculator cost chip's expansion state is reset
 - Prevents stale UI state between pages
 
 ### Key Features
@@ -550,7 +549,7 @@ Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. T
 
 - Uses `context.watch<CharactersModel>()` for reactive rebuilds
 - Retired characters have disabled edit controls and strikethrough gold
-- Bottom padding adjusts for element sheet expansion state
+- Bottom padding (`fabBottomClearance`) keeps the last section clear of the FAB
 - `ValueKey` on form fields keyed to character UUID
 - Responsive max-width constraints via `ResponsiveLayout` (phones: fills screen, tablets: capped)
 - Scroll controller from `CharactersModel` for app bar animations
@@ -670,4 +669,3 @@ Horizontal PageView container for browsing all characters.
 - Page indicator dots showing current position
 - Filters retired characters based on `showRetired` toggle
 - Empty state prompts character creation
-- Element tracker sheet overlay (slides up from bottom)

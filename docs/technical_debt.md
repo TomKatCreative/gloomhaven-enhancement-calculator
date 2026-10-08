@@ -70,7 +70,7 @@ Patterns that aren't single-file problems but affect the codebase broadly.
 
 ### ~~Hardcoded Magic Numbers~~ — RESOLVED
 
-> **Audited 2026-04-29**: The values flagged previously in `element_tracker_sheet.dart` and `expandable_cost_chip.dart` (`0.065`, `0.14`, `100.0`, `56.0`, `468.0`, etc.) are now defined as named file-private `static const` fields with semantic names (e.g., `_collapsedSize`, `_cardMaxWidth`, `_blurFadeThreshold`, `_chipHeight`). These satisfy the constants policy — local naming is the correct encapsulation for widget-specific values.
+> **Audited 2026-04-29**: The values flagged previously in `expandable_cost_chip.dart` (and the since-removed element tracker sheet) (`0.065`, `0.14`, `100.0`, `56.0`, `468.0`, etc.) are now defined as named file-private `static const` fields with semantic names (e.g., `_collapsedSize`, `_cardMaxWidth`, `_blurFadeThreshold`, `_chipHeight`). These satisfy the constants policy — local naming is the correct encapsulation for widget-specific values.
 
 ### `asset_config.dart` (995 lines)
 
@@ -161,7 +161,6 @@ These use 130+ local `const` string aliases to reduce duplication. Changing game
 
 - **`AppThemeBuilder`** (350 lines) — Manual theme caching via `_lightThemeCache`/`_darkThemeCache` maps that may be unnecessary given Flutter's built-in theme computation.
 - **`InfoDialog`** (401 lines) — 8+ private configuration methods with a switch statement that could be data-driven.
-- **`ElementTrackerSheet`** (453 lines) — 3 expansion states with hardcoded size values.
 - **`ExpandableCostChip`** (482 lines) — Handles collapsed chip, expanded card, 3-layer blur, and scroll animation in one widget.
 - **`ClassSelectorScreen`** (561 lines) — Complex filtering/search with SearchDelegate pattern.
 - **`EnhancementCalculatorScreen`** (650 lines) — Overly nested widget structure; `setState({})` called in build callback.

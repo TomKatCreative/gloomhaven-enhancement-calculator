@@ -206,29 +206,6 @@ One-time flags to show update dialogs on first launch after update.
 
 ---
 
-## Element Tracker State
-
-Element states for the Gloomhaven 2e+ element tracker sheet.
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| `elementEarthState` | int | 0 | Earth element state |
-| `elementFireState` | int | 0 | Fire element state |
-| `elementIceState` | int | 0 | Ice element state |
-| `elementLightState` | int | 0 | Light element state |
-| `elementDarkState` | int | 0 | Dark element state |
-| `elementAirState` | int | 0 | Air element state |
-
-### State Values
-
-| Value | State | Visual |
-|-------|-------|--------|
-| 0 | Gone | Grayed out |
-| 1 | Strong | Fully lit/glowing |
-| 2 | Waning | Fading/dimmed |
-
----
-
 ## Game Edition Migration
 
 The `gameEdition` getter includes backward-compatible migration from a legacy boolean key.
@@ -348,7 +325,6 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `showUpdate*Dialog` | One-time dialog flags |
 | `isUSRegion` | Device-specific locale detection |
 | `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |
-| `element*State` | Transient game session state |
 
 ### Enhancer Level Cascade Bypass
 

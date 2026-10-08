@@ -64,7 +64,7 @@ Throughout the codebase, methods like `Widget _buildMyWidget()` should be `State
 **File:** `lib/viewmodels/characters_model.dart` (~470 lines, down from ~598)
 
 Remaining candidates are thin wrappers, tightly coupled to CRUD/theme sync. Likely not worth extracting:
-- Element sheet state, scroll controllers, navigation logic
+- Scroll controllers, navigation logic
 - Perk/mastery toggle (~13 lines each, 2 methods)
 
 ### SharedPrefs enhancer level cascade
@@ -87,11 +87,10 @@ Replace per-category `_configure*` methods with data-driven configuration. (Cros
 
 ### Remaining direct SharedPrefs access in UI
 
-~34 calls in 7 files, deferred from the broader cleanup:
+~22 calls in 6 files, deferred from the broader cleanup:
 
 | File | Calls | Reason |
 |------|-------|--------|
-| `element_tracker_sheet.dart` | 12 | Purely local widget state, self-contained |
 | `class_selector_screen.dart` | 5 | Needs per-class unlock map in a new model |
 | `gameplay_settings_section.dart` | 8 | Envelope X/V toggles need new model or AppModel expansion |
 | `home.dart` | 1 | One-shot dialog flag, minimal value |
@@ -108,9 +107,8 @@ These came out of the codebase audit on 2026-04-29 — see `docs/technical_debt.
 - **Add `test/utils/` coverage** — `game_text_tokenizer`, `themed_svg`, `color_utils`.
 - **Add dialog widget tests** — restore, info, enhancer (only backup is currently covered).
 - ~~**Theme cache invalidation**~~ — Verified 2026-04-29: the cache is content-addressed by `ThemeConfig.hashCode` (immutable, defines `==` over all theme inputs), so it cannot go stale. Removed the unused `clearCache()` method and added a regression test (`test/theme/app_theme_builder_test.dart`) that locks the contract in place.
-- **Element color theming** — replace raw `Colors.deepOrange` etc. in `animated_element_icon.dart` with theme-aware element palette.
 - **Marker rendering DRY** — extract `CostMarkerBuilder` shared by `info_dialog.dart` and `enhancement_calculator_screen.dart` for `†‡§*` markers.
-- **Refactor oversized files** — `info_dialog.dart` (403 lines, 9 `_configure*` methods), `enhancement_calculator_screen.dart` (639 lines, 9 file-scoped `_…Card` classes), `animated_element_icon.dart` (1,218 lines, per-element configs).
+- **Refactor oversized files** — `info_dialog.dart` (403 lines, 9 `_configure*` methods) and `enhancement_calculator_screen.dart` (639 lines, 9 file-scoped `_…Card` classes).
 
 ---
 
