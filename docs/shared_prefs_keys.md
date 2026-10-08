@@ -166,7 +166,7 @@ This ensures users can only have contiguous levels (can't have L3 without L1-L2)
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| `initialPage` | int | 0 | Home screen tab on app launch |
+| `initialPage` | int | `kCharactersPageIndex` | Home screen tab on app launch, stored as a raw page index |
 | `currentCharacterIndex` | int | 0 | Selected character page index |
 | `generalExpanded` | bool | true | General section expansion |
 | `questAndNotesExpanded` | bool | true | Quest & Notes section expansion |

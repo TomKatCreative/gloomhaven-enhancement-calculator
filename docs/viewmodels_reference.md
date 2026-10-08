@@ -104,7 +104,7 @@ Handles app-level navigation state and page management.
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `pageController` | `PageController` | created | Controls PageView navigation |
-| `page` | `int` | from SharedPrefs | Current page index (0=Town, 1=Characters, 2=Enhancements) |
+| `page` | `int` | from SharedPrefs | Current page index: `kTownPageIndex`, `kCharactersPageIndex` or `kCalculatorPageIndex` (`lib/data/constants.dart`). Restored from `initialPage`, clamped to `kCalculatorPageIndex` |
 
 Theme mode and font preference are owned by `ThemeProvider`, not `AppModel`.
 

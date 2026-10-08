@@ -80,13 +80,15 @@ The fake always calls `_generateCharacterMasteries`. The real `database_helper.d
 
 Each item is its own branch. Each removes a rule or list that is currently maintained by hand in several places.
 
-### CQ-7 ⬜ Page-index constants for the Town flag
+### CQ-7 ✅ Page-index constants for the Town flag
 
 **Files:** `lib/ui/screens/home.dart:53-54,63,142,146`, `lib/ui/widgets/ghc_animated_app_bar.dart:284-285,365`, `lib/viewmodels/app_model.dart:36`, `lib/shared_prefs.dart:100`
 
 `kTownSheetEnabled ? 1 : 0` / `? 2 : 1` is repeated about 6 times, and the Town page is sometimes a bare `0`. Missing one copy when the Town tab ships breaks navigation.
 
 **Fix:** Define `kTownPageIndex`, `kCharactersPageIndex` and `kCalculatorPageIndex` in `lib/data/constants.dart` and use them everywhere. **Do this before shipping the Town tab.**
+
+**Done:** All copies now use the three constants, including the bare Town `0`s and the calculator clamp in `AppModel`. The sweep also fixed `RestoreDialog`, which reset `initialPage` to a bare `0` and so would have opened Town after a restore once the flag is on. **Decision (2026-10-08): no `initialPage` migration.** It stays a raw index. When Town ships, existing users open one tab to the left once, and the next tab change saves the correct index. Turning the flag on also exposes 5 `restoreBackup` failures in `database_backup_service_test.dart` that were already there before this change and belong to the Town release.
 
 ### CQ-8 ⬜ Enhancement cost rules: one source of truth
 

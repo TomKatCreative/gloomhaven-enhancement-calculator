@@ -47,7 +47,7 @@ const bool kTownSheetEnabled = false;
 
 | Flag | What it gates |
 |------|---------------|
-| `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page index mapping (characters=0→1, calculator=1→2) |
+| `kTownSheetEnabled` | Town tab in bottom nav, TownScreen page, Campaigns/Parties DB tables, TownModel initialization, page indices (`kTownPageIndex`, `kCharactersPageIndex`, `kCalculatorPageIndex` in `constants.dart`) |
 
 **Database versioning**: Production schema is v20 (v19: Personal Quests with 24 GH + 23 FH quests, Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories; v20: `ShowResources` and `IsJawsOfTheLion` columns on Characters). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
