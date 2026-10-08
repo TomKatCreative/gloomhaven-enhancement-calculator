@@ -9,12 +9,6 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get appTitleIOS => 'Gloomhaven Utility';
-
-  @override
-  String get appTitleAndroid => 'Gloomhaven Companion';
-
-  @override
   String get search => 'Pesquisar...';
 
   @override
@@ -130,9 +124,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get previousEnhancements => 'Melhorias anteriores';
 
   @override
-  String get enhancementType => 'Tipo de melhoria';
-
-  @override
   String get actionDetails => 'Melhoria';
 
   @override
@@ -142,9 +133,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get discounts => 'Descontos';
 
   @override
-  String get enhancementCalculator => 'Calculadora de melhorias';
-
-  @override
   String get enhancementGuidelines => 'Diretrizes de melhoria';
 
   @override
@@ -152,9 +140,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get multipleTargets => 'Múltiplos alvos';
-
-  @override
-  String get generalGuidelines => 'Diretrizes gerais';
 
   @override
   String get scenario114Reward => 'Recompensa do cenário 114';
@@ -206,9 +191,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get hailsDiscount => 'Desconto de Hail';
-
-  @override
-  String get lossNonPersistent => 'Perda não persistente';
 
   @override
   String get persistent => 'Persistente';
@@ -297,14 +279,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get filename => 'Nome do arquivo';
-
-  @override
-  String saved(String filename) {
-    return '$filename salvo';
-  }
-
-  @override
-  String get filenameRequired => 'Por favor, insira um nome de arquivo';
 
   @override
   String get backupIncludes =>
@@ -417,12 +391,6 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String get removePersonalQuestBody =>
       'Isso removerá sua missão atual e redefinirá todo o progresso.';
-
-  @override
-  String get comingSoon => 'Em breve...';
-
-  @override
-  String get noPersonalQuest => 'Nenhuma missão pessoal selecionada';
 
   @override
   String get change => 'Alterar';
@@ -573,9 +541,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get renameParty => 'Renomear';
-
-  @override
-  String get checkmarks => 'marcas';
 
   @override
   String get openEnvelopeB => 'Abra o envelope B';

@@ -1,7 +1,5 @@
 {
   "@@locale": "en",
-  "appTitleIOS": "Gloomhaven Utility",
-  "appTitleAndroid": "Gloomhaven Companion",
   "search": "Search...",
   "close": "Close",
   "cancel": "Cancel",
@@ -51,15 +49,12 @@
   "battleGoals": "Battle goals",
   "cardLevel": "Card level",
   "previousEnhancements": "Previous enhancements",
-  "enhancementType": "Enhancement type",
   "actionDetails": "Enhancement",
   "cardDetails": "Card details",
   "discounts": "Discounts",
-  "enhancementCalculator": "Enhancement calculator",
   "enhancementGuidelines": "Enhancement guidelines",
   "type": "Select type...",
   "multipleTargets": "Multiple targets",
-  "generalGuidelines": "General guidelines",
   "scenario114Reward": "Scenario 114 reward",
   "forgottenCirclesSpoilers": "Forgotten Circles spoilers",
   "temporaryEnhancement": "Temporary enhancements",
@@ -76,7 +71,6 @@
   "reduceLevelPenalties": "and reduce level penalties by 10 gold per level",
   "reduceRepeatPenalties": "and reduce repeat penalties by 25 gold per enhancement",
   "hailsDiscount": "Hail's discount",
-  "lossNonPersistent": "Lost & non-persistent",
   "persistent": "Persistent",
   "eligibleFor": "Eligible for",
   "gameplay": "GAMEPLAY",
@@ -105,15 +99,6 @@
   "restore": "Restore",
   "restoreDescription": "Restore your characters from a backup file on your device",
   "filename": "Filename",
-  "saved": "Saved {filename}",
-  "@saved": {
-    "placeholders": {
-      "filename": {
-        "type": "String"
-      }
-    }
-  },
-  "filenameRequired": "Please enter a filename",
   "backupIncludes": "Your backup will include all characters, perks, masteries, and app settings (theme, calculator state, class unlocks).",
   "backupError": "Failed to create backup. Please try again.",
   "restoreWarning": "Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?",
@@ -175,8 +160,6 @@
   "changePersonalQuestBody": "This will replace your current quest and reset all progress.",
   "removePersonalQuest": "Remove personal quest?",
   "removePersonalQuestBody": "This will remove your current quest and reset all progress.",
-  "comingSoon": "Coming soon...",
-  "noPersonalQuest": "No personal quest selected",
   "change": "Change",
   "remove": "Remove",
   "progressOf": "{current}/{target}",
@@ -248,7 +231,6 @@
   "switchParty": "Switch party",
   "renameCampaign": "Rename campaign",
   "renameParty": "Rename",
-  "checkmarks": "checkmarks",
   "openEnvelopeB": "Open envelope B",
   "noParty": "No party",
   "notAssignedToParty": "Not assigned to a party",

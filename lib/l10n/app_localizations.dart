@@ -98,18 +98,6 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
-  /// No description provided for @appTitleIOS.
-  ///
-  /// In en, this message translates to:
-  /// **'Gloomhaven Utility'**
-  String get appTitleIOS;
-
-  /// No description provided for @appTitleAndroid.
-  ///
-  /// In en, this message translates to:
-  /// **'Gloomhaven Companion'**
-  String get appTitleAndroid;
-
   /// No description provided for @search.
   ///
   /// In en, this message translates to:
@@ -320,12 +308,6 @@ abstract class AppLocalizations {
   /// **'Previous enhancements'**
   String get previousEnhancements;
 
-  /// No description provided for @enhancementType.
-  ///
-  /// In en, this message translates to:
-  /// **'Enhancement type'**
-  String get enhancementType;
-
   /// No description provided for @actionDetails.
   ///
   /// In en, this message translates to:
@@ -344,12 +326,6 @@ abstract class AppLocalizations {
   /// **'Discounts'**
   String get discounts;
 
-  /// No description provided for @enhancementCalculator.
-  ///
-  /// In en, this message translates to:
-  /// **'Enhancement calculator'**
-  String get enhancementCalculator;
-
   /// No description provided for @enhancementGuidelines.
   ///
   /// In en, this message translates to:
@@ -367,12 +343,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Multiple targets'**
   String get multipleTargets;
-
-  /// No description provided for @generalGuidelines.
-  ///
-  /// In en, this message translates to:
-  /// **'General guidelines'**
-  String get generalGuidelines;
 
   /// No description provided for @scenario114Reward.
   ///
@@ -469,12 +439,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Hail\'s discount'**
   String get hailsDiscount;
-
-  /// No description provided for @lossNonPersistent.
-  ///
-  /// In en, this message translates to:
-  /// **'Lost & non-persistent'**
-  String get lossNonPersistent;
 
   /// No description provided for @persistent.
   ///
@@ -643,18 +607,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Filename'**
   String get filename;
-
-  /// No description provided for @saved.
-  ///
-  /// In en, this message translates to:
-  /// **'Saved {filename}'**
-  String saved(String filename);
-
-  /// No description provided for @filenameRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter a filename'**
-  String get filenameRequired;
 
   /// No description provided for @backupIncludes.
   ///
@@ -853,18 +805,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This will remove your current quest and reset all progress.'**
   String get removePersonalQuestBody;
-
-  /// No description provided for @comingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Coming soon...'**
-  String get comingSoon;
-
-  /// No description provided for @noPersonalQuest.
-  ///
-  /// In en, this message translates to:
-  /// **'No personal quest selected'**
-  String get noPersonalQuest;
 
   /// No description provided for @change.
   ///
@@ -1147,12 +1087,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rename'**
   String get renameParty;
-
-  /// No description provided for @checkmarks.
-  ///
-  /// In en, this message translates to:
-  /// **'checkmarks'**
-  String get checkmarks;
 
   /// No description provided for @openEnvelopeB.
   ///

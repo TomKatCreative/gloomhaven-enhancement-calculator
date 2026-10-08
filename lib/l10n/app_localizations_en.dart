@@ -9,12 +9,6 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitleIOS => 'Gloomhaven Utility';
-
-  @override
-  String get appTitleAndroid => 'Gloomhaven Companion';
-
-  @override
   String get search => 'Search...';
 
   @override
@@ -130,9 +124,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get previousEnhancements => 'Previous enhancements';
 
   @override
-  String get enhancementType => 'Enhancement type';
-
-  @override
   String get actionDetails => 'Enhancement';
 
   @override
@@ -142,9 +133,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discounts => 'Discounts';
 
   @override
-  String get enhancementCalculator => 'Enhancement calculator';
-
-  @override
   String get enhancementGuidelines => 'Enhancement guidelines';
 
   @override
@@ -152,9 +140,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get multipleTargets => 'Multiple targets';
-
-  @override
-  String get generalGuidelines => 'General guidelines';
 
   @override
   String get scenario114Reward => 'Scenario 114 reward';
@@ -206,9 +191,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hailsDiscount => 'Hail\'s discount';
-
-  @override
-  String get lossNonPersistent => 'Lost & non-persistent';
 
   @override
   String get persistent => 'Persistent';
@@ -298,14 +280,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filename => 'Filename';
-
-  @override
-  String saved(String filename) {
-    return 'Saved $filename';
-  }
-
-  @override
-  String get filenameRequired => 'Please enter a filename';
 
   @override
   String get backupIncludes =>
@@ -417,12 +391,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get removePersonalQuestBody =>
       'This will remove your current quest and reset all progress.';
-
-  @override
-  String get comingSoon => 'Coming soon...';
-
-  @override
-  String get noPersonalQuest => 'No personal quest selected';
 
   @override
   String get change => 'Change';
@@ -573,9 +541,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get renameParty => 'Rename';
-
-  @override
-  String get checkmarks => 'checkmarks';
 
   @override
   String get openEnvelopeB => 'Open envelope B';
