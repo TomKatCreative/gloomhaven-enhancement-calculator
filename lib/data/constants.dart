@@ -115,14 +115,8 @@ const double chipBarHeight = 60.0;
 /// 100.0 — Blur bar at bottom of calculator
 const double blurBarHeight = 100.0;
 
-/// 80.0 — Bottom clearance for element tracker
-const double elementTrackerClearance = 80.0;
-
 /// 28.0 — Vertical spacing between form fields
 const double formFieldSpacing = 28.0;
-
-/// 0.85 — Bottom sheet expanded fraction
-const double sheetExpandedSize = 0.85;
 
 /// 82.0 — FAB clearance padding at screen bottom
 const double fabBottomClearance = 82.0;

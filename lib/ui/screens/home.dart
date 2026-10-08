@@ -56,7 +56,6 @@ class _HomeState extends State<Home> {
     // Hide FAB when:
     // - On town page (0) with no campaigns
     // - On characters page with no characters (empty state has inline button)
-    // - On characters page when element sheet is fully expanded
     // - On enhancement calculator page when cost chip is expanded or nothing to clear
     final hideFab =
         (kTownSheetEnabled &&
@@ -64,8 +63,6 @@ class _HomeState extends State<Home> {
             townModel.campaigns.isEmpty) ||
         (appModel.page == charactersPage &&
             charactersModel.characters.isEmpty) ||
-        (appModel.page == charactersPage &&
-            charactersModel.isElementSheetFullExpanded) ||
         (appModel.page == calculatorPage &&
             (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
 
@@ -81,9 +78,8 @@ class _HomeState extends State<Home> {
           charactersModel.isEditMode = false;
           if (kTownSheetEnabled) townModel.isEditMode = false;
           context.read<AppModel>().page = index;
-          // Reset sheet expanded states when navigating between pages
+          // Reset the cost chip's expanded state when navigating between pages
           context.read<EnhancementCalculatorModel>().isSheetExpanded = false;
-          charactersModel.isElementSheetExpanded = false;
           setState(() {});
         },
         children: [

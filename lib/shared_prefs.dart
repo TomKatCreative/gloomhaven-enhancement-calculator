@@ -290,36 +290,13 @@ class SharedPrefs {
       _sharedPrefs.setBool('showAllCharacters', value);
 
   // ===========================================================================
-  // Element Tracker States
-  // Stored as int: 0=gone, 1=strong, 2=waning
-  // ===========================================================================
-
-  int get earthState => _sharedPrefs.getInt('elementEarthState') ?? 0;
-  set earthState(int value) => _sharedPrefs.setInt('elementEarthState', value);
-
-  int get fireState => _sharedPrefs.getInt('elementFireState') ?? 0;
-  set fireState(int value) => _sharedPrefs.setInt('elementFireState', value);
-
-  int get iceState => _sharedPrefs.getInt('elementIceState') ?? 0;
-  set iceState(int value) => _sharedPrefs.setInt('elementIceState', value);
-
-  int get lightState => _sharedPrefs.getInt('elementLightState') ?? 0;
-  set lightState(int value) => _sharedPrefs.setInt('elementLightState', value);
-
-  int get darkState => _sharedPrefs.getInt('elementDarkState') ?? 0;
-  set darkState(int value) => _sharedPrefs.setInt('elementDarkState', value);
-
-  int get airState => _sharedPrefs.getInt('elementAirState') ?? 0;
-  set airState(int value) => _sharedPrefs.setInt('elementAirState', value);
-
-  // ===========================================================================
   // Backup Export / Import
   // ===========================================================================
 
   /// Exports a categorized map of SharedPreferences for inclusion in backups.
   ///
   /// Excluded: clearOldPrefs, initialPage, generalExpanded,
-  /// showUpdate*Dialog, isUSRegion, gloomhavenMode (legacy), element tracker.
+  /// showUpdate*Dialog, isUSRegion, gloomhavenMode (legacy).
   Map<String, dynamic> exportForBackup() {
     final classUnlocks = <String, dynamic>{};
     for (final pc in PlayerClasses.playerClasses) {

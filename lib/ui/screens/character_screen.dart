@@ -156,13 +156,6 @@ class _CharacterScreenState extends State<CharacterScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final model = context.watch<CharactersModel>();
-    final isSheetExpanded = model.isElementSheetExpanded;
-    final screenHeight = MediaQuery.of(context).size.height;
-
-    final double bottomPadding = isSheetExpanded
-        ? screenHeight * sheetExpandedSize
-        : fabBottomClearance;
-
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
     final hasQuestOrNotes =
         !widget.character.isRetired ||
@@ -290,7 +283,7 @@ class _CharacterScreenState extends State<CharacterScreen>
                 ),
               ),
               // BOTTOM PADDING
-              SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+              SliverToBoxAdapter(child: SizedBox(height: fabBottomClearance)),
             ],
           ),
         ),

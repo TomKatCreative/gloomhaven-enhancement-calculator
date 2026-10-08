@@ -97,12 +97,6 @@ class CharactersModel with ChangeNotifier {
   bool showRetired;
   bool _showAllCharacters;
   bool _isEditMode = false;
-  bool _isElementSheetExpanded = false;
-  bool _isElementSheetFullExpanded = false;
-
-  /// Notifier to trigger element sheet collapse from outside the widget.
-  /// Increment the value to signal collapse.
-  final ValueNotifier<int> collapseElementSheetNotifier = ValueNotifier<int>(0);
 
   // ===========================================================================
   // Section expansion state (passthrough to SharedPrefs, no notify needed)
@@ -131,24 +125,6 @@ class CharactersModel with ChangeNotifier {
   set isEditMode(bool value) {
     _isEditMode = value;
     notifyListeners();
-  }
-
-  bool get isElementSheetExpanded => _isElementSheetExpanded;
-
-  set isElementSheetExpanded(bool value) {
-    if (_isElementSheetExpanded != value) {
-      _isElementSheetExpanded = value;
-      notifyListeners();
-    }
-  }
-
-  bool get isElementSheetFullExpanded => _isElementSheetFullExpanded;
-
-  set isElementSheetFullExpanded(bool value) {
-    if (_isElementSheetFullExpanded != value) {
-      _isElementSheetFullExpanded = value;
-      notifyListeners();
-    }
   }
 
   @override
