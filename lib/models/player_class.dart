@@ -10,7 +10,7 @@
 /// - [Variant.base] - Original version
 /// - [Variant.frosthavenCrossover] - Frosthaven crossover rules
 /// - [Variant.gloomhaven2E] - Gloomhaven 2nd Edition (may have different name)
-/// - [Variant.v2], [Variant.v3], [Variant.v4] - Additional versions
+/// - [Variant.v2], [Variant.v3] - Additional versions
 ///
 /// ## Categories
 ///
@@ -53,7 +53,7 @@ enum ClassCategory {
 ///
 /// Some classes have different names, perks, or rules across editions.
 /// For example, "Brute" in base Gloomhaven becomes "Bruiser" in GH2E.
-enum Variant { base, frosthavenCrossover, gloomhaven2E, v2, v3, v4 }
+enum Variant { base, frosthavenCrossover, gloomhaven2E, v2, v3 }
 
 /// Defines a player character class with attributes, colors, and variants.
 ///
@@ -120,11 +120,6 @@ class PlayerClass {
       return ' ${title!}';
     }
     return '$race ${getDisplayName(variant)}';
-  }
-
-  /// Check if this class has a custom name for the given variant
-  bool hasVariantName(Variant variant) {
-    return variantNames?.containsKey(variant) ?? false;
   }
 
   /// Get the hand size for a specific variant, falling back to [handSize].

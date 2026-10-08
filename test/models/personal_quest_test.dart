@@ -65,36 +65,6 @@ void main() {
         PersonalQuestEdition.gloomhaven.name,
       );
     });
-
-    test('fromMap reconstructs quest', () {
-      final map = {
-        columnPersonalQuestId: 'pq_gh_512',
-        columnPersonalQuestNumber: 512,
-        columnPersonalQuestTitle: 'Greed is Good',
-        columnPersonalQuestEdition: 'gloomhaven',
-      };
-
-      final quest = PersonalQuest.fromMap(map);
-      expect(quest.id, 'pq_gh_512');
-      expect(quest.number, 512);
-      expect(quest.title, 'Greed is Good');
-      expect(quest.edition, PersonalQuestEdition.gloomhaven);
-    });
-
-    test('toMap/fromMap round-trip preserves data', () {
-      final original = PersonalQuest(
-        id: 'pq_gh_515',
-        number: 515,
-        title: 'Lawbringer',
-        edition: PersonalQuestEdition.gloomhaven,
-      );
-
-      final roundTripped = PersonalQuest.fromMap(original.toMap());
-      expect(roundTripped.id, original.id);
-      expect(roundTripped.number, original.number);
-      expect(roundTripped.title, original.title);
-      expect(roundTripped.edition, original.edition);
-    });
   });
 
   group('PersonalQuestRequirement', () {

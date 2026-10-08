@@ -1,20 +1,13 @@
-/// App-level state management for navigation and theme preferences.
+/// App-level state management for page navigation.
 ///
-/// [AppModel] is a lightweight ChangeNotifier that handles:
-/// - Page navigation state (Characters vs Calculator)
-/// - Theme mode (light/dark) preference
-/// - Font preference (default vs custom)
+/// [AppModel] is a lightweight ChangeNotifier that handles page navigation
+/// state (Town vs Characters vs Calculator). Theme mode and font preference
+/// live in [ThemeProvider].
 ///
 /// ## Provider Setup
 ///
 /// This model is set up early in the provider tree and has no dependencies
 /// on other providers.
-///
-/// ## State Persistence
-///
-/// Theme and font preferences are persisted via [SharedPrefs]:
-/// - `darkTheme` for theme mode
-/// - `useDefaultFonts` for font preference
 ///
 /// See also:
 /// - [ThemeProvider] for actual theme data generation
@@ -25,12 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
-/// Manages app-level navigation and theme state.
-///
-/// This is a lightweight model primarily handling:
-/// - Current page index (0=Town, 1=Characters, 2=Enhancements)
-/// - Theme mode delegation
-/// - Font preference
+/// Manages app-level navigation state: the current page index
+/// (0=Town, 1=Characters, 2=Enhancements).
 class AppModel extends ChangeNotifier {
   AppModel() {
     final maxPage = kTownSheetEnabled ? 2 : 1;
@@ -40,31 +29,6 @@ class AppModel extends ChangeNotifier {
   }
 
   late final PageController pageController;
-  ThemeMode _themeMode = SharedPrefs().darkTheme
-      ? ThemeMode.dark
-      : ThemeMode.light;
-  bool _useDefaultFonts = SharedPrefs().useDefaultFonts;
-
-  ThemeMode get themeMode => _themeMode;
-
-  set themeMode(ThemeMode mode) {
-    _themeMode = mode;
-    notifyListeners();
-  }
-
-  bool get useDefaultFonts => _useDefaultFonts;
-
-  set useDefaultFonts(bool mode) {
-    _useDefaultFonts = mode;
-    notifyListeners();
-  }
-
-  void updateTheme({ThemeMode? themeMode}) {
-    if (themeMode != null) {
-      _themeMode = themeMode;
-    }
-    notifyListeners();
-  }
 
   int _page = 0;
 

@@ -79,20 +79,4 @@ class ColorUtils {
     // Fallback: return fully darkened or lightened version
     return shouldDarken ? Colors.black : Colors.white;
   }
-
-  /// Returns a color suitable for text display on the given background.
-  ///
-  /// This is a convenience method that uses the theme's primary color
-  /// and ensures it has sufficient contrast against the background.
-  ///
-  /// Example:
-  /// ```dart
-  /// final textColor = ColorUtils.readableTextColor(
-  ///   theme.colorScheme.primary,
-  ///   theme.colorScheme.surface,
-  /// );
-  /// ```
-  static Color readableTextColor(Color preferredColor, Color backgroundColor) {
-    return ensureContrast(preferredColor, backgroundColor);
-  }
 }

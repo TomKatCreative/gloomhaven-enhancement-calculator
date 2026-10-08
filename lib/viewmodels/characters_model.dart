@@ -6,7 +6,6 @@
 /// - Edit mode state
 /// - Perk and mastery selection
 /// - Theme synchronization with character colors
-/// - Element tracker sheet expansion state
 ///
 /// ## Provider Dependencies
 ///
@@ -68,9 +67,7 @@ class CharactersModel with ChangeNotifier {
     required this.databaseHelper,
     required this.themeProvider,
     required this.showRetired,
-    bool showAllCharacters = true,
-  }) : _showAllCharacters = showAllCharacters,
-       _personalQuestService = PersonalQuestService(
+  }) : _personalQuestService = PersonalQuestService(
          databaseHelper: databaseHelper,
        );
 
@@ -95,7 +92,6 @@ class CharactersModel with ChangeNotifier {
   );
 
   bool showRetired;
-  bool _showAllCharacters;
   bool _isEditMode = false;
 
   // ===========================================================================
@@ -111,14 +107,6 @@ class CharactersModel with ChangeNotifier {
   bool get perksAndMasteriesExpanded => SharedPrefs().perksAndMasteriesExpanded;
   set perksAndMasteriesExpanded(bool v) =>
       SharedPrefs().perksAndMasteriesExpanded = v;
-
-  bool get showAllCharacters => _showAllCharacters;
-
-  set showAllCharacters(bool value) {
-    _showAllCharacters = value;
-    SharedPrefs().showAllCharacters = value;
-    notifyListeners();
-  }
 
   bool get isEditMode => _isEditMode;
 
@@ -221,23 +209,9 @@ class CharactersModel with ChangeNotifier {
     return !showRetired && _characters.isNotEmpty;
   }
 
-  List<Character> get characters {
-    var filtered = showRetired
-        ? _characters
-        : _characters.where((character) => !character.isRetired).toList();
-
-    // Apply party filter
-    if (!_showAllCharacters) {
-      final partyId = SharedPrefs().activePartyId;
-      if (partyId != null) {
-        filtered = filtered
-            .where((c) => c.partyId == partyId || c.partyId == null)
-            .toList();
-      }
-    }
-
-    return filtered;
-  }
+  List<Character> get characters => showRetired
+      ? _characters
+      : _characters.where((character) => !character.isRetired).toList();
 
   set characters(List<Character> characters) {
     _characters = characters;

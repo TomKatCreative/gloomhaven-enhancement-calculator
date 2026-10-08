@@ -13,9 +13,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/confirmation_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
-import 'package:gloomhaven_enhancement_calc/viewmodels/app_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
-import 'package:provider/provider.dart';
 
 /// Guards against showing duplicate retirement snackbars.
 @visibleForTesting
@@ -91,8 +89,5 @@ Future<void> _showRetirementDialog(
   );
   if (confirmed == true && context.mounted) {
     await model.retireCurrentCharacter();
-    if (context.mounted) {
-      context.read<AppModel>().updateTheme();
-    }
   }
 }

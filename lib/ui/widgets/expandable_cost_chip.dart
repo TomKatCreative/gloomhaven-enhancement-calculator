@@ -1,4 +1,4 @@
-import 'dart:ui' show ImageFilter;
+import 'dart:ui' show ImageFilter, lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -158,7 +158,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
             left: 0,
             right: 0,
             bottom: 0,
-            height: 100,
+            height: blurBarHeight,
             child: Opacity(
               opacity: _blurOpacity,
               child: GestureDetector(
@@ -246,18 +246,18 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   // Interpolate border radius
                   final borderRadius = BorderRadius.vertical(
                     top: Radius.circular(
-                      _lerpDouble(
+                      lerpDouble(
                         _chipBorderRadius,
                         _cardTopRadius,
                         _expandAnimation.value,
-                      ),
+                      )!,
                     ),
                     bottom: Radius.circular(
-                      _lerpDouble(
+                      lerpDouble(
                         _chipBorderRadius,
                         _cardBottomRadius,
                         _expandAnimation.value,
-                      ),
+                      )!,
                     ),
                   );
 
@@ -474,9 +474,5 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
     return enhancement.category == EnhancementCategory.charPlusOne ||
         enhancement.category == EnhancementCategory.summonPlusOne ||
         enhancement.category == EnhancementCategory.target;
-  }
-
-  double _lerpDouble(double a, double b, double t) {
-    return a + (b - a) * t;
   }
 }

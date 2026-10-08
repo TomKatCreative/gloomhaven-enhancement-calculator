@@ -41,8 +41,6 @@ void main() {
       extensions: const [
         AppThemeExtension(
           characterPrimary: Color(0xff4e7ec1),
-          characterSecondary: Color(0xff4e7ec1),
-          characterAccent: Color(0xff4e7ec1),
           contrastedPrimary: Color(0xff4e7ec1),
         ),
       ],

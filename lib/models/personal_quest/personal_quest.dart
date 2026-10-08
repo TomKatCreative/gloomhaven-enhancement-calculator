@@ -81,15 +81,6 @@ class PersonalQuest {
     this.displayNumberOverride,
   });
 
-  PersonalQuest.fromMap(Map<String, dynamic> map) : requirements = const [] {
-    id = map[columnPersonalQuestId] as String;
-    number = map[columnPersonalQuestNumber] as int;
-    title = map[columnPersonalQuestTitle] as String;
-    edition = PersonalQuestEdition.values.byName(
-      map[columnPersonalQuestEdition] as String,
-    );
-  }
-
   Map<String, dynamic> toMap() => {
     columnPersonalQuestId: id,
     columnPersonalQuestNumber: number,

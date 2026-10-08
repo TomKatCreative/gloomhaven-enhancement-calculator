@@ -99,16 +99,4 @@ void main() {
       expect(adjusted, anyOf(equals(Colors.black), equals(Colors.white)));
     });
   });
-
-  group('ColorUtils.readableTextColor', () {
-    test('delegates to ensureContrast', () {
-      // Same input → same output.
-      const fg = Color(0xff888888);
-      const bg = Colors.white;
-      expect(
-        ColorUtils.readableTextColor(fg, bg),
-        equals(ColorUtils.ensureContrast(fg, bg)),
-      );
-    });
-  });
 }

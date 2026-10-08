@@ -5,10 +5,6 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 
 class AppThemeBuilder {
-  /// The dark surface color for the Android system navigation bar.
-  /// Note: This matches M3's default dark surface color.
-  static const Color darkSurface = Color(0xff1c1b1f);
-
   // Content-addressed theme cache. The key is `ThemeConfig.hashCode`, and
   // ThemeConfig is immutable with `==` defined over all theme inputs
   // (seedColor, useDarkMode, useDefaultFonts). A given config always
@@ -241,8 +237,6 @@ class AppThemeBuilder {
       extensions: [
         AppThemeExtension(
           characterPrimary: primaryColor,
-          characterSecondary: primaryColor,
-          characterAccent: _adjustColor(primaryColor, brightness),
           contrastedPrimary: ColorUtils.ensureContrast(
             primaryColor,
             colorScheme.surface,
@@ -376,24 +370,6 @@ class AppThemeBuilder {
               offset: const Offset(0, 2),
             ),
           ];
-  }
-
-  static Color _adjustColor(Color color, Brightness brightness) {
-    // Create lighter/darker variants based on brightness
-    return brightness == Brightness.dark
-        ? _lighten(color, 10)
-        : _darken(color, 10);
-  }
-
-  static Color _darken(Color color, [int percent = 10]) {
-    assert(1 <= percent && percent <= 100);
-    final f = 1 - percent / 100;
-    return Color.fromARGB(
-      (color.a * 255).round(),
-      (color.r * f * 255).round(),
-      (color.g * f * 255).round(),
-      (color.b * f * 255).round(),
-    );
   }
 
   static Color _lighten(Color color, [int percent = 10]) {

@@ -112,14 +112,12 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
   Future<void> _handleRetire(
     BuildContext context,
     CharactersModel charactersModel,
-    AppModel appModel,
   ) async {
     final l10n = AppLocalizations.of(context);
     final String message =
         '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? l10n.unretire.toLowerCase() : l10n.retire.toLowerCase()}d';
     Character? character = charactersModel.currentCharacter;
     await charactersModel.retireCurrentCharacter();
-    appModel.updateTheme();
     if (!context.mounted) return;
     final theme = Theme.of(context);
     ScaffoldMessenger.of(context)
@@ -390,8 +388,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
                   icon: Icon(
                     isRetired ? Icons.work_rounded : Icons.work_off_rounded,
                   ),
-                  onPressed: () =>
-                      _handleRetire(context, charactersModel, appModel),
+                  onPressed: () => _handleRetire(context, charactersModel),
                 ),
               ),
               Tooltip(

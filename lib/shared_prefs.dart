@@ -112,12 +112,6 @@ class SharedPrefs {
   set generalExpanded(bool value) =>
       _sharedPrefs.setBool('generalExpanded', value);
 
-  bool get personalQuestExpanded =>
-      _sharedPrefs.getBool('personalQuestExpanded') ?? false;
-
-  set personalQuestExpanded(bool value) =>
-      _sharedPrefs.setBool('personalQuestExpanded', value);
-
   bool get questAndNotesExpanded =>
       _sharedPrefs.getBool('questAndNotesExpanded') ?? true;
 
