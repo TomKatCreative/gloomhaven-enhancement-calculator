@@ -50,20 +50,17 @@ class _HomeState extends State<Home> {
     final enhancementModel = context.watch<EnhancementCalculatorModel>();
     final townModel = context.watch<TownModel>();
 
-    const charactersPage = kTownSheetEnabled ? 1 : 0;
-    const calculatorPage = kTownSheetEnabled ? 2 : 1;
-
     // Hide FAB when:
-    // - On town page (0) with no campaigns
+    // - On town page with no campaigns
     // - On characters page with no characters (empty state has inline button)
     // - On enhancement calculator page when cost chip is expanded or nothing to clear
     final hideFab =
         (kTownSheetEnabled &&
-            appModel.page == 0 &&
+            appModel.page == kTownPageIndex &&
             townModel.campaigns.isEmpty) ||
-        (appModel.page == charactersPage &&
+        (appModel.page == kCharactersPageIndex &&
             charactersModel.characters.isEmpty) ||
-        (appModel.page == calculatorPage &&
+        (appModel.page == kCalculatorPageIndex &&
             (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
 
     return Scaffold(
@@ -135,11 +132,9 @@ class _HomeState extends State<Home> {
     EnhancementCalculatorModel enhancementModel,
     TownModel townModel,
   ) {
-    const calculatorPage = kTownSheetEnabled ? 2 : 1;
-
     // Town page: edit mode toggle FAB
     if (kTownSheetEnabled &&
-        appModel.page == 0 &&
+        appModel.page == kTownPageIndex &&
         townModel.campaigns.isNotEmpty) {
       return FloatingActionButton(
         heroTag: null,
@@ -151,7 +146,7 @@ class _HomeState extends State<Home> {
     }
 
     // Calculator page: clear FAB
-    if (appModel.page == calculatorPage) {
+    if (appModel.page == kCalculatorPageIndex) {
       return FloatingActionButton(
         heroTag: null,
         onPressed: () => enhancementModel.resetCost(),

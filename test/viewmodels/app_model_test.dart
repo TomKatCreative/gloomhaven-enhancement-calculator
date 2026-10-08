@@ -16,23 +16,23 @@ void main() {
     group('initial state', () {
       test('page defaults to Characters tab when no initialPage saved', () {
         final model = AppModel();
-        expect(model.page, kTownSheetEnabled ? 1 : 0);
+        expect(model.page, kCharactersPageIndex);
       });
 
       test('page restores from SharedPrefs initialPage', () async {
-        final maxPage = kTownSheetEnabled ? 2 : 1;
-        SharedPreferences.setMockInitialValues({'initialPage': maxPage});
+        SharedPreferences.setMockInitialValues({
+          'initialPage': kCalculatorPageIndex,
+        });
         await SharedPrefs().init();
         final model = AppModel();
-        expect(model.page, maxPage);
+        expect(model.page, kCalculatorPageIndex);
       });
 
       test('page clamps out-of-range initialPage to valid range', () async {
-        final maxPage = kTownSheetEnabled ? 2 : 1;
         SharedPreferences.setMockInitialValues({'initialPage': 99});
         await SharedPrefs().init();
         final model = AppModel();
-        expect(model.page, maxPage);
+        expect(model.page, kCalculatorPageIndex);
       });
 
       test('pageController is accessible', () {

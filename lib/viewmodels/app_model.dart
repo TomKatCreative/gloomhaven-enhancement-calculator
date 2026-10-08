@@ -19,11 +19,10 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
 /// Manages app-level navigation state: the current page index
-/// (0=Town, 1=Characters, 2=Enhancements).
+/// ([kTownPageIndex], [kCharactersPageIndex], [kCalculatorPageIndex]).
 class AppModel extends ChangeNotifier {
   AppModel() {
-    final maxPage = kTownSheetEnabled ? 2 : 1;
-    final savedPage = SharedPrefs().initialPage.clamp(0, maxPage);
+    final savedPage = SharedPrefs().initialPage.clamp(0, kCalculatorPageIndex);
     _page = savedPage;
     pageController = PageController(initialPage: savedPage);
   }

@@ -204,7 +204,7 @@ Widget _buildTestApp({
   required MockThemeProvider themeProvider,
 }) {
   final appModel = AppModel();
-  appModel.page = kTownSheetEnabled ? 1 : 0;
+  appModel.page = kCharactersPageIndex;
 
   return MultiProvider(
     providers: [

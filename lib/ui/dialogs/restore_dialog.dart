@@ -100,7 +100,7 @@ class RestoreDialog {
 
     try {
       await DatabaseHelper.instance.backupService.restoreBackup(contents);
-      SharedPrefs().initialPage = 0;
+      SharedPrefs().initialPage = kCharactersPageIndex;
       if (!context.mounted) return;
 
       // Refresh theme from restored SharedPrefs

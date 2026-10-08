@@ -187,3 +187,10 @@ class ResponsiveLayout {
 
 // Feature flags — set to `true` to enable unreleased features.
 const bool kTownSheetEnabled = false;
+
+/// Bottom-nav page indices. The Town page exists only when
+/// [kTownSheetEnabled] is true, so guard every use of [kTownPageIndex] with
+/// the flag. [kCalculatorPageIndex] is always the last page.
+const int kTownPageIndex = 0;
+const int kCharactersPageIndex = kTownSheetEnabled ? 1 : 0;
+const int kCalculatorPageIndex = kTownSheetEnabled ? 2 : 1;

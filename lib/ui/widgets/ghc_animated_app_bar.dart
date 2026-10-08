@@ -187,8 +187,6 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
 
   Widget _buildTitleContent({
     required int displayPage,
-    required int charactersPage,
-    required int calculatorPage,
     required ThemeData theme,
     required ColorScheme colorScheme,
     required CharactersModel charactersModel,
@@ -197,7 +195,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
   }) {
     Widget content;
     if (kTownSheetEnabled &&
-        displayPage == 0 &&
+        displayPage == kTownPageIndex &&
         townModel.activeCampaign != null) {
       content = GestureDetector(
         onTap: () => CampaignSelector.show(
@@ -221,7 +219,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           ],
         ),
       );
-    } else if (displayPage == charactersPage &&
+    } else if (displayPage == kCharactersPageIndex &&
         charactersModel.characters.length > 1) {
       content = SmoothPageIndicator(
         controller: charactersModel.pageController,
@@ -233,7 +231,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           activeDotColor: colorScheme.primary,
         ),
       );
-    } else if (displayPage == calculatorPage) {
+    } else if (displayPage == kCalculatorPageIndex) {
       content = SegmentedButton<GameEdition>(
         style: const ButtonStyle(
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -279,9 +277,6 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     final l10n = AppLocalizations.of(context);
     final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
 
-    const charactersPage = kTownSheetEnabled ? 1 : 0;
-    const calculatorPage = kTownSheetEnabled ? 2 : 1;
-
     // Reset tint state when switching characters so the new screen starts clean.
     final uuid = charactersModel.currentCharacter?.uuid;
     if (uuid != _currentCharacterUuid) {
@@ -297,21 +292,21 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
         _flipController.forward(from: 0.0);
       }
       _currentPage = appModel.page;
-      if (appModel.page == charactersPage) {
+      if (appModel.page == kCharactersPageIndex) {
         final isFixedHeader =
             charactersModel.isEditMode &&
             !(charactersModel.currentCharacter?.isRetired ?? true);
         final collapseRange = isFixedHeader ? 0.0 : 124.0;
         _isScrolledToTop = _charScrollOffsetNotifier.value <= collapseRange;
-      } else if (appModel.page == calculatorPage) {
+      } else if (appModel.page == kCalculatorPageIndex) {
         _isCalcScrolledToTop =
             !_calcScrollController.hasClients ||
             _calcScrollController.offset <= 0;
       }
     }
 
-    final isOnCharactersPage = appModel.page == charactersPage;
-    final isOnCalcPage = appModel.page == calculatorPage;
+    final isOnCharactersPage = appModel.page == kCharactersPageIndex;
+    final isOnCalcPage = appModel.page == kCalculatorPageIndex;
     final showTint =
         (isOnCharactersPage && !_isScrolledToTop) ||
         (isOnCalcPage && !_isCalcScrolledToTop);
@@ -349,8 +344,6 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
             },
             child: _buildTitleContent(
               displayPage: _previousPage ?? appModel.page,
-              charactersPage: charactersPage,
-              calculatorPage: calculatorPage,
               theme: theme,
               colorScheme: colorScheme,
               charactersModel: charactersModel,
@@ -360,7 +353,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           ),
           actions: <Widget>[
             // Town page edit mode: delete campaign
-            if (kTownSheetEnabled && townModel.isEditMode && appModel.page == 0)
+            if (kTownSheetEnabled &&
+                townModel.isEditMode &&
+                appModel.page == kTownPageIndex)
               Tooltip(
                 message: l10n.deleteCampaign,
                 child: IconButton(
@@ -369,7 +364,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
                 ),
               ),
             if (!charactersModel.isEditMode &&
-                appModel.page == charactersPage &&
+                appModel.page == kCharactersPageIndex &&
                 charactersModel.characters.isNotEmpty)
               Tooltip(
                 message: 'New Character',
@@ -381,7 +376,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
                 ),
               ),
             if (charactersModel.isEditMode &&
-                appModel.page == charactersPage) ...[
+                appModel.page == kCharactersPageIndex) ...[
               Tooltip(
                 message: isRetired ? l10n.unretire : l10n.retire,
                 child: IconButton(

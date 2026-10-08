@@ -97,7 +97,7 @@ class SharedPrefs {
   set envelopeV(bool value) => _sharedPrefs.setBool('envelopeV', value);
 
   int get initialPage =>
-      _sharedPrefs.getInt('initialPage') ?? (kTownSheetEnabled ? 1 : 0);
+      _sharedPrefs.getInt('initialPage') ?? kCharactersPageIndex;
 
   set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
 
