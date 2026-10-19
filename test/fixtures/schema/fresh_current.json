@@ -1,0 +1,223 @@
+{
+  "version": 20,
+  "tables": {
+    "CharacterMasteries": {
+      "CharacterUuid": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "MasteryAchieved": {
+        "type": "BOOL",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "MasteryID": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      }
+    },
+    "CharacterPerks": {
+      "CharacterUuid": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "IsSelected": {
+        "type": "BOOL",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "PerkID": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      }
+    },
+    "Characters": {
+      "CheckMarks": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ClassCode": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "Gold": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "IsJawsOfTheLion": {
+        "type": "BOOL",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "IsRetired": {
+        "type": "BOOL",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "Name": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "Notes": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "PersonalQuestId": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": "''",
+        "pk": 0
+      },
+      "PersonalQuestProgress": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": "'[]'",
+        "pk": 0
+      },
+      "PreviousRetirements": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceArrowVine": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceAxeNut": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceCorpseCap": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceFlameFruit": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceHide": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceMetal": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceRockRoot": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceSnowThistle": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ResourceWood": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "ShowResources": {
+        "type": "BOOL",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "Uuid": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "Variant": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "XP": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "_id": {
+        "type": "INTEGER",
+        "notNull": false,
+        "default": null,
+        "pk": 1
+      }
+    },
+    "MetaData": {
+      "AppBuildNumber": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "AppVersion": {
+        "type": "TEXT",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "DatabaseVersion": {
+        "type": "INTEGER",
+        "notNull": true,
+        "default": null,
+        "pk": 0
+      },
+      "LastUpdated": {
+        "type": "DATETIME",
+        "notNull": false,
+        "default": "CURRENT_TIMESTAMP",
+        "pk": 0
+      }
+    }
+  },
+  "sql": [
+    "CREATE TABLE CharacterMasteries (\n        CharacterUuid TEXT NOT NULL,\n        MasteryID TEXT NOT NULL,\n        MasteryAchieved BOOL NOT NULL\n      )",
+    "CREATE TABLE CharacterPerks (\n        CharacterUuid TEXT NOT NULL,\n        PerkID TEXT NOT NULL,\n        IsSelected BOOL NOT NULL\n      )",
+    "CREATE TABLE Characters (_id INTEGER PRIMARY KEY AUTOINCREMENT, Uuid TEXT NOT NULL, Name TEXT NOT NULL, ClassCode TEXT NOT NULL, PreviousRetirements INTEGER NOT NULL, XP INTEGER NOT NULL, Gold INTEGER NOT NULL, Notes TEXT NOT NULL, CheckMarks INTEGER NOT NULL, IsRetired BOOL NOT NULL, ShowResources BOOL NOT NULL, IsJawsOfTheLion BOOL NOT NULL, ResourceHide INTEGER NOT NULL, ResourceMetal INTEGER NOT NULL, ResourceWood INTEGER NOT NULL, ResourceArrowVine INTEGER NOT NULL, ResourceAxeNut INTEGER NOT NULL, ResourceRockRoot INTEGER NOT NULL, ResourceFlameFruit INTEGER NOT NULL, ResourceCorpseCap INTEGER NOT NULL, ResourceSnowThistle INTEGER NOT NULL, Variant TEXT NOT NULL, PersonalQuestId TEXT NOT NULL DEFAULT '', PersonalQuestProgress TEXT NOT NULL DEFAULT '[]')",
+    "CREATE TABLE MetaData (\n          DatabaseVersion INTEGER NOT NULL,\n          AppVersion TEXT NOT NULL,\n          AppBuildNumber INTEGER NOT NULL,\n          LastUpdated DATETIME DEFAULT CURRENT_TIMESTAMP\n        )"
+  ]
+}

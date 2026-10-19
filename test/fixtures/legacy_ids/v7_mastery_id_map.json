@@ -1,0 +1,576 @@
+{
+  "1": {
+    "class": "br",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Cause enemies to suffer a total of 12 or more RETALIATE damage during attacks targeting you in a single round",
+    "liveText": null
+  },
+  "2": {
+    "class": "br",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Across three consecutive rounds, play six different ability cards and cause enemies to suffer at least DAMAGE 6 on each of your turns",
+    "liveText": null
+  },
+  "3": {
+    "class": "ti",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Heal an ally or apply a negative condition to an enemy each turn",
+    "liveText": null
+  },
+  "4": {
+    "class": "ti",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform two actions with lost icons before your first rest and then only rest after having played at least two actions with lost icons since your previous rest",
+    "liveText": null
+  },
+  "5": {
+    "class": "sw",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Infuse and consume all six elements",
+    "liveText": null
+  },
+  "6": {
+    "class": "sw",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform four different loss actions twice each",
+    "liveText": null
+  },
+  "7": {
+    "class": "sc",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Kill at least six enemies that are adjacent to at least one of your allies",
+    "liveText": null
+  },
+  "8": {
+    "class": "sc",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Kill at least six enemies that are adjacent to none of your allies",
+    "liveText": null
+  },
+  "9": {
+    "class": "ch",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Only attack enemies adjacent to obstacles or walls",
+    "liveText": null
+  },
+  "10": {
+    "class": "ch",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Damage or heal at least one ally each round",
+    "liveText": null
+  },
+  "11": {
+    "class": "mt",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Trigger the on-attack effect of four different Augments thrice each",
+    "liveText": null
+  },
+  "12": {
+    "class": "mt",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Never be targeted by an attack",
+    "liveText": null
+  },
+  "13": {
+    "class": "sk",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Reduce attacks targeting you by a total of 20 or more through Shield effects in a single round",
+    "liveText": null
+  },
+  "14": {
+    "class": "sk",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "LIGHT or consume_LIGHT during each of your turns",
+    "liveText": null
+  },
+  "15": {
+    "class": "qm",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Spend, lose, or refresh one or more items on each of your turns without ever performing the top action of ~Reinforced ~Steel",
+    "liveText": null
+  },
+  "16": {
+    "class": "qm",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "LOOT six or more loot tokens in a single turn",
+    "liveText": null
+  },
+  "17": {
+    "class": "su",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Summon the Lava Golem on your first turn and keep it alive for the entire scenario",
+    "liveText": null
+  },
+  "18": {
+    "class": "su",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform the summon action of five different ability cards",
+    "liveText": null
+  },
+  "19": {
+    "class": "ns",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Have INVISIBLE at the start or end of each of your turns",
+    "liveText": null
+  },
+  "20": {
+    "class": "ns",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "DARK or consume_DARK during each of your turns",
+    "liveText": null
+  },
+  "21": {
+    "class": "ph",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Kill at least five enemies with non-attack abilities",
+    "liveText": null
+  },
+  "22": {
+    "class": "ph",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform three different attack abilities that target at least four enemies each",
+    "liveText": null
+  },
+  "23": {
+    "class": "be",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Lose at least one hit point during each of your turns, without ever performing the bottom action of ~Blood ~Pact",
+    "liveText": null
+  },
+  "24": {
+    "class": "be",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Have exactly one hit point at the end of each of your turns",
+    "liveText": null
+  },
+  "25": {
+    "class": "ss",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "On your first turn of the scenario and the turn after each of your rests, perform one Song action that you have not yet performed this scenario",
+    "liveText": null
+  },
+  "26": {
+    "class": "ss",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Have all 10 monster CURSE cards and all 10 BLESS cards in modifier decks at the same time",
+    "liveText": null
+  },
+  "27": {
+    "class": "ds",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Never perform a Doom action that you have already performed in the scenario",
+    "liveText": null
+  },
+  "28": {
+    "class": "ds",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Kill three Doomed enemies during one of your turns",
+    "liveText": null
+  },
+  "29": {
+    "class": "sb",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "On each of your turns, give an ally an ability card, target an ally with a HEAL ability, grant an ally SHIELD, or place an ability card in an ally's active area",
+    "liveText": null
+  },
+  "30": {
+    "class": "sb",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Deal at least DAMAGE 20 with a single attack ability",
+    "liveText": null
+  },
+  "31": {
+    "class": "el",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Consume at least two different elements with each of four different attack abilities without ever performing the bottom action of ~Formless ~Power or ~Shaping ~the ~Ether",
+    "liveText": null
+  },
+  "32": {
+    "class": "el",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Infuse five or more elements during one of your turns, then consume five or more elements during your following turn",
+    "liveText": null
+  },
+  "33": {
+    "class": "bt",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Have your bear summon deal DAMAGE 10 or more in three consecutive rounds",
+    "liveText": null
+  },
+  "34": {
+    "class": "bt",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "You or your summons must apply a negative condition to at least 10 different enemies",
+    "liveText": null
+  },
+  "35": {
+    "class": "bs",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Perform two different summon actions on your first turn and keep all summons from those actions alive for the entire scenario",
+    "liveText": null
+  },
+  "36": {
+    "class": "bs",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform three different non-summon persistent loss actions before your first rest",
+    "liveText": null
+  },
+  "37": {
+    "class": "dv",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "During one round, have at least four monsters move into four different Rifts that affect those monsters",
+    "liveText": null
+  },
+  "38": {
+    "class": "dv",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Reveal at least one card from at least one ability card deck or attack modifier deck each round",
+    "liveText": null
+  },
+  "39": {
+    "class": "dl",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Deal DAMAGE 10 or more with each of three different attack actions",
+    "liveText": null
+  },
+  "40": {
+    "class": "dl",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Destroy at least six obstacles. End the scenario with no obstacles on the map other than ones placed by allies",
+    "liveText": null
+  },
+  "41": {
+    "class": "hc",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "AIR or consume_AIR during each of your turns",
+    "liveText": null
+  },
+  "42": {
+    "class": "hc",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "During each round in which there is at least one enemy on the map at the start of your turn, either place one of your tokens on an ability card of yours or on an enemy",
+    "liveText": null
+  },
+  "43": {
+    "class": "rg",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Kill at least five enemies during their turns",
+    "liveText": null
+  },
+  "44": {
+    "class": "rg",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Force each enemy in the scenario to move at least one hex, forcing at least six enemies to move",
+    "liveText": null
+  },
+  "45": {
+    "class": "vw",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Cause enemies to suffer DAMAGE 20 or more in a single turn with granted or commanded attacks",
+    "liveText": null
+  },
+  "46": {
+    "class": "vw",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Give at least one ally or enemy POISON, STRENGTHEN, BLESS, or WARD each round",
+    "liveText": null
+  },
+  "47": {
+    "class": "drifter",
+    "position": 1,
+    "migratedId": "drifter_base_0",
+    "legacyText": "End a scenario with your character tokens on the last use slots of four persistent abilities",
+    "liveText": "End a scenario with your character tokens on the last use slots of four persistent abilities"
+  },
+  "48": {
+    "class": "drifter",
+    "position": 2,
+    "migratedId": "drifter_base_1",
+    "legacyText": "Never perform a move or attack ability with a value less than 4, and perform at least one move or attack ability every round",
+    "liveText": "Never perform a move or attack ability with a value less than 4, and perform at least one move or attack ability every round"
+  },
+  "49": {
+    "class": "blinkblade",
+    "position": 1,
+    "migratedId": "blinkblade_base_0",
+    "legacyText": "Declare Fast seven rounds in a row",
+    "liveText": "Declare Fast seven rounds in a row"
+  },
+  "50": {
+    "class": "blinkblade",
+    "position": 2,
+    "migratedId": "blinkblade_base_1",
+    "legacyText": "Never be targeted by an attack",
+    "liveText": "Never be targeted by an attack"
+  },
+  "51": {
+    "class": "bannerspear",
+    "position": 1,
+    "migratedId": "bannerspear_base_0",
+    "legacyText": "Attack at least three targets with three different area of effect attacks",
+    "liveText": "Attack at least three targets with three different area of effect attacks"
+  },
+  "52": {
+    "class": "bannerspear",
+    "position": 2,
+    "migratedId": "bannerspear_base_1",
+    "legacyText": "Play a Banner summon ability on your first turn, always have it within RANGE 3 of you, and keep it alive for the entire scenario",
+    "liveText": "Play a Banner summon ability on your first turn, always have it within RANGE 3 of you, and keep it alive for the entire scenario"
+  },
+  "53": {
+    "class": "deathwalker",
+    "position": 1,
+    "migratedId": "deathwalker_base_0",
+    "legacyText": "Consume seven SHADOW in one round",
+    "liveText": "Consume seven SHADOW in one round"
+  },
+  "54": {
+    "class": "deathwalker",
+    "position": 2,
+    "migratedId": "deathwalker_base_1",
+    "legacyText": "Create or consume at least one SHADOW every round",
+    "liveText": "Create or consume at least one SHADOW every round"
+  },
+  "55": {
+    "class": "boneshaper",
+    "position": 1,
+    "migratedId": "boneshaper_base_0",
+    "legacyText": "Kill at least 15 of your summons",
+    "liveText": "Kill at least 15 of your summons"
+  },
+  "56": {
+    "class": "boneshaper",
+    "position": 2,
+    "migratedId": "boneshaper_base_1",
+    "legacyText": "Play a summon action on your first turn, have this summon kill at least 6 enemies, and keep it alive for the entire scenario",
+    "liveText": "Play a summon action on your first turn, have this summon kill at least 6 enemies, and keep it alive for the entire scenario"
+  },
+  "57": {
+    "class": "geminate",
+    "position": 1,
+    "migratedId": "geminate_base_0",
+    "legacyText": "Switch forms every round",
+    "liveText": "Switch forms every round"
+  },
+  "58": {
+    "class": "geminate",
+    "position": 2,
+    "migratedId": "geminate_base_1",
+    "legacyText": "Lose at least one card every round",
+    "liveText": "Lose at least one card every round"
+  },
+  "59": {
+    "class": "infuser",
+    "position": 1,
+    "migratedId": "infuser_base_0",
+    "legacyText": "Have five active INFUSION bonuses",
+    "liveText": "Have five active INFUSION bonuses"
+  },
+  "60": {
+    "class": "infuser",
+    "position": 2,
+    "migratedId": "infuser_base_1",
+    "legacyText": "Kill at least four enemies, but never attack",
+    "liveText": "Kill at least four enemies, but never attack"
+  },
+  "61": {
+    "class": "pyroclast",
+    "position": 1,
+    "migratedId": "pyroclast_base_0",
+    "legacyText": "Create or destroy at least one obstacle or hazardous terrain tile each round",
+    "liveText": "Create or destroy at least one obstacle or hazardous terrain tile each round"
+  },
+  "62": {
+    "class": "pyroclast",
+    "position": 2,
+    "migratedId": "pyroclast_base_1",
+    "legacyText": "Move enemies through six different hexes of hazardous terrain you created in one turn",
+    "liveText": "Move enemies through six different hexes of hazardous terrain you created in one turn"
+  },
+  "63": {
+    "class": "shattersong",
+    "position": 1,
+    "migratedId": "shattersong_base_0",
+    "legacyText": "Always have 0 RESONANCE directly before you gain RESONANCE at the end of each of your turns",
+    "liveText": "Always have 0 RESONANCE directly before you gain RESONANCE at the end of each of your turns"
+  },
+  "64": {
+    "class": "shattersong",
+    "position": 2,
+    "migratedId": "shattersong_base_1",
+    "legacyText": "Spend 5 RESONANCE on each of five different Wave abilities",
+    "liveText": "Spend 5 RESONANCE on each of five different Wave abilities"
+  },
+  "65": {
+    "class": "trapper",
+    "position": 1,
+    "migratedId": "trapper_base_0",
+    "legacyText": "Have one HEAL trap on the map with a value of at least 20",
+    "liveText": "Have one HEAL trap on the map with a value of at least 20"
+  },
+  "66": {
+    "class": "trapper",
+    "position": 2,
+    "migratedId": "trapper_base_1",
+    "legacyText": "Move enemies through seven or more traps with one ability",
+    "liveText": "Move enemies through seven or more traps with one ability"
+  },
+  "67": {
+    "class": "painconduit",
+    "position": 1,
+    "migratedId": "painconduit_base_0",
+    "legacyText": "Cause other figures to suffer a total of at least DAMAGE 40 in one round",
+    "liveText": "Cause other figures to suffer a total of at least DAMAGE 40 in one round"
+  },
+  "68": {
+    "class": "painconduit",
+    "position": 2,
+    "migratedId": "painconduit_base_1",
+    "legacyText": "Start a turn with WOUND, BRITTLE, BANE, POISON, IMMOBILIZE, DISARM, STUN, and MUDDLE",
+    "liveText": "Start a turn with WOUND, BRITTLE, BANE, POISON, IMMOBILIZE, DISARM, STUN, and MUDDLE"
+  },
+  "69": {
+    "class": "snowdancer",
+    "position": 1,
+    "migratedId": "snowdancer_base_0",
+    "legacyText": "Cause at least one ally or enemy to move each round",
+    "liveText": "Cause at least one ally or enemy to move each round"
+  },
+  "70": {
+    "class": "snowdancer",
+    "position": 2,
+    "migratedId": "snowdancer_base_1",
+    "legacyText": "Ensure the first ally to suffer DAMAGE each round, directly before suffering the DAMAGE, has at least one condition you applied",
+    "liveText": "Ensure the first ally to suffer DAMAGE each round, directly before suffering the DAMAGE, has at least one condition you applied"
+  },
+  "71": {
+    "class": "frozenfist",
+    "position": 1,
+    "migratedId": "frozenfist_base_0",
+    "legacyText": "RECOVER at least one card from your discard pile each round",
+    "liveText": "RECOVER at least one card from your discard pile each round"
+  },
+  "72": {
+    "class": "frozenfist",
+    "position": 2,
+    "migratedId": "frozenfist_base_1",
+    "legacyText": "Enter at least ten different hexes with one move ability, then cause one enemy to suffer at least DAMAGE 10 with one attack ability in the same turn",
+    "liveText": "Enter at least ten different hexes with one move ability, then cause one enemy to suffer at least DAMAGE 10 with one attack ability in the same turn"
+  },
+  "73": {
+    "class": "hive",
+    "position": 1,
+    "migratedId": "hive_base_0",
+    "legacyText": "TRANSFER each round",
+    "liveText": "TRANSFER each round"
+  },
+  "74": {
+    "class": "hive",
+    "position": 2,
+    "migratedId": "hive_base_1",
+    "legacyText": "TRANSFER into four different summons in one round",
+    "liveText": "TRANSFER into four different summons in one round"
+  },
+  "75": {
+    "class": "metalmosaic",
+    "position": 1,
+    "migratedId": "metalmosaic_base_0",
+    "legacyText": "Never attack",
+    "liveText": "Never attack"
+  },
+  "76": {
+    "class": "metalmosaic",
+    "position": 2,
+    "migratedId": "metalmosaic_base_1",
+    "legacyText": "For four consecutive rounds, move the pressure gauge up or down three levels from where it started the round (PRESSURE_LOW to PRESSURE_HIGH, or vice versa)",
+    "liveText": "For four consecutive rounds, move the pressure gauge up or down three levels from where it started the round (PRESSURE_LOW to PRESSURE_HIGH, or vice versa)"
+  },
+  "77": {
+    "class": "deepwraith",
+    "position": 1,
+    "migratedId": "deepwraith_base_0",
+    "legacyText": "Perform all your attacks with advantage",
+    "liveText": "Perform all your attacks with advantage"
+  },
+  "78": {
+    "class": "deepwraith",
+    "position": 2,
+    "migratedId": "deepwraith_base_1",
+    "legacyText": "Infuse DARK each round",
+    "liveText": "Infuse DARK each round"
+  },
+  "79": {
+    "class": "crashingtide",
+    "position": 1,
+    "migratedId": "crashingtide_base_0",
+    "legacyText": "Never suffer damage from attacks, and be targeted by at least five attacks",
+    "liveText": "Never suffer damage from attacks, and be targeted by at least five attacks"
+  },
+  "80": {
+    "class": "crashingtide",
+    "position": 2,
+    "migratedId": "crashingtide_base_1",
+    "legacyText": "At the start of each of your rests, have more active TIDE than cards in your discard pile",
+    "liveText": "At the start of each of your rests, have more active TIDE than cards in your discard pile"
+  },
+  "81": {
+    "class": "incarnate",
+    "position": 1,
+    "migratedId": null,
+    "legacyText": "Never end your turn with the same spirit you started in that turn",
+    "liveText": null
+  },
+  "82": {
+    "class": "incarnate",
+    "position": 2,
+    "migratedId": null,
+    "legacyText": "Perform fifteen attacks using One_Hand or Two_Hand items",
+    "liveText": null
+  }
+}

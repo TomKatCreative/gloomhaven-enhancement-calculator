@@ -25,3 +25,7 @@ lives in the parent directories (`perks/` and `masteries/`).
 **Do not modify these files** unless you are specifically fixing a migration issue.
 Changing the data or order of entries could break migrations for users upgrading
 from older versions of the app.
+
+## Tests
+
+These files are the oracle for the v7→v8 ID remap. `test/migration/legacy_id_mapping_test.dart` proves where every legacy perk/mastery ID lands against reviewed goldens in `test/fixtures/legacy_ids/`; editing these files makes it fail. See `docs/database_migration_testing.md`.

@@ -60,14 +60,38 @@ class DatabaseHelper implements IDatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String databasePath = join(documentsDirectory.path, _databaseName);
     debugPrint('Database Path:: $databasePath');
-    // Open the database. Can also add an onUpgrade callback parameter.
-    return await openDatabase(
-      databasePath,
-      version: _databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
-      onDowngrade: onDatabaseDowngradeDelete,
-    );
+    return await _open(databasePath);
+  }
+
+  /// The only place the app opens its database: the real schema version and
+  /// the real create/upgrade/downgrade callbacks.
+  Future<Database> _open(String path) => openDatabase(
+    path,
+    version: _databaseVersion,
+    onCreate: _onCreate,
+    onUpgrade: _onUpgrade,
+    onDowngrade: onDatabaseDowngradeDelete,
+  );
+
+  /// The schema version the app opens databases at.
+  @visibleForTesting
+  static const int currentVersion = _databaseVersion;
+
+  /// Opens the database file at [path] exactly as the app would (running any
+  /// create/upgrade/downgrade), and installs it as this singleton's
+  /// connection so [backupService] and the CRUD methods operate on it.
+  @visibleForTesting
+  Future<Database> openForTesting(String path) async {
+    await closeForTesting();
+    return _database = await _open(path);
+  }
+
+  /// Closes and forgets the connection installed by [openForTesting].
+  @visibleForTesting
+  Future<void> closeForTesting() async {
+    final db = _database;
+    _database = null;
+    await db?.close();
   }
 
   static const String idType = 'INTEGER PRIMARY KEY AUTOINCREMENT';

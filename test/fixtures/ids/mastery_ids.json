@@ -1,0 +1,374 @@
+{
+  "br": {
+    "frosthavenCrossover": {
+      "br_frosthavenCrossover_0": "Cause enemies to suffer a total of 12 or more RETALIATE damage during attacks targeting you in a single round",
+      "br_frosthavenCrossover_1": "Across three consecutive rounds, play six different ability cards and cause enemies to suffer at least DAMAGE 6 on each of your turns"
+    },
+    "gloomhaven2E": {
+      "br_gloomhaven2E_0": "In 3 different scenarios, kill an enemy that you Pushed or Pulled that round",
+      "br_gloomhaven2E_1": "In a single scenario, across 3 consecutive rounds, play 6 different ability cards and cause enemies to suffer 7 or more damage during each of those rounds"
+    }
+  },
+  "ti": {
+    "frosthavenCrossover": {
+      "ti_frosthavenCrossover_0": "Heal an ally or apply a negative condition to an enemy each turn",
+      "ti_frosthavenCrossover_1": "Perform two actions with lost icons before your first rest and then only rest after having played at least two actions with lost icons since your previous rest"
+    },
+    "gloomhaven2E": {
+      "ti_gloomhaven2E_0": "For an entire scenario, during each of your turns, give an enemy a negative condition, give an ally a positive condition, heal an ally, or grant an ally shield",
+      "ti_gloomhaven2E_1": "Perform 11 different LOSS actions"
+    }
+  },
+  "sw": {
+    "frosthavenCrossover": {
+      "sw_frosthavenCrossover_0": "Infuse and consume all six elements",
+      "sw_frosthavenCrossover_1": "Perform four different loss actions twice each"
+    },
+    "gloomhaven2E": {
+      "sw_gloomhaven2E_0": "In a single scenario, consume both FIRE and ICE during the same turn 6 times",
+      "sw_gloomhaven2E_1": "In a single scenario, perform 4 different LOSS actions twice each"
+    }
+  },
+  "sc": {
+    "frosthavenCrossover": {
+      "sc_frosthavenCrossover_0": "Kill at least six enemies that are adjacent to at least one of your allies",
+      "sc_frosthavenCrossover_1": "Kill at least six enemies that are adjacent to none of your allies"
+    },
+    "gloomhaven2E": {
+      "sc_gloomhaven2E_0": "For an entire scenario, only attack enemies that are adjacent to one of your allies or adjacent to none of their allies, and perform at least 10 attacks",
+      "sc_gloomhaven2E_1": "End 3 scenarios with 12 or more money tokens"
+    }
+  },
+  "ch": {
+    "frosthavenCrossover": {
+      "ch_frosthavenCrossover_0": "Only attack enemies adjacent to obstacles or walls",
+      "ch_frosthavenCrossover_1": "Damage or heal at least one ally each round"
+    },
+    "gloomhaven2E": {
+      "ch_gloomhaven2E_0": "For an entire scenario, create, destroy, or move at least one obstacle tile each round",
+      "ch_gloomhaven2E_1": "In a single scenario, heal 8 or more hit points during a single round, deal 8 or more damage with a ranged attack ability, and deal 8 or more damage with a melee attack ability"
+    }
+  },
+  "mt": {
+    "frosthavenCrossover": {
+      "mt_frosthavenCrossover_0": "Trigger the on-attack effect of four different Augments thrice each",
+      "mt_frosthavenCrossover_1": "Never be targeted by an attack"
+    },
+    "gloomhaven2E": {
+      "mt_gloomhaven2E_0": "In a single scenario, kill 5 or more enemies with control abilities",
+      "mt_gloomhaven2E_1": "In a single scenario, trigger the on-attack effect from four different Augments at least 3 times each"
+    }
+  },
+  "sk": {
+    "frosthavenCrossover": {
+      "sk_frosthavenCrossover_0": "Reduce attacks targeting you by a total of 20 or more through Shield effects in a single round",
+      "sk_frosthavenCrossover_1": "LIGHT or consume_LIGHT during each of your turns"
+    },
+    "gloomhaven2E": {
+      "sk_gloomhaven2E_0": "For an entire scenario, infuse or consume LIGHT during each of your turns",
+      "sk_gloomhaven2E_1": "In a single scenario, deal 8 or more damage with an attack 3 or more times"
+    }
+  },
+  "qm": {
+    "frosthavenCrossover": {
+      "qm_frosthavenCrossover_0": "Spend, lose, or refresh one or more items on each of your turns without ever performing the top action of *Reinforced Steel*",
+      "qm_frosthavenCrossover_1": "LOOT six or more loot tokens in a single turn"
+    },
+    "gloomhaven2E": {
+      "qm_gloomhaven2E_0": "In a single scenario, spend 50 SUPPLIES to refresh 50 gold of lost items 3 times",
+      "qm_gloomhaven2E_1": "For an entire scenario, give yourself or an ally an item from the Quartermaster item Supply each round except when performing a long rest"
+    }
+  },
+  "su": {
+    "frosthavenCrossover": {
+      "su_frosthavenCrossover_0": "Summon the Lava Golem on your first turn and keep it alive for the entire scenario",
+      "su_frosthavenCrossover_1": "Perform the summon action of five different ability cards"
+    },
+    "gloomhaven2E": {
+      "su_gloomhaven2E_0": "Perform 3 different summon actions before your first rest and keep those cards in your active area for the entire scenario",
+      "su_gloomhaven2E_1": "Perform 6 different summon abilities from your ability cards over the course of the first rounds of 6 scenarios"
+    }
+  },
+  "ns": {
+    "frosthavenCrossover": {
+      "ns_frosthavenCrossover_0": "Have INVISIBLE at the start or end of each of your turns",
+      "ns_frosthavenCrossover_1": "DARK or consume_DARK during each of your turns"
+    },
+    "gloomhaven2E": {
+      "ns_gloomhaven2E_0": "In a single scenario, infuse or consume DARK during each of your turns",
+      "ns_gloomhaven2E_1": "In a single scenario, perform an attack ability during your turn in 5 consecutive rounds"
+    }
+  },
+  "ph": {
+    "frosthavenCrossover": {
+      "ph_frosthavenCrossover_0": "Kill at least five enemies with non-attack abilities",
+      "ph_frosthavenCrossover_1": "Perform three different attack abilities that target at least four enemies each"
+    },
+    "gloomhaven2E": {
+      "ph_gloomhaven2E_0": "In a single turn, kill 3 or more enemies without drawing an attack modifier card",
+      "ph_gloomhaven2E_1": "For an entire scenario, either apply or remove poison from an ally or enemy each round"
+    }
+  },
+  "be": {
+    "frosthavenCrossover": {
+      "be_frosthavenCrossover_0": "Lose at least one hit point during each of your turns, without ever performing the bottom action of *Blood Pact*",
+      "be_frosthavenCrossover_1": "Have exactly one hit point at the end of each of your turns"
+    },
+    "gloomhaven2E": {
+      "be_gloomhaven2E_0": "Kill 20 enemies with retaliate",
+      "be_gloomhaven2E_1": "For an entire scenario, never end your turn with your current hit point value above half your maximum"
+    }
+  },
+  "ss": {
+    "frosthavenCrossover": {
+      "ss_frosthavenCrossover_0": "On your first turn of the scenario and the turn after each of your rests, perform one Song action that you have not yet performed this scenario",
+      "ss_frosthavenCrossover_1": "Have all 10 monster CURSE cards and all 10 BLESS cards in modifier decks at the same time"
+    },
+    "gloomhaven2E": {
+      "ss_gloomhaven2E_0": "In a single scenario, perform 7 different SONG actions",
+      "ss_gloomhaven2E_1": "In a single scenario, create 20 or more Notes and use each Note you create in a SONG"
+    }
+  },
+  "ds": {
+    "frosthavenCrossover": {
+      "ds_frosthavenCrossover_0": "Never perform a Doom action that you have already performed in the scenario",
+      "ds_frosthavenCrossover_1": "Kill three Doomed enemies during one of your turns"
+    },
+    "gloomhaven2E": {
+      "ds_gloomhaven2E_0": "Kill 20 Doomed enemies",
+      "ds_gloomhaven2E_1": "In a single round, you and one of your summons must perform a combined total of 6 or more attack abilities"
+    }
+  },
+  "sb": {
+    "frosthavenCrossover": {
+      "sb_frosthavenCrossover_0": "On each of your turns, give an ally an ability card, target an ally with a HEAL ability, grant an ally SHIELD, or place an ability card in an ally's active area",
+      "sb_frosthavenCrossover_1": "Deal at least DAMAGE 20 with a single attack ability"
+    },
+    "gloomhaven2E": {
+      "sb_gloomhaven2E_0": "In a single scenario, give an ally a medical pack or PRESCRIPTION each round except when performing a long rest",
+      "sb_gloomhaven2E_1": "In a single scenario, never attack an undamaged enemy while there are any damaged monsters alive, and perform at least 10 attacks"
+    }
+  },
+  "el": {
+    "frosthavenCrossover": {
+      "el_frosthavenCrossover_0": "Consume at least two different elements with each of four different attack abilities without ever performing the bottom action of *Formless Power* or *Shaping the Ether*",
+      "el_frosthavenCrossover_1": "Infuse five or more elements during one of your turns, then consume five or more elements during your following turn"
+    },
+    "gloomhaven2E": {
+      "el_gloomhaven2E_0": "In a single scenario, consume 4 or more elements in a single turn 5 times",
+      "el_gloomhaven2E_1": "Once in 3 different scenarios, have all 6 elements strong or waning at the same time"
+    }
+  },
+  "bt": {
+    "frosthavenCrossover": {
+      "bt_frosthavenCrossover_0": "Have your bear summon deal DAMAGE 10 or more in three consecutive rounds",
+      "bt_frosthavenCrossover_1": "You or your summons must apply a negative condition to at least 10 different enemies"
+    },
+    "gloomhaven2E": {
+      "bt_gloomhaven2E_0": "In a single scenario, infuse or consume AIR or EARTH during each of your turns",
+      "bt_gloomhaven2E_1": "In a single scenario, kill 4 or more enemies with COMMAND attacks of 7 or greater (after all bonuses, before attack modifiers)"
+    }
+  },
+  "bs": {
+    "frosthavenCrossover": {
+      "bs_frosthavenCrossover_0": "Perform two different summon actions on your first turn and keep all summons from those actions alive for the entire scenario",
+      "bs_frosthavenCrossover_1": "Perform three different non-summon persistent loss actions before your first rest"
+    },
+    "gloomhaven2E": {
+      "bs_gloomhaven2E_0": "Perform 6 different PERSISTENT LOSS abilities with no more than 3 of the 6 being summon abilities",
+      "bs_gloomhaven2E_1": "Gain this mastery when you feel you deserve it"
+    }
+  },
+  "dv": {
+    "frosthavenCrossover": {
+      "dv_frosthavenCrossover_0": "During one round, have at least four monsters move into four different Rifts that affect those monsters",
+      "dv_frosthavenCrossover_1": "Reveal at least one card from at least one ability card deck or attack modifier deck each round"
+    }
+  },
+  "dl": {
+    "frosthavenCrossover": {
+      "dl_frosthavenCrossover_0": "Deal DAMAGE 10 or more with each of three different attack actions",
+      "dl_frosthavenCrossover_1": "Destroy at least six obstacles. End the scenario with no obstacles on the map other than ones placed by allies"
+    }
+  },
+  "hc": {
+    "frosthavenCrossover": {
+      "hc_frosthavenCrossover_0": "AIR or consume_AIR during each of your turns",
+      "hc_frosthavenCrossover_1": "During each round in which there is at least one enemy on the map at the start of your turn, either place one of your tokens on an ability card of yours or on an enemy"
+    }
+  },
+  "rg": {
+    "frosthavenCrossover": {
+      "rg_frosthavenCrossover_0": "Kill at least five enemies during their turns",
+      "rg_frosthavenCrossover_1": "Force each enemy in the scenario to move at least one hex, forcing at least six enemies to move"
+    }
+  },
+  "vw": {
+    "frosthavenCrossover": {
+      "vw_frosthavenCrossover_0": "Cause enemies to suffer DAMAGE 20 or more in a single turn with granted or commanded attacks",
+      "vw_frosthavenCrossover_1": "Give at least one ally or enemy POISON, STRENGTHEN, BLESS, or WARD each round"
+    }
+  },
+  "drifter": {
+    "base": {
+      "drifter_base_0": "End a scenario with your character tokens on the last use slots of four persistent abilities",
+      "drifter_base_1": "Never perform a move or attack ability with a value less than 4, and perform at least one move or attack ability every round"
+    }
+  },
+  "blinkblade": {
+    "base": {
+      "blinkblade_base_0": "Declare Fast seven rounds in a row",
+      "blinkblade_base_1": "Never be targeted by an attack"
+    }
+  },
+  "bannerspear": {
+    "base": {
+      "bannerspear_base_0": "Attack at least three targets with three different area of effect attacks",
+      "bannerspear_base_1": "Play a Banner summon ability on your first turn, always have it within RANGE 3 of you, and keep it alive for the entire scenario"
+    }
+  },
+  "deathwalker": {
+    "base": {
+      "deathwalker_base_0": "Consume seven SHADOW in one round",
+      "deathwalker_base_1": "Create or consume at least one SHADOW every round"
+    }
+  },
+  "boneshaper": {
+    "base": {
+      "boneshaper_base_0": "Kill at least 15 of your summons",
+      "boneshaper_base_1": "Play a summon action on your first turn, have this summon kill at least 6 enemies, and keep it alive for the entire scenario"
+    }
+  },
+  "geminate": {
+    "base": {
+      "geminate_base_0": "Switch forms every round",
+      "geminate_base_1": "Lose at least one card every round"
+    }
+  },
+  "infuser": {
+    "base": {
+      "infuser_base_0": "Have five active INFUSION bonuses",
+      "infuser_base_1": "Kill at least four enemies, but never attack"
+    }
+  },
+  "pyroclast": {
+    "base": {
+      "pyroclast_base_0": "Create or destroy at least one obstacle or hazardous terrain tile each round",
+      "pyroclast_base_1": "Move enemies through six different hexes of hazardous terrain you created in one turn"
+    }
+  },
+  "shattersong": {
+    "base": {
+      "shattersong_base_0": "Always have 0 RESONANCE directly before you gain RESONANCE at the end of each of your turns",
+      "shattersong_base_1": "Spend 5 RESONANCE on each of five different Wave abilities"
+    }
+  },
+  "trapper": {
+    "base": {
+      "trapper_base_0": "Have one HEAL trap on the map with a value of at least 20",
+      "trapper_base_1": "Move enemies through seven or more traps with one ability"
+    }
+  },
+  "painconduit": {
+    "base": {
+      "painconduit_base_0": "Cause other figures to suffer a total of at least DAMAGE 40 in one round",
+      "painconduit_base_1": "Start a turn with WOUND, BRITTLE, BANE, POISON, IMMOBILIZE, DISARM, STUN, and MUDDLE"
+    }
+  },
+  "snowdancer": {
+    "base": {
+      "snowdancer_base_0": "Cause at least one ally or enemy to move each round",
+      "snowdancer_base_1": "Ensure the first ally to suffer DAMAGE each round, directly before suffering the DAMAGE, has at least one condition you applied"
+    }
+  },
+  "frozenfist": {
+    "base": {
+      "frozenfist_base_0": "RECOVER at least one card from your discard pile each round",
+      "frozenfist_base_1": "Enter at least ten different hexes with one move ability, then cause one enemy to suffer at least DAMAGE 10 with one attack ability in the same turn"
+    }
+  },
+  "hive": {
+    "base": {
+      "hive_base_0": "TRANSFER each round",
+      "hive_base_1": "TRANSFER into four different summons in one round"
+    }
+  },
+  "metalmosaic": {
+    "base": {
+      "metalmosaic_base_0": "Never attack",
+      "metalmosaic_base_1": "For four consecutive rounds, move the pressure gauge up or down three levels from where it started the round (PRESSURE_LOW to PRESSURE_HIGH, or vice versa)"
+    }
+  },
+  "deepwraith": {
+    "base": {
+      "deepwraith_base_0": "Perform all your attacks with advantage",
+      "deepwraith_base_1": "Infuse DARK each round"
+    }
+  },
+  "crashingtide": {
+    "base": {
+      "crashingtide_base_0": "Never suffer damage from attacks, and be targeted by at least five attacks",
+      "crashingtide_base_1": "At the start of each of your rests, have more active TIDE than cards in your discard pile"
+    }
+  },
+  "anaphi": {
+    "base": {
+      "anaphi_base_0": "Have 3 different summons kill 3 enemies each",
+      "anaphi_base_1": "In each of 3 scenarios, perform 8 attacks targetting enemies that have negative conditions"
+    }
+  },
+  "cassandra": {
+    "base": {
+      "cassandra_base_0": "For an entire scenario, reveal at least one card from an attack modifier deck or monster ability card deck each round",
+      "cassandra_base_1": "Target 6 figures with an ability that targets figures occupying hexes containing RIFT"
+    }
+  },
+  "hail": {
+    "base": {
+      "hail_base_0": "For an entire scenario, gain at least 1 RESOLVE each round",
+      "hail_base_1": "In a single scenario, across three consecutive rounds, spend at least 3 RESOLVE each round"
+    }
+  },
+  "satha": {
+    "base": {
+      "satha_base_0": "For an entire scenario, have at least one ally perform a move or attack ability during each of your turns except when performing a long rest",
+      "satha_base_1": "For an entire scenario, never have an ally be a target of an attack"
+    }
+  },
+  "vimthreader": {
+    "base": {
+      "vimthreader_base_0": "For an entire scenario, perform a heal ability and cause a figure to suffer DAMAGE each round",
+      "vimthreader_base_1": "Gain the attributes of 12 different monster types"
+    }
+  },
+  "incarnate": {
+    "frosthavenCrossover": {
+      "incarnate_frosthavenCrossover_0": "Never end your turn in the same spirit you started in that turn",
+      "incarnate_frosthavenCrossover_1": "Perform fifteen attacks using One_Hand or Two_Hand items"
+    }
+  },
+  "core": {
+    "base": {
+      "core_base_0": "Kill the last enemy to die in the scenario and finish with nine ability cards in your lost pile.",
+      "core_base_1": "Trigger an ongoing effect on *Chaotic Recursion* six or more times in one round."
+    }
+  },
+  "dome": {
+    "base": {
+      "dome_base_0": "Only declare rests while your helper bot is adjacent to a figure, but not adjacent to you.",
+      "dome_base_1": "Never end your turn with 0 or 1 barrier, and absorb (partially or fully) at least 10 attacks with your barrier."
+    }
+  },
+  "skitterclaw": {
+    "base": {
+      "skitterclaw_base_0": "Have at least one Latched summon on four different enemies",
+      "skitterclaw_base_1": "Have your summons perform twelve attacks in one round"
+    }
+  },
+  "alchemancer": {
+    "base": {
+      "alchemancer_base_0": "Activate 12 EXPERIMENT abilities with at least two Vial_Wild used for bonuses during a single scenario",
+      "alchemancer_base_1": "Consume six elements in one turn twice during a single scenario"
+    }
+  }
+}
