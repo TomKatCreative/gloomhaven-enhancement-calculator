@@ -53,7 +53,7 @@ const bool kTownSheetEnabled = false;
 
 **Database versioning**: Production schema is v20 (v19: Personal Quests with 24 GH + 23 FH quests, Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories; v20: `ShowResources` and `IsJawsOfTheLion` columns on Characters). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
-**Migration safety**: every schema version back to v1 is upgrade-tested by `test/migration/` (frozen historical schemas + real backups in `test/fixtures/`). Any schema change MUST follow `docs/database_migration_testing.md#adding-a-migration`; `tripwire_test` fails until the outgoing schema is frozen. Known data bugs: `docs/known_data_bugs.md`.
+**Migration safety**: every schema version back to v1 is upgrade-tested by `test/migration/` (frozen historical schemas + real backups in `test/fixtures/`). Any schema change MUST follow `docs/database_migration_testing.md#adding-a-migration`; `tripwire_test` fails until the outgoing schema is frozen. Fixes for old data that breaks a shipped step go in `_runMigrations`' `preSteps` map, never in the shipped step. Known data bugs: `docs/known_data_bugs.md`.
 
 ## Key Domain Concepts
 

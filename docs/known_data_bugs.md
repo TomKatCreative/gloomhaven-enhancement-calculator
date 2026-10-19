@@ -3,7 +3,7 @@
 These are data-integrity problems found by the migration and backup harness (`docs/database_migration_testing.md`). Each one has at least one skipped test that fails when forced to run. The ID matches the `skip:` reason, from `test/migration/harness/known_bugs.dart`.
 
 ```bash
-flutter test --run-skipped test/migration test/backup   # all 12 skips fail
+flutter test --run-skipped test/migration test/backup   # all 7 skips fail
 ```
 
 When fixing a bug, remove its `skip:` and leave the test in place as a regression check. The fix plan, grouped into three tasks, is in [`data_integrity_roadmap.md`](data_integrity_roadmap.md).
@@ -11,14 +11,14 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 | ID | Severity | Status |
 |---|---|---|
 | [BUG-004](#bug-004) | **Critical**: silent loss of all characters | Fixed (DI-1) |
-| [BUG-003](#bug-003) | **High**: app can't open its database | Open |
+| [BUG-003](#bug-003) | **High**: app can't open its database | Fixed (DI-2) |
 | [BUG-001](#bug-001) | Medium: mastery checkboxes hidden | Open |
 | [BUG-002](#bug-002) | Low: hidden mastery rows that can never be shown | Open (fix decided: delete) |
 | [BUG-005](#bug-005) | Medium: settings half-applied | Fixed (DI-1) |
 | [BUG-006](#bug-006) | Low: orphan rows from crafted/old backups | Open |
 | [BUG-007](#bug-007) | Low: wrong MetaData after restore | Fixed (DI-1) |
-| [RISK-001](#risk-001) | Medium: data wiped on downgrade | By design (sqflite), undecided |
-| [RISK-003](#risk-003) | Unknown: only if a late-v6 dev build shipped | Open |
+| [RISK-001](#risk-001) | Medium: data wiped on downgrade | Fixed (DI-2) |
+| [RISK-003](#risk-003) | Unknown: only if a late-v6 dev build shipped | Fixed (DI-2) |
 | [DRIFT-001…004](#drift) | Low: schema DEFAULT differences | Accepted |
 
 ---
@@ -49,6 +49,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
   - `:634` uses `Character.fromMap(characters.first)` on an empty query.
   - `:465` uses `perk725List[0]`.
 - **Fix direction:** Skip (or delete) rows with no matching character, and guard the 725 lookup.
+- **Fixed (DI-2):** `DatabaseMigrations.repairLegacyRows` runs just before the v7→v8 step. It deletes perk and mastery rows with no character and inserts an unselected 725 row where only 724 exists. The shipped v8 step is unchanged.
 
 ## BUG-001
 
@@ -110,8 +111,8 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 
 - **What happens:** `onDowngrade: onDatabaseDowngradeDelete` (`lib/data/database_helper.dart:73`) deletes the file and creates an empty one whenever a build with a lower schema version opens it.
 - **Who it can hit:** For example, a tester moving from the internal track back to production.
-- **Test:** Pinned by `migration/migration_idempotence_test.dart` "a database from a newer app version is deleted on open (RISK-001)". This test passes; it characterizes the current behavior.
-- **Fix direction:** Refuse to open and show a message, or keep the file aside.
+- **Test:** `migration/migration_idempotence_test.dart`, group "a database from a newer app version (RISK-001)".
+- **Fixed (DI-2):** `onDowngrade` throws `DatabaseTooNewException` and leaves the file untouched. The Characters page shows `DatabaseOpenErrorView`, which asks the user to update the app and offers to export the raw database.
 
 ## RISK-003
 
@@ -119,7 +120,8 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 
 - **What happens:** Builds around 3.6.3+90 (`e186195`, May 2022) created `MasteriesTable` and `CharacterMasteries (MasteryProgress)` at fresh install without bumping past v6. The v7 step then fails with `table MasteriesTable already exists`. The rollback works, but the app can't open its database.
 - **Who it can hit:** Only installs of those dev builds, if any shipped.
-- **Tests:** `migration/migration_atomicity_test.dart` "late v6 development schema … upgrades" (skipped), plus a passing companion test that shows the data is intact.
+- **Tests:** `migration/migration_atomicity_test.dart` "late v6 development schema … upgrades".
+- **Fixed (DI-2):** `DatabaseMigrations.dropLateV6DevTables` runs just before the v6→v7 step and drops the dev mastery tables, which the v7 step then re-creates. Their `MasteryProgress` counters have no meaning in any later schema.
 
 ## DRIFT
 

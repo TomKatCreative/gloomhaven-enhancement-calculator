@@ -316,6 +316,19 @@ The legacy (4.0.0) Infuser list defined perk 9 as a single check instead of two,
 
 ---
 
+### Opening the Database
+
+`DatabaseHelper._open` is the only place the database is opened.
+
+- **Upgrade:** `_onUpgrade` runs every step from `oldVersion` in one transaction, then stamps MetaData. Any failure rolls back everything, so the file stays at its old version and the next launch retries.
+- **Legacy repairs (`preSteps`):** some old data breaks a shipped step, so a repair runs just before that step, in the same transaction:
+  - before v6→v7, `dropLateV6DevTables` drops the mastery tables that late-v6 dev builds created (RISK-003);
+  - before v7→v8, `repairLegacyRows` deletes perk/mastery rows with no character and adds the missing Infuser 725 row (BUG-003). By then every database has the v7 layout, so one repair covers v1–v7.
+- **Downgrade:** a file from a newer app version is refused with `DatabaseTooNewException` (in `lib/data/database_too_new_exception.dart`). It is never deleted, so updating the app gets the data back (RISK-001).
+- **Failure screen:** if the open throws for any reason, `Home` shows `DatabaseOpenErrorView` in place of the Characters page. It offers **Export database** (shares the raw `.db` file from `DatabaseHelper.databasePath()`) and **Contact developer** (`sendSupportEmail` with the error attached).
+
+---
+
 ## Perk & Mastery Definitions (Repository-Based)
 
 As of v19, perk and mastery definitions are loaded directly from code repositories at runtime — no database tables needed.
@@ -417,4 +430,5 @@ In short:
 2. **Bump** `_databaseVersion` in `database_helper.dart` and append a step to `_runMigrations` (key = the version upgraded *from*)
 3. **Match `_createTables`** for fresh installs, and add `??=` defaults in `DatabaseBackupService.restoreBackup` for older backups
 4. `_onUpgrade` stamps MetaData via `updateMetaDataTable()` after all steps — steps don't call it themselves
-5. Run `flutter test` and the on-device run before release
+5. **Legacy data fixes go in `preSteps`**, never in a shipped step. When old data breaks a shipped step, add a repair function to `DatabaseMigrations` and register it in `_runMigrations`' `preSteps` map under that step's key
+6. Run `flutter test` and the on-device run before release

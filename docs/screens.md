@@ -267,6 +267,7 @@ The main container/shell for the app, managing navigation between Town, Characte
 - Loads campaigns on init via `TownModel.loadCampaigns()` (only when `kTownSheetEnabled`)
 - Shows update dialogs (v4.4.0) if flag set in SharedPrefs
 - Uses `FutureBuilder` with loading spinner while characters load
+- If the database can't be opened, shows `DatabaseOpenErrorView` (`lib/ui/widgets/database_open_error_view.dart`) instead: export the raw DB file, email the developer, and see error details. A database from a newer app version (`DatabaseTooNewException`) gets an "update the app" message.
 
 ### FAB Logic
 

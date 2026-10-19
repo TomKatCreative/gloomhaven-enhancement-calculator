@@ -7,7 +7,7 @@ This roadmap fixes the findings in [`known_data_bugs.md`](known_data_bugs.md). T
 | Task | Theme | Closes | Schema bump | Size |
 |------|-------|--------|-------------|------|
 | [DI-1](#di-1) ✅ | Safe, atomic restore | BUG-004, BUG-005, BUG-007 | No | M |
-| [DI-2](#di-2) | Database open never strands or wipes data | BUG-003, RISK-003, RISK-001 | No | M |
+| [DI-2](#di-2) ✅ | Database open never strands or wipes data | BUG-003, RISK-003, RISK-001 | No | M |
 | [DI-3](#di-3) | Reconcile perk/mastery rows (v21) | BUG-001, BUG-002, BUG-006 | **v21** | M |
 | — | Accepted, no task | DRIFT-001…004 | — | — |
 
@@ -53,7 +53,7 @@ All three bugs come from `restoreBackup` doing its work in the wrong order: wipe
 - Unknown `classUnlocks` keys are ignored. Only locked classes this version knows are written.
 - **Addition:** a Characters row whose `ClassCode` or `Variant` this app version doesn't know (a backup from a newer app) is rejected with `BackupException`. Restoring it would replace the user's data with characters that fail to load.
 
-## DI-2 ⬜ Database open never strands or wipes data {#di-2}
+## DI-2 ✅ Database open never strands or wipes data {#di-2}
 
 **Closes:**
 - BUG-003: an orphan row aborts the upgrade, so the app can't open its database.
@@ -79,6 +79,12 @@ All three are about what happens when the app opens the database, and all are fi
 **Un-skips:** 3 orphan cases (`migration_atomicity_test.dart`), the Infuser no-725 case (`legacy_id_mapping_test.dart`) and the late-v6 case.
 **Change:** the RISK-001 characterization test in `migration_idempotence_test.dart` flips. It should now assert the newer database is left untouched and the open throws `DatabaseTooNewException`.
 **Docs:** `database_schema.md` (open/upgrade behavior) and `database_migration_testing.md`. Also note in CLAUDE.md that legacy fixes go in the sanitizer, never in shipped steps.
+
+**Done (2026-10-19):**
+- **Deviation from step 1:** there is no single sanitizer at the top of `_runMigrations`. Two repairs run just before the step that needs them, from a `preSteps` map: `dropLateV6DevTables` before v6→v7 and `repairLegacyRows` before v7→v8. By v7→v8 every database has the v7 layout (UUID-keyed rows, v7 legacy perk IDs), so one repair covers v1–v7. Run first, it would have had to handle integer-keyed v1–v3 rows and pre-v7 perk ID layouts.
+- The "…that blocks the upgrade leaves the data intact" companion tests were removed: those upgrades now succeed. The injected-failure rollback tests remain. The orphan tests also check the upgrade matches a clean upgrade of the same data.
+- sqflite closes the database itself when `onDowngrade` throws, so no extra handling was needed.
+- `DatabaseOpenErrorView` replaces the raw error text on the Characters page. The support email builder moved from the settings screen to `sendSupportEmail` in `settings_helpers.dart` so both use it.
 
 ## DI-3 ⬜ Reconcile perk/mastery rows (schema v21) {#di-3}
 

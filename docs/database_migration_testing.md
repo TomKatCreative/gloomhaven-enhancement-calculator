@@ -43,7 +43,7 @@ emulator -avd ghc_api24 -no-snapshot
 | `migration/legacy_id_mapping_test.dart` | Where each of the 995 legacy (v7) perk rows and 82 mastery rows lands. The real upgrade runs 5 times with bit-encoded selections, so every migrated row decodes back to its source. The result is checked against the reviewed goldens in `test/fixtures/legacy_ids/`, which pair legacy and live perk text. Covers the Infuser 724/725 fix in all four combinations, with two Infusers in one DB. |
 | `migration/schema_parity_test.dart` | Every migrated DB has the same tables and columns as a fresh install. Only the allowlisted DEFAULT differences (DRIFT-001…004) may remain, and a stale allowlist entry also fails. |
 | `migration/migration_atomicity_test.dart` | A step that throws rolls back everything. Schema, data and `user_version` are byte-identical afterwards, and the next launch fails the same way. |
-| `migration/migration_idempotence_test.dart` | Reopening a current DB changes nothing, and the same input always gives the same output. The old definition tables' contents never affect character data. Also characterizes downgrade behavior (RISK-001). |
+| `migration/migration_idempotence_test.dart` | Reopening a current DB changes nothing, and the same input always gives the same output. The old definition tables' contents never affect character data. A database from a newer app version is refused with `DatabaseTooNewException` and left untouched (RISK-001). |
 | `migration/fresh_install_test.dart` | A fresh install's schema matches the golden `test/fixtures/schema/fresh_current.json`. |
 | `migration/tripwire_test.dart` | Every version below the current one has a frozen schema, and the fresh-install golden is for the current version. |
 | `migration/id_snapshot_test.dart` | Perk and mastery IDs are append-only. Removing or renumbering one always fails. New IDs or text edits need `--update-goldens`. |
@@ -78,7 +78,7 @@ Each frozen schema in `harness/frozen_schemas.dart` is the fresh-install DDL of 
 |---|---|---|
 | v1–v4 | 3.0.0 – 3.2.1 | `1524e9a`, `19270f4`, `e611670`, `863d276` (identical DDL) |
 | v5–v6 | 3.2.5 – 3.6.3+86 | `19581f1`, `b133d58` (identical DDL) |
-| v6 (late dev) | 3.6.3+90, not a known release | `e186195` — RISK-003 characterization only |
+| v6 (late dev) | 3.6.3+90, not a known release | `e186195` — RISK-003 regression test only |
 | v7 | 4.0.0 – 4.1.0 | `d297c90` |
 | v8–v17 | 4.2.0 – 4.4.0 | `c57b409`, `v4.2.2`, `v4.3.0`–`v4.4.0` (identical DDL) |
 | v18 | 4.5.0 | `v4.5.0` |
