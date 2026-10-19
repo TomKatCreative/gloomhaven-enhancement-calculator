@@ -19,10 +19,17 @@ env:
   JAVA_VERSION: "21"
   BUILD_NUMBER_OFFSET: 370  # After repo transfer: run 1 + 370 = 371 (previous max was 368)
 
+# One deploy at a time. A newer push cancels an older run still in progress,
+# so an older build can never finish uploading after a newer one.
+concurrency:
+  group: deploy-internal
+  cancel-in-progress: true
+
 jobs:
   deploy:
     # Pinned: ubuntu-latest moves to Ubuntu 26 from 2026-10-19.
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v7
@@ -69,19 +76,42 @@ jobs:
         id: build_number
         run: echo "value=$(( ${{ github.run_number }} + ${{ env.BUILD_NUMBER_OFFSET }} ))" >> $GITHUB_OUTPUT
 
-      - name: Build App Bundle
+      # The APK is built with the same R8 config as the bundle, for the smoke
+      # test below; only the bundle is uploaded.
+      - name: Build App Bundle and APK
         run: |
           BUILD_ARGS="--release --build-number=${{ steps.build_number.outputs.value }}"
           if [ -n "${{ inputs.version_name }}" ]; then
             BUILD_ARGS="$BUILD_ARGS --build-name=${{ inputs.version_name }}"
           fi
           flutter build appbundle $BUILD_ARGS
+          flutter build apk $BUILD_ARGS
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Launches the release build on an emulator. Tests and debug builds never
+      # run R8, so this is the only gate that checks what actually ships.
+      - name: Smoke test release build
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: .github/scripts/android_smoke_test.sh build/app/outputs/flutter-apk/app-release.apk
 
       - name: Decode service account
         run: echo "${{ secrets.PLAY_STORE_SERVICE_ACCOUNT_JSON }}" | base64 --decode > service-account.json
 
       - name: Upload to Play Store (Internal Track)
-        uses: r0adkll/upload-google-play@v1.1.5
+        # Pinned to a commit: this third-party action receives the Play
+        # service account credentials.
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5 # v1.1.5
         with:
           serviceAccountJson: service-account.json
           packageName: tomkatcreative.gloomhavenenhancementcalc
