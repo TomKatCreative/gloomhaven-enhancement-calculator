@@ -4,6 +4,9 @@
 # Miscellaneous
 *.class
 *.lock
+# pubspec.lock is committed so CI builds the exact dependency versions tested
+# locally; an unpinned resolve shipped a broken shared_preferences_android.
+!pubspec.lock
 *.log
 *.pyc
 *.swp
