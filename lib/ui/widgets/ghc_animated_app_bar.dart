@@ -229,6 +229,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           dotHeight: 10,
           dotWidth: 10,
           activeDotColor: colorScheme.primary,
+          // smooth_page_indicator 3 no longer derives this from the theme;
+          // keep the 2.x default.
+          dotColor: theme.unselectedWidgetColor.withValues(alpha: 0.1),
         ),
       );
     } else if (displayPage == kCalculatorPageIndex) {
