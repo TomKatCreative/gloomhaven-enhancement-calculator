@@ -731,4 +731,58 @@ class DatabaseMigrations {
       'ALTER TABLE $tableCharacters ADD COLUMN $columnCharacterPartyId TEXT DEFAULT NULL',
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Legacy data repairs (DI-2)
+  //
+  // Shipped migration steps are never edited. Data that a shipped step can't
+  // handle is repaired here instead, just before that step runs, inside the
+  // same upgrade transaction.
+  // ---------------------------------------------------------------------------
+
+  /// Runs before the v6→v7 step (RISK-003).
+  ///
+  /// Dev builds around 3.6.3+90 created `MasteriesTable` and
+  /// `CharacterMasteries (MasteryProgress)` without bumping past v6, so the v7
+  /// step's CREATE TABLE fails. Their progress counters mean nothing in any
+  /// later schema, so both tables are dropped and the v7 step re-creates them.
+  static Future<void> dropLateV6DevTables(Transaction txn) async {
+    await txn.execute('DROP TABLE IF EXISTS $tableMasteries');
+    await txn.execute('DROP TABLE IF EXISTS $tableCharacterMasteries');
+  }
+
+  /// Runs before the v7→v8 step (BUG-003). By then every database, whatever
+  /// version it started at, has the v7 layout: rows keyed by
+  /// `CharacterUuid` and perk IDs in the v7 legacy layout.
+  ///
+  /// - Deletes perk and mastery rows whose character no longer exists. v1–v4
+  ///   `deleteCharacter` didn't await its deletes, so these can exist; no
+  ///   version of the app can show them, and the v8 step throws on them.
+  /// - Inserts an unselected Infuser 725 row for any character that has a
+  ///   724 row but no 725 row, which the v8 step's 724/725 fix requires.
+  static Future<void> repairLegacyRows(Transaction txn) async {
+    for (final table in [tableCharacterPerks, tableCharacterMasteries]) {
+      await txn.delete(
+        table,
+        where:
+            '$columnAssociatedCharacterUuid NOT IN '
+            '(SELECT $columnCharacterUuid FROM $tableCharacters)',
+      );
+    }
+    await txn.rawInsert('''
+      INSERT INTO $tableCharacterPerks (
+        $columnAssociatedCharacterUuid,
+        $columnAssociatedPerkId,
+        $columnCharacterPerkIsSelected
+      )
+      SELECT DISTINCT $columnAssociatedCharacterUuid, 725, 0
+      FROM $tableCharacterPerks p
+      WHERE $columnAssociatedPerkId = 724
+        AND NOT EXISTS (
+          SELECT 1 FROM $tableCharacterPerks q
+          WHERE q.$columnAssociatedCharacterUuid = p.$columnAssociatedCharacterUuid
+            AND q.$columnAssociatedPerkId = 725
+        )
+    ''');
+  }
 }

@@ -6,7 +6,6 @@ import '../harness/dataset.dart';
 import '../harness/db_snapshot.dart';
 import '../harness/frozen_schemas.dart';
 import '../harness/harness.dart';
-import '../harness/known_bugs.dart';
 
 /// A migration that throws must leave the database exactly as it was: the
 /// upgrade runs in one exclusive transaction and `user_version` is only
@@ -105,20 +104,24 @@ void defineAtomicityTests() {
 
       for (final MapEntry(key: label, value: (version, corrupt))
           in cases.entries) {
-        test('a $label does not block the upgrade', () async {
+        test('a $label does not block the upgrade and is removed', () async {
+          final clean = await prepare(version, (_) async {});
+          final expected = await dataDump(await openThroughApp(clean.path));
+
           final before = await prepare(version, corrupt);
           final db = await openThroughApp(before.path);
           expect(await userVersion(db), greaterThan(version));
-        }, skip: knownBug('BUG-003'));
-
-        test(
-          'a $label that blocks the upgrade leaves the data intact',
-          () async {
-            final before = await prepare(version, corrupt);
-            await expectLater(openThroughApp(before.path), throwsA(anything));
-            await expectUntouched(before, version);
-          },
-        );
+          // Every real character upgrades exactly as it would without the
+          // orphan; MetaData's timestamp aside, nothing else differs.
+          expect(await dataDump(db), expected);
+          for (final table in ['CharacterPerks', 'CharacterMasteries']) {
+            final orphans = await db.rawQuery(
+              'SELECT * FROM $table '
+              'WHERE CharacterUuid NOT IN (SELECT Uuid FROM Characters)',
+            );
+            expect(orphans, isEmpty, reason: table);
+          }
+        });
       }
     });
 
@@ -127,12 +130,6 @@ void defineAtomicityTests() {
         final before = await prepare(6, (_) async {}, schema: v06LateDev);
         final db = await openThroughApp(before.path);
         expect(await userVersion(db), greaterThan(6));
-      }, skip: knownBug('RISK-003'));
-
-      test('a failed upgrade leaves the data intact', () async {
-        final before = await prepare(6, (_) async {}, schema: v06LateDev);
-        await expectLater(openThroughApp(before.path), throwsA(anything));
-        await expectUntouched(before, 6);
       });
     });
   });

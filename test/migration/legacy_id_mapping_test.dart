@@ -186,17 +186,30 @@ void main() {
       });
     }
 
-    test('a character with a 724 row but no 725 row still upgrades', () async {
-      final path = tempDbPath(createTempDbDir());
-      final raw = await rawOpen(path);
-      final c = infuser('infuser-no-725', true, false);
-      await seedFrozenDatabase(raw, 7, characters: [c]);
-      await raw.delete('CharacterPerks', where: 'PerkID = ?', whereArgs: [725]);
-      await raw.close();
+    // A second, complete Infuser in the same database checks that the repair
+    // matches 725 rows per character, not database-wide.
+    for (final sel724 in [true, false]) {
+      test('a character with a 724 row (${sel724 ? 'on' : 'off'}) but no 725 '
+          'row still upgrades, alongside a complete Infuser', () async {
+        final path = tempDbPath(createTempDbDir());
+        final raw = await rawOpen(path);
+        final c = infuser('infuser-no-725', sel724, false);
+        final complete = infuser('infuser-complete', !sel724, true);
+        await seedFrozenDatabase(raw, 7, characters: [c, complete]);
+        await raw.delete(
+          'CharacterPerks',
+          where: 'PerkID = ? AND CharacterUuid = ?',
+          whereArgs: [725, c.uuid],
+        );
+        await raw.close();
 
-      final db = await openThroughApp(path);
-      expect(await userVersion(db), greaterThan(7));
-    }, skip: knownBug('BUG-003'));
+        final db = await openThroughApp(path);
+        expect(await userVersion(db), greaterThan(7));
+        // The missing 725 row is treated as unselected.
+        expect(await perksOf(db, c.uuid), expectedPerks(c, 7));
+        expect(await perksOf(db, complete.uuid), expectedPerks(complete, 7));
+      });
+    }
   });
 }
 

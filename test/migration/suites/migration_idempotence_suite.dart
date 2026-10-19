@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_too_new_exception.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
@@ -111,17 +112,15 @@ void defineIdempotenceTests() {
       }
     });
 
-    test(
-      'a database from a newer app version is deleted on open (RISK-001)',
-      () async {
-        // Characterizes onDatabaseDowngradeDelete: installing an older build over
-        // a newer database wipes every character. Documented as RISK-001.
+    group('a database from a newer app version (RISK-001)', () {
+      /// A database with one character, stamped one version ahead of the app.
+      Future<({String path, Object master, Object data})> newer() async {
         final path = tempDbPath(createTempDbDir());
         await openThroughApp(path);
         await DatabaseHelper.instance.insertCharacter(
           Character(
-            uuid: 'downgrade-victim',
-            name: 'Victim',
+            uuid: 'downgrade-survivor',
+            name: 'Survivor',
             playerClass: PlayerClasses.playerClassByClassCode(ClassCodes.brute),
           ),
         );
@@ -130,12 +129,47 @@ void defineIdempotenceTests() {
         await raw.execute(
           'PRAGMA user_version = ${DatabaseHelper.currentVersion + 1}',
         );
+        final master = await masterDump(raw);
+        final data = await dataDump(raw);
         await raw.close();
+        return (path: path, master: master, data: data);
+      }
 
-        final db = await openThroughApp(path);
-        expect(await userVersion(db), DatabaseHelper.currentVersion);
-        expect(await db.query('Characters'), isEmpty);
-      },
-    );
+      Future<void> expectRefusedAndUntouched(
+        ({String path, Object master, Object data}) before,
+      ) async {
+        await expectLater(
+          openThroughApp(before.path),
+          throwsA(
+            isA<DatabaseTooNewException>()
+                .having(
+                  (e) => e.found,
+                  'found',
+                  DatabaseHelper.currentVersion + 1,
+                )
+                .having(
+                  (e) => e.supported,
+                  'supported',
+                  DatabaseHelper.currentVersion,
+                ),
+          ),
+        );
+        final raw = await rawOpen(before.path);
+        expect(await userVersion(raw), DatabaseHelper.currentVersion + 1);
+        expect(await masterDump(raw), before.master);
+        expect(await dataDump(raw), before.data);
+        await raw.close();
+      }
+
+      test('is refused and left untouched', () async {
+        await expectRefusedAndUntouched(await newer());
+      });
+
+      test('is refused the same way on the next launch', () async {
+        final before = await newer();
+        await expectRefusedAndUntouched(before);
+        await expectRefusedAndUntouched(before);
+      });
+    });
   });
 }

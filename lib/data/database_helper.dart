@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_backup_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper_interface.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_too_new_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:path/path.dart';
@@ -56,11 +57,18 @@ class DatabaseHelper implements IDatabaseHelper {
 
   // open the database
   Future<Database> _initDatabase() async {
+    final path = await databasePath();
+    debugPrint('Database Path:: $path');
+    return await _open(path);
+  }
+
+  /// The database file's location in the app documents directory. Also used
+  /// to export the raw file when the database can't be opened.
+  static Future<String> databasePath() async {
     // The path_provider plugin gets the right directory for Android or iOS.
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String databasePath = join(documentsDirectory.path, _databaseName);
-    debugPrint('Database Path:: $databasePath');
-    return await _open(databasePath);
+    final Directory documentsDirectory =
+        await getApplicationDocumentsDirectory();
+    return join(documentsDirectory.path, _databaseName);
   }
 
   /// The only place the app opens its database: the real schema version and
@@ -70,8 +78,16 @@ class DatabaseHelper implements IDatabaseHelper {
     version: _databaseVersion,
     onCreate: _onCreate,
     onUpgrade: _onUpgrade,
-    onDowngrade: onDatabaseDowngradeDelete,
+    onDowngrade: _onDowngrade,
   );
+
+  /// A newer app version wrote this file. Refuse to open it instead of
+  /// deleting it, so updating the app gets the data back.
+  static Future<void> _onDowngrade(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) => throw DatabaseTooNewException(found: oldVersion, supported: newVersion);
 
   /// The schema version the app opens databases at.
   @visibleForTesting
@@ -287,10 +303,19 @@ class DatabaseHelper implements IDatabaseHelper {
       },
     };
 
+    // Legacy data repairs, run just before the step that would fail on that
+    // data. Shipped steps above are never edited; fixes for data they can't
+    // handle go here (see DatabaseMigrations.repairLegacyRows).
+    final preSteps = <int, Future<void> Function()>{
+      6: () => DatabaseMigrations.dropLateV6DevTables(txn),
+      7: () => DatabaseMigrations.repairLegacyRows(txn),
+    };
+
     // Run migrations in order for versions > oldVersion
     final sortedVersions = migrations.keys.toList()..sort();
     for (final version in sortedVersions) {
       if (oldVersion <= version) {
+        await preSteps[version]?.call();
         await migrations[version]!();
       }
     }
