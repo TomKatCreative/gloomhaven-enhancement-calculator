@@ -3,20 +3,20 @@
 These are data-integrity problems found by the migration and backup harness (`docs/database_migration_testing.md`). Each one has at least one skipped test that fails when forced to run. The ID matches the `skip:` reason, from `test/migration/harness/known_bugs.dart`.
 
 ```bash
-flutter test --run-skipped test/migration test/backup   # all 28 skips fail
+flutter test --run-skipped test/migration test/backup   # all 12 skips fail
 ```
 
 When fixing a bug, remove its `skip:` and leave the test in place as a regression check. The fix plan, grouped into three tasks, is in [`data_integrity_roadmap.md`](data_integrity_roadmap.md).
 
 | ID | Severity | Status |
 |---|---|---|
-| [BUG-004](#bug-004) | **Critical**: silent loss of all characters | Open |
+| [BUG-004](#bug-004) | **Critical**: silent loss of all characters | Fixed (DI-1) |
 | [BUG-003](#bug-003) | **High**: app can't open its database | Open |
 | [BUG-001](#bug-001) | Medium: mastery checkboxes hidden | Open |
 | [BUG-002](#bug-002) | Low: hidden mastery rows that can never be shown | Open (fix decided: delete) |
-| [BUG-005](#bug-005) | Medium: settings half-applied | Open |
+| [BUG-005](#bug-005) | Medium: settings half-applied | Fixed (DI-1) |
 | [BUG-006](#bug-006) | Low: orphan rows from crafted/old backups | Open |
-| [BUG-007](#bug-007) | Low: wrong MetaData after restore | Open |
+| [BUG-007](#bug-007) | Low: wrong MetaData after restore | Fixed (DI-1) |
 | [RISK-001](#risk-001) | Medium: data wiped on downgrade | By design (sqflite), undecided |
 | [RISK-003](#risk-003) | Unknown: only if a late-v6 dev build shipped | Open |
 | [DRIFT-001…004](#drift) | Low: schema DEFAULT differences | Accepted |
@@ -32,7 +32,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Message mismatch:** The error dialog (`restoreErrorMessage`) tells the user "Your existing data was saved".
 - **Tests:** `backup/backup_rejection_test.dart`, 6 cases, "… leaves the existing characters untouched".
 - **Root cause:** `lib/data/database_backup_service.dart:63` runs `_clearAllTables()` before `jsonDecode` (`:67`) and before the MetaData/version checks. The `fallBack` backup is only restored when `batch.commit` fails (`:130`), not when parsing or validation throws.
-- **Fix direction:** Parse and validate first. Then wipe and insert inside one transaction, so any failure rolls back.
+- **Fixed (DI-1):** `restoreBackup` parses and validates everything first, throwing `BackupException` with the database untouched, then wipes and inserts inside one transaction.
 
 ## BUG-003
 
@@ -84,7 +84,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Root cause:**
   - `SharedPrefs.importFromBackup` (`lib/shared_prefs.dart:346`) applies values one by one with `as bool` / `as int`.
   - It is called after `batch.commit` (`lib/data/database_backup_service.dart:140`).
-- **Fix direction:** Validate and convert every value first, then write. Validate prefs before touching the DB.
+- **Fixed (DI-1):** `BackupPrefs.parse` type-checks every value during backup validation, before the DB is touched. `SharedPrefs.applyBackupPrefs` runs only after the restore transaction commits.
 
 ## BUG-006
 
@@ -102,7 +102,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Observed:** After restoring a v8 backup into a v20 database, MetaData says `DatabaseVersion: 8`. Later backups then carry the wrong version. That's why `db16_app432_version_440.json` claims v16 / 4.3.2 although it was exported by a 4.5+ app.
 - **Tests:** `backup/backup_fixture_restore_test.dart` "keeps the MetaData of the running schema" (9 fixtures).
 - **Root cause:** MetaData is in `DatabaseHelper.tables`, so it is wiped and restored like user data.
-- **Fix direction:** Skip MetaData on restore. Nothing reads it today, so this is low risk.
+- **Fixed (DI-1):** MetaData is skipped on clear and on insert. Backups exported before this fix can still carry a wrong MetaData version.
 
 ## RISK-001
 

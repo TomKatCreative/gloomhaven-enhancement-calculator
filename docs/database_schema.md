@@ -245,7 +245,7 @@ Accessed via `DatabaseHelper.instance.backupService`.
 | Method | Description |
 |--------|-------------|
 | `generateBackup()` | Export all tables + SharedPrefs as JSON string |
-| `restoreBackup(String)` | Restore from JSON with version validation, column patching, and safety fallback |
+| `restoreBackup(String)` | Validate the whole backup (throws `BackupException` with nothing changed), then replace all tables except MetaData in one transaction and apply prefs after it commits |
 
 ---
 
@@ -402,6 +402,8 @@ The backup is a 3-element JSON array: `[tableNames, tableData, sharedPrefs]`.
 **Note**: All definition tables (Perks, Masteries, PersonalQuests) were removed in v19 and were never included in backup. Campaigns and Parties tables ARE included in backup (when `kTownSheetEnabled`) since they contain user-created data.
 
 **Minimum supported backup version**: DB schema v8 (app v4.2.0). Backups from older versions are rejected during restore with a descriptive error message.
+
+**Restore is all-or-nothing.** The JSON shape, MetaData version, each character's class and variant, and the settings are all validated before anything is written. The wipe and inserts run in one transaction, so a failed insert rolls back to the user's data. The `MetaData` table is never cleared or restored, because it describes the running schema, not the backup.
 
 ---
 

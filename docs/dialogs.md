@@ -104,7 +104,7 @@ await RestoreDialog.show(context: context);
 - Confirmation warning before proceeding
 - Document picker (`file_selector`) for `.json`/`.txt` backup files
 - Progress indicator during restore
-- Error dialog with copy-to-clipboard option
+- Error dialog with copy-to-clipboard option. A rejected or rolled-back restore changes nothing (`restoreErrorMessage`). If the restore committed but reloading the app failed, the dialog says the backup was restored (`restoreAppliedErrorMessage`). Either way, characters are reloaded so the UI matches the database
 - Automatic navigation after success
 
 ## EnhancerDialog

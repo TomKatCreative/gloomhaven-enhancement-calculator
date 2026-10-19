@@ -333,7 +333,17 @@ During import, enhancer levels are written directly via `_sharedPrefs.setBool()`
 | Method | Description |
 |--------|-------------|
 | `exportForBackup()` | Returns categorized `Map<String, dynamic>` of all backed-up prefs |
-| `importFromBackup(Map<String, dynamic>)` | Applies backup data; missing categories are skipped |
+| `BackupPrefs.parse(Map<String, dynamic>)` | Validates backup prefs without writing; throws `BackupException` on a wrong-typed value or a category that isn't a map |
+| `applyBackupPrefs(BackupPrefs)` | Writes validated prefs |
+| `importFromBackup(Map<String, dynamic>)` | `parse` then `apply`; missing categories are skipped |
+
+### Import Validation
+
+`restoreBackup` calls `BackupPrefs.parse` before touching the database and applies the result only after the database transaction commits, so a bad settings value rejects the whole restore.
+
+- A wrong-typed value rejects the import.
+- Unknown keys are ignored, including `classUnlocks` keys that aren't locked classes this version knows.
+- Out-of-range `gameEdition`, `targetCardLvl` (0–8) and `enhancementsOnTargetAction` (0–3) values are skipped and keep their current value.
 
 ---
 

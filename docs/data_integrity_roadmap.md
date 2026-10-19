@@ -6,7 +6,7 @@ This roadmap fixes the findings in [`known_data_bugs.md`](known_data_bugs.md). T
 
 | Task | Theme | Closes | Schema bump | Size |
 |------|-------|--------|-------------|------|
-| [DI-1](#di-1) | Safe, atomic restore | BUG-004, BUG-005, BUG-007 | No | M |
+| [DI-1](#di-1) ✅ | Safe, atomic restore | BUG-004, BUG-005, BUG-007 | No | M |
 | [DI-2](#di-2) | Database open never strands or wipes data | BUG-003, RISK-003, RISK-001 | No | M |
 | [DI-3](#di-3) | Reconcile perk/mastery rows (v21) | BUG-001, BUG-002, BUG-006 | **v21** | M |
 | — | Accepted, no task | DRIFT-001…004 | — | — |
@@ -23,7 +23,7 @@ This roadmap fixes the findings in [`known_data_bugs.md`](known_data_bugs.md). T
 
 ---
 
-## DI-1 ⬜ Safe, atomic restore {#di-1}
+## DI-1 ✅ Safe, atomic restore {#di-1}
 
 **Closes:** BUG-004 (restore wipes data before validating), BUG-005 (prefs half-applied), BUG-007 (MetaData overwritten).
 **Files:** `lib/data/database_backup_service.dart`, `lib/shared_prefs.dart`, `lib/ui/dialogs/restore_dialog.dart`
@@ -46,6 +46,12 @@ All three bugs come from `restoreBackup` doing its work in the wrong order: wipe
 **Un-skips:** 6 BUG-004 cases, the BUG-005 case and 9 BUG-007 cases (`backup_rejection_test.dart`, `backup_fixture_restore_test.dart`).
 **Add:** a rollback test where the insert fails mid-batch (replacing the old fallback test); prefs range checks (`targetCardLvl`, `enhancementsOnTargetAction`, `gameEdition` < 0); and unknown `classUnlocks` keys that must not be written as prefs. All of these were found during the investigation.
 **Docs:** the backup section of `database_schema.md`, and the import section of `shared_prefs_keys.md`.
+
+**Done (2026-10-19):**
+- `BackupPrefs.parse` lives in `shared_prefs.dart`, and `SharedPrefs.applyBackupPrefs` only writes. `importFromBackup` remains as parse + apply.
+- **Deviation from step 2:** a wrong *type* rejects the restore, but an out-of-range `gameEdition`, `targetCardLvl` (0–8) or `enhancementsOnTargetAction` (0–3) is skipped and keeps the current value. This matches the existing `gameEdition` behavior, so a backup from a newer app with a new edition still restores.
+- Unknown `classUnlocks` keys are ignored. Only locked classes this version knows are written.
+- **Addition:** a Characters row whose `ClassCode` or `Variant` this app version doesn't know (a backup from a newer app) is rejected with `BackupException`. Restoring it would replace the user's data with characters that fail to load.
 
 ## DI-2 ⬜ Database open never strands or wipes data {#di-2}
 
