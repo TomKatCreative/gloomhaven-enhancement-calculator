@@ -577,4 +577,32 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get addPartyNotes => 'Adicionar notas do grupo...';
+
+  @override
+  String get databaseTooNewTitle => 'Atualização necessária';
+
+  @override
+  String get databaseTooNewMessage =>
+      'Seus personagens foram salvos por uma versão mais recente deste aplicativo. Atualize o aplicativo para continuar. Seus dados não foram alterados.';
+
+  @override
+  String get databaseOpenErrorTitle =>
+      'Não foi possível carregar seus personagens';
+
+  @override
+  String get databaseOpenErrorMessage =>
+      'Ocorreu um erro ao carregar seus dados. Seus dados não foram excluídos. Exporte seu banco de dados e entre em contato com o desenvolvedor para que eles possam ser recuperados.';
+
+  @override
+  String get exportDatabase => 'Exportar banco de dados';
+
+  @override
+  String get exportDatabaseError =>
+      'Não foi possível exportar o banco de dados. Tente novamente.';
+
+  @override
+  String get contactDeveloper => 'Contatar desenvolvedor';
+
+  @override
+  String get errorDetails => 'Detalhes do erro';
 }

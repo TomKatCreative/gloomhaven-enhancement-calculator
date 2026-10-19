@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Shows a loading dialog with a progress indicator during restore operations.
@@ -34,6 +35,32 @@ void showLoaderDialog(BuildContext context) {
 Future<void> launchURL(Uri uri) async => await canLaunchUrl(uri)
     ? await launchUrl(uri, mode: LaunchMode.externalApplication)
     : await launchUrl(uri);
+
+/// Opens a support email to the developer, prefilled with the app version
+/// and device info. [details] (e.g. an error) is added below them.
+Future<void> sendSupportEmail({String? details}) async {
+  final deviceInfo = await getDeviceInfo();
+  final packageInfo = await PackageInfo.fromPlatform();
+  final appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+
+  final emailBody =
+      '''
+App Version: $appVersion
+Platform: ${Platform.isIOS ? 'iOS' : 'Android'}
+  $deviceInfo
+${details == null ? '' : '\n$details\n'}
+--- Please describe your issue or provide your feedback below ---
+
+''';
+
+  await launchURL(
+    Uri.parse(
+      'mailto:tomkatcreative@gmail.com'
+      '?subject=${Uri.encodeComponent('GHC Support & Feedback')}'
+      '&body=${Uri.encodeComponent(emailBody)}',
+    ),
+  );
+}
 
 /// Gets device information for support emails.
 ///

@@ -1153,6 +1153,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add party notes...'**
   String get addPartyNotes;
+
+  /// No description provided for @databaseTooNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get databaseTooNewTitle;
+
+  /// No description provided for @databaseTooNewMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your characters were saved by a newer version of this app. Update the app to continue. Your data has not been changed.'**
+  String get databaseTooNewMessage;
+
+  /// No description provided for @databaseOpenErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load your characters'**
+  String get databaseOpenErrorTitle;
+
+  /// No description provided for @databaseOpenErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong while loading your data. Your data has not been deleted. Export your database and contact the developer so it can be recovered.'**
+  String get databaseOpenErrorMessage;
+
+  /// No description provided for @exportDatabase.
+  ///
+  /// In en, this message translates to:
+  /// **'Export database'**
+  String get exportDatabase;
+
+  /// No description provided for @exportDatabaseError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t export the database. Please try again.'**
+  String get exportDatabaseError;
+
+  /// No description provided for @contactDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact developer'**
+  String get contactDeveloper;
+
+  /// No description provided for @errorDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Error details'**
+  String get errorDetails;
 }
 
 class _AppLocalizationsDelegate

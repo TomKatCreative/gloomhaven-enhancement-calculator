@@ -163,32 +163,10 @@ class _SettingsBottomSheet extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.email),
-          onPressed: () => _sendSupportEmail(context),
+          tooltip: AppLocalizations.of(context).contactDeveloper,
+          onPressed: sendSupportEmail,
         ),
       ],
-    );
-  }
-
-  Future<void> _sendSupportEmail(BuildContext context) async {
-    final deviceInfo = await getDeviceInfo();
-    final appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
-
-    final emailBody =
-        '''
-App Version: $appVersion
-Platform: ${Platform.isIOS ? 'iOS' : 'Android'}
-  $deviceInfo
-
---- Please describe your issue or provide your feedback below ---
-
-''';
-
-    await launchURL(
-      Uri.parse(
-        'mailto:tomkatcreative@gmail.com'
-        '?subject=${Uri.encodeComponent('GHC Support & Feedback')}'
-        '&body=${Uri.encodeComponent(emailBody)}',
-      ),
     );
   }
 

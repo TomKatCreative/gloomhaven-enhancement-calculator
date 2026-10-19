@@ -7,6 +7,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/update_450_dialog.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/database_open_error_view.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/characters_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_animated_app_bar.dart';
@@ -88,7 +89,7 @@ class _HomeState extends State<Home> {
                   snapshot.hasData) {
                 return const CharactersScreen();
               } else if (snapshot.hasError) {
-                return Text(snapshot.error.toString());
+                return DatabaseOpenErrorView(error: snapshot.error!);
               } else {
                 return SizedBox(
                   width: MediaQuery.of(context).size.width,

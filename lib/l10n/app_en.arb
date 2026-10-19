@@ -248,5 +248,13 @@
   "partyNotes": "Party notes",
   "achievements": "Achievements",
   "shopPriceModifier": "Shop",
-  "addPartyNotes": "Add party notes..."
+  "addPartyNotes": "Add party notes...",
+  "databaseTooNewTitle": "Update required",
+  "databaseTooNewMessage": "Your characters were saved by a newer version of this app. Update the app to continue. Your data has not been changed.",
+  "databaseOpenErrorTitle": "Couldn't load your characters",
+  "databaseOpenErrorMessage": "Something went wrong while loading your data. Your data has not been deleted. Export your database and contact the developer so it can be recovered.",
+  "exportDatabase": "Export database",
+  "exportDatabaseError": "Couldn't export the database. Please try again.",
+  "contactDeveloper": "Contact developer",
+  "errorDetails": "Error details"
 }

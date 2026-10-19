@@ -175,5 +175,13 @@
   "partyNotes": "Notas do grupo",
   "achievements": "Conquistas",
   "shopPriceModifier": "Loja",
-  "addPartyNotes": "Adicionar notas do grupo..."
+  "addPartyNotes": "Adicionar notas do grupo...",
+  "databaseTooNewTitle": "Atualização necessária",
+  "databaseTooNewMessage": "Seus personagens foram salvos por uma versão mais recente deste aplicativo. Atualize o aplicativo para continuar. Seus dados não foram alterados.",
+  "databaseOpenErrorTitle": "Não foi possível carregar seus personagens",
+  "databaseOpenErrorMessage": "Ocorreu um erro ao carregar seus dados. Seus dados não foram excluídos. Exporte seu banco de dados e entre em contato com o desenvolvedor para que eles possam ser recuperados.",
+  "exportDatabase": "Exportar banco de dados",
+  "exportDatabaseError": "Não foi possível exportar o banco de dados. Tente novamente.",
+  "contactDeveloper": "Contatar desenvolvedor",
+  "errorDetails": "Detalhes do erro"
 }

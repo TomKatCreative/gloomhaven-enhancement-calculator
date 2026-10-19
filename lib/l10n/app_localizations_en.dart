@@ -576,4 +576,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPartyNotes => 'Add party notes...';
+
+  @override
+  String get databaseTooNewTitle => 'Update required';
+
+  @override
+  String get databaseTooNewMessage =>
+      'Your characters were saved by a newer version of this app. Update the app to continue. Your data has not been changed.';
+
+  @override
+  String get databaseOpenErrorTitle => 'Couldn\'t load your characters';
+
+  @override
+  String get databaseOpenErrorMessage =>
+      'Something went wrong while loading your data. Your data has not been deleted. Export your database and contact the developer so it can be recovered.';
+
+  @override
+  String get exportDatabase => 'Export database';
+
+  @override
+  String get exportDatabaseError =>
+      'Couldn\'t export the database. Please try again.';
+
+  @override
+  String get contactDeveloper => 'Contact developer';
+
+  @override
+  String get errorDetails => 'Error details';
 }
