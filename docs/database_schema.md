@@ -255,6 +255,7 @@ Accessed via `DatabaseHelper.instance.backupService`.
 
 | Version | Key Changes |
 |---------|-------------|
+| v1–v4 | App 3.0.0–3.2.1. Integer `_id` characters, `CharacterPerks.CharacterID`, uppercase class codes (`'BR'`, never rewritten). Upgrades only regenerated the Perks table |
 | v5 | UUID migration, perk table regeneration |
 | v6 | Perk cleanup, add Ruinmaw class |
 | v7 | Frosthaven perks, masteries table, resources |
@@ -276,18 +277,12 @@ Accessed via `DatabaseHelper.instance.backupService`.
 
 #### v5: UUID Migration
 
-Converts integer character IDs to UUIDs for multi-device sync support.
-
-```sql
--- Before: CharacterId INTEGER PRIMARY KEY
--- After: CharacterUUID TEXT NOT NULL (with legacy CharacterId kept)
-```
+Rebuilds Characters and CharacterPerks around a text `Uuid` (`migrateToUuids`).
 
 **Process**:
-1. Create new Characters table with UUID column
-2. Generate UUIDs for existing characters
-3. Update CharacterPerks to use UUID references
-4. Keep legacy `CharacterId` for backward compatibility
+1. Rebuild CharacterPerks with `CharacterUuid` copied from the old integer `CharacterID`
+2. Rebuild Characters, dropping the v1–v4 `ClassColor`/`ClassIcon`/`ClassRace`/`ClassName` columns
+3. Set each existing character's `Uuid` to its integer `_id` as text (`'1'`, `'2'`, …) — no UUIDs are generated; only characters created from v5 on get real UUIDs
 
 #### v7: Frosthaven Support
 
@@ -317,15 +312,7 @@ Major schema overhaul for multi-edition class support.
 
 #### Infuser Perk Fix (v8)
 
-Historical correction for Infuser class perks 724-726 where a grouped perk was incorrectly set up:
-
-```dart
-// If perk 724 selected, automatically select 725
-if (perk724Selected) {
-  UPDATE CharacterPerks SET isSelected = 1
-  WHERE perkId = 725 AND characterUuid = ?
-}
-```
+The legacy (4.0.0) Infuser list defined perk 9 as a single check instead of two, so its last two legacy rows are shifted: legacy **724 is perk 10** and **725 is perk 11**, and perk 9's second check had no legacy row. The v8 step inserts `infuser_base_11a` from 725's selection, moves 724's selection to 725 (→ `infuser_base_10a`), and clears 724 (→ `infuser_base_09b`, unselected). Proven for all four 724/725 combinations by `test/migration/legacy_id_mapping_test.dart`.
 
 ---
 
@@ -420,24 +407,12 @@ The backup is a 3-element JSON array: `[tableNames, tableData, sharedPrefs]`.
 
 ## Migration Best Practices
 
-When adding new migrations:
+Migrations are tested end to end from every historical schema (v1 onward) by the harness in `test/migration/` and `test/backup/`. **Follow the checklist in [`database_migration_testing.md`](database_migration_testing.md#adding-a-migration)** — the tripwire test fails until the outgoing schema is frozen. Known data bugs the harness found are in [`known_data_bugs.md`](known_data_bugs.md).
 
-1. **Append only** - Never modify existing migrations
-2. **Increment version** - Update schema version in `database_helper.dart`
-3. **Add to map** - Add migration function to `_migrations` map
-4. **Handle nulls** - Account for existing data that may not have new columns
-5. **Test upgrade paths** - Verify migrations work from multiple prior versions
-6. **Update MetaData** - Call `updateMetaDataTable()` at end of migration
+In short:
 
-```dart
-// In database_migrations.dart
-static final Map<int, Future<void> Function(Transaction)> _migrations = {
-  // ... existing migrations
-  18: _migrateV17ToV18,
-};
-
-static Future<void> _migrateV17ToV18(Transaction txn) async {
-  // Your migration logic
-  await updateMetaDataTable(txn);
-}
-```
+1. **Append only** — never modify a step that has shipped (every push to `dev` ships to the internal track)
+2. **Bump** `_databaseVersion` in `database_helper.dart` and append a step to `_runMigrations` (key = the version upgraded *from*)
+3. **Match `_createTables`** for fresh installs, and add `??=` defaults in `DatabaseBackupService.restoreBackup` for older backups
+4. `_onUpgrade` stamps MetaData via `updateMetaDataTable()` after all steps — steps don't call it themselves
+5. Run `flutter test` and the on-device run before release

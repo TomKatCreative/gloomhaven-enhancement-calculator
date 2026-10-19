@@ -51,6 +51,8 @@ const bool kTownSheetEnabled = false;
 
 **Database versioning**: Production schema is v20 (v19: Personal Quests with 24 GH + 23 FH quests, Perks/Masteries/PersonalQuests definition tables dropped — loaded from repositories; v20: `ShowResources` and `IsJawsOfTheLion` columns on Characters). When `kTownSheetEnabled` is `true`, Campaigns/Parties tables and `PartyId` column on Characters are created on fresh installs (will need a numbered migration when the flag ships).
 
+**Migration safety**: every schema version back to v1 is upgrade-tested by `test/migration/` (frozen historical schemas + real backups in `test/fixtures/`). Any schema change MUST follow `docs/database_migration_testing.md#adding-a-migration`; `tripwire_test` fails until the outgoing schema is frozen. Known data bugs: `docs/known_data_bugs.md`.
+
 ## Key Domain Concepts
 
 ### Class Variants
@@ -161,6 +163,7 @@ Project docs live in `/docs`. Key reference files:
 - `docs/technical_debt.md` — current debt landscape, refactor history.
 - `docs/database_schema.md`, `docs/models_reference.md`, `docs/viewmodels_reference.md`, `docs/shared_prefs_keys.md` — code references.
 - `docs/enhancement_rules.md`, `docs/perk_format_reference.md`, `docs/game_text_parser.md` — domain rules.
+- `docs/database_migration_testing.md`, `docs/known_data_bugs.md`, `docs/data_integrity_roadmap.md` — migration/backup test harness, the data bugs it found, and the plan to fix them.
 - `docs/calculator_widgets.md`, `docs/dialogs.md`, `docs/screens.md`, `docs/theme_system.md` — feature/widget docs.
 - `docs/TODO.md` — task tracking.
 - `docs/releases.md` — release history.
