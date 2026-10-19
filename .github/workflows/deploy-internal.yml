@@ -42,6 +42,12 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      # Gate the deploy on the full suite, including the migration and backup
+      # harness (docs/database_migration_testing.md). Runs before any secrets
+      # are written to disk.
+      - name: Run tests
+        run: flutter test
+
       - name: Decode keystore
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
 
