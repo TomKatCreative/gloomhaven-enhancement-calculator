@@ -297,7 +297,12 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String restoreErrorMessage(String error) {
-    return 'Houve um erro durante o processo de restauração. Seus dados existentes foram salvos e seu backup não foi modificado. Entre em contato com o desenvolvedor (através do menu Configurações) com seu arquivo de backup existente e estas informações:\n\n$error';
+    return 'Houve um erro durante o processo de restauração. Seus dados existentes não foram alterados e seu arquivo de backup não foi modificado. Entre em contato com o desenvolvedor (através do menu Configurações) com seu arquivo de backup existente e estas informações:\n\n$error';
+  }
+
+  @override
+  String restoreAppliedErrorMessage(String error) {
+    return 'O backup foi restaurado, mas houve um erro ao carregá-lo. Reinicie o aplicativo. Se o problema continuar, entre em contato com o desenvolvedor (através do menu Configurações) com seu arquivo de backup e estas informações:\n\n$error';
   }
 
   @override

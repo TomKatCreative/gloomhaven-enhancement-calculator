@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -338,118 +341,217 @@ class SharedPrefs {
     };
   }
 
-  /// Imports SharedPreferences data from a backup map.
+  /// Validates and imports SharedPreferences data from a backup map.
   ///
-  /// Each category is optional — missing categories are skipped.
-  /// Enhancer levels are written directly to bypass cascade logic,
-  /// since backup data is already self-consistent.
-  void importFromBackup(Map<String, dynamic> data) {
-    // Settings
-    if (data['settings'] is Map) {
-      final s = Map<String, dynamic>.from(data['settings'] as Map);
-      if (s.containsKey('darkTheme')) darkTheme = s['darkTheme'] as bool;
-      if (s.containsKey('useDefaultFonts')) {
-        useDefaultFonts = s['useDefaultFonts'] as bool;
-      }
-      if (s.containsKey('primaryClassColor')) {
-        primaryClassColor = s['primaryClassColor'] as int;
-      }
-      if (s.containsKey('showRetiredCharacters')) {
-        showRetiredCharacters = s['showRetiredCharacters'] as bool;
-      }
-      if (s.containsKey('hideCustomClassesWarningMessage')) {
-        hideCustomClassesWarningMessage =
-            s['hideCustomClassesWarningMessage'] as bool;
-      }
-      if (s.containsKey('envelopeX')) envelopeX = s['envelopeX'] as bool;
-      if (s.containsKey('envelopeV')) envelopeV = s['envelopeV'] as bool;
-      if (s.containsKey('showAllCharacters')) {
-        showAllCharacters = s['showAllCharacters'] as bool;
+  /// Throws a [BackupException] before writing anything if a value is invalid.
+  void importFromBackup(Map<String, dynamic> data) =>
+      applyBackupPrefs(BackupPrefs.parse(data));
+
+  /// Writes settings already validated by [BackupPrefs.parse].
+  ///
+  /// Enhancer levels are written directly to bypass cascade logic, since
+  /// backup data is already self-consistent.
+  void applyBackupPrefs(BackupPrefs prefs) {
+    for (final MapEntry(:key, :value) in prefs.values.entries) {
+      switch (value) {
+        case bool():
+          _sharedPrefs.setBool(key, value);
+        case int():
+          _sharedPrefs.setInt(key, value);
+        case String():
+          _sharedPrefs.setString(key, value);
       }
     }
+    prefs.removals.forEach(remove);
 
-    // Town state (only when town sheet feature is enabled)
-    if (kTownSheetEnabled && data['town'] is Map) {
-      final t = Map<String, dynamic>.from(data['town'] as Map);
-      if (t.containsKey('activeCampaignId')) {
-        activeCampaignId = t['activeCampaignId'] as String?;
-      }
-      if (t.containsKey('activePartyId')) {
-        activePartyId = t['activePartyId'] as String?;
-      }
-    }
-
-    // Calculator
-    if (data['calculator'] is Map) {
-      final c = Map<String, dynamic>.from(data['calculator'] as Map);
-      if (c.containsKey('gameEdition')) {
-        final idx = c['gameEdition'] as int;
-        if (idx >= 0 && idx < GameEdition.values.length) {
-          gameEdition = GameEdition.values[idx];
+    // Class unlocks — reset all locked classes first, then apply backup
+    final unlocks = prefs.classUnlocks;
+    if (unlocks != null) {
+      for (final pc in PlayerClasses.playerClasses) {
+        if (pc.locked) {
+          setPlayerClassIsUnlocked(
+            pc.classCode,
+            unlocks[pc.classCode] ?? false,
+          );
         }
+      }
+    }
+  }
+}
+
+/// The SharedPreferences part of a backup, type-checked and ready to write.
+///
+/// [parse] does all the validation, so a restore can reject bad settings
+/// before it touches the database. [SharedPrefs.applyBackupPrefs] only writes.
+class BackupPrefs {
+  const BackupPrefs._(this.values, this.removals, this.classUnlocks);
+
+  /// Pref key → validated `bool`, `int` or `String` value to write.
+  final Map<String, Object> values;
+
+  /// Pref keys to remove.
+  final Set<String> removals;
+
+  /// Locked class code → unlocked; null when the backup has no unlocks.
+  /// Classes missing from the map are re-locked on apply.
+  final Map<String, bool>? classUnlocks;
+
+  // Highest selectable values in the calculator UI (card_level_body.dart,
+  // previous_enhancements_body.dart). Larger values would break its widgets.
+  static const _maxTargetCardLvl = 8;
+  static const _maxPreviousEnhancements = 3;
+
+  static const _settingsBools = [
+    'darkTheme',
+    'useDefaultFonts',
+    'showRetiredCharacters',
+    'hideCustomClassesWarningMessage',
+    'envelopeX',
+    'envelopeV',
+    'showAllCharacters',
+  ];
+
+  static const _calculatorBools = [
+    'disableMultiTargetsSwitch',
+    'multipleTargetsSelected',
+    'temporaryEnhancementMode',
+    'partyBoon',
+    'lostNonPersistent',
+    'persistent',
+    'hailsDiscount',
+  ];
+
+  static const _enhancerLevels = [
+    'enhancerLvl1',
+    'enhancerLvl2',
+    'enhancerLvl3',
+    'enhancerLvl4',
+  ];
+
+  /// Validates a backup's prefs map. Throws a [BackupException] if any value
+  /// has the wrong type.
+  ///
+  /// Each category is optional, and keys this version doesn't know are
+  /// ignored. Out-of-range calculator values (e.g. an edition from a newer
+  /// app) are skipped and keep their current value.
+  static BackupPrefs parse(Map<String, dynamic> data) {
+    final values = <String, Object>{};
+    final removals = <String>{};
+
+    final settings = _category(data, 'settings');
+    if (settings != null) {
+      for (final key in _settingsBools) {
+        _put<bool>(values, settings, 'settings', key);
+      }
+      _put<int>(values, settings, 'settings', 'primaryClassColor');
+    }
+
+    final town = kTownSheetEnabled ? _category(data, 'town') : null;
+    if (town != null) {
+      for (final key in ['activeCampaignId', 'activePartyId']) {
+        if (!town.containsKey(key)) continue;
+        final id = _typed<String?>(town, 'town', key);
+        id == null ? removals.add(key) : values[key] = id;
+      }
+    }
+
+    final calculator = _category(data, 'calculator');
+    if (calculator != null) {
+      final edition = _typed<int?>(calculator, 'calculator', 'gameEdition');
+      if (edition != null &&
+          edition >= 0 &&
+          edition < GameEdition.values.length) {
+        values['gameEdition'] = edition;
       }
       // Each format clears the other so the restored selection always wins:
       // the key takes precedence over the legacy index when both are present.
-      if (c.containsKey('enhancementKey')) {
-        enhancementKey = c['enhancementKey'] as String?;
-        remove('enhancementType');
-      } else if (c.containsKey('enhancementType')) {
-        enhancementTypeIndex = c['enhancementType'] as int;
-        enhancementKey = null;
+      if (calculator.containsKey('enhancementKey')) {
+        final key = _typed<String?>(calculator, 'calculator', 'enhancementKey');
+        key == null
+            ? removals.add('enhancementKey')
+            : values['enhancementKey'] = key;
+        removals.add('enhancementType');
+      } else if (calculator.containsKey('enhancementType')) {
+        values['enhancementType'] = _typed<int>(
+          calculator,
+          'calculator',
+          'enhancementType',
+        );
+        removals.add('enhancementKey');
       }
-      if (c.containsKey('enhancementsOnTargetAction')) {
-        previousEnhancements = c['enhancementsOnTargetAction'] as int;
-      }
-      if (c.containsKey('targetCardLvl')) {
-        targetCardLvl = c['targetCardLvl'] as int;
-      }
-      if (c.containsKey('disableMultiTargetsSwitch')) {
-        disableMultiTargetSwitch = c['disableMultiTargetsSwitch'] as bool;
-      }
-      if (c.containsKey('multipleTargetsSelected')) {
-        multipleTargetsSwitch = c['multipleTargetsSelected'] as bool;
-      }
-      if (c.containsKey('temporaryEnhancementMode')) {
-        temporaryEnhancementMode = c['temporaryEnhancementMode'] as bool;
-      }
-      if (c.containsKey('partyBoon')) partyBoon = c['partyBoon'] as bool;
-      if (c.containsKey('lostNonPersistent')) {
-        lostNonPersistent = c['lostNonPersistent'] as bool;
-      }
-      if (c.containsKey('persistent')) persistent = c['persistent'] as bool;
-      if (c.containsKey('hailsDiscount')) {
-        hailsDiscount = c['hailsDiscount'] as bool;
+      _putInRange(
+        values,
+        calculator,
+        'enhancementsOnTargetAction',
+        _maxPreviousEnhancements,
+      );
+      _putInRange(values, calculator, 'targetCardLvl', _maxTargetCardLvl);
+      for (final key in _calculatorBools) {
+        _put<bool>(values, calculator, 'calculator', key);
       }
     }
 
-    // Enhancer levels — bypass cascade logic with direct writes
-    if (data['enhancerLevels'] is Map) {
-      final e = Map<String, dynamic>.from(data['enhancerLevels'] as Map);
-      if (e.containsKey('enhancerLvl1')) {
-        _sharedPrefs.setBool('enhancerLvl1', e['enhancerLvl1'] as bool);
-      }
-      if (e.containsKey('enhancerLvl2')) {
-        _sharedPrefs.setBool('enhancerLvl2', e['enhancerLvl2'] as bool);
-      }
-      if (e.containsKey('enhancerLvl3')) {
-        _sharedPrefs.setBool('enhancerLvl3', e['enhancerLvl3'] as bool);
-      }
-      if (e.containsKey('enhancerLvl4')) {
-        _sharedPrefs.setBool('enhancerLvl4', e['enhancerLvl4'] as bool);
+    final enhancerLevels = _category(data, 'enhancerLevels');
+    if (enhancerLevels != null) {
+      for (final key in _enhancerLevels) {
+        _put<bool>(values, enhancerLevels, 'enhancerLevels', key);
       }
     }
 
-    // Class unlocks — reset all locked classes first, then apply backup
-    if (data['classUnlocks'] is Map) {
-      final u = Map<String, dynamic>.from(data['classUnlocks'] as Map);
-      for (final pc in PlayerClasses.playerClasses) {
-        if (pc.locked) {
-          setPlayerClassIsUnlocked(pc.classCode, false);
-        }
-      }
-      for (final entry in u.entries) {
-        setPlayerClassIsUnlocked(entry.key, entry.value as bool);
-      }
+    Map<String, bool>? classUnlocks;
+    final unlocks = _category(data, 'classUnlocks');
+    if (unlocks != null) {
+      // Only locked classes this version knows are written; any other key
+      // would become a stray pref.
+      classUnlocks = {
+        for (final pc in PlayerClasses.playerClasses)
+          if (pc.locked && unlocks.containsKey(pc.classCode))
+            pc.classCode: _typed<bool>(unlocks, 'classUnlocks', pc.classCode),
+      };
     }
+
+    return BackupPrefs._(values, removals, classUnlocks);
+  }
+
+  static Map<String, dynamic>? _category(
+    Map<String, dynamic> data,
+    String name,
+  ) {
+    final category = data[name];
+    if (category == null) return null;
+    if (category is! Map) {
+      throw BackupException('Invalid backup settings: "$name" is not a map');
+    }
+    return Map<String, dynamic>.from(category);
+  }
+
+  static T _typed<T>(Map<String, dynamic> map, String category, String key) {
+    final value = map[key];
+    if (value is! T) {
+      throw BackupException(
+        'Invalid backup setting $category.$key: ${jsonEncode(value)}',
+      );
+    }
+    return value;
+  }
+
+  static void _put<T extends Object>(
+    Map<String, Object> values,
+    Map<String, dynamic> map,
+    String category,
+    String key,
+  ) {
+    if (map.containsKey(key)) values[key] = _typed<T>(map, category, key);
+  }
+
+  static void _putInRange(
+    Map<String, Object> values,
+    Map<String, dynamic> calculator,
+    String key,
+    int max,
+  ) {
+    if (!calculator.containsKey(key)) return;
+    final value = _typed<int>(calculator, 'calculator', key);
+    if (value >= 0 && value <= max) values[key] = value;
   }
 }

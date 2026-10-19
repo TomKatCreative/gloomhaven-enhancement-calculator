@@ -35,7 +35,8 @@ class RestoreDialog {
   /// 3. Open file picker to select backup file
   /// 4. Show loading dialog while restoring
   /// 5. Restore the database and reload characters
-  /// 6. Show error dialog if restore fails
+  /// 6. Show error dialog if restore fails, saying whether the backup was
+  ///    applied
   static Future<void> show({required BuildContext context}) async {
     final confirmed = await _showConfirmationDialog(context);
     if (confirmed != true) return;
@@ -89,17 +90,21 @@ class RestoreDialog {
     final String contents = await file.readAsString();
 
     if (!context.mounted) return;
-    await _performRestore(context, contents);
+    await performRestore(context, contents);
   }
 
-  static Future<void> _performRestore(
+  /// Restores [contents] and refreshes the app, or shows the error dialog.
+  @visibleForTesting
+  static Future<void> performRestore(
     BuildContext context,
     String contents,
   ) async {
     showLoaderDialog(context);
 
+    var restored = false;
     try {
       await DatabaseHelper.instance.backupService.restoreBackup(contents);
+      restored = true;
       SharedPrefs().initialPage = kCharactersPageIndex;
       if (!context.mounted) return;
 
@@ -127,7 +132,14 @@ class RestoreDialog {
       context.read<CharactersModel>().jumpToPage(0);
     } catch (e) {
       if (!context.mounted) return;
-      await _showErrorDialog(context, e);
+      // Either the restore rolled back (the database still holds the user's
+      // data) or it committed and refreshing the app failed. Reload anyway so
+      // the UI never shows stale in-memory state.
+      try {
+        await context.read<CharactersModel>().loadCharacters();
+      } catch (_) {}
+      if (!context.mounted) return;
+      await _showErrorDialog(context, e, restored: restored);
     }
 
     if (!context.mounted) return;
@@ -139,8 +151,9 @@ class RestoreDialog {
 
   static Future<void> _showErrorDialog(
     BuildContext context,
-    Object error,
-  ) async {
+    Object error, {
+    required bool restored,
+  }) async {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
 
@@ -170,7 +183,11 @@ class RestoreDialog {
               maxWidth: ResponsiveLayout.dialogMaxWidth(context),
             ),
             child: SingleChildScrollView(
-              child: Text(l10n.restoreErrorMessage(error.toString())),
+              child: Text(
+                restored
+                    ? l10n.restoreAppliedErrorMessage(error.toString())
+                    : l10n.restoreErrorMessage(error.toString()),
+              ),
             ),
           ),
         );

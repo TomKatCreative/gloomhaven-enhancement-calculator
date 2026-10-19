@@ -297,7 +297,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String restoreErrorMessage(String error) {
-    return 'There was an error during the restoration process. Your existing data was saved and your backup hasn\'t been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n$error';
+    return 'There was an error during the restoration process. Your existing data was not changed and your backup file hasn\'t been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n$error';
+  }
+
+  @override
+  String restoreAppliedErrorMessage(String error) {
+    return 'The backup was restored, but there was an error loading it. Please restart the app. If the problem continues, contact the developer (through the Settings menu) with your backup file and this information:\n\n$error';
   }
 
   @override

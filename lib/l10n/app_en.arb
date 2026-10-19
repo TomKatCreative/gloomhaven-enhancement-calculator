@@ -103,8 +103,16 @@
   "backupError": "Failed to create backup. Please try again.",
   "restoreWarning": "Restoring a backup file will overwrite all current characters and app settings (theme, calculator state, class unlocks). Do you wish to continue?",
   "errorDuringRestore": "Error during restore operation",
-  "restoreErrorMessage": "There was an error during the restoration process. Your existing data was saved and your backup hasn't been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}",
+  "restoreErrorMessage": "There was an error during the restoration process. Your existing data was not changed and your backup file hasn't been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}",
   "@restoreErrorMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "restoreAppliedErrorMessage": "The backup was restored, but there was an error loading it. Please restart the app. If the problem continues, contact the developer (through the Settings menu) with your backup file and this information:\n\n{error}",
+  "@restoreAppliedErrorMessage": {
     "placeholders": {
       "error": {
         "type": "String"

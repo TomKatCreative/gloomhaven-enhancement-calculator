@@ -635,8 +635,14 @@ abstract class AppLocalizations {
   /// No description provided for @restoreErrorMessage.
   ///
   /// In en, this message translates to:
-  /// **'There was an error during the restoration process. Your existing data was saved and your backup hasn\'t been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}'**
+  /// **'There was an error during the restoration process. Your existing data was not changed and your backup file hasn\'t been modified. Please contact the developer (through the Settings menu) with your existing backup file and this information:\n\n{error}'**
   String restoreErrorMessage(String error);
+
+  /// No description provided for @restoreAppliedErrorMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup was restored, but there was an error loading it. Please restart the app. If the problem continues, contact the developer (through the Settings menu) with your backup file and this information:\n\n{error}'**
+  String restoreAppliedErrorMessage(String error);
 
   /// No description provided for @createAll.
   ///
