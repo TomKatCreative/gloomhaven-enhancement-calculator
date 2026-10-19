@@ -8,7 +8,6 @@ import '../migration/harness/dataset.dart';
 import '../migration/harness/ffi.dart';
 import '../migration/harness/harness.dart';
 import '../migration/harness/invariants.dart';
-import '../migration/harness/known_bugs.dart';
 import 'backup_harness.dart';
 
 /// Restores every committed real-world backup through the real
@@ -90,7 +89,7 @@ void main() {
         final before = await db.query('MetaData');
         await restore(fixture.read());
         expect(await db.query('MetaData'), before);
-      }, skip: knownBug('BUG-007'));
+      });
 
       test(
         'round-trips: restore → export → restore → export is stable',

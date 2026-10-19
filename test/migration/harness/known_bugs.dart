@@ -8,10 +8,7 @@ const Map<String, String> knownBugs = {
   'BUG-002':
       'v7 masteries are remapped to {class}_base_N IDs the app never shows',
   'BUG-003': 'An orphaned perk/mastery row aborts the v7→v8 upgrade',
-  'BUG-004': 'restoreBackup wipes all tables before validating the backup',
-  'BUG-005': 'Prefs import is not atomic and hard-casts values',
   'BUG-006': 'restoreBackup never validates perk/mastery IDs',
-  'BUG-007': "restoreBackup replaces MetaData with the backup's version",
   'RISK-003':
       'Late v6 dev builds created mastery tables that the v7 step re-creates',
 };

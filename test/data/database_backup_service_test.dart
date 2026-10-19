@@ -1,6 +1,7 @@
 import 'dart:convert' as convert;
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_backup_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -294,7 +295,7 @@ void main() {
 
       expect(
         () => service.restoreBackup(invalid),
-        throwsA(contains('No Meta Data Table')),
+        throwsA(_backupException(contains('No Meta Data Table'))),
       );
     });
 
@@ -307,7 +308,7 @@ void main() {
 
       expect(
         () => service.restoreBackup(invalid),
-        throwsA(contains('no longer supported')),
+        throwsA(_backupException(contains('no longer supported'))),
       );
     });
 
@@ -327,14 +328,17 @@ void main() {
 
       expect(
         () => service.restoreBackup(invalid),
-        throwsA(allOf(contains('3.0.0'), contains('no longer supported'))),
+        throwsA(
+          _backupException(
+            allOf(contains('3.0.0'), contains('no longer supported')),
+          ),
+        ),
       );
     });
 
     test('accepts DB version 8 (the minimum)', () async {
       // Seed a v8-shaped backup with no rows other than MetaData.
-      // The restoreBackup path skips tables not in the current schema,
-      // and MetaData is always preserved.
+      await seedMetaData(20, '4.6.0');
       final v8Backup = convert.jsonEncode([
         [DatabaseHelper.tableMetaData],
         [
@@ -352,8 +356,61 @@ void main() {
       // Should not throw.
       await service.restoreBackup(v8Backup);
 
+      // MetaData describes the running schema, so the backup's is not
+      // restored over it.
       final meta = await db.query(DatabaseHelper.tableMetaData);
-      expect(meta.first[DatabaseHelper.columnAppVersion], '4.2.0');
+      expect(meta.single[DatabaseHelper.columnAppVersion], '4.6.0');
+    });
+
+    test('throws when the DB version is not a number', () async {
+      final invalid = convert.jsonEncode([
+        [DatabaseHelper.tableMetaData],
+        [
+          [
+            {
+              DatabaseHelper.columnDatabaseVersion: '20',
+              DatabaseHelper.columnAppVersion: '4.6.0',
+            },
+          ],
+        ],
+      ]);
+
+      expect(
+        () => service.restoreBackup(invalid),
+        throwsA(_backupException(contains('no longer supported'))),
+      );
+    });
+
+    test('throws when the settings element is not a map', () async {
+      await seedMetaData(20, '4.6.0');
+      await seedCharacterRow(uuid: 'uuid-keep');
+      final backup = convert.jsonDecode(await service.generateBackup()) as List;
+      backup[2] = 'not a map';
+      // The database now differs from the backup, so a write would show.
+      await seedCharacterRow(uuid: 'uuid-new');
+
+      await expectLater(
+        service.restoreBackup(convert.jsonEncode(backup)),
+        throwsA(isA<BackupException>()),
+      );
+      final rows = await db.query(tableCharacters);
+      expect(
+        rows.map((r) => r[columnCharacterUuid]),
+        unorderedEquals(['uuid-keep', 'uuid-new']),
+      );
+    });
+
+    test('accepts a backup without a settings element (pre-4.5.0)', () async {
+      await seedMetaData(20, '4.6.0');
+      await seedCharacterRow(uuid: 'uuid-keep');
+      SharedPrefs().darkTheme = true;
+      final backup = convert.jsonDecode(await service.generateBackup()) as List;
+
+      SharedPrefs().darkTheme = false;
+      await service.restoreBackup(convert.jsonEncode(backup.sublist(0, 2)));
+
+      expect(await db.query(tableCharacters), hasLength(1));
+      expect(SharedPrefs().darkTheme, isFalse);
     });
   });
 
@@ -526,3 +583,6 @@ void main() {
     });
   });
 }
+
+Matcher _backupException(Matcher message) =>
+    isA<BackupException>().having((e) => e.message, 'message', message);

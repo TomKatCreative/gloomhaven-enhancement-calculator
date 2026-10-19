@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
@@ -211,6 +212,21 @@ void main() {
         expect(prefs.enhancementTypeIndex, 0);
       });
 
+      test('null enhancementKey clears the stored selection', () async {
+        await _initPrefs({
+          'enhancementKey': 'charPlusOne:Move',
+          'enhancementType': 5,
+        });
+        final prefs = SharedPrefs();
+
+        prefs.importFromBackup({
+          'calculator': {'enhancementKey': null},
+        });
+
+        expect(prefs.enhancementKey, isNull);
+        expect(prefs.enhancementTypeIndex, 0);
+      });
+
       test('round-trip preserves all values', () async {
         await _initPrefs({
           'darkTheme': true,
@@ -350,6 +366,84 @@ void main() {
 
         // Should still be the default
         expect(prefs.gameEdition, GameEdition.gloomhaven);
+      });
+
+      test('out-of-range calculator values keep the current value', () async {
+        await _initPrefs({'targetCardLvl': 4, 'enhancementsOnTargetAction': 2});
+        final prefs = SharedPrefs();
+
+        prefs.importFromBackup({
+          'calculator': {'targetCardLvl': 9, 'enhancementsOnTargetAction': 4},
+        });
+        expect(prefs.targetCardLvl, 4);
+        expect(prefs.previousEnhancements, 2);
+
+        prefs.importFromBackup({
+          'calculator': {'targetCardLvl': -1, 'enhancementsOnTargetAction': -1},
+        });
+        expect(prefs.targetCardLvl, 4);
+        expect(prefs.previousEnhancements, 2);
+      });
+
+      test(
+        'the highest card level and previous enhancements are accepted',
+        () async {
+          await _initPrefs();
+          final prefs = SharedPrefs();
+
+          prefs.importFromBackup({
+            'calculator': {'targetCardLvl': 8, 'enhancementsOnTargetAction': 3},
+          });
+
+          expect(prefs.targetCardLvl, 8);
+          expect(prefs.previousEnhancements, 3);
+        },
+      );
+
+      test('unknown classUnlocks keys are not written as prefs', () async {
+        await _initPrefs();
+
+        SharedPrefs().importFromBackup({
+          'classUnlocks': {
+            ClassCodes.sunkeeper: true,
+            'notAClass': true,
+            'darkTheme': true,
+          },
+        });
+
+        final raw = await SharedPreferences.getInstance();
+        expect(
+          SharedPrefs().getPlayerClassIsUnlocked(ClassCodes.sunkeeper),
+          isTrue,
+        );
+        expect(raw.get('notAClass'), isNull);
+        expect(raw.get('darkTheme'), isNull);
+      });
+
+      test('a wrong-typed value anywhere writes nothing', () async {
+        await _initPrefs({'darkTheme': false, 'enhancerLvl1': false});
+        final prefs = SharedPrefs();
+
+        expect(
+          () => prefs.importFromBackup({
+            'settings': {'darkTheme': true},
+            'enhancerLevels': {'enhancerLvl1': true},
+            'classUnlocks': {ClassCodes.sunkeeper: 'yes'},
+          }),
+          throwsA(isA<BackupException>()),
+        );
+
+        expect(prefs.darkTheme, isFalse);
+        expect(prefs.enhancerLvl1, isFalse);
+      });
+
+      test('a category that is not a map is rejected', () async {
+        await _initPrefs();
+
+        expect(
+          () => SharedPrefs().importFromBackup({'calculator': 'nope'}),
+          throwsA(isA<BackupException>()),
+        );
       });
 
       test('gameEdition negative index falls back to default', () async {

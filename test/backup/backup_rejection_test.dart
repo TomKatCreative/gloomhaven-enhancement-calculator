@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
@@ -84,7 +85,7 @@ void main() {
     group(label, () {
       test('is rejected', () async {
         await databaseWithData();
-        await expectLater(restore(contents), throwsA(anything));
+        await expectLater(restore(contents), throwsA(isA<BackupException>()));
       });
 
       test('leaves the existing characters untouched', () async {
@@ -92,24 +93,83 @@ void main() {
         final before = await dataDump(db);
         await expectLater(restore(contents), throwsA(anything));
         expect(await dataDump(db), before);
-      }, skip: knownBug('BUG-004'));
+      });
     });
   }
 
-  test('a row the schema rejects falls back to the previous data', () async {
+  group('an insert that fails mid-batch', () {
+    // Valid rows from other characters come first, so part of the batch has
+    // already been inserted when the bad row fails.
+    Future<String> backupWithBadLastRow() async {
+      final backup = jsonDecode(await generate()) as List;
+      final tables = backup[0] as List;
+      final characters = backup[1][tables.indexOf('Characters')] as List;
+      characters.add({
+        ...characters.single as Map,
+        '_id': 2,
+        'Uuid': 'other',
+        'Name': 'Other',
+      });
+      (backup[1][tables.indexOf('CharacterPerks')] as List).add({
+        'CharacterUuid': 'bad',
+        'PerkID': 'br_base_01a',
+        'IsSelected': 1,
+        'NoSuchColumn': 1,
+      });
+      SharedPrefs().primaryClassColor = 0xff123456;
+      backup[2] = {
+        'settings': {'primaryClassColor': 0xffabcdef},
+      };
+      return jsonEncode(backup);
+    }
+
+    test('rolls the database back to the previous data', () async {
+      final db = await databaseWithData();
+      final backup = await backupWithBadLastRow();
+      final before = await dataDump(db);
+      await expectLater(restore(backup), throwsA(isA<DatabaseException>()));
+      expect(await dataDump(db), before);
+    });
+
+    test('leaves the prefs untouched', () async {
+      await databaseWithData();
+      final backup = await backupWithBadLastRow();
+      await expectLater(restore(backup), throwsA(anything));
+      expect(SharedPrefs().primaryClassColor, 0xff123456);
+    });
+  });
+
+  test('backups whose tables are not lists of rows are rejected', () async {
     final db = await databaseWithData();
     final before = await dataDump(db);
     final backup = jsonDecode(await generate()) as List;
     final tables = backup[0] as List;
-    (backup[1][tables.indexOf('Characters')] as List).add({
-      'Uuid': 'bad',
-      'Name': 'Bad',
-      'ClassCode': 'br',
-      'NoSuchColumn': 1,
-    });
-    await expectLater(restore(jsonEncode(backup)), throwsA(anything));
+    backup[1][tables.indexOf('Characters')] = {'Name': 'Not a list'};
+    await expectLater(
+      restore(jsonEncode(backup)),
+      throwsA(isA<BackupException>()),
+    );
     expect(await dataDump(db), before);
   });
+
+  for (final MapEntry(key: column, value: value) in {
+    'ClassCode': 'zz',
+    'Variant': 'v99',
+  }.entries) {
+    test('a character with an unknown $column is rejected untouched', () async {
+      final db = await databaseWithData();
+      final before = await dataDump(db);
+      final backup = jsonDecode(await generate()) as List;
+      final tables = backup[0] as List;
+      final characters = backup[1][tables.indexOf('Characters')] as List;
+      (characters.single as Map)[column] = value;
+      await expectLater(
+        restore(jsonEncode(backup)),
+        throwsA(isA<BackupException>()),
+      );
+      expect(await dataDump(db), before);
+    });
+  }
 
   test('tables the current schema does not have are skipped', () async {
     final db = await databaseWithData();
@@ -140,11 +200,13 @@ void main() {
   );
 
   group('a backup whose prefs contain a wrong-typed value', () {
-    // The database part is the user's own current data, so only the prefs
-    // import can change anything. primaryClassColor is valid and applied
-    // before the bad showRetiredCharacters value is reached.
+    // The backup's characters differ from the database's, so a restore that
+    // touched the database before rejecting the prefs would be visible.
+    // primaryClassColor is valid and precedes the bad showRetiredCharacters.
     Future<String> backupWithBadPrefs() async {
       final backup = jsonDecode(await generate()) as List;
+      final tables = backup[0] as List;
+      (backup[1][tables.indexOf('Characters')] as List).clear();
       backup[2] = {
         'settings': {
           'primaryClassColor': 0xffabcdef,
@@ -157,14 +219,30 @@ void main() {
     test('is rejected', () async {
       await databaseWithData();
       SharedPrefs().primaryClassColor = 0xff123456;
-      await expectLater(restore(await backupWithBadPrefs()), throwsA(anything));
+      await expectLater(
+        restore(await backupWithBadPrefs()),
+        throwsA(isA<BackupException>()),
+      );
+    });
+
+    test('leaves the database untouched', () async {
+      final db = await databaseWithData();
+      final before = await dataDump(db);
+      await expectLater(
+        restore(await backupWithBadPrefs()),
+        throwsA(isA<BackupException>()),
+      );
+      expect(await dataDump(db), before);
     });
 
     test('leaves every pref as it was', () async {
       await databaseWithData();
       SharedPrefs().primaryClassColor = 0xff123456;
-      await expectLater(restore(await backupWithBadPrefs()), throwsA(anything));
+      await expectLater(
+        restore(await backupWithBadPrefs()),
+        throwsA(isA<BackupException>()),
+      );
       expect(SharedPrefs().primaryClassColor, 0xff123456);
-    }, skip: knownBug('BUG-005'));
+    });
   });
 }
