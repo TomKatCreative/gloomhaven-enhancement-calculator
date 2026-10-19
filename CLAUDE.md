@@ -13,6 +13,8 @@ Standard Flutter workflow — see `pubspec.yaml` for dependencies, `flutter test
 - **`master`** - Production-ready code only. Only merge in when preparing a production release.
 - **`dev`** - Main development branch. Pushes auto-deploy to Google Play's internal testing track via `.github/workflows/deploy-internal.yml`.
 
+**CI builds what you tested.** `pubspec.lock` is committed and CI runs `flutter pub get --enforce-lockfile`, then `flutter analyze` and `flutter test`, on the Flutter version pinned in the workflow (keep it equal to your local one). Debug builds and tests never run R8, so after a dependency or toolchain upgrade, check a `flutter build apk --release` on a device: plugins that call Kotlin through `package:jni` need the keep rules in `android/app/proguard-rules.pro`.
+
 ### Common Git Commands
 
 **IMPORTANT:** Git options (like `--stat`, `--oneline`) must come BEFORE file arguments, not after.
