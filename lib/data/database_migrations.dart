@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper.dart';
 import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/migrations/legacy_definition_rows.dart';
 import 'package:gloomhaven_enhancement_calc/data/migrations/masteries_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/data/migrations/perks_repository_legacy.dart';
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
@@ -9,12 +10,11 @@ import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
-import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
-import 'package:gloomhaven_enhancement_calc/models/mastery/legacy_mastery.dart'
+import 'package:gloomhaven_enhancement_calc/data/migrations/legacy_mastery.dart'
     as legacy;
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
-import 'package:gloomhaven_enhancement_calc/models/perk/legacy_perk.dart'
+import 'package:gloomhaven_enhancement_calc/data/migrations/legacy_perk.dart'
     as legacy;
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
@@ -66,7 +66,7 @@ class DatabaseMigrations {
             );
             await txn.insert(
               tablePerks,
-              perk.toMap('$index${indexToLetter(i)}'),
+              perk.toLegacyRow('$index${indexToLetter(i)}'),
             );
           }
         }
@@ -97,7 +97,7 @@ class DatabaseMigrations {
           mastery.classCode = classCode;
           await txn.insert(
             tableMasteries,
-            mastery.toMap('${list.masteries.indexOf(mastery)}'),
+            mastery.toLegacyRow('${list.masteries.indexOf(mastery)}'),
           );
         }
       }
@@ -418,7 +418,7 @@ class DatabaseMigrations {
           for (int i = 0; i < perk.quantity; i++) {
             String suffix = '$index${indexToLetter(i)}';
 
-            await txn.insert(tempTablePerks, perk.toMap(suffix));
+            await txn.insert(tempTablePerks, perk.toLegacyRow(suffix));
 
             // The legacy integer ID is taken from the frozen v7 layout, never
             // from this insert's rowid: the live map's class order has changed
@@ -548,7 +548,9 @@ class DatabaseMigrations {
           for (int i = 0; i < perk.quantity; i++) {
             await txn.insert(
               tempTablePerks,
-              perk.toMap('${list.perks.indexOf(perk)}${indexToLetter(i)}'),
+              perk.toLegacyRow(
+                '${list.perks.indexOf(perk)}${indexToLetter(i)}',
+              ),
             );
           }
         }
@@ -616,7 +618,7 @@ class DatabaseMigrations {
 
           int id = await txn.insert(
             tempTableMasteries,
-            mastery.toMap(list.masteries.indexOf(mastery).toString()),
+            mastery.toLegacyRow(list.masteries.indexOf(mastery).toString()),
           );
           CharacterMastery? matchingCharacterMastery;
 
@@ -675,7 +677,7 @@ class DatabaseMigrations {
         $columnPersonalQuestEdition ${DatabaseHelper.textType}
       )''');
     for (final quest in PersonalQuestsRepository.quests) {
-      await txn.insert(tablePersonalQuests, quest.toMap());
+      await txn.insert(tablePersonalQuests, quest.toLegacyRow());
     }
   }
 

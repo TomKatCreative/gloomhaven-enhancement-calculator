@@ -1,3 +1,7 @@
+// MIGRATION-ONLY. Do not modify or import outside `lib/data/migrations/`.
+// Frozen text fragments for `PerksRepositoryLegacy`, which the v7→v8 ID remap
+// reads. Live perk and mastery text uses `PerkTextConstants` instead.
+
 /// Constants used in perk descriptions and effect text
 class PerkAndMasteryConstants {
   // Action verbs

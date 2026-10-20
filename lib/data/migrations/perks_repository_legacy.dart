@@ -4,8 +4,8 @@
 // from older app versions.
 
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
-import 'package:gloomhaven_enhancement_calc/data/perk_and_mastery_constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/perk/legacy_perk.dart'
+import 'package:gloomhaven_enhancement_calc/data/migrations/perk_and_mastery_constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/migrations/legacy_perk.dart'
     as legacy;
 
 class PerksRepositoryLegacy {

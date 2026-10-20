@@ -47,24 +47,6 @@ void main() {
 
       expect(quest.displayName, '510: Seeker of Xorn');
     });
-
-    test('toMap produces correct map', () {
-      final quest = PersonalQuest(
-        id: 'pq_gh_510',
-        number: 510,
-        title: 'Seeker of Xorn',
-        edition: PersonalQuestEdition.gloomhaven,
-      );
-
-      final map = quest.toMap();
-      expect(map[columnPersonalQuestId], 'pq_gh_510');
-      expect(map[columnPersonalQuestNumber], 510);
-      expect(map[columnPersonalQuestTitle], 'Seeker of Xorn');
-      expect(
-        map[columnPersonalQuestEdition],
-        PersonalQuestEdition.gloomhaven.name,
-      );
-    });
   });
 
   group('PersonalQuestRequirement', () {

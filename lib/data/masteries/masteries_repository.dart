@@ -1,5 +1,5 @@
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
-import 'package:gloomhaven_enhancement_calc/data/perk_and_mastery_constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/perks/perk_text_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
@@ -67,7 +67,7 @@ class MasteriesRepository {
         Mastery(
           0,
           masteryDetails:
-              'Cause enemies to suffer a total of 12 or more ${PerkAndMasteryConstants.retaliate} damage during attacks targeting you in a single round',
+              'Cause enemies to suffer a total of 12 or more ${PerkTextConstants.retaliate} damage during attacks targeting you in a single round',
         ),
         Mastery(
           1,
@@ -124,7 +124,7 @@ class MasteriesRepository {
         Mastery(
           0,
           masteryDetails:
-              'In a single scenario, consume both ${PerkAndMasteryConstants.fire} and ${PerkAndMasteryConstants.ice} during the same turn 6 times',
+              'In a single scenario, consume both ${PerkTextConstants.fire} and ${PerkTextConstants.ice} during the same turn 6 times',
         ),
         Mastery(
           1,
@@ -417,7 +417,7 @@ class MasteriesRepository {
         Mastery(
           0,
           masteryDetails:
-              'On each of your turns, give an ally an ability card, target an ally with a HEAL ability, grant an ally ${PerkAndMasteryConstants.shield}, or place an ability card in an ally\'s active area',
+              'On each of your turns, give an ally an ability card, target an ally with a HEAL ability, grant an ally ${PerkTextConstants.shield}, or place an ability card in an ally\'s active area',
         ),
         Mastery(
           1,
@@ -709,7 +709,7 @@ class MasteriesRepository {
         Mastery(
           1,
           masteryDetails:
-              'Start a turn with WOUND, BRITTLE, BANE, POISON, ${PerkAndMasteryConstants.immobilize}, DISARM, STUN, and MUDDLE',
+              'Start a turn with WOUND, BRITTLE, BANE, POISON, ${PerkTextConstants.immobilize}, DISARM, STUN, and MUDDLE',
         ),
       ]),
     ],

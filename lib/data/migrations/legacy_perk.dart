@@ -1,3 +1,6 @@
+// MIGRATION-ONLY. Do not modify or import outside `lib/data/migrations/` and
+// `database_migrations.dart`. The integer-ID perk rows used before v8.
+
 const String tablePerks = 'PerksTable';
 const String columnPerkId = '_id';
 const String columnPerkClass = 'Class';

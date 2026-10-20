@@ -1,3 +1,6 @@
+// MIGRATION-ONLY. Do not modify or import outside `lib/data/migrations/` and
+// `database_migrations.dart`. The integer-ID mastery rows used before v8.
+
 const String tableMasteries = 'MasteriesTable';
 const String columnMasteryId = '_id';
 const String columnMasteryClass = 'Class';

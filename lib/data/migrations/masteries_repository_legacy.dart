@@ -4,7 +4,7 @@
 // from older app versions.
 
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
-import 'package:gloomhaven_enhancement_calc/models/mastery/legacy_mastery.dart'
+import 'package:gloomhaven_enhancement_calc/data/migrations/legacy_mastery.dart'
     as legacy;
 
 class MasteriesRepositoryLegacy {

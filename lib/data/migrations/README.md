@@ -14,10 +14,22 @@ Used in database migration code to map old perk IDs to new text-based IDs.
 Contains the legacy mastery definitions with the old integer-based ID system.
 Used during database upgrades to migrate mastery data.
 
+### `perk_and_mastery_constants.dart`
+Frozen text fragments used by `perks_repository_legacy.dart`. Live perk and
+mastery text uses `PerkTextConstants` instead.
+
+### `legacy_perk.dart` / `legacy_mastery.dart`
+The integer-ID row models for the pre-v8 definition tables.
+
+### `legacy_definition_rows.dart`
+Table/column names and `toLegacyRow` serializers for the text-ID Perks,
+Masteries and PersonalQuests definition tables that migrations v8–v18 build
+(all dropped in v19).
+
 ## Usage
 
-These files are imported only by `database_migrations.dart` and should not be
-used elsewhere in the application. The current/active perk and mastery data
+These files are imported only by `database_migrations.dart` (and by each other)
+and should not be used elsewhere in the application. The current/active perk and mastery data
 lives in the parent directories (`perks/` and `masteries/`).
 
 ## Warning

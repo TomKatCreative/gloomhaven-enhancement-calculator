@@ -36,16 +36,6 @@ enum PersonalQuestEdition {
   };
 }
 
-// Legacy database table/column constants.
-// The PersonalQuestsTable was dropped in v19 — definitions now come from
-// PersonalQuestsRepository. These constants are kept for historical migration
-// compatibility (database_migrations.dart v18).
-const String tablePersonalQuests = 'PersonalQuestsTable';
-const String columnPersonalQuestId = '_id';
-const String columnPersonalQuestNumber = 'Number';
-const String columnPersonalQuestTitle = 'Title';
-const String columnPersonalQuestEdition = 'Edition';
-
 /// A personal quest card with retirement requirements.
 ///
 /// Quests are identified by [id] (e.g., "pq_gh_510") and belong to a specific
@@ -80,13 +70,6 @@ class PersonalQuest {
     this.altNumber,
     this.displayNumberOverride,
   });
-
-  Map<String, dynamic> toMap() => {
-    columnPersonalQuestId: id,
-    columnPersonalQuestNumber: number,
-    columnPersonalQuestTitle: title,
-    columnPersonalQuestEdition: edition.name,
-  };
 
   /// Display string for the card number.
   ///
