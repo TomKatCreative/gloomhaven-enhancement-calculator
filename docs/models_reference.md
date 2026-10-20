@@ -242,12 +242,14 @@ Represents an enhancement option for the calculator.
 | `ghCost` | `int` | 0 | Gloomhaven cost |
 | `fhCost` | `int?` | null | Frosthaven/GH2E cost (fallback to ghCost) |
 | `assetKey` | `String?` | null | SVG asset identifier |
+| `excludedEditions` | `Set<GameEdition>` | `{}` | Editions the enhancement does not exist in (Disarm: all but GH; Ward: GH) |
 
 ### Getters
 
 | Getter | Type | Description |
 |--------|------|-------------|
 | `cost` | `int` | Edition-specific cost with fallback |
+| `isAvailableIn(GameEdition)` | `bool` | False if the edition is in `excludedEditions`. `EnhancementData.isAvailableInEdition` delegates here |
 | `key` | `String` | Stable persistence ID, `'<category>:<name>'` (e.g. `charPlusOne:Move`). Survives reordering of `EnhancementData.enhancements`; look it up with `EnhancementData.byKey(key)` (null if unknown) |
 
 ### EnhancementCategory Enum
@@ -298,7 +300,7 @@ All fields are `final`. Construct a new instance when inputs change.
 |--------|------|-------------|
 | `totalCost` | `int` | Final calculated total cost |
 | `showCost` | `bool` | Whether any input is set |
-| `breakdown` | `List<CalculationStep>` | Step-by-step cost breakdown |
+| `breakdown` | `List<CalculationStep>` | Step-by-step cost breakdown. Step values are running totals; the enhancement cost's clamp at 0 is not recorded, so read the total from `totalCost` |
 
 ### Methods
 
@@ -307,7 +309,13 @@ All fields are `final`. Construct a new instance when inputs change.
 | `enhancementCost(Enhancement?)` | `int` | Base cost with multipliers and discounts |
 | `cardLevelPenalty(int)` | `int` | Card level penalty with discounts |
 | `previousEnhancementsPenalty(int)` | `int` | Previous enhancements penalty |
-| `eligibleForMultipleTargets(Enhancement, {edition})` | `bool` | Static: multi-target eligibility |
+| `eligibleForMultipleTargets(Enhancement, {edition})` | `bool` | Static: multi-target eligibility, by `EnhancementCategory` (never hex; in GH2E/FH not target or elements) |
+
+The totals and the breakdown share one set of private step builders, so the two cannot drift. The public methods are thin wrappers over them.
+
+### Rule Constants
+
+`static const` fields hold every number in the cost rules: `multiTargetMultiplier` (2), `lostDivisor` (2), `persistentMultiplier` (3), `enhancerL2Discount` (10), `hailsDiscountAmount` (5), `costPerCardLevel` (25), `partyBoonDiscountPerLevel` (5), `enhancerL3DiscountPerLevel` (10), `costPerPreviousEnhancement` (75), `enhancerL4DiscountPerEnhancement` (25), `temporaryEnhancementDiscount` (20) and `temporaryEnhancementMultiplier` (0.8). `CardDetailsCard` uses the per-level and per-enhancement values for its before-discount figures.
 
 ---
 

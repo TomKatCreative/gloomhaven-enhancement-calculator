@@ -90,7 +90,7 @@ Each item is its own branch. Each removes a rule or list that is currently maint
 
 **Done:** All copies now use the three constants, including the bare Town `0`s and the calculator clamp in `AppModel`. The sweep also fixed `RestoreDialog`, which reset `initialPage` to a bare `0` and so would have opened Town after a restore once the flag is on. **Decision (2026-10-08): no `initialPage` migration.** It stays a raw index. When Town ships, existing users open one tab to the left once, and the next tab change saves the correct index. Turning the flag on also exposes 5 `restoreBackup` failures in `database_backup_service_test.dart` that were already there before this change and belong to the Town release.
 
-### CQ-8 ⬜ Enhancement cost rules: one source of truth
+### CQ-8 ✅ Enhancement cost rules: one source of truth
 
 **Files:** `lib/models/enhancement_cost_calculator.dart`, `lib/viewmodels/enhancement_calculator_model.dart:427-466`, `lib/data/enhancement_data.dart:323`
 
@@ -102,6 +102,8 @@ Each item is its own branch. Each removes a rule or list that is currently maint
 **Fix:** Make the step builders the only source (`totalCost => breakdown.last.value`, with the per-part getters as thin wrappers). Hoist the numbers to named `static const` values. Base multi-target eligibility on `EnhancementCategory` and reuse it in `enhancementSelected`. Add an `excludedEditions` field to `Enhancement`. Fix the stale doc and Regenerate comment, and cross-check against `docs/enhancement_rules.md`.
 
 **Enables:** CQ-24 (localized breakdown text).
+
+**Done:** Behaviour-preserving only: a temporary differential test compared the old and new calculator across about 3 million input combinations (every edition, enhancement, flag, card level 0–8 and 0–3 previous enhancements) for totals, per-part costs and every breakdown field, plus eligibility, availability and `enhancementSelected` side effects, with zero differences. One correction to the planned fix: `totalCost` is *not* `breakdown.last.value`. The enhancement cost is clamped at 0 before penalties without a breakdown step, so a discount step can show a negative value (FH Pull, lost + Enhancer L2 + Hail's shows −5g, total 0). Both instead run through a shared `_compute`. The `25`/`75` copies in `card_details_card.dart` now use the constants too. `(cost * 0.8).ceil()` was kept as is; it is exact for every total from 0 to 2000.
 
 ### CQ-9 ⬜ Shared enhancement icon widget
 
