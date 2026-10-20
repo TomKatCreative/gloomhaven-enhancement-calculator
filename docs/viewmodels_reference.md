@@ -313,6 +313,7 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `characters` | `List<Character>` | Filtered list (respects showRetired) |
 | `isEditMode` | `bool` | Current edit mode state (also a setter — see [Edit Mode](#edit-mode)) |
 | `retiredCharactersAreHidden` | `bool` | Inverse of showRetired |
+| `revision` | `int` | Bumped on every notification except a page swipe (`onPageChanged`) or an edit-mode toggle, i.e. whenever character data changes. See [Character Page Rebuilds](#character-page-rebuilds) |
 
 ### Section Expansion State (passthrough to SharedPrefs)
 
@@ -375,7 +376,15 @@ These are simple getter/setter pairs that read/write directly to SharedPrefs wit
 
 | Property | Description |
 |----------|-------------|
-| `isEditMode` | Getter/setter pair; the setter (`model.isEditMode = true`) updates the state and notifies listeners. There is no `setEditMode` method |
+| `isEditMode` | Getter/setter pair; the setter (`model.isEditMode = true`) updates the state and notifies listeners without bumping `revision`. There is no `setEditMode` method |
+
+### Character Page Rebuilds
+
+Character pages stay mounted across swipes, so widgets inside a page must not `watch<CharactersModel>()` (that rebuilt every visited page on each swipe). Instead:
+
+| API | Description |
+|-----|-------------|
+| `context.watchCharacterPage(character)` | `BuildContext` extension (`CharacterPageWatch`). Selects `(this page is in edit mode, revision)`, so it rebuilds on data changes and when this page enters or leaves edit mode, but not on a swipe or another page's edit-mode toggle. Returns whether this page is in edit mode — pass that down rather than reading `model.isEditMode`. Use `read<CharactersModel>()` for the model itself |
 
 ### Toggle Retired Visibility Logic
 

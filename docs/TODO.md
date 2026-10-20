@@ -158,13 +158,15 @@ Some files use relative imports, most use `package:` — pick one and stick with
 
 ### Character PageView swiping performance
 
-**Added:** 2026-02-09 · **Status:** Active jank fixed; deeper profiling deferred unless issue recurs.
+**Added:** 2026-02-09 · **Updated:** 2026-10-20 · **Status:** Swipe jank fixed; data-edit rebuilds and first-visit spike remain.
 
-Initial scroll jank and tint-persistence bugs are resolved (commits `42925b8`, `8cc8c66`). Remaining ideas, only if the issue resurfaces:
-1. Add `allowImplicitScrolling: true` to `PageView.builder` to preload adjacent pages
-2. Wrap `CharacterScreen` in `RepaintBoundary`
-3. Profile with Flutter DevTools Performance overlay
-4. Cache the rasterized class icon background image
+Initial scroll jank and tint-persistence bugs are resolved (commits `42925b8`, `8cc8c66`). On 2026-10-20, swipes stopped rebuilding the kept-alive pages. Before, each swipe rebuilt every visited page, which cost about 10–20 ms per page in profile mode on a Pixel 6. The fixes are `CharactersModel.revision` with `watchCharacterPage`, `CharacterPageTheme`, and explicit text-selection colors. `test/widgets/character_page_rebuild_test.dart` pins this.
+
+Remaining work:
+1. **Data edits still rebuild every visited page.** `revision` is shared by all characters, so tapping a perk or checkmark on one page rebuilds the page widgets on every visited page. In profile mode that cost about 55–130 ms per tap with 7 pages mounted. **Fix:** keep a revision per character, for example a `Map<String, int>` keyed by uuid that each mutation bumps for the character it changed, and have `watchCharacterPage` select only its own character's entry. Also check `ResourcesContent`, which selects edit mode directly. Extend the rebuild test so that editing one page leaves the other pages unbuilt.
+2. **The first visit to a page spikes for about 50–100 ms** while the page is built for the first time. Try `allowImplicitScrolling: true` on `PageView.builder`, which builds the neighboring page once a swipe settles rather than mid-drag.
+3. **`ThemeProvider._rebuildThemes` builds both the light and the dark theme** for each new class color, but only one is shown. That costs about 1–5 ms on the first visit to each color.
+4. Wrap `CharacterScreen` in `RepaintBoundary`, and cache the rasterized class-icon background. Raster time runs about 10–20 ms per frame during the swipe animation.
 
 ---
 

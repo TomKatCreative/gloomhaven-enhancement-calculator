@@ -556,7 +556,8 @@ Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. T
 
 ### Key Features
 
-- Uses `context.watch<CharactersModel>()` for reactive rebuilds
+- Uses `context.watchCharacterPage(character)` rather than `watch<CharactersModel>()`, so a swipe or another page's edit-mode toggle doesn't rebuild it (see `docs/viewmodels_reference.md#character-page-rebuilds`); tracks whether it is the current page with a model listener instead of a rebuild
+- `CharactersScreen` wraps each page in `CharacterPageTheme` (its own `Theme` from the character's color) and keys it by character UUID, and only rebuilds when the visible character list changes
 - Retired characters have disabled edit controls and strikethrough gold
 - Bottom padding (`fabBottomClearance`) keeps the last section clear of the FAB
 - `ValueKey` on form fields keyed to character UUID

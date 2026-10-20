@@ -119,6 +119,11 @@ The app's `ColorScheme` maps `secondaryContainer`/`onSecondaryContainer` to matc
 | `ChipThemeData` | `showCheckmark: false` | Hides checkmark on selected FilterChips |
 | `PopupMenuThemeData` | `labelTextStyle: bodySmall` | Consistent popup menu text size |
 | `SegmentedButtonThemeData` | None (M3 defaults) | Uses `secondaryContainer`/`onSecondaryContainer` from colorScheme |
+| `TextSelectionThemeData` | MaterialApp's defaults, set explicitly | A nested `Theme` without selection colors inherits the app's, and every `Text` depends on them, so per-page themes would otherwise rebuild all their text on every app color change |
+
+### Per-Character Page Theme
+
+The app-wide seed color follows the current character and changes on every swipe. `CharacterPageTheme` (`lib/ui/widgets/character/character_page_theme.dart`) gives each kept-alive character page its own `Theme` and `CupertinoTheme`, seeded with `Character.getEffectiveColor` and the cached `AppThemeBuilder`, so a swipe doesn't rebuild every `Theme.of` reader on every visited page, and the incoming page shows its own color while it slides in. It rebuilds on dark mode, font, and character data changes (e.g. retiring).
 
 ---
 
