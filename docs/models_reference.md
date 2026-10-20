@@ -109,7 +109,7 @@ Represents a player's character instance with stats, resources, and progression.
 | `checkMarkProgress` | `int` | Current progress toward next perk (0-2) |
 | `numOfSelectedPerks` | `int` | Count of selected perks |
 | `shouldShowTraits` | `bool` | Whether to display class traits |
-| `shouldShowMasteries` | `bool` | Whether masteries apply to this character |
+| `shouldShowMasteries` | `bool` | Whether the class/variant has masteries (derived from `MasteriesRepository`) |
 | `classSubtitle` | `String` | Full display name with variant suffix |
 | `personalQuest` | `PersonalQuest?` | Resolved from `PersonalQuestsRepository` by `personalQuestId` |
 
@@ -415,11 +415,11 @@ Defines a class mastery (Frosthaven feature).
 
 Masteries are only available for:
 - Frosthaven classes
-- Custom classes (community)
+- The Frosthaven Crossover and Gloomhaven 2e variants of Gloomhaven, Jaws of the Lion and Forgotten Circles classes (base variants have none)
 - Mercenary packs
-- Crimson Scales classes
+- Some custom (community) classes: Vimthreader, Incarnate, Core, Dome, Skitterclaw, Alchemancer
 
-The `Character.shouldShowMasteries` getter determines display.
+The `Character.shouldShowMasteries` getter determines display. It is derived from `MasteriesRepository.getMasteryIds(classCode, variant)`, so there is no separate list of classes to update.
 
 ---
 

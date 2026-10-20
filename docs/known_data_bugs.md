@@ -1,9 +1,9 @@
 # Known Data Bugs
 
-These are data-integrity problems found by the migration and backup harness (`docs/database_migration_testing.md`). Each one has at least one skipped test that fails when forced to run. The ID matches the `skip:` reason, from `test/migration/harness/known_bugs.dart`.
+These are data-integrity problems found by the migration and backup harness (`docs/database_migration_testing.md`). Each open one has at least one skipped test that fails when forced to run. The ID matches the `skip:` reason, from `test/migration/harness/known_bugs.dart`.
 
 ```bash
-flutter test --run-skipped test/migration test/backup   # all 7 skips fail
+flutter test --run-skipped test/migration test/backup   # no open bugs: nothing is skipped
 ```
 
 When fixing a bug, remove its `skip:` and leave the test in place as a regression check. The fix plan, grouped into three tasks, is in [`data_integrity_roadmap.md`](data_integrity_roadmap.md).
@@ -12,10 +12,10 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 |---|---|---|
 | [BUG-004](#bug-004) | **Critical**: silent loss of all characters | Fixed (DI-1) |
 | [BUG-003](#bug-003) | **High**: app can't open its database | Fixed (DI-2) |
-| [BUG-001](#bug-001) | Medium: mastery checkboxes hidden | Open |
-| [BUG-002](#bug-002) | Low: hidden mastery rows that can never be shown | Open (fix decided: delete) |
+| [BUG-001](#bug-001) | Medium: mastery checkboxes hidden | Fixed (DI-3) |
+| [BUG-002](#bug-002) | Low: hidden mastery rows that can never be shown | Fixed (DI-3) |
 | [BUG-005](#bug-005) | Medium: settings half-applied | Fixed (DI-1) |
-| [BUG-006](#bug-006) | Low: orphan rows from crafted/old backups | Open |
+| [BUG-006](#bug-006) | Low: orphan rows from crafted/old backups | Fixed (DI-3) |
 | [BUG-007](#bug-007) | Low: wrong MetaData after restore | Fixed (DI-1) |
 | [RISK-001](#risk-001) | Medium: data wiped on downgrade | Fixed (DI-2) |
 | [RISK-003](#risk-003) | Unknown: only if a late-v6 dev build shipped | Fixed (DI-2) |
@@ -59,7 +59,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Observed:** `Expected: {'drifter_base_0': false, 'drifter_base_1': false}`, `Actual: {}`. The UI hides both mastery checkboxes (`perk_row.dart` lookup).
 - **Tests:** `migration/upgrade_matrix_test.dart`, upgrade from v6: "maps masteries of pre-v7 characters", "satisfies every database invariant", "loads in the app with every mastery visible".
 - **Root cause:** The v7 step `includeClassMasteries` (`lib/data/database_migrations.dart:197`) creates an empty `CharacterMasteries` table. No step ever backfills rows for existing characters.
-- **Fix direction:** Add a reconciliation step, either post-migration or on load, that inserts missing perk and mastery rows (unselected).
+- **Fixed (DI-3):** The v21 step `DatabaseMigrations.reconcileCharacterRows` inserts every missing perk and mastery row unselected. Adding perks or masteries to a shipped class/variant needs the same step again; `id_snapshot_test` says so when it happens.
 
 ## BUG-002
 
@@ -73,7 +73,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Root cause:** `_handleVariantMasteries` (`lib/data/database_migrations.dart:596`) always writes `{class}_base_{index}`.
   - Its legacy-ID matching uses insertion rowids over the live map. It is correct only because every mastery list has exactly 2 entries; the legacy-ID golden test would catch a change.
   - The update at `:643` has no character filter.
-- **Fix (decided):** Delete these rows in the DI-3 reconciliation. A character's variant is fixed at creation, so they can never be shown. See [`data_integrity_roadmap.md`](data_integrity_roadmap.md#decision-bug-002).
+- **Fixed (DI-3):** The v21 reconciliation deletes these rows. A character's variant is fixed at creation, so they can never be shown. See [`data_integrity_roadmap.md`](data_integrity_roadmap.md#decision-bug-002).
 
 ## BUG-005
 
@@ -94,7 +94,7 @@ When fixing a bug, remove its `skip:` and leave the test in place as a regressio
 - **Observed:** A backup row with `PerkID: 'br_base_99z'` restores as an orphan (`noOrphanPerks` invariant).
 - **Test:** `backup/backup_rejection_test.dart` "perk/mastery IDs the app does not know are not restored as orphans".
 - **Root cause:** `lib/data/database_backup_service.dart:126` inserts rows verbatim.
-- **Fix direction:** The same reconciliation as BUG-001: drop unknown IDs and add missing ones.
+- **Fixed (DI-3):** `restoreBackup` runs `reconcileCharacterRows` inside its transaction after the inserts, so unknown IDs are dropped and missing rows added.
 
 ## BUG-007
 

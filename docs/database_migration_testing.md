@@ -83,7 +83,8 @@ Each frozen schema in `harness/frozen_schemas.dart` is the fresh-install DDL of 
 | v8–v17 | 4.2.0 – 4.4.0 | `c57b409`, `v4.2.2`, `v4.3.0`–`v4.4.0` (identical DDL) |
 | v18 | 4.5.0 | `v4.5.0` |
 | v19 | 4.5.1 – 4.5.3 | `v4.5.3` |
-| v20 (current) | 4.6.x | `test/fixtures/schema/fresh_current.json` |
+| v20 | 4.6.0 – 4.6.1 | `v4.6.1` |
+| v21 (current) | next release | `test/fixtures/schema/fresh_current.json` |
 
 Within a version, the schema sometimes changed across commits without a version bump (v6, v7, v8). Freeze from the **release**, not from the commit that bumped the version. For example, `b89f9d1`'s v8 MetaData lacks `LastUpdated`, while the shipped 4.2.0 has it.
 
@@ -96,7 +97,7 @@ Within a version, the schema sometimes changed across commits without a version 
 5. **Patch older backups.** Add a `??=` default in `DatabaseBackupService.restoreBackup` for every new column, and mirror it in `restorePatchDefaults` in `test/backup/backup_harness.dart`.
 6. **Update the expectations.** Add the new column's default to `expectedCharacterRow`.
 7. **Regenerate and review.** Run `flutter test --update-goldens test/migration`, then review the golden diff.
-8. **Never renumber perk or mastery IDs.** `id_snapshot_test` enforces this.
+8. **Never renumber perk or mastery IDs.** `id_snapshot_test` enforces this. Adding IDs to a class/variant that already shipped also needs a step that calls `DatabaseMigrations.reconcileCharacterRows`, or existing characters get no rows for them (BUG-001). The snapshot test's failure message lists such IDs.
 9. **Run everything.** Run `flutter test`, then the on-device run on iOS and API 24.
 10. **Update the docs:** `docs/database_schema.md` (Migration History) and the CLAUDE.md "Database versioning" line.
 

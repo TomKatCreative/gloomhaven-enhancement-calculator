@@ -131,7 +131,7 @@ Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFr
 
 ### CQ-12 ⬜ Derive mastery and legacy data instead of duplicating it
 
-- **`lib/models/character.dart:306-315`:** `shouldShowMasteries` hand-lists class codes, categories and variants that `MasteriesRepository.masteriesMap` already knows. Replace it with `masteriesMap[classCode]?.any((m) => m.variant == variant) ?? false`. The reviewer confirmed it gives the same answers on current data. Also delete the stale TODO at :292-294.
+- ~~**`shouldShowMasteries`**~~: moved to [DI-3](data_integrity_roadmap.md#di-3) step 5, because reconciliation depends on it.
 - **`lib/data/migrations/perks_repository_legacy.dart:7`:** the "frozen" legacy data depends on `PerkAndMasteryConstants`, which the live `masteries_repository.dart` still uses, so editing it for current masteries silently changes migration data. A near-duplicate, `PerkTextConstants`, also exists. Switch masteries to `PerkTextConstants`, then move `PerkAndMasteryConstants` into `lib/data/migrations/` as migration-only.
 - Move migration-only serializers (`Perk.toMap`, `Mastery.toMap`, `PersonalQuest.toMap` and the legacy table-column constants) out of the live models into `lib/data/migrations/`.
 

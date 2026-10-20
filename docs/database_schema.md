@@ -7,7 +7,7 @@ This document provides a comprehensive reference for the SQLite database schema,
 ## Overview
 
 - **Database Name**: `GloomhavenCompanion.db`
-- **Current Schema Version**: 20
+- **Current Schema Version**: 21
 - **ORM**: sqflite (direct SQL)
 - **Pattern**: Singleton DatabaseHelper
 
@@ -127,7 +127,9 @@ Join table linking characters to their mastery achievements.
 | `AssociatedMasteryId` | TEXT | NOT NULL | Mastery ID (format: `{classCode}_{variant}_{number}`, where `number` is 0-based from the mastery's explicit `number` field) |
 | `CharacterMasteryAchieved` | BOOL | NOT NULL | Achievement state |
 
-**Conditional creation**: Only created when `character.shouldShowMasteries == true`.
+**Conditional creation**: Only created when `character.shouldShowMasteries == true` (the class/variant has masteries in `MasteriesRepository`).
+
+**Reconciliation**: `DatabaseMigrations.reconcileCharacterRows` makes every character's `CharacterPerks`/`CharacterMasteries` rows exactly one per ID the app shows for its class and variant. It runs as the v21 step and at the end of every restore.
 
 ---
 
@@ -245,7 +247,7 @@ Accessed via `DatabaseHelper.instance.backupService`.
 | Method | Description |
 |--------|-------------|
 | `generateBackup()` | Export all tables + SharedPrefs as JSON string |
-| `restoreBackup(String)` | Validate the whole backup (throws `BackupException` with nothing changed), then replace all tables except MetaData in one transaction and apply prefs after it commits |
+| `restoreBackup(String)` | Validate the whole backup (throws `BackupException` with nothing changed), then replace all tables except MetaData and reconcile perk/mastery rows in one transaction, and apply prefs after it commits |
 
 ---
 
@@ -272,6 +274,7 @@ Accessed via `DatabaseHelper.instance.backupService`.
 | v18 | Personal Quests table (24 GH quests), PQ columns on Characters |
 | v19 | Drop all definition tables (Perks, Masteries, PersonalQuests) — loaded from repositories |
 | v20 | Add `ShowResources` (toggles Resources section, default shown) and `IsJawsOfTheLion` (persists JotL edition choice, default 0) flags to Characters |
+| v21 | No schema change. Reconcile perk/mastery rows with each character's class and variant: backfill pre-v7 masteries (BUG-001), delete hidden 4.0.x mastery rows (BUG-002) |
 
 ### Critical Migrations
 

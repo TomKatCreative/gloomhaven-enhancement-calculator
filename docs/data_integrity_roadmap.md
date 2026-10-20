@@ -8,7 +8,7 @@ This roadmap fixes the findings in [`known_data_bugs.md`](known_data_bugs.md). T
 |------|-------|--------|-------------|------|
 | [DI-1](#di-1) ✅ | Safe, atomic restore | BUG-004, BUG-005, BUG-007 | No | M |
 | [DI-2](#di-2) ✅ | Database open never strands or wipes data | BUG-003, RISK-003, RISK-001 | No | M |
-| [DI-3](#di-3) | Reconcile perk/mastery rows (v21) | BUG-001, BUG-002, BUG-006 | **v21** | M |
+| [DI-3](#di-3) ✅ | Reconcile perk/mastery rows (v21) | BUG-001, BUG-002, BUG-006 | **v21** | M |
 | — | Accepted, no task | DRIFT-001…004 | — | — |
 
 **Order:** DI-1 → DI-2 → DI-3.
@@ -86,7 +86,7 @@ All three are about what happens when the app opens the database, and all are fi
 - sqflite closes the database itself when `onDowngrade` throws, so no extra handling was needed.
 - `DatabaseOpenErrorView` replaces the raw error text on the Characters page. The support email builder moved from the settings screen to `sendSupportEmail` in `settings_helpers.dart` so both use it.
 
-## DI-3 ⬜ Reconcile perk/mastery rows (schema v21) {#di-3}
+## DI-3 ✅ Reconcile perk/mastery rows (schema v21) {#di-3}
 
 **Closes:**
 - BUG-001: pre-v7 characters have no mastery rows.
@@ -110,8 +110,19 @@ All three leave the same wrong state behind: a character's perk/mastery rows don
    - regenerate the goldens.
 3. **Run it inside the DI-1 restore transaction, after the inserts (BUG-006).** This also repairs old backups made from databases that had BUG-001/002 rows.
 4. Optionally, run it after `insertCharacter` in debug builds as an assertion. It is not needed in production.
+5. **Derive `Character.shouldShowMasteries` from the repository** (moved here from CQ-12).
+   - Replace the hand-written list of class codes, categories and variants with `MasteriesRepository.getMasteryIds(classCode, variant).isNotEmpty`. Delete the stale `TODO` above it.
+   - Reconciliation, `insertCharacter`, `_loadMasteries` and `invariants.dart` all gate on this getter. Deriving it means a class or variant with masteries can never be left out of the list, which would make reconciliation delete that class's rows.
+   - Audited 2026-10-19 over every class × variant: the derived getter matches the current one exactly. Pin it with a test that loops over `PlayerClasses.playerClasses` × `Variant.values`.
 
 **Un-skips:** the BUG-001/BUG-002 tests in `upgrade_matrix_test.dart` (v6 and v7 groups), the BUG-002 legacy-mapping test, and BUG-006 in `backup_rejection_test.dart`. `masteryBugFor` in `harness/dataset.dart` then always returns null and can be deleted.
+
+**Done (2026-10-19):**
+- A character whose class or variant has no perks in this app version is skipped, not stripped of its rows. Class codes are lowercased first, because v1–v4 stored them uppercase and nothing rewrote them.
+- Characters whose rows already match aren't rewritten.
+- Step 4 (a debug assertion after `insertCharacter`) was not done. `test/migration/reconcile_test.dart` covers the function directly.
+- The legacy-mapping BUG-002 test changed one line: a class whose hidden rows are deleted now has no rows at all, so it checks `?? const {}`.
+- **Addition:** `id_snapshot_test` now names IDs added to a shipped class/variant and says they need a migration step that calls `reconcileCharacterRows`. Without that step, BUG-001 would come back when a class gains perks or masteries.
 
 ### BUG-002: the hidden v7 mastery rows are deleted (decided 2026-10-19) {#decision-bug-002}
 
