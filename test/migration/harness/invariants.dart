@@ -157,10 +157,7 @@ Future<void> expectDbInvariants(
 /// Asserts what the user would see: every perk and mastery the UI renders for
 /// a loaded character has its selection row (mirrors `perk_row.dart`'s
 /// lookup, where a missing row silently hides the checkbox).
-void expectLoadedModelInvariants(
-  CharactersModel model, {
-  bool masteries = true,
-}) {
+void expectLoadedModelInvariants(CharactersModel model) {
   final problems = <String>[];
   for (final c in model.characters) {
     for (final perk in c.perks) {
@@ -169,7 +166,6 @@ void expectLoadedModelInvariants(
       );
       if (row == null) problems.add('${c.name}: perk ${perk.perkId} hidden');
     }
-    if (!masteries) continue;
     for (final mastery in c.masteries) {
       final row = c.characterMasteries.firstWhereOrNull(
         (cm) => cm.associatedMasteryId == mastery.id,

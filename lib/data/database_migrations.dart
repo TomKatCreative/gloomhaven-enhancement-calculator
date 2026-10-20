@@ -733,7 +733,7 @@ class DatabaseMigrations {
   }
 
   // ---------------------------------------------------------------------------
-  // Legacy data repairs (DI-2)
+  // Legacy data repairs
   //
   // Shipped migration steps are never edited. Data that a shipped step can't
   // handle is repaired here instead, just before that step runs, inside the
@@ -761,14 +761,7 @@ class DatabaseMigrations {
   /// - Inserts an unselected Infuser 725 row for any character that has a
   ///   724 row but no 725 row, which the v8 step's 724/725 fix requires.
   static Future<void> repairLegacyRows(Transaction txn) async {
-    for (final table in [tableCharacterPerks, tableCharacterMasteries]) {
-      await txn.delete(
-        table,
-        where:
-            '$columnAssociatedCharacterUuid NOT IN '
-            '(SELECT $columnCharacterUuid FROM $tableCharacters)',
-      );
-    }
+    await _deleteOrphanRows(txn);
     await txn.rawInsert('''
       INSERT INTO $tableCharacterPerks (
         $columnAssociatedCharacterUuid,
@@ -784,5 +777,120 @@ class DatabaseMigrations {
             AND q.$columnAssociatedPerkId = 725
         )
     ''');
+  }
+
+  /// Deletes perk and mastery rows whose character no longer exists.
+  static Future<void> _deleteOrphanRows(Transaction txn) async {
+    for (final table in [tableCharacterPerks, tableCharacterMasteries]) {
+      await txn.delete(
+        table,
+        where:
+            '$columnAssociatedCharacterUuid NOT IN '
+            '(SELECT $columnCharacterUuid FROM $tableCharacters)',
+      );
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Perk/mastery reconciliation
+  // ---------------------------------------------------------------------------
+
+  /// Makes every character's perk and mastery rows match what the app shows
+  /// for its class and variant: one row per ID from [PerksRepository.getPerkIds]
+  /// and [MasteriesRepository.getMasteryIds].
+  ///
+  /// - Inserts missing IDs unselected (BUG-001).
+  /// - Deletes rows with IDs the app doesn't show (BUG-002, BUG-006) and rows
+  ///   whose character no longer exists.
+  /// - Collapses duplicate rows, keeping "selected" if any was selected.
+  ///
+  /// A character whose class or variant has no perks in this version of the
+  /// app is left untouched rather than stripped of its rows. Characters whose
+  /// rows already match aren't written.
+  ///
+  /// Runs as the v20→v21 step and inside every backup restore. Unlike the v8
+  /// step, it reads the live repositories on purpose: the target is "matches
+  /// the running app", and perk/mastery IDs are append-only
+  /// (`id_snapshot_test`), so newer data can only add rows.
+  static Future<void> reconcileCharacterRows(Transaction txn) async {
+    await _deleteOrphanRows(txn);
+
+    final perkRows = (await txn.query(
+      tableCharacterPerks,
+    )).groupListsBy((r) => '${r[columnAssociatedCharacterUuid]}');
+    final masteryRows = (await txn.query(
+      tableCharacterMasteries,
+    )).groupListsBy((r) => '${r[columnAssociatedCharacterUuid]}');
+
+    final batch = txn.batch();
+    for (final character in await txn.query(
+      tableCharacters,
+      columns: [columnCharacterUuid, columnCharacterClassCode, columnVariant],
+    )) {
+      final uuid = '${character[columnCharacterUuid]}';
+      final classCode = '${character[columnCharacterClassCode]}'.toLowerCase();
+      final variant = Variant.values.firstWhereOrNull(
+        (v) => v.name == character[columnVariant],
+      );
+      if (variant == null) continue;
+      final perkIds = PerksRepository.getPerkIds(classCode, variant);
+      if (perkIds.isEmpty) continue;
+
+      _reconcileRows(
+        batch,
+        uuid: uuid,
+        rows: perkRows[uuid] ?? const [],
+        expectedIds: perkIds,
+        table: tableCharacterPerks,
+        idColumn: columnAssociatedPerkId,
+        selectedColumn: columnCharacterPerkIsSelected,
+      );
+      _reconcileRows(
+        batch,
+        uuid: uuid,
+        rows: masteryRows[uuid] ?? const [],
+        expectedIds: MasteriesRepository.getMasteryIds(classCode, variant),
+        table: tableCharacterMasteries,
+        idColumn: columnAssociatedMasteryId,
+        selectedColumn: columnCharacterMasteryAchieved,
+      );
+    }
+    await batch.commit(noResult: true);
+  }
+
+  /// Queues a rewrite of one character's rows in [table] when they differ
+  /// from exactly one row per ID in [expectedIds].
+  static void _reconcileRows(
+    Batch batch, {
+    required String uuid,
+    required List<Map<String, Object?>> rows,
+    required List<String> expectedIds,
+    required String table,
+    required String idColumn,
+    required String selectedColumn,
+  }) {
+    final selected = <String, bool>{};
+    for (final row in rows) {
+      final id = '${row[idColumn]}';
+      selected[id] = (selected[id] ?? false) || row[selectedColumn] == 1;
+    }
+    final matches =
+        rows.length == expectedIds.length &&
+        selected.length == expectedIds.length &&
+        expectedIds.every(selected.containsKey);
+    if (matches) return;
+
+    batch.delete(
+      table,
+      where: '$columnAssociatedCharacterUuid = ?',
+      whereArgs: [uuid],
+    );
+    for (final id in expectedIds) {
+      batch.insert(table, {
+        columnAssociatedCharacterUuid: uuid,
+        idColumn: id,
+        selectedColumn: (selected[id] ?? false) ? 1 : 0,
+      });
+    }
   }
 }

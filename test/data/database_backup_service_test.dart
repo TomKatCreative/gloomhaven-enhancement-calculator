@@ -4,9 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_backup_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper.dart';
+import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
+import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -227,29 +230,48 @@ void main() {
       expect(rows.first[columnCharacterGold], 50);
     });
 
-    test('perks and masteries survive round-trip', () async {
+    test('perk and mastery selections survive round-trip', () async {
       await seedMetaData(19, '4.5.3');
-      await seedCharacterRow(uuid: 'uuid-pm');
-      await db.insert(tableCharacterPerks, {
-        columnAssociatedCharacterUuid: 'uuid-pm',
-        columnAssociatedPerkId: 'br_base_01a',
-        columnCharacterPerkIsSelected: 1,
-      });
-      await db.insert(tableCharacterMasteries, {
-        columnAssociatedCharacterUuid: 'uuid-pm',
-        columnAssociatedMasteryId: 'br_base_1',
-        columnCharacterMasteryAchieved: 1,
-      });
+      await seedCharacterRow(uuid: 'uuid-pm', classCode: 'drifter');
+      final perkIds = PerksRepository.getPerkIds('drifter', Variant.base);
+      final masteryIds = MasteriesRepository.getMasteryIds(
+        'drifter',
+        Variant.base,
+      );
+      for (final id in perkIds) {
+        await db.insert(tableCharacterPerks, {
+          columnAssociatedCharacterUuid: 'uuid-pm',
+          columnAssociatedPerkId: id,
+          columnCharacterPerkIsSelected: id == perkIds.first ? 1 : 0,
+        });
+      }
+      for (final id in masteryIds) {
+        await db.insert(tableCharacterMasteries, {
+          columnAssociatedCharacterUuid: 'uuid-pm',
+          columnAssociatedMasteryId: id,
+          columnCharacterMasteryAchieved: id == masteryIds.last ? 1 : 0,
+        });
+      }
 
       final backup = await service.generateBackup();
       await service.restoreBackup(backup);
 
       final perks = await db.query(tableCharacterPerks);
       final masteries = await db.query(tableCharacterMasteries);
-      expect(perks, hasLength(1));
-      expect(perks.first[columnAssociatedPerkId], 'br_base_01a');
-      expect(masteries, hasLength(1));
-      expect(masteries.first[columnAssociatedMasteryId], 'br_base_1');
+      expect(
+        {
+          for (final r in perks)
+            r[columnAssociatedPerkId]: r[columnCharacterPerkIsSelected],
+        },
+        {for (final id in perkIds) id: id == perkIds.first ? 1 : 0},
+      );
+      expect(
+        {
+          for (final r in masteries)
+            r[columnAssociatedMasteryId]: r[columnCharacterMasteryAchieved],
+        },
+        {for (final id in masteryIds) id: id == masteryIds.last ? 1 : 0},
+      );
     });
 
     test(

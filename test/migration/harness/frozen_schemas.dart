@@ -312,6 +312,57 @@ CREATE TABLE CharacterMasteries (
   ],
 );
 
+/// v20 (app 4.6.0 – 4.6.1). ShowResources and IsJawsOfTheLion flags. The
+/// fresh install declares them without the DEFAULTs that migrated databases
+/// get (DRIFT, see `schema_parity_test.dart`).
+const _v20 = FrozenSchema(
+  id: 'v20',
+  versions: {20},
+  source: 'v4.6.1: test/fixtures/schema/fresh_current.json at 9be97a3',
+  statements: [
+    _metaData,
+    """
+CREATE TABLE Characters (
+  _id INTEGER PRIMARY KEY AUTOINCREMENT,
+  Uuid TEXT NOT NULL,
+  Name TEXT NOT NULL,
+  ClassCode TEXT NOT NULL,
+  PreviousRetirements INTEGER NOT NULL,
+  XP INTEGER NOT NULL,
+  Gold INTEGER NOT NULL,
+  Notes TEXT NOT NULL,
+  CheckMarks INTEGER NOT NULL,
+  IsRetired BOOL NOT NULL,
+  ShowResources BOOL NOT NULL,
+  IsJawsOfTheLion BOOL NOT NULL,
+  ResourceHide INTEGER NOT NULL,
+  ResourceMetal INTEGER NOT NULL,
+  ResourceWood INTEGER NOT NULL,
+  ResourceArrowVine INTEGER NOT NULL,
+  ResourceAxeNut INTEGER NOT NULL,
+  ResourceRockRoot INTEGER NOT NULL,
+  ResourceFlameFruit INTEGER NOT NULL,
+  ResourceCorpseCap INTEGER NOT NULL,
+  ResourceSnowThistle INTEGER NOT NULL,
+  Variant TEXT NOT NULL,
+  PersonalQuestId TEXT NOT NULL DEFAULT '',
+  PersonalQuestProgress TEXT NOT NULL DEFAULT '[]'
+)""",
+    '''
+CREATE TABLE CharacterPerks (
+  CharacterUuid TEXT NOT NULL,
+  PerkID TEXT NOT NULL,
+  IsSelected BOOL NOT NULL
+)''',
+    '''
+CREATE TABLE CharacterMasteries (
+  CharacterUuid TEXT NOT NULL,
+  MasteryID TEXT NOT NULL,
+  MasteryAchieved BOOL NOT NULL
+)''',
+  ],
+);
+
 const List<FrozenSchema> frozenSchemas = [
   _v01to04,
   _v05to06,
@@ -319,6 +370,7 @@ const List<FrozenSchema> frozenSchemas = [
   _v08to17,
   _v18,
   _v19,
+  _v20,
 ];
 
 /// Every schema version a user can upgrade from that has a frozen fixture.

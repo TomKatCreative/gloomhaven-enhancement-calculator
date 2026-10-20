@@ -9,6 +9,10 @@ import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 /// meaning the same perk forever. IDs are append-only: removing or
 /// renumbering one fails even under --update-goldens. Added IDs and text
 /// edits fail until the golden is regenerated and the diff reviewed.
+///
+/// IDs added to a class/variant that already shipped are missing from
+/// existing characters' rows, which hides their checkboxes (BUG-001). Those
+/// need a migration step that calls `DatabaseMigrations.reconcileCharacterRows`.
 void main() {
   test('perk IDs are append-only', () {
     _expectSnapshot('test/fixtures/ids/perk_ids.json', {
@@ -51,6 +55,7 @@ void _expectSnapshot(
   Map<String, Map<String, Map<String, String>>> live,
 ) {
   final file = File(path);
+  final addedToShipped = <String>[];
   if (file.existsSync()) {
     final golden = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     final removed = <String>[];
@@ -62,6 +67,17 @@ void _expectSnapshot(
             removed.add('$classCode/$variant/$id');
           }
         }
+      }
+    }
+    for (final MapEntry(key: classCode, value: variants) in live.entries) {
+      for (final MapEntry(key: variant, value: ids) in variants.entries) {
+        final shipped = golden[classCode]?[variant] as Map<String, dynamic>?;
+        if (shipped == null) continue;
+        addedToShipped.addAll(
+          ids.keys
+              .where((id) => !shipped.containsKey(id))
+              .map((id) => '$classCode/$variant/$id'),
+        );
       }
     }
     expect(
@@ -81,6 +97,10 @@ void _expectSnapshot(
   expect(
     live,
     jsonDecode(file.readAsStringSync()),
-    reason: 'IDs or texts changed; review and run --update-goldens',
+    reason:
+        'IDs or texts changed; review and run --update-goldens.'
+        '${addedToShipped.isEmpty ? '' : ' $addedToShipped were added to a '
+                  'shipped class/variant: add a migration step that calls '
+                  'DatabaseMigrations.reconcileCharacterRows.'}',
   );
 }

@@ -377,6 +377,11 @@ Future<void> _writeCharacter(
     row['PersonalQuestId'] = c.personalQuestId;
     row['PersonalQuestProgress'] = c.personalQuestProgress;
   }
+  if (version >= 20) {
+    // The v20 fresh install declares these without DEFAULTs.
+    row['ShowResources'] = 1;
+    row['IsJawsOfTheLion'] = 0;
+  }
   await txn.insert('Characters', row);
 
   if (version <= 7) {
@@ -506,21 +511,4 @@ Map<String, bool> expectedMasteries(FixtureCharacter c, int fromVersion) {
     for (int i = 0; i < liveIds.length; i++)
       liveIds[i]: hadProgress && c.masteriesAchieved[i],
   };
-}
-
-/// The known bug, if any, that leaves [c]'s mastery rows wrong after an
-/// upgrade from [fromVersion].
-String? masteryBugFor(FixtureCharacter c, int fromVersion) {
-  // Before v7 there was no CharacterMasteries table; the v7 step creates it
-  // empty, so characters the app shows masteries for get none.
-  if (fromVersion < 7 && _showsMasteries(c)) return 'BUG-001';
-  // 4.0.0 stored mastery progress for every class with legacy masteries; the
-  // v8 step rewrites it to {class}_base_N, which the app never shows for
-  // classes without base-variant masteries.
-  if (fromVersion == 7 &&
-      !_showsMasteries(c) &&
-      legacyMasteryIdsByClass().containsKey(c.classCode)) {
-    return 'BUG-002';
-  }
-  return null;
 }

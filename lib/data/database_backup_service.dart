@@ -3,6 +3,7 @@ import 'dart:convert' as convert;
 import 'package:gloomhaven_enhancement_calc/data/backup_exception.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/database_helper.dart';
+import 'package:gloomhaven_enhancement_calc/data/database_migrations.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
@@ -59,7 +60,8 @@ class DatabaseBackupService {
   /// rejected. The database is then replaced in a single transaction, so a
   /// failed insert rolls back to the user's data. Prefs are written only after
   /// the transaction commits. The MetaData table is left alone: it describes
-  /// the running schema, not the backup.
+  /// the running schema, not the backup. Perk/mastery rows are reconciled
+  /// with each character's class and variant before the commit.
   Future<void> restoreBackup(String backup) async {
     final parsed = _parseBackup(backup);
 
@@ -73,6 +75,8 @@ class DatabaseBackupService {
         }
       }
       await batch.commit(noResult: true);
+      // Old backups can carry missing, hidden or unknown perk/mastery rows.
+      await DatabaseMigrations.reconcileCharacterRows(txn);
     });
 
     if (parsed.prefs != null) SharedPrefs().applyBackupPrefs(parsed.prefs!);

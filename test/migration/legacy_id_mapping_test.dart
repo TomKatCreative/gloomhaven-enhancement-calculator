@@ -14,7 +14,6 @@ import 'harness/dataset.dart';
 import 'harness/frozen_schemas.dart';
 import 'harness/ffi.dart';
 import 'harness/harness.dart';
-import 'harness/known_bugs.dart';
 
 /// Proves where every legacy (v7, app 4.0.0) integer perk and mastery ID
 /// lands after a real upgrade, against a reviewed golden map.
@@ -105,7 +104,8 @@ void main() {
             if (entry['class'] == classCode && entry['migratedId'] != null)
               entry['migratedId'] as String: entry['position'] as int,
         };
-        if (expected.isEmpty) continue; // No live base masteries: BUG-002.
+        // Hidden after v8 and deleted by v21: see the next test.
+        if (expected.isEmpty) continue;
         expect(masteryTags[classCode], expected, reason: classCode);
       }
     });
@@ -121,9 +121,9 @@ void main() {
       };
       expect(affected, isNotEmpty);
       for (final classCode in affected) {
-        expect(masteryTags[classCode], isEmpty, reason: classCode);
+        expect(masteryTags[classCode] ?? const {}, isEmpty, reason: classCode);
       }
-    }, skip: knownBug('BUG-002'));
+    });
   });
 
   group('Infuser legacy-definition fix', () {

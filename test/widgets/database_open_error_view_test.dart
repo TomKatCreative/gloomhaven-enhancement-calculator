@@ -8,7 +8,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../helpers/test_helpers.dart';
 
 /// Tests for [DatabaseOpenErrorView], the Characters page shown when the
-/// database can't be opened (DI-2).
+/// database can't be opened.
 void main() {
   const shareChannel = MethodChannel('dev.fluttercommunity.plus/share');
   const urlChannel = MethodChannel('plugins.flutter.io/url_launcher');

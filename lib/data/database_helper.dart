@@ -24,7 +24,7 @@ class DatabaseHelper implements IDatabaseHelper {
   static const _databaseName = 'GloomhavenCompanion.db';
 
   // Increment this version when you need to change the schema.
-  static const _databaseVersion = 20;
+  static const _databaseVersion = 21;
 
   // Make this a singleton class.
   DatabaseHelper._privateConstructor();
@@ -301,6 +301,10 @@ class DatabaseHelper implements IDatabaseHelper {
         await DatabaseMigrations.addShowResourcesColumn(txn);
         await DatabaseMigrations.addJawsOfTheLionColumn(txn);
       },
+      // v21: Make every character's perk/mastery rows match its class and
+      // variant: backfills pre-v7 masteries (BUG-001) and deletes the hidden
+      // 4.0.x mastery rows (BUG-002). No schema change.
+      20: () => DatabaseMigrations.reconcileCharacterRows(txn),
     };
 
     // Legacy data repairs, run just before the step that would fail on that

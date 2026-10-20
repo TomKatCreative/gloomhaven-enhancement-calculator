@@ -14,7 +14,6 @@ import '../migration/harness/db_snapshot.dart';
 import '../migration/harness/ffi.dart';
 import '../migration/harness/harness.dart';
 import '../migration/harness/invariants.dart';
-import '../migration/harness/known_bugs.dart';
 import 'backup_harness.dart';
 
 /// Backups the app must refuse, and what refusing does to the user's data.
@@ -196,7 +195,6 @@ void main() {
       await restore(jsonEncode(backup));
       await expectDbInvariants(db);
     },
-    skip: knownBug('BUG-006'),
   );
 
   group('a backup whose prefs contain a wrong-typed value', () {

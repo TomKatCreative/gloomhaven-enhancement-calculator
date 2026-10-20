@@ -7,7 +7,6 @@ import '../../helpers/test_helpers.dart';
 import '../harness/dataset.dart';
 import '../harness/harness.dart';
 import '../harness/invariants.dart';
-import '../harness/known_bugs.dart';
 import '../../backup/backup_harness.dart';
 
 /// Upgrades a frozen database of every historical schema version through the
@@ -70,12 +69,6 @@ void defineUpgradeMatrixTests() {
           }
         });
 
-        // Characters whose mastery rows a known bug leaves wrong.
-        final masteryBugs = {
-          for (final c in characters) c: ?masteryBugFor(c, version),
-        };
-        final bugIds = masteryBugs.values.toSet();
-
         Future<Map<String, bool>> masteriesOf(FixtureCharacter c) async {
           final rows = await db.query(
             'CharacterMasteries',
@@ -89,9 +82,7 @@ void defineUpgradeMatrixTests() {
         }
 
         test('maps every mastery', () async {
-          for (final c in characters.where(
-            (c) => !masteryBugs.containsKey(c),
-          )) {
+          for (final c in characters) {
             expect(
               await masteriesOf(c),
               expectedMasteries(c, version),
@@ -100,59 +91,20 @@ void defineUpgradeMatrixTests() {
           }
         });
 
-        for (final bug in bugIds) {
-          test('maps masteries of ${bug == 'BUG-001' ? 'pre-v7' : 'v7'} '
-              'characters', () async {
-            for (final c in masteryBugs.keys.where(
-              (c) => masteryBugs[c] == bug,
-            )) {
-              expect(
-                await masteriesOf(c),
-                expectedMasteries(c, version),
-                reason: c.name,
-              );
-            }
-          }, skip: knownBug(bug));
-        }
-
-        final bugInvariants = {
-          if (bugIds.contains('BUG-001')) Invariant.masteryRowsComplete,
-          if (bugIds.contains('BUG-002')) Invariant.noOrphanMasteries,
-        };
-
-        test(
-          'satisfies every database invariant'
-          '${bugInvariants.isEmpty ? '' : ' not covered by a known bug'}',
-          () async {
-            await expectDbInvariants(db, excluding: bugInvariants);
-          },
-        );
-
-        if (bugInvariants.isNotEmpty) {
-          test('satisfies every database invariant', () async {
-            await expectDbInvariants(db);
-          }, skip: knownBug(bugIds.first));
-        }
+        test('satisfies every database invariant', () async {
+          await expectDbInvariants(db);
+        });
 
         Future<CharactersModel> loadModel() async {
           await setupSharedPreferences();
           return loadCharactersModel();
         }
 
-        final hidesMasteries = bugIds.contains('BUG-001');
-
-        test('loads in the app with every perk'
-            '${hidesMasteries ? '' : ' and mastery'} visible', () async {
+        test('loads in the app with every perk and mastery visible', () async {
           final model = await loadModel();
           expect(model.characters, hasLength(characters.length));
-          expectLoadedModelInvariants(model, masteries: !hidesMasteries);
+          expectLoadedModelInvariants(model);
         });
-
-        if (hidesMasteries) {
-          test('loads in the app with every mastery visible', () async {
-            expectLoadedModelInvariants(await loadModel());
-          }, skip: knownBug('BUG-001'));
-        }
       });
     }
   });
