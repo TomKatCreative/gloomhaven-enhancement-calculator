@@ -7,7 +7,7 @@ import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/models/resource_field.dart';
+import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/add_subtract_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/resource_card.dart';
@@ -160,7 +160,7 @@ class _StatsSectionState extends State<StatsSection> {
                     ),
                   ),
                   SizedBox(
-                    width: 40,
+                    width: xpLabelWidth,
                     child: Text(
                       '${Character.xpForNextLevel(Character.level(widget.character.xp))}',
                       textAlign: TextAlign.start,
@@ -461,21 +461,23 @@ class ResourcesContent extends StatelessWidget {
     required Color iconColor,
     required bool canEdit,
   }) {
-    return resourceFields.map((fieldData) {
+    final l10n = AppLocalizations.of(context);
+    return Resource.displayOrder.map((resource) {
+      final name = resource.label(l10n);
       return ResourceCard(
-        name: fieldData.name,
-        assetKey: fieldData.assetKey,
+        name: name,
+        assetKey: resource.assetKey,
         iconColor: iconColor,
-        count: fieldData.getter(character),
+        count: character.resources[resource]!,
         onTap: canEdit
             ? () => ResourceStepperSheet.show(
                 context: context,
-                name: fieldData.name,
-                assetKey: fieldData.assetKey,
+                name: name,
+                assetKey: resource.assetKey,
                 iconColor: iconColor,
-                initialCount: fieldData.getter(character),
+                initialCount: character.resources[resource]!,
                 onCountChanged: (newCount) {
-                  fieldData.setter(character, newCount);
+                  character.resources[resource] = newCount;
                   charactersModel.updateCharacter(character);
                 },
               )

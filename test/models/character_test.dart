@@ -6,6 +6,7 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/character_consta
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
+import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 
 import '../helpers/test_data.dart';
 
@@ -48,15 +49,8 @@ void main() {
     test('all Frosthaven resources default to 0', () {
       final character = TestData.createCharacter();
 
-      expect(character.resourceHide, equals(0));
-      expect(character.resourceMetal, equals(0));
-      expect(character.resourceLumber, equals(0));
-      expect(character.resourceArrowvine, equals(0));
-      expect(character.resourceAxenut, equals(0));
-      expect(character.resourceRockroot, equals(0));
-      expect(character.resourceFlamefruit, equals(0));
-      expect(character.resourceCorpsecap, equals(0));
-      expect(character.resourceSnowthistle, equals(0));
+      expect(character.resources.keys, unorderedEquals(Resource.values));
+      expect(character.resources.values, everyElement(0));
     });
 
     test('isRetired defaults to false', () {
@@ -292,8 +286,9 @@ void main() {
       );
       original.id = 5;
       original.notes = 'Round trip notes';
-      original.resourceHide = 3;
-      original.resourceMetal = 2;
+      for (final resource in Resource.values) {
+        original.resources[resource] = resource.index + 1;
+      }
 
       final map = original.toMap();
       final restored = Character.fromMap(map);
@@ -318,8 +313,7 @@ void main() {
         restored.playerClass.classCode,
         equals(original.playerClass.classCode),
       );
-      expect(restored.resourceHide, equals(original.resourceHide));
-      expect(restored.resourceMetal, equals(original.resourceMetal));
+      expect(restored.resources, equals(original.resources));
     });
   });
 

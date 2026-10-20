@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations_en.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculation_step_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
@@ -68,6 +70,8 @@ Future<void> _setupMultiTargetPrefs(
   });
   await SharedPrefs().init();
 }
+
+final en = AppLocalizationsEn();
 
 void main() {
   group('EnhancementCalculatorModel', () {
@@ -1357,7 +1361,7 @@ void main() {
         final steps = model.getCalculationBreakdown();
 
         expect(steps.length, 1);
-        expect(steps[0].description, contains('+1 Move'));
+        expect(steps[0].title(en), contains('+1 Move'));
         expect(steps[0].value, 30);
         expect(steps[0].formula, '30g');
       });
@@ -1373,7 +1377,7 @@ void main() {
         final steps = model.getCalculationBreakdown();
 
         expect(steps.length, 2);
-        expect(steps[1].description, 'Multiple targets');
+        expect(steps[1].title(en), 'Multiple targets');
         expect(steps[1].formula, '×2');
         expect(steps[1].value, 150);
       });
@@ -1395,7 +1399,7 @@ void main() {
         final steps = model.getCalculationBreakdown();
         final lostStep = steps.firstWhere((s) => s.formula == '÷2');
 
-        expect(lostStep.description, 'Lost action');
+        expect(lostStep.title(en), 'Lost action');
         expect(lostStep.value, 25);
       });
 
@@ -1414,7 +1418,7 @@ void main() {
         final steps = model.getCalculationBreakdown();
         final lostStep = steps.firstWhere((s) => s.formula == '÷2');
 
-        expect(lostStep.description, 'Lost action (non-persistent)');
+        expect(lostStep.title(en), 'Lost action (non-persistent)');
       });
 
       test('card level step shows formula', () async {
@@ -1426,8 +1430,8 @@ void main() {
         final steps = model.getCalculationBreakdown();
 
         expect(steps.length, 1);
-        expect(steps[0].description, 'Card level 3');
-        expect(steps[0].modifier, contains('Party Boon'));
+        expect(steps[0].title(en), 'Card level 3');
+        expect(steps[0].modifierText(en), contains('Party Boon'));
       });
 
       test('previous enhancements step with temp -20g', () async {
@@ -1438,7 +1442,7 @@ void main() {
 
         final steps = model.getCalculationBreakdown();
         final prevStep = steps.firstWhere(
-          (s) => s.description.contains('previous'),
+          (s) => s.title(en).contains('previous'),
         );
 
         expect(prevStep.formula, contains('− 20g'));
@@ -1456,10 +1460,10 @@ void main() {
 
         final steps = model.getCalculationBreakdown();
         final tempStep = steps.lastWhere(
-          (s) => s.description.contains('Temporary'),
+          (s) => s.title(en).contains('Temporary'),
         );
 
-        expect(tempStep.description, contains('×0.8'));
+        expect(tempStep.title(en), contains('×0.8'));
       });
     });
 

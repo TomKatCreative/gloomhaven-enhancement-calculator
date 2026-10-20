@@ -48,9 +48,15 @@ void showRetirementSnackBar(
       .then((_) => isRetirementSnackBarVisible = false);
 }
 
+/// How long the confetti cannon fires.
+const _confettiBurst = Duration(seconds: 1);
+
+/// How long the overlay stays up, so the last particles can fall.
+const _confettiLifetime = Duration(seconds: 6);
+
 void _showConfetti(BuildContext context) {
   final overlay = Overlay.of(context);
-  final controller = ConfettiController(duration: const Duration(seconds: 1));
+  final controller = ConfettiController(duration: _confettiBurst);
   late OverlayEntry entry;
   entry = OverlayEntry(
     builder: (_) => Align(
@@ -68,7 +74,7 @@ void _showConfetti(BuildContext context) {
   overlay.insert(entry);
   controller.play();
   // Remove overlay after particles settle
-  Future.delayed(const Duration(seconds: 6), () {
+  Future.delayed(_confettiLifetime, () {
     entry.remove();
     controller.dispose();
   });

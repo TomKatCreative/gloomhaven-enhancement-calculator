@@ -35,6 +35,7 @@ import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/personal_quest/personal_quest.dart';
+import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 
 import 'player_class.dart';
 
@@ -101,15 +102,11 @@ class Character {
   late int gold;
   late String notes;
   late int checkMarks;
-  late int resourceHide;
-  late int resourceMetal;
-  late int resourceLumber;
-  late int resourceArrowvine;
-  late int resourceAxenut;
-  late int resourceRockroot;
-  late int resourceFlamefruit;
-  late int resourceCorpsecap;
-  late int resourceSnowthistle;
+
+  /// Count of each Frosthaven resource. Every [Resource] has an entry.
+  final Map<Resource, int> resources = {
+    for (final resource in Resource.values) resource: 0,
+  };
   bool isRetired = false;
 
   /// Whether the Resources section is shown on this character's sheet.
@@ -122,9 +119,9 @@ class Character {
 
   /// Whether this character was created under the Jaws of the Lion edition.
   ///
-  /// JotL has no personal quests, prosperity, or resources. This persists the
-  /// edition choice so those sections stay hidden even when the chosen class
-  /// isn't a [ClassCategory.jawsOfTheLion] class (see [isJawsOfTheLion]).
+  /// JotL has no personal quests, prosperity, or resources. This persisted
+  /// game-mode flag is the only thing that makes a character JotL; the class
+  /// plays no part (see [isJawsOfTheLion]).
   bool jawsOfTheLionEdition = false;
   Variant variant = Variant.base;
   String personalQuestId = '';
@@ -144,15 +141,6 @@ class Character {
     this.gold = 0,
     this.notes = 'Items, reminders, wishlist...',
     this.checkMarks = 0,
-    this.resourceHide = 0,
-    this.resourceMetal = 0,
-    this.resourceLumber = 0,
-    this.resourceArrowvine = 0,
-    this.resourceAxenut = 0,
-    this.resourceRockroot = 0,
-    this.resourceFlamefruit = 0,
-    this.resourceCorpsecap = 0,
-    this.resourceSnowthistle = 0,
     this.isRetired = false,
     this.showResources = true,
     this.jawsOfTheLionEdition = false,
@@ -160,7 +148,10 @@ class Character {
     this.personalQuestId = '',
     this.personalQuestProgress = const [],
     this.partyId,
-  });
+    Map<Resource, int> resources = const {},
+  }) {
+    this.resources.addAll(resources);
+  }
 
   Character.fromMap(Map<String, dynamic> map) {
     id = map[columnCharacterId] as int?;
@@ -175,15 +166,9 @@ class Character {
     gold = map[columnCharacterGold] ?? 0;
     notes = map[columnCharacterNotes] ?? '';
     checkMarks = map[columnCharacterCheckMarks] ?? 0;
-    resourceHide = map[columnResourceHide] ?? 0;
-    resourceMetal = map[columnResourceMetal] ?? 0;
-    resourceLumber = map[columnResourceLumber] ?? 0;
-    resourceArrowvine = map[columnResourceArrowvine] ?? 0;
-    resourceAxenut = map[columnResourceAxenut] ?? 0;
-    resourceRockroot = map[columnResourceRockroot] ?? 0;
-    resourceFlamefruit = map[columnResourceFlamefruit] ?? 0;
-    resourceCorpsecap = map[columnResourceCorpsecap] ?? 0;
-    resourceSnowthistle = map[columnResourceSnowthistle] ?? 0;
+    for (final resource in Resource.values) {
+      resources[resource] = map[resource.column] ?? 0;
+    }
     isRetired = map[columnIsRetired] == 1;
     // Defaults to shown when the column is absent (pre-v20 reads).
     showResources = (map[columnShowResources] ?? 1) == 1;
@@ -209,15 +194,8 @@ class Character {
     columnCharacterGold: gold,
     columnCharacterNotes: notes,
     columnCharacterCheckMarks: checkMarks,
-    columnResourceHide: resourceHide,
-    columnResourceMetal: resourceMetal,
-    columnResourceLumber: resourceLumber,
-    columnResourceArrowvine: resourceArrowvine,
-    columnResourceAxenut: resourceAxenut,
-    columnResourceRockroot: resourceRockroot,
-    columnResourceFlamefruit: resourceFlamefruit,
-    columnResourceCorpsecap: resourceCorpsecap,
-    columnResourceSnowthistle: resourceSnowthistle,
+    for (final resource in Resource.values)
+      resource.column: resources[resource],
     columnIsRetired: isRetired ? 1 : 0,
     columnShowResources: showResources ? 1 : 0,
     columnIsJawsOfTheLion: jawsOfTheLionEdition ? 1 : 0,

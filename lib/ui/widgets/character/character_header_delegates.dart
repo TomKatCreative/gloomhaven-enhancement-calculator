@@ -286,7 +286,9 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
           child: Text(
             character.name,
             maxLines: 1,
-            style: theme.textTheme.displayMedium?.copyWith(fontSize: 31),
+            style: theme.textTheme.displayMedium?.copyWith(
+              fontSize: fontSizeCharacterName,
+            ),
             overflow: TextOverflow.fade,
             softWrap: false,
           ),
@@ -459,7 +461,7 @@ class _LevelBadge extends StatelessWidget {
       children: [
         ThemedSvg(assetKey: 'LEVEL', width: iconSizeXL + tinyPadding),
         Padding(
-          padding: EdgeInsets.only(top: 8),
+          padding: EdgeInsets.only(top: smallPadding),
           child: Text(
             '${Character.level(character.xp)}',
             style: theme.textTheme.bodyMedium?.copyWith(

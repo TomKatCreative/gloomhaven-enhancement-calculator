@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 
 class Update450Dialog extends StatefulWidget {
@@ -38,13 +39,13 @@ class _Update450DialogState extends State<Update450Dialog> {
             const Text(
               '• You can now assign Gloomhaven personal quests to new and existing characters. Currently only Gloomhaven, but Frosthaven, Gloomhaven 2nd Edition, and Crimson Scales coming soon!',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: mediumPadding),
             const Text(
               '• As of v4.4.0, the backup system includes all app data. Note that backups created before version 4.2.0 can no longer be restored.',
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: mediumPadding),
             const Text('• UI overhaul of the whole app.'),
-            const SizedBox(height: 12),
+            const SizedBox(height: mediumPadding),
             Text(
               showBuyMeACoffee
                   ? "• If you enjoy using this app, please consider supporting its development through the 'Buy Me a Coffee' link in the Settings screen, or by leaving a review! ✨"

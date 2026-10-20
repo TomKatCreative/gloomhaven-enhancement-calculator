@@ -183,7 +183,7 @@ class GameplaySettingsSection extends StatelessWidget {
       leading: const ThemedSvg(assetKey: 'ENHANCEMENTS'),
       title: Text(l10n.enhancementGuidelines),
       trailing: SizedBox(
-        width: 60, // Match Switch width for alignment
+        width: switchSlotWidth,
         child: Center(
           child: Icon(
             Icons.open_in_new,

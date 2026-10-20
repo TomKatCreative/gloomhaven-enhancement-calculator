@@ -25,6 +25,9 @@ const double fontSizeHeadlineLarge = 34.0;
 /// 30.0
 const double fontSizeHeadlineMedium = 30.0;
 
+/// 31.0 — Character name in the sheet header (displayMedium is too large)
+const double fontSizeCharacterName = 31.0;
+
 /// 26.0
 const double fontSizeHeadlineSmall = 26.0;
 
@@ -59,6 +62,9 @@ const double fontSizeLabelSmall = 14.0;
 
 /// 4.0 — Minimal spacing, tight layouts
 const double tinyPadding = 4.0;
+
+/// 6.0 — Icon-to-text gaps and compact chip padding
+const double compactPadding = 6.0;
 
 /// 8.0 — Standard tight spacing
 const double smallPadding = 8.0;
@@ -97,6 +103,9 @@ const double hairlineThickness = 0.5;
 /// 1.0 — Standard divider line
 const double dividerThickness = 1.0;
 
+/// 2.0 — Focused input borders
+const double focusedBorderThickness = 2.0;
+
 // Animation Duration - standard duration for all animations
 
 /// 250ms
@@ -104,6 +113,23 @@ const Duration animationDuration = Duration(milliseconds: 250);
 
 /// 300ms — App bar and header tint fading in as content scrolls under them
 const Duration tintAnimationDuration = Duration(milliseconds: 300);
+
+/// 300ms — Cost chip expanding into the breakdown sheet
+const Duration expandAnimationDuration = Duration(milliseconds: 300);
+
+/// 300ms — Paging between characters
+const Duration pageAnimationDuration = Duration(milliseconds: 300);
+
+// Shadows
+
+/// 4.0 — Light-mode display and headline text shadow
+const double textShadowBlurRadius = 4.0;
+
+/// 8.0 — Floating cost chip shadow
+const double chipShadowBlurRadius = 8.0;
+
+/// Drop offset shared by the text and chip shadows
+const Offset shadowOffset = Offset(0, 2);
 
 // Blur - backdrop blur sigma for expanded sections over the class icon
 
@@ -127,6 +153,27 @@ const double fabBottomClearance = 82.0;
 /// 50.0 — Scroll-spy position tolerance
 const double scrollSpyThresholdBuffer = 50.0;
 
+/// 160.0 — Settings scroll clearance above the bottom sheet
+const double settingsBottomClearance = 160.0;
+
+/// 60.0 — Slot matching a [Switch]'s width, to align trailing controls
+const double switchSlotWidth = 60.0;
+
+/// 52.0 — Vertical divider between the checkmarks and retirements counters
+const double statDividerHeight = 52.0;
+
+/// 40.0 — Next-level XP label on the stats row
+const double xpLabelWidth = 40.0;
+
+/// 55.0 — Personal quest progress text field
+const double progressFieldWidth = 55.0;
+
+/// 80.0 — Resource stepper count field
+const double stepperFieldWidth = 80.0;
+
+/// 35.0 — Gap above the custom-class dialog's checkbox row
+const double dialogCheckboxSpacing = 35.0;
+
 // Icon Sizes - use these for all icons (never hardcode or derive sizes)
 
 /// 14.0 — Decorative overlays (+1 badge)
@@ -137,6 +184,9 @@ const double iconSizeSmall = 20.0;
 
 /// 26.0 — Inline text icons (perks), section headers
 const double iconSizeMedium = 26.0;
+
+/// 28.0 — Expand/collapse chevrons
+const double iconSizeChevron = 28.0;
 
 /// 32.0 — Navigation, calculator, dialog buttons
 const double iconSizeLarge = 32.0;

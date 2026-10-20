@@ -40,7 +40,7 @@ class EnhancementTypeBody extends StatelessWidget {
         onSelected: model.enhancementSelected,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: mediumPadding),
         child: enhancement != null
             ? _buildSelectedEnhancement(context, enhancement)
             : Text(
@@ -61,7 +61,7 @@ class EnhancementTypeBody extends StatelessWidget {
     return Row(
       children: [
         EnhancementIcon(enhancement: enhancement, size: iconSizeLarge),
-        const SizedBox(width: 12),
+        const SizedBox(width: mediumPadding),
         Flexible(
           child: Text(
             enhancement.name,
@@ -70,7 +70,7 @@ class EnhancementTypeBody extends StatelessWidget {
           ),
         ),
         if (costConfig != null) ...[
-          const SizedBox(width: 12),
+          const SizedBox(width: mediumPadding),
           CostDisplay(config: costConfig!),
         ],
       ],

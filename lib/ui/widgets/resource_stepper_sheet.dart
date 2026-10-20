@@ -143,7 +143,7 @@ class _ResourceStepperSheetState extends State<ResourceStepperSheet> {
                       horizontal: mediumPadding,
                     ),
                     child: SizedBox(
-                      width: 80,
+                      width: stepperFieldWidth,
                       child: TextField(
                         controller: _controller,
                         textAlign: TextAlign.center,

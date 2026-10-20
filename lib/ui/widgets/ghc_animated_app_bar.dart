@@ -114,8 +114,10 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     CharactersModel charactersModel,
   ) async {
     final l10n = AppLocalizations.of(context);
-    final String message =
-        '${charactersModel.currentCharacter!.name} ${charactersModel.currentCharacter!.isRetired ? l10n.unretire.toLowerCase() : l10n.retire.toLowerCase()}d';
+    final name = charactersModel.currentCharacter!.name;
+    final String message = charactersModel.currentCharacter!.isRetired
+        ? l10n.characterUnretired(name)
+        : l10n.characterRetired(name);
     Character? character = charactersModel.currentCharacter;
     await charactersModel.retireCurrentCharacter();
     if (!context.mounted) return;
@@ -129,7 +131,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           action: charactersModel.showRetired
               ? null
               : SnackBarAction(
-                  label: 'Show',
+                  label: l10n.show,
                   textColor: ColorUtils.ensureContrast(
                     theme.colorScheme.primary,
                     theme.colorScheme.inverseSurface,
@@ -146,11 +148,12 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     BuildContext context,
     CharactersModel charactersModel,
   ) async {
+    final l10n = AppLocalizations.of(context);
     final bool? result = await ConfirmationDialog.show(
       context: context,
-      content: const Text('Are you sure? This cannot be undone'),
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      content: Text(l10n.deleteCharacterBody),
+      confirmLabel: l10n.delete,
+      cancelLabel: l10n.cancel,
     );
 
     if (result == true && context.mounted) {
@@ -159,7 +162,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
       if (!context.mounted) return;
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text('$characterName deleted')));
+        ..showSnackBar(
+          SnackBar(content: Text(l10n.itemDeleted(characterName))),
+        );
     }
   }
 
@@ -181,7 +186,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
       if (!context.mounted) return;
       ScaffoldMessenger.of(context)
         ..clearSnackBars()
-        ..showSnackBar(SnackBar(content: Text('$campaignName deleted')));
+        ..showSnackBar(SnackBar(content: Text(l10n.itemDeleted(campaignName))));
     }
   }
 
@@ -190,13 +195,13 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     required ThemeData theme,
     required ColorScheme colorScheme,
     required CharactersModel charactersModel,
-    required TownModel townModel,
+    required TownModel? townModel,
     required EnhancementCalculatorModel enhancementCalculatorModel,
   }) {
     Widget content;
     if (kTownSheetEnabled &&
         displayPage == kTownPageIndex &&
-        townModel.activeCampaign != null) {
+        townModel!.activeCampaign != null) {
       content = GestureDetector(
         onTap: () => CampaignSelector.show(
           context: context,
@@ -238,7 +243,9 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
       content = SegmentedButton<GameEdition>(
         style: const ButtonStyle(
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
+          padding: WidgetStatePropertyAll(
+            EdgeInsets.symmetric(horizontal: smallPadding),
+          ),
         ),
         showSelectedIcon: false,
         segments: [
@@ -275,7 +282,8 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
     final theme = Theme.of(context);
     final appModel = context.watch<AppModel>();
     final charactersModel = context.watch<CharactersModel>();
-    final townModel = context.watch<TownModel>();
+    // TownModel is lazy; only subscribe to it when the Town tab exists.
+    final townModel = kTownSheetEnabled ? context.watch<TownModel>() : null;
     final colorScheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     final isRetired = charactersModel.currentCharacter?.isRetired ?? false;
@@ -351,7 +359,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           actions: <Widget>[
             // Town page edit mode: delete campaign
             if (kTownSheetEnabled &&
-                townModel.isEditMode &&
+                townModel!.isEditMode &&
                 appModel.page == kTownPageIndex)
               Tooltip(
                 message: l10n.deleteCampaign,
@@ -364,7 +372,7 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
                 appModel.page == kCharactersPageIndex &&
                 charactersModel.characters.isNotEmpty)
               Tooltip(
-                message: 'New Character',
+                message: l10n.newCharacter,
                 child: IconButton(
                   icon: const Icon(Icons.person_add_rounded),
                   onPressed: () async {

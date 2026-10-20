@@ -1,3 +1,4 @@
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
@@ -14,21 +15,21 @@ enum EnhancementCategory {
   hex;
 
   /// Returns the section title for this category
-  String get sectionTitle {
+  String sectionTitle(AppLocalizations l10n) {
     switch (this) {
       case EnhancementCategory.charPlusOne:
       case EnhancementCategory.target:
-        return 'Character';
+        return l10n.sectionCharacter;
       case EnhancementCategory.summonPlusOne:
-        return 'Summon';
+        return l10n.sectionSummon;
       case EnhancementCategory.posEffect:
       case EnhancementCategory.negEffect:
       case EnhancementCategory.jump:
       case EnhancementCategory.specElem:
       case EnhancementCategory.anyElem:
-        return 'Effect';
+        return l10n.sectionEffect;
       case EnhancementCategory.hex:
-        return 'Existing hexes';
+        return l10n.sectionExistingHexes;
     }
   }
 

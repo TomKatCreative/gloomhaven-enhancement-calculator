@@ -86,7 +86,7 @@ class PerkRowState extends State<PerkRow> {
         : Theme.of(context).dividerTheme.color!;
 
     return Container(
-      margin: const EdgeInsets.only(right: 6, left: 1),
+      margin: const EdgeInsets.only(right: compactPadding, left: 1),
       decoration: BoxDecoration(
         color: allSelected
             ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)

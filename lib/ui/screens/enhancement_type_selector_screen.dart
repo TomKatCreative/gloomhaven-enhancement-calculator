@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
@@ -117,6 +118,7 @@ class _EnhancementTypeSelectorScreenState
   /// [SliverPersistentHeader] + [SliverList] pairs.
   List<(String title, String? assetKey, List<Enhancement> items)>
   get _sections {
+    final l10n = AppLocalizations.of(context);
     final enhancements = _filteredEnhancements;
     final sections = <(String, String?, List<Enhancement>)>[];
     String? currentTitle;
@@ -124,7 +126,7 @@ class _EnhancementTypeSelectorScreenState
     List<Enhancement> currentItems = [];
 
     for (final e in enhancements) {
-      final title = e.category.sectionTitle;
+      final title = e.category.sectionTitle(l10n);
       if (title != currentTitle) {
         if (currentTitle != null) {
           sections.add((currentTitle, currentAssetKey, currentItems));
@@ -221,7 +223,10 @@ class _EnhancementTypeSelectorScreenState
     return ListTile(
       selected: isSelected,
       selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: largePadding,
+        vertical: tinyPadding,
+      ),
       leading: EnhancementIcon(enhancement: enhancement, size: iconSizeMedium),
       title: Text(enhancement.name, style: theme.textTheme.bodyLarge),
       trailing: _buildCostDisplay(
@@ -254,7 +259,10 @@ class _EnhancementTypeSelectorScreenState
     final colorScheme = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(
+        horizontal: mediumPadding,
+        vertical: compactPadding,
+      ),
       child: hasDiscount
           ? Row(
               mainAxisSize: MainAxisSize.min,
@@ -265,7 +273,7 @@ class _EnhancementTypeSelectorScreenState
                     color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                   ),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: compactPadding),
                 Text(
                   '${discountedCost}g${showMarker ? ' \u2021' : ''}',
                   style: theme.textTheme.bodyMedium?.copyWith(

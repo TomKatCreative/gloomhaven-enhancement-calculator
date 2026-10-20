@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/calculation_step.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculation_step_text.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/enhancement_icon.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
@@ -61,7 +63,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: expandAnimationDuration,
       vsync: this,
     );
     _expandAnimation = CurvedAnimation(
@@ -276,9 +278,9 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                         // Soft shadow for depth
                         BoxShadow(
                           color: colorScheme.shadow.withValues(alpha: 0.2),
-                          blurRadius: 8,
+                          blurRadius: chipShadowBlurRadius,
                           spreadRadius: 1,
-                          offset: const Offset(0, 2),
+                          offset: shadowOffset,
                         ),
                       ],
                     ),
@@ -288,7 +290,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                       color: chipColor,
                       clipBehavior: Clip.antiAlias,
                       child: AnimatedSize(
-                        duration: const Duration(milliseconds: 300),
+                        duration: expandAnimationDuration,
                         curve: Curves.easeOutCubic,
                         child: ConstrainedBox(
                           constraints: isExpanding
@@ -321,7 +323,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
     return InkWell(
       onTap: _toggleExpanded,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: largePadding),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -338,10 +340,10 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                 fontWeight: FontWeight.w800,
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: tinyPadding),
             Icon(
               Icons.keyboard_arrow_up,
-              size: 28,
+              size: iconSizeChevron,
               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ],
@@ -374,10 +376,15 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
 
         // Footer with total cost and close button
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+          padding: const EdgeInsets.fromLTRB(
+            largePadding,
+            largePadding,
+            smallPadding,
+            largePadding,
+          ),
           child: SizedBox(
             width: double.infinity,
-            height: 48,
+            height: kMinInteractiveDimension,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -406,7 +413,7 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   child: IconButton(
                     icon: const Icon(Icons.keyboard_arrow_down),
                     onPressed: _collapse,
-                    tooltip: 'Close',
+                    tooltip: AppLocalizations.of(context).close,
                   ),
                 ),
               ],
@@ -419,19 +426,21 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
 
   Widget _buildStepRow(ThemeData theme, CalculationStep step) {
     final colorScheme = theme.colorScheme;
-    final hasSubtitle = step.modifier != null || step.formula != null;
+    final l10n = AppLocalizations.of(context);
+    final modifier = step.modifierText(l10n);
+    final hasSubtitle = modifier != null || step.formula != null;
 
     return ListTile(
       dense: true,
       contentPadding: EdgeInsets.zero,
-      title: Text(step.description, style: theme.textTheme.bodyMedium),
+      title: Text(step.title(l10n), style: theme.textTheme.bodyMedium),
       subtitle: hasSubtitle
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (step.modifier != null)
+                if (modifier != null)
                   Text(
-                    step.modifier!,
+                    modifier,
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: colorScheme.onSurface.withValues(alpha: 0.7),
                     ),

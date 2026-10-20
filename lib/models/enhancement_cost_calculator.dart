@@ -261,7 +261,8 @@ class EnhancementCostCalculator {
       final enhancementName = enh.isPlusOne ? '+1 ${enh.name}' : enh.name;
       steps.add(
         CalculationStep(
-          description: 'Base cost ($enhancementName)',
+          kind: CalculationStepKind.baseCost,
+          enhancementName: enhancementName,
           value: baseCost,
           formula: '${baseCost}g',
         ),
@@ -281,7 +282,7 @@ class EnhancementCostCalculator {
       runningTotal *= multiTargetMultiplier;
       steps?.add(
         CalculationStep(
-          description: 'Multiple targets',
+          kind: CalculationStepKind.multipleTargets,
           value: runningTotal,
           formula: '×$multiTargetMultiplier',
         ),
@@ -295,9 +296,9 @@ class EnhancementCostCalculator {
       // In GH2E, just say "Lost action" since there's no persistent concept
       steps?.add(
         CalculationStep(
-          description: edition.hasPersistentModifier
-              ? 'Lost action (non-persistent)'
-              : 'Lost action',
+          kind: edition.hasPersistentModifier
+              ? CalculationStepKind.lostNonPersistentAction
+              : CalculationStepKind.lostAction,
           value: runningTotal,
           formula: '÷$lostDivisor',
         ),
@@ -309,7 +310,7 @@ class EnhancementCostCalculator {
       runningTotal *= persistentMultiplier;
       steps?.add(
         CalculationStep(
-          description: 'Persistent action',
+          kind: CalculationStepKind.persistentAction,
           value: runningTotal,
           formula: '×$persistentMultiplier',
         ),
@@ -326,7 +327,7 @@ class EnhancementCostCalculator {
       runningTotal -= enhancerL2Discount;
       steps?.add(
         CalculationStep(
-          description: 'Enhancer Level 2',
+          kind: CalculationStepKind.enhancerLevel2,
           value: runningTotal,
           formula: '−${enhancerL2Discount}g',
         ),
@@ -338,7 +339,7 @@ class EnhancementCostCalculator {
       runningTotal -= hailsDiscountAmount;
       steps?.add(
         CalculationStep(
-          description: "Hail's Discount",
+          kind: CalculationStepKind.hailsDiscount,
           value: runningTotal,
           formula: '−${hailsDiscountAmount}g',
         ),
@@ -359,29 +360,36 @@ class EnhancementCostCalculator {
     }
 
     int discountPerLevel = 0;
-    String? modifier;
+    CalculationModifier? modifier;
 
     // Apply party boon discount (GH/GH2E)
     if (edition.supportsPartyBoon && partyBoon) {
       discountPerLevel = partyBoonDiscountPerLevel;
-      modifier = 'Party Boon: −${discountPerLevel}g/level';
+      modifier = CalculationModifier(
+        CalculationModifierKind.partyBoon,
+        discountPerLevel,
+      );
     }
     // Apply Enhancer L3 discount (FH)
     else if (edition.hasEnhancerLevels && enhancerLvl3) {
       discountPerLevel = enhancerL3DiscountPerLevel;
-      modifier = 'Enhancer L3: −${discountPerLevel}g/level';
+      modifier = CalculationModifier(
+        CalculationModifierKind.enhancerLevel3,
+        discountPerLevel,
+      );
     }
 
     runningTotal += (costPerCardLevel - discountPerLevel) * level;
 
     steps?.add(
       CalculationStep(
-        description: 'Card level ${level + 1}',
+        kind: CalculationStepKind.cardLevel,
+        count: level + 1,
         value: runningTotal,
         formula: discountPerLevel > 0
             ? '(${costPerCardLevel}g − ${discountPerLevel}g) × $level'
             : '${costPerCardLevel}g × $level',
-        modifier: modifier,
+        modifiers: [?modifier],
       ),
     );
 
@@ -399,12 +407,17 @@ class EnhancementCostCalculator {
     }
 
     int discountPerEnhancement = 0;
-    final modifiers = <String>[];
+    final modifiers = <CalculationModifier>[];
 
     // Apply Enhancer L4 discount (FH)
     if (edition.hasEnhancerLevels && enhancerLvl4) {
       discountPerEnhancement = enhancerL4DiscountPerEnhancement;
-      modifiers.add('Enhancer L4: −${discountPerEnhancement}g/enh.');
+      modifiers.add(
+        CalculationModifier(
+          CalculationModifierKind.enhancerLevel4,
+          discountPerEnhancement,
+        ),
+      );
     }
 
     int enhancementPenalty =
@@ -413,7 +426,12 @@ class EnhancementCostCalculator {
     // Apply temporary enhancement discount (-20g if at least 1 prev enhancement)
     if (temporaryEnhancementMode) {
       enhancementPenalty -= temporaryEnhancementDiscount;
-      modifiers.add('Temp. Enh.: −${temporaryEnhancementDiscount}g');
+      modifiers.add(
+        CalculationModifier(
+          CalculationModifierKind.temporaryEnhancement,
+          temporaryEnhancementDiscount,
+        ),
+      );
     }
 
     runningTotal += enhancementPenalty;
@@ -424,12 +442,13 @@ class EnhancementCostCalculator {
           : '';
       steps.add(
         CalculationStep(
-          description: '$count previous enhancement${count > 1 ? 's' : ''}',
+          kind: CalculationStepKind.previousEnhancements,
+          count: count,
           value: runningTotal,
           formula: discountPerEnhancement > 0
               ? '(${costPerPreviousEnhancement}g − ${discountPerEnhancement}g) × $count$tempSuffix'
               : '${costPerPreviousEnhancement}g × $count$tempSuffix',
-          modifier: modifiers.isNotEmpty ? modifiers.join('\n') : null,
+          modifiers: modifiers,
         ),
       );
     }
@@ -450,7 +469,7 @@ class EnhancementCostCalculator {
     runningTotal = (runningTotal * temporaryEnhancementMultiplier).ceil();
     steps?.add(
       CalculationStep(
-        description: 'Temporary Enhancement (×0.8↑)',
+        kind: CalculationStepKind.temporaryEnhancement,
         value: runningTotal,
         formula:
             '${preTempTotal}g × $temporaryEnhancementMultiplier = ${runningTotal}g',

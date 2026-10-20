@@ -37,12 +37,13 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    // Acronyms such as XP stay upper case; other labels read mid-sentence.
+    final label = widget.labelText == widget.labelText.toUpperCase()
+        ? widget.labelText
+        : widget.labelText.toLowerCase();
     return AlertDialog(
-      title: Center(
-        child: Text(
-          'Adjust ${widget.labelText == widget.labelText.toUpperCase() ? widget.labelText : widget.labelText.toLowerCase()}',
-        ),
-      ),
+      title: Center(child: Text(l10n.adjustValue(label))),
       content: Container(
         constraints: BoxConstraints(
           maxWidth: ResponsiveLayout.dialogMaxWidth(context),
@@ -51,7 +52,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Enter a value to add or subtract from your current ${widget.labelText == widget.labelText.toUpperCase() ? widget.labelText : widget.labelText.toLowerCase()}',
+              l10n.addSubtractPrompt(label),
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: largePadding),
@@ -108,7 +109,7 @@ class _AddSubtractDialogState extends State<AddSubtractDialog> {
             ),
             const SizedBox(height: smallPadding),
             Text(
-              'Current: ${widget.currentValue}',
+              l10n.currentValue(widget.currentValue),
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],

@@ -8,6 +8,7 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_con
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
+import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -193,15 +194,9 @@ class DatabaseBackupService {
     // Resource columns (v7) are defaulted for safety, though v8+ backups
     // already have them. PersonalQuest columns were added in v18.
     if (table == tableCharacters) {
-      row[columnResourceHide] ??= 0;
-      row[columnResourceMetal] ??= 0;
-      row[columnResourceLumber] ??= 0;
-      row[columnResourceArrowvine] ??= 0;
-      row[columnResourceAxenut] ??= 0;
-      row[columnResourceRockroot] ??= 0;
-      row[columnResourceFlamefruit] ??= 0;
-      row[columnResourceCorpsecap] ??= 0;
-      row[columnResourceSnowthistle] ??= 0;
+      for (final resource in Resource.values) {
+        row[resource.column] ??= 0;
+      }
       row[columnCharacterPersonalQuestId] ??= '';
       row[columnCharacterPersonalQuestProgress] ??= '[]';
       // ShowResources and IsJawsOfTheLion were both added in v20. Default

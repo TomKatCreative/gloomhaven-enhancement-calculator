@@ -80,7 +80,7 @@ class DiscountsGroupCard extends StatelessWidget {
           subtitle: AppLocalizations.of(context).frosthavenSpoilers,
           value: enhancementCalculatorModel.hasAnyEnhancerUpgrades,
           trailingWidget: SizedBox(
-            width: 60, // Match Switch width for alignment
+            width: switchSlotWidth,
             child: Center(
               child: Icon(
                 Icons.open_in_new,

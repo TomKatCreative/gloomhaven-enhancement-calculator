@@ -259,8 +259,8 @@ class DatabaseMigrations {
   /// v20: Adds the [columnIsJawsOfTheLion] flag to the Characters table.
   ///
   /// Persists the Jaws of the Lion edition choice from character creation.
-  /// Existing characters default to `0` (not created under JotL); JotL-class
-  /// characters are still recognised via their class category. The column is
+  /// Existing characters default to `0` (not created under JotL). Only this
+  /// flag makes a character JotL; its class does not. The column is
   /// NOT NULL, so a DEFAULT is required for the ALTER against existing rows.
   static Future<void> addJawsOfTheLionColumn(Transaction txn) async {
     await txn.rawInsert(

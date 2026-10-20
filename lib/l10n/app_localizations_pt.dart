@@ -605,4 +605,160 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorDetails => 'Detalhes do erro';
+
+  @override
+  String get deleteCharacterBody => 'Tem certeza? Isso não pode ser desfeito';
+
+  @override
+  String itemDeleted(String name) {
+    return '$name: exclusão concluída';
+  }
+
+  @override
+  String characterRetired(String name) {
+    return '$name: aposentadoria registrada';
+  }
+
+  @override
+  String characterUnretired(String name) {
+    return '$name: aposentadoria desfeita';
+  }
+
+  @override
+  String get show => 'Mostrar';
+
+  @override
+  String get newCharacter => 'Novo personagem';
+
+  @override
+  String get customClasses => 'Classes personalizadas';
+
+  @override
+  String get customClassesWarningBody =>
+      'Observe que essas classes são criadas por membros da \'Gloomhaven Custom Content Unity Guild\' e estão sujeitas a alterações. Use por sua conta e risco e relate quaisquer inconsistências ao desenvolvedor. Mais informações podem ser encontradas no ';
+
+  @override
+  String get discordServer => 'servidor do Discord';
+
+  @override
+  String get dontShowAgain => 'Não mostrar novamente';
+
+  @override
+  String get none => 'Nenhum';
+
+  @override
+  String get gloomhaven2e => 'Gloomhaven 2ª Edição';
+
+  @override
+  String get resourceHide => 'Couro';
+
+  @override
+  String get resourceMetal => 'Metal';
+
+  @override
+  String get resourceLumber => 'Madeira';
+
+  @override
+  String get resourceArrowvine => 'Arrowvine';
+
+  @override
+  String get resourceAxenut => 'Axenut';
+
+  @override
+  String get resourceRockroot => 'Rockroot';
+
+  @override
+  String get resourceFlamefruit => 'Flamefruit';
+
+  @override
+  String get resourceCorpsecap => 'Corpsecap';
+
+  @override
+  String get resourceSnowthistle => 'Snowthistle';
+
+  @override
+  String stepBaseCost(String enhancement) {
+    return 'Custo base ($enhancement)';
+  }
+
+  @override
+  String get stepLostAction => 'Ação perdida';
+
+  @override
+  String get stepLostNonPersistentAction => 'Ação perdida (não persistente)';
+
+  @override
+  String get stepPersistentAction => 'Ação persistente';
+
+  @override
+  String get stepEnhancerLevel2 => 'Aprimorador nível 2';
+
+  @override
+  String stepCardLevel(int level) {
+    return 'Nível da carta $level';
+  }
+
+  @override
+  String stepPreviousEnhancements(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count melhorias anteriores',
+      one: '1 melhoria anterior',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get stepTemporaryEnhancement => 'Melhoria temporária (×0.8↑)';
+
+  @override
+  String modifierPartyBoon(int amount) {
+    return 'Bênção do grupo: −${amount}g/nível';
+  }
+
+  @override
+  String modifierEnhancerLevel3(int amount) {
+    return 'Aprimorador N3: −${amount}g/nível';
+  }
+
+  @override
+  String modifierEnhancerLevel4(int amount) {
+    return 'Aprimorador N4: −${amount}g/melh.';
+  }
+
+  @override
+  String modifierTemporaryEnhancement(int amount) {
+    return 'Melh. temp.: −${amount}g';
+  }
+
+  @override
+  String get sectionCharacter => 'Personagem';
+
+  @override
+  String get sectionSummon => 'Invocação';
+
+  @override
+  String get sectionEffect => 'Efeito';
+
+  @override
+  String get sectionExistingHexes => 'Hexágonos existentes';
+
+  @override
+  String get stepHailsDiscount => 'Desconto de Hail';
+
+  @override
+  String adjustValue(String label) {
+    return 'Ajustar $label';
+  }
+
+  @override
+  String addSubtractPrompt(String label) {
+    return 'Insira um valor para somar ou subtrair do seu $label atual';
+  }
+
+  @override
+  String currentValue(int value) {
+    return 'Atual: $value';
+  }
 }

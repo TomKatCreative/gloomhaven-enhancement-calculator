@@ -70,7 +70,7 @@ class EditionToggle extends StatelessWidget {
               ButtonSegment(
                 value: GameEdition.gloomhaven2e,
                 label: Text(GameEdition.gloomhaven2e.shortLabel),
-                tooltip: 'Gloomhaven 2nd Edition',
+                tooltip: l10n.gloomhaven2e,
               ),
               ButtonSegment(
                 value: GameEdition.frosthaven,

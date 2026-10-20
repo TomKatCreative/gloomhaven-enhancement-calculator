@@ -33,7 +33,7 @@ class _ChangelogScreenState extends State<ChangelogScreen> {
         ),
         body: ListView(
           controller: _scrollController,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(largePadding),
           children: [
             const _VersionSection(
               version: '4.6.1',
@@ -188,7 +188,7 @@ class _VersionSection extends StatelessWidget {
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: smallPadding),
             Text(
               date,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -197,10 +197,13 @@ class _VersionSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: smallPadding),
         ...changes.map(
           (change) => Padding(
-            padding: const EdgeInsets.only(left: 8, bottom: 4),
+            padding: const EdgeInsets.only(
+              left: smallPadding,
+              bottom: tinyPadding,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

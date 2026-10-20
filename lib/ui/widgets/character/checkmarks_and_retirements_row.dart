@@ -34,8 +34,8 @@ class CheckmarksAndRetirementsRow extends StatelessWidget {
         ),
         // Vertical divider (matches CheckRowDivider style from perk rows)
         Container(
-          width: 1,
-          height: 52,
+          width: dividerThickness,
+          height: statDividerHeight,
           margin: const EdgeInsets.symmetric(horizontal: largePadding),
           color: theme.dividerTheme.color,
         ),

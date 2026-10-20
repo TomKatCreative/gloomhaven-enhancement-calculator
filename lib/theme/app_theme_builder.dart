@@ -126,7 +126,10 @@ class AppThemeBuilder {
           borderSide: BorderSide(color: colorScheme.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: colorScheme.error, width: 2.0),
+          borderSide: BorderSide(
+            color: colorScheme.error,
+            width: focusedBorderThickness,
+          ),
         ),
 
         // Disabled state
@@ -267,47 +270,62 @@ class AppThemeBuilder {
 
     return TextTheme(
       // Display - large hero text (M3 defaults)
-      displayLarge: TextStyle(fontSize: 59, fontFamily: bodyFont),
+      displayLarge: TextStyle(
+        fontSize: fontSizeDisplayLarge,
+        fontFamily: bodyFont,
+      ),
       displayMedium: TextStyle(
-        fontSize: 47,
+        fontSize: fontSizeDisplayMedium,
         fontFamily: displayFont,
         letterSpacing: displayLetterSpacing,
         shadows: shadow,
       ),
-      displaySmall: TextStyle(fontSize: 38, fontFamily: bodyFont),
+      displaySmall: TextStyle(
+        fontSize: fontSizeDisplaySmall,
+        fontFamily: bodyFont,
+      ),
       // Headline - screen/section titles (M3 defaults)
-      headlineLarge: TextStyle(fontSize: 34, fontFamily: bodyFont),
-      headlineMedium: TextStyle(fontSize: 30, fontFamily: bodyFont),
-      headlineSmall: TextStyle(fontSize: 26, fontFamily: bodyFont),
+      headlineLarge: TextStyle(
+        fontSize: fontSizeHeadlineLarge,
+        fontFamily: bodyFont,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: fontSizeHeadlineMedium,
+        fontFamily: bodyFont,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: fontSizeHeadlineSmall,
+        fontFamily: bodyFont,
+      ),
       // Title - smaller titles, emphasized text (scaled up)
-      titleLarge: TextStyle(fontSize: 24, fontFamily: bodyFont),
+      titleLarge: TextStyle(fontSize: fontSizeTitleLarge, fontFamily: bodyFont),
       titleMedium: TextStyle(
-        fontSize: 20,
+        fontSize: fontSizeTitleMedium,
         fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
       titleSmall: TextStyle(
-        fontSize: 18,
+        fontSize: fontSizeTitleSmall,
         fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
       // Body - main reading text (scaled up for readability)
-      bodyLarge: TextStyle(fontSize: 24, fontFamily: bodyFont),
-      bodyMedium: TextStyle(fontSize: 22, fontFamily: bodyFont),
-      bodySmall: TextStyle(fontSize: 20, fontFamily: bodyFont),
+      bodyLarge: TextStyle(fontSize: fontSizeBodyLarge, fontFamily: bodyFont),
+      bodyMedium: TextStyle(fontSize: fontSizeBodyMedium, fontFamily: bodyFont),
+      bodySmall: TextStyle(fontSize: fontSizeBodySmall, fontFamily: bodyFont),
       // Label - buttons, captions, annotations (scaled up)
       labelLarge: TextStyle(
-        fontSize: 18,
+        fontSize: fontSizeLabelLarge,
         fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
       labelMedium: TextStyle(
-        fontSize: 16,
+        fontSize: fontSizeLabelMedium,
         fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
       labelSmall: TextStyle(
-        fontSize: 14,
+        fontSize: fontSizeLabelSmall,
         fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
@@ -322,8 +340,8 @@ class AppThemeBuilder {
         : [
             Shadow(
               color: Colors.black.withValues(alpha: 0.35),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              blurRadius: textShadowBlurRadius,
+              offset: shadowOffset,
             ),
           ];
   }

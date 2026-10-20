@@ -319,7 +319,7 @@ class _RequirementRowState extends State<RequirementRow> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 55,
+          width: progressFieldWidth,
           child: TextField(
             controller: _textController,
             enabled: !widget.isLocked,

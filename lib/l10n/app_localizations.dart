@@ -1201,6 +1201,252 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error details'**
   String get errorDetails;
+
+  /// No description provided for @deleteCharacterBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure? This cannot be undone'**
+  String get deleteCharacterBody;
+
+  /// No description provided for @itemDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} deleted'**
+  String itemDeleted(String name);
+
+  /// No description provided for @characterRetired.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} retired'**
+  String characterRetired(String name);
+
+  /// No description provided for @characterUnretired.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} unretired'**
+  String characterUnretired(String name);
+
+  /// No description provided for @show.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get show;
+
+  /// No description provided for @newCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'New character'**
+  String get newCharacter;
+
+  /// No description provided for @customClasses.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom classes'**
+  String get customClasses;
+
+  /// No description provided for @customClassesWarningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please note that these classes are created by members of the \'Gloomhaven Custom Content Unity Guild\' and are subject to change. Use at your own risk and report any incongruencies to the developer. More information can be found on the '**
+  String get customClassesWarningBody;
+
+  /// No description provided for @discordServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Discord server'**
+  String get discordServer;
+
+  /// No description provided for @dontShowAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t show again'**
+  String get dontShowAgain;
+
+  /// No description provided for @none.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get none;
+
+  /// No description provided for @gloomhaven2e.
+  ///
+  /// In en, this message translates to:
+  /// **'Gloomhaven 2nd Edition'**
+  String get gloomhaven2e;
+
+  /// No description provided for @resourceHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get resourceHide;
+
+  /// No description provided for @resourceMetal.
+  ///
+  /// In en, this message translates to:
+  /// **'Metal'**
+  String get resourceMetal;
+
+  /// No description provided for @resourceLumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Lumber'**
+  String get resourceLumber;
+
+  /// No description provided for @resourceArrowvine.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrowvine'**
+  String get resourceArrowvine;
+
+  /// No description provided for @resourceAxenut.
+  ///
+  /// In en, this message translates to:
+  /// **'Axenut'**
+  String get resourceAxenut;
+
+  /// No description provided for @resourceRockroot.
+  ///
+  /// In en, this message translates to:
+  /// **'Rockroot'**
+  String get resourceRockroot;
+
+  /// No description provided for @resourceFlamefruit.
+  ///
+  /// In en, this message translates to:
+  /// **'Flamefruit'**
+  String get resourceFlamefruit;
+
+  /// No description provided for @resourceCorpsecap.
+  ///
+  /// In en, this message translates to:
+  /// **'Corpsecap'**
+  String get resourceCorpsecap;
+
+  /// No description provided for @resourceSnowthistle.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowthistle'**
+  String get resourceSnowthistle;
+
+  /// No description provided for @stepBaseCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Base cost ({enhancement})'**
+  String stepBaseCost(String enhancement);
+
+  /// No description provided for @stepLostAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost action'**
+  String get stepLostAction;
+
+  /// No description provided for @stepLostNonPersistentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Lost action (non-persistent)'**
+  String get stepLostNonPersistentAction;
+
+  /// No description provided for @stepPersistentAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Persistent action'**
+  String get stepPersistentAction;
+
+  /// No description provided for @stepEnhancerLevel2.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhancer Level 2'**
+  String get stepEnhancerLevel2;
+
+  /// No description provided for @stepCardLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Card level {level}'**
+  String stepCardLevel(int level);
+
+  /// No description provided for @stepPreviousEnhancements.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} previous enhancement{count, plural, =1{} other{s}}'**
+  String stepPreviousEnhancements(int count);
+
+  /// No description provided for @stepTemporaryEnhancement.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Enhancement (×0.8↑)'**
+  String get stepTemporaryEnhancement;
+
+  /// No description provided for @modifierPartyBoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Party Boon: −{amount}g/level'**
+  String modifierPartyBoon(int amount);
+
+  /// No description provided for @modifierEnhancerLevel3.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhancer L3: −{amount}g/level'**
+  String modifierEnhancerLevel3(int amount);
+
+  /// No description provided for @modifierEnhancerLevel4.
+  ///
+  /// In en, this message translates to:
+  /// **'Enhancer L4: −{amount}g/enh.'**
+  String modifierEnhancerLevel4(int amount);
+
+  /// No description provided for @modifierTemporaryEnhancement.
+  ///
+  /// In en, this message translates to:
+  /// **'Temp. Enh.: −{amount}g'**
+  String modifierTemporaryEnhancement(int amount);
+
+  /// No description provided for @sectionCharacter.
+  ///
+  /// In en, this message translates to:
+  /// **'Character'**
+  String get sectionCharacter;
+
+  /// No description provided for @sectionSummon.
+  ///
+  /// In en, this message translates to:
+  /// **'Summon'**
+  String get sectionSummon;
+
+  /// No description provided for @sectionEffect.
+  ///
+  /// In en, this message translates to:
+  /// **'Effect'**
+  String get sectionEffect;
+
+  /// No description provided for @sectionExistingHexes.
+  ///
+  /// In en, this message translates to:
+  /// **'Existing hexes'**
+  String get sectionExistingHexes;
+
+  /// No description provided for @stepHailsDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Hail\'s Discount'**
+  String get stepHailsDiscount;
+
+  /// No description provided for @adjustValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust {label}'**
+  String adjustValue(String label);
+
+  /// No description provided for @addSubtractPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a value to add or subtract from your current {label}'**
+  String addSubtractPrompt(String label);
+
+  /// No description provided for @currentValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Current: {value}'**
+  String currentValue(int value);
 }
 
 class _AppLocalizationsDelegate

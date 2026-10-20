@@ -14,6 +14,7 @@ import 'package:gloomhaven_enhancement_calc/models/campaign.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/party.dart';
+import 'package:gloomhaven_enhancement_calc/models/resource.dart';
 import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 
 import 'database_migrations.dart';
@@ -144,15 +145,7 @@ class DatabaseHelper implements IDatabaseHelper {
       '$columnIsRetired $boolType',
       '$columnShowResources $boolType',
       '$columnIsJawsOfTheLion $boolType',
-      '$columnResourceHide $integerType',
-      '$columnResourceMetal $integerType',
-      '$columnResourceLumber $integerType',
-      '$columnResourceArrowvine $integerType',
-      '$columnResourceAxenut $integerType',
-      '$columnResourceRockroot $integerType',
-      '$columnResourceFlamefruit $integerType',
-      '$columnResourceCorpsecap $integerType',
-      '$columnResourceSnowthistle $integerType',
+      for (final resource in Resource.values) '${resource.column} $integerType',
       '$columnVariant $textType',
       "$columnCharacterPersonalQuestId $textType DEFAULT ''",
       "$columnCharacterPersonalQuestProgress $textType DEFAULT '[]'",
@@ -295,8 +288,8 @@ class DatabaseHelper implements IDatabaseHelper {
       // v20: Add per-character flags — ShowResources (toggles the Resources
       // section) and IsJawsOfTheLion (persists the JotL edition choice).
       // Existing characters default to resources-shown / not-JotL, so nothing
-      // is hidden on upgrade; JotL-class characters are recognised via class
-      // category regardless.
+      // is hidden on upgrade. Only this flag makes a character JotL; its class
+      // does not.
       19: () async {
         await DatabaseMigrations.addShowResourcesColumn(txn);
         await DatabaseMigrations.addJawsOfTheLionColumn(txn);

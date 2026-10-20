@@ -256,5 +256,137 @@
   "exportDatabase": "Export database",
   "exportDatabaseError": "Couldn't export the database. Please try again.",
   "contactDeveloper": "Contact developer",
-  "errorDetails": "Error details"
+  "errorDetails": "Error details",
+  "deleteCharacterBody": "Are you sure? This cannot be undone",
+  "itemDeleted": "{name} deleted",
+  "@itemDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "characterRetired": "{name} retired",
+  "@characterRetired": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "characterUnretired": "{name} unretired",
+  "@characterUnretired": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "show": "Show",
+  "newCharacter": "New character",
+  "customClasses": "Custom classes",
+  "customClassesWarningBody": "Please note that these classes are created by members of the 'Gloomhaven Custom Content Unity Guild' and are subject to change. Use at your own risk and report any incongruencies to the developer. More information can be found on the ",
+  "discordServer": "Discord server",
+  "dontShowAgain": "Don't show again",
+  "none": "None",
+  "gloomhaven2e": "Gloomhaven 2nd Edition",
+  "resourceHide": "Hide",
+  "resourceMetal": "Metal",
+  "resourceLumber": "Lumber",
+  "resourceArrowvine": "Arrowvine",
+  "resourceAxenut": "Axenut",
+  "resourceRockroot": "Rockroot",
+  "resourceFlamefruit": "Flamefruit",
+  "resourceCorpsecap": "Corpsecap",
+  "resourceSnowthistle": "Snowthistle",
+  "stepBaseCost": "Base cost ({enhancement})",
+  "@stepBaseCost": {
+    "placeholders": {
+      "enhancement": {
+        "type": "String"
+      }
+    }
+  },
+  "stepLostAction": "Lost action",
+  "stepLostNonPersistentAction": "Lost action (non-persistent)",
+  "stepPersistentAction": "Persistent action",
+  "stepEnhancerLevel2": "Enhancer Level 2",
+  "stepCardLevel": "Card level {level}",
+  "@stepCardLevel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "stepPreviousEnhancements": "{count} previous enhancement{count, plural, =1{} other{s}}",
+  "@stepPreviousEnhancements": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stepTemporaryEnhancement": "Temporary Enhancement (×0.8↑)",
+  "modifierPartyBoon": "Party Boon: −{amount}g/level",
+  "@modifierPartyBoon": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "modifierEnhancerLevel3": "Enhancer L3: −{amount}g/level",
+  "@modifierEnhancerLevel3": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "modifierEnhancerLevel4": "Enhancer L4: −{amount}g/enh.",
+  "@modifierEnhancerLevel4": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "modifierTemporaryEnhancement": "Temp. Enh.: −{amount}g",
+  "@modifierTemporaryEnhancement": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "sectionCharacter": "Character",
+  "sectionSummon": "Summon",
+  "sectionEffect": "Effect",
+  "sectionExistingHexes": "Existing hexes",
+  "stepHailsDiscount": "Hail's Discount",
+  "adjustValue": "Adjust {label}",
+  "@adjustValue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "addSubtractPrompt": "Enter a value to add or subtract from your current {label}",
+  "@addSubtractPrompt": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "currentValue": "Current: {value}",
+  "@currentValue": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  }
 }

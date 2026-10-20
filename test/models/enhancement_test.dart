@@ -1,7 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations_en.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
+
+final en = AppLocalizationsEn();
 
 void main() {
   group('Enhancement', () {
@@ -220,27 +223,27 @@ void main() {
   group('EnhancementCategory', () {
     group('sectionTitle', () {
       test('charPlusOne returns Character', () {
-        expect(EnhancementCategory.charPlusOne.sectionTitle, 'Character');
+        expect(EnhancementCategory.charPlusOne.sectionTitle(en), 'Character');
       });
 
       test('target returns Character', () {
-        expect(EnhancementCategory.target.sectionTitle, 'Character');
+        expect(EnhancementCategory.target.sectionTitle(en), 'Character');
       });
 
       test('summonPlusOne returns Summon', () {
-        expect(EnhancementCategory.summonPlusOne.sectionTitle, 'Summon');
+        expect(EnhancementCategory.summonPlusOne.sectionTitle(en), 'Summon');
       });
 
       test('posEffect returns Effect', () {
-        expect(EnhancementCategory.posEffect.sectionTitle, 'Effect');
+        expect(EnhancementCategory.posEffect.sectionTitle(en), 'Effect');
       });
 
       test('negEffect returns Effect', () {
-        expect(EnhancementCategory.negEffect.sectionTitle, 'Effect');
+        expect(EnhancementCategory.negEffect.sectionTitle(en), 'Effect');
       });
 
       test('hex returns Existing hexes', () {
-        expect(EnhancementCategory.hex.sectionTitle, 'Existing hexes');
+        expect(EnhancementCategory.hex.sectionTitle(en), 'Existing hexes');
       });
     });
 

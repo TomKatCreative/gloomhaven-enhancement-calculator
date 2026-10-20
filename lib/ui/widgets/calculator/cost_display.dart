@@ -72,7 +72,7 @@ class CostDisplay extends StatelessWidget {
               color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: compactPadding),
           Text(
             '${config.displayCost}g',
             style: theme.textTheme.bodyLarge?.copyWith(

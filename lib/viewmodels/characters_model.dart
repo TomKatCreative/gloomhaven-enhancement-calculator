@@ -342,7 +342,7 @@ class CharactersModel with ChangeNotifier {
     if (pageController.hasClients) {
       pageController.animateToPage(
         index,
-        duration: const Duration(milliseconds: 300),
+        duration: pageAnimationDuration,
         curve: Curves.easeIn,
       );
     }

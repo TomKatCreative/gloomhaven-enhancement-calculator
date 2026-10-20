@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -46,10 +47,11 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return AlertDialog(
       title: Center(
-        child: Text('Custom classes', style: theme.textTheme.headlineLarge),
+        child: Text(l10n.customClasses, style: theme.textTheme.headlineLarge),
       ),
       content: Container(
         constraints: BoxConstraints(
@@ -63,16 +65,13 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
               Text.rich(
                 TextSpan(
                   children: [
-                    const TextSpan(
-                      text:
-                          "Please note that these classes are created by members of the 'Gloomhaven Custom Content Unity Guild' and are subject to change. Use at your own risk and report any incongruencies to the developer. More information can be found on the ",
-                    ),
+                    TextSpan(text: l10n.customClassesWarningBody),
                     TextSpan(
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.blue,
                         decoration: TextDecoration.underline,
                       ),
-                      text: 'Discord server',
+                      text: l10n.discordServer,
                       recognizer: TapGestureRecognizer()
                         ..onTap = () async {
                           Uri uri = Uri(
@@ -90,14 +89,11 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
                   ],
                 ),
               ),
-              const SizedBox(height: 35),
+              const SizedBox(height: dialogCheckboxSpacing),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Text(
-                    "Don't show again",
-                    overflow: TextOverflow.visible,
-                  ),
+                  Text(l10n.dontShowAgain, overflow: TextOverflow.visible),
                   Checkbox(
                     value: _hideMessage,
                     onChanged: (bool? value) {
@@ -117,12 +113,12 @@ class _CustomClassWarningDialogState extends State<CustomClassWarningDialog> {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
           onPressed: () => Navigator.pop(context, false),
         ),
         TextButton(
           child: Text(
-            'Continue',
+            l10n.continue_,
             style: TextStyle(color: theme.contrastedPrimary),
           ),
           onPressed: () => Navigator.pop(context, true),

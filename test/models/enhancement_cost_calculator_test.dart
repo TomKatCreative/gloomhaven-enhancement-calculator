@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gloomhaven_enhancement_calc/l10n/app_localizations_en.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculation_step_text.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
@@ -16,6 +18,8 @@ Enhancement _findByCategory(String name, EnhancementCategory category) {
     (e) => e.name == name && e.category == category,
   );
 }
+
+final en = AppLocalizationsEn();
 
 void main() {
   group('EnhancementCostCalculator', () {
@@ -644,8 +648,8 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(1));
-        expect(steps[0].description, contains('Base cost'));
-        expect(steps[0].description, contains('+1 Move'));
+        expect(steps[0].title(en), contains('Base cost'));
+        expect(steps[0].title(en), contains('+1 Move'));
         expect(steps[0].value, 30);
       });
 
@@ -655,7 +659,7 @@ void main() {
           enhancement: _find('Attack'),
         );
         final steps = calc.breakdown;
-        expect(steps[0].description, 'Base cost (+1 Attack)');
+        expect(steps[0].title(en), 'Base cost (+1 Attack)');
       });
 
       test('base cost label uses +1 prefix for summonPlusOne', () {
@@ -667,7 +671,7 @@ void main() {
           ),
         );
         final steps = calc.breakdown;
-        expect(steps[0].description, 'Base cost (+1 Move)');
+        expect(steps[0].title(en), 'Base cost (+1 Move)');
       });
 
       test('base cost label uses +1 prefix for target', () {
@@ -676,7 +680,7 @@ void main() {
           enhancement: _find('Target'),
         );
         final steps = calc.breakdown;
-        expect(steps[0].description, 'Base cost (+1 Target)');
+        expect(steps[0].title(en), 'Base cost (+1 Target)');
       });
 
       test('base cost label has no prefix for effects', () {
@@ -685,7 +689,7 @@ void main() {
           enhancement: _find('Wound'),
         );
         final steps = calc.breakdown;
-        expect(steps[0].description, 'Base cost (Wound)');
+        expect(steps[0].title(en), 'Base cost (Wound)');
       });
 
       test('multi-target step appears', () {
@@ -696,7 +700,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(2));
-        expect(steps[1].description, 'Multiple targets');
+        expect(steps[1].title(en), 'Multiple targets');
         expect(steps[1].formula, '×2');
         expect(steps[1].value, 60);
       });
@@ -709,7 +713,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(2));
-        expect(steps[1].description, 'Lost action');
+        expect(steps[1].title(en), 'Lost action');
         expect(steps[1].formula, '÷2');
       });
 
@@ -720,7 +724,7 @@ void main() {
           lostNonPersistent: true,
         );
         final steps = calc.breakdown;
-        expect(steps[1].description, 'Lost action (non-persistent)');
+        expect(steps[1].title(en), 'Lost action (non-persistent)');
       });
 
       test('persistent action step in FH', () {
@@ -731,7 +735,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(2));
-        expect(steps[1].description, 'Persistent action');
+        expect(steps[1].title(en), 'Persistent action');
         expect(steps[1].formula, '×3');
         expect(steps[1].value, 90);
       });
@@ -744,7 +748,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(2));
-        expect(steps[1].description, 'Enhancer Level 2');
+        expect(steps[1].title(en), 'Enhancer Level 2');
         expect(steps[1].formula, '−10g');
         expect(steps[1].value, 20);
       });
@@ -757,7 +761,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(2));
-        expect(steps[1].description, "Hail's Discount");
+        expect(steps[1].title(en), "Hail's Discount");
         expect(steps[1].formula, '−5g');
         expect(steps[1].value, 25);
       });
@@ -770,9 +774,9 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(1));
-        expect(steps[0].description, 'Card level 4');
+        expect(steps[0].title(en), 'Card level 4');
         expect(steps[0].formula, '(25g − 5g) × 3');
-        expect(steps[0].modifier, 'Party Boon: −5g/level');
+        expect(steps[0].modifierText(en), 'Party Boon: −5g/level');
         expect(steps[0].value, 60);
       });
 
@@ -784,9 +788,9 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(1));
-        expect(steps[0].description, 'Card level 3');
+        expect(steps[0].title(en), 'Card level 3');
         expect(steps[0].formula, '(25g − 10g) × 2');
-        expect(steps[0].modifier, 'Enhancer L3: −10g/level');
+        expect(steps[0].modifierText(en), 'Enhancer L3: −10g/level');
         expect(steps[0].value, 30);
       });
 
@@ -797,7 +801,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps[0].formula, '25g × 2');
-        expect(steps[0].modifier, isNull);
+        expect(steps[0].modifierText(en), isNull);
       });
 
       test('previous enhancements step', () {
@@ -807,7 +811,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps, hasLength(1));
-        expect(steps[0].description, '2 previous enhancements');
+        expect(steps[0].title(en), '2 previous enhancements');
         expect(steps[0].formula, '75g × 2');
         expect(steps[0].value, 150);
       });
@@ -818,7 +822,7 @@ void main() {
           previousEnhancements: 1,
         );
         final steps = calc.breakdown;
-        expect(steps[0].description, '1 previous enhancement');
+        expect(steps[0].title(en), '1 previous enhancement');
       });
 
       test('previous enhancements with enhancer L4', () {
@@ -829,7 +833,7 @@ void main() {
         );
         final steps = calc.breakdown;
         expect(steps[0].formula, '(75g − 25g) × 2');
-        expect(steps[0].modifier, contains('Enhancer L4'));
+        expect(steps[0].modifierText(en), contains('Enhancer L4'));
         expect(steps[0].value, 100);
       });
 
@@ -842,10 +846,10 @@ void main() {
         final steps = calc.breakdown;
         // First step: prev enhancements with -20g
         expect(steps[0].formula, '75g × 1 − 20g');
-        expect(steps[0].modifier, contains('Temp. Enh.: −20g'));
+        expect(steps[0].modifierText(en), contains('Temp. Enh.: −20g'));
         expect(steps[0].value, 55);
         // Second step: temp mode ×0.8
-        expect(steps[1].description, 'Temporary Enhancement (×0.8↑)');
+        expect(steps[1].title(en), 'Temporary Enhancement (×0.8↑)');
         expect(steps[1].value, 44);
       });
 
@@ -886,7 +890,7 @@ void main() {
         // 1. Base cost = 30
         // 2. Temp Enhancement ×0.8 = 24
         expect(steps, hasLength(2));
-        expect(steps.last.description, 'Temporary Enhancement (×0.8↑)');
+        expect(steps.last.title(en), 'Temporary Enhancement (×0.8↑)');
         expect(steps.last.value, 24);
       });
     });
@@ -945,7 +949,7 @@ void main() {
           enhancerLvl2: true,
           hailsDiscount: true,
         );
-        expect(calc.breakdown.last.description, "Hail's Discount");
+        expect(calc.breakdown.last.title(en), "Hail's Discount");
         expect(calc.breakdown.last.value, -5);
         expect(calc.totalCost, 0);
       });

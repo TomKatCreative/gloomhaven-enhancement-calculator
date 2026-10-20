@@ -125,7 +125,7 @@ class _CardLevelSection extends StatelessWidget {
           CardLevelBody(model: model),
           Padding(
             padding: const EdgeInsets.only(
-              left: 48 + largePadding,
+              left: kMinInteractiveDimension + largePadding,
               top: smallPadding,
               bottom: smallPadding,
             ),
@@ -202,7 +202,7 @@ class _PreviousEnhancementsSection extends StatelessWidget {
           PreviousEnhancementsBody(model: model),
           Padding(
             padding: const EdgeInsets.only(
-              left: 48 + largePadding,
+              left: kMinInteractiveDimension + largePadding,
               top: smallPadding,
               bottom: smallPadding,
             ),

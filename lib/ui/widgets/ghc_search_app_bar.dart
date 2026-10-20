@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 
 /// An AppBar with an integrated search field.
@@ -79,7 +80,7 @@ class GHCSearchAppBar extends StatelessWidget implements PreferredSizeWidget {
           focusNode: focusNode,
           hintText: hintText ?? AppLocalizations.of(context).search,
           leading: const Padding(
-            padding: EdgeInsets.only(left: 8),
+            padding: EdgeInsets.only(left: smallPadding),
             child: Icon(Icons.search),
           ),
           trailing: searchQuery.isNotEmpty

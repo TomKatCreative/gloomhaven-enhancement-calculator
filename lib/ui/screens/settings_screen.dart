@@ -65,7 +65,7 @@ class SettingsScreenState extends State<SettingsScreen> {
                 const BackupSettingsSection(),
                 const DebugSettingsSection(),
                 // Extra padding to scroll content above bottom sheet
-                const SizedBox(height: 160),
+                const SizedBox(height: settingsBottomClearance),
               ],
             ),
           ),
