@@ -64,19 +64,15 @@ class EnhancementCalculatorModel with ChangeNotifier {
     if (key != null) return EnhancementData.byKey(key);
 
     final index = SharedPrefs().enhancementTypeIndex;
-    SharedPrefs().remove('enhancementType');
-    if (index > 0 && index < EnhancementData.enhancements.length) {
+    SharedPrefs().enhancementTypeIndex = null;
+    if (index != null &&
+        index > 0 &&
+        index < EnhancementData.enhancements.length) {
       final enhancement = EnhancementData.enhancements[index];
       SharedPrefs().enhancementKey = enhancement.key;
       return enhancement;
     }
     return null;
-  }
-
-  /// Clears the persisted selection in both the current and legacy formats.
-  static void _clearPersistedEnhancement() {
-    SharedPrefs().enhancementKey = null;
-    SharedPrefs().remove('enhancementType');
   }
 
   // ===========================================================================
@@ -177,36 +173,38 @@ class EnhancementCalculatorModel with ChangeNotifier {
   /// Returns the enhancer level 2 state.
   bool get enhancerLvl2 => _enhancerLvl2;
 
-  set enhancerLvl2(bool value) {
-    SharedPrefs().enhancerLvl2 = value;
-    _enhancerLvl2 = value;
-    // SharedPrefs cascade may have changed lvl3/4, re-read them
-    _enhancerLvl3 = SharedPrefs().enhancerLvl3;
-    _enhancerLvl4 = SharedPrefs().enhancerLvl4;
-    _changed();
-  }
+  set enhancerLvl2(bool value) => _setEnhancerLevel(2, value);
 
   /// Returns the enhancer level 3 state.
   bool get enhancerLvl3 => _enhancerLvl3;
 
-  set enhancerLvl3(bool value) {
-    SharedPrefs().enhancerLvl3 = value;
-    _enhancerLvl3 = value;
-    // SharedPrefs cascade may have changed lvl2/4, re-read them
-    _enhancerLvl2 = SharedPrefs().enhancerLvl2;
-    _enhancerLvl4 = SharedPrefs().enhancerLvl4;
-    _changed();
-  }
+  set enhancerLvl3(bool value) => _setEnhancerLevel(3, value);
 
   /// Returns the enhancer level 4 state.
   bool get enhancerLvl4 => _enhancerLvl4;
 
-  set enhancerLvl4(bool value) {
-    SharedPrefs().enhancerLvl4 = value;
-    _enhancerLvl4 = value;
-    // SharedPrefs cascade may have changed lvl2/3, re-read them
-    _enhancerLvl2 = SharedPrefs().enhancerLvl2;
-    _enhancerLvl3 = SharedPrefs().enhancerLvl3;
+  set enhancerLvl4(bool value) => _setEnhancerLevel(4, value);
+
+  /// Sets enhancer [level] and keeps the others consistent: each level needs
+  /// the ones below it, so turning one on turns on every lower level and
+  /// turning one off turns off every higher level. All four levels are
+  /// persisted (level 1 has no toggle but is kept for backups).
+  ///
+  /// The untouched levels come from SharedPrefs rather than the cache, so a
+  /// restore that wrote new levels without [reloadFromPrefs] isn't undone.
+  void _setEnhancerLevel(int level, bool value) {
+    bool resolve(int other, bool current) {
+      if (other == level) return value;
+      if (value && other < level) return true;
+      if (!value && other > level) return false;
+      return current;
+    }
+
+    final prefs = SharedPrefs();
+    prefs.enhancerLvl1 = resolve(1, prefs.enhancerLvl1);
+    prefs.enhancerLvl2 = _enhancerLvl2 = resolve(2, prefs.enhancerLvl2);
+    prefs.enhancerLvl3 = _enhancerLvl3 = resolve(3, prefs.enhancerLvl3);
+    prefs.enhancerLvl4 = _enhancerLvl4 = resolve(4, prefs.enhancerLvl4);
     _changed();
   }
 
@@ -386,14 +384,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _disableMultiTargetsSwitch = false;
     _lostNonPersistent = false;
     _persistent = false;
-    SharedPrefs().remove('targetCardLvl');
-    SharedPrefs().remove('enhancementsOnTargetAction');
-    _clearPersistedEnhancement();
-    SharedPrefs().remove('disableMultiTargetsSwitch');
-    SharedPrefs().remove('multipleTargetsSelected');
-    SharedPrefs().remove('enhancementCost');
-    SharedPrefs().remove('lostNonPersistent');
-    SharedPrefs().remove('persistent');
+    SharedPrefs().resetCalculatorInputs();
     _changed();
   }
 
@@ -455,7 +446,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     // available in the current edition (e.g., Disarm in GH2E/FH, Ward in GH)
     if (!EnhancementData.isAvailableInEdition(selectedEnhancement, edition)) {
       _enhancement = null;
-      _clearPersistedEnhancement();
+      SharedPrefs().clearEnhancementSelection();
       return;
     }
 

@@ -6,6 +6,59 @@ import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_con
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Stored SharedPreferences key for each [SharedPrefs] property, named after
+/// the property. Several values differ from their names for historical
+/// reasons; they are what's on disk and in backups, so never change one.
+abstract final class _Keys {
+  static const clearSharedPrefs = 'clearOldPrefs';
+  static const partyBoon = 'partyBoon';
+  static const showRetiredCharacters = 'showRetiredCharacters';
+  static const enhancerLvl1 = 'enhancerLvl1';
+  static const enhancerLvl2 = 'enhancerLvl2';
+  static const enhancerLvl3 = 'enhancerLvl3';
+  static const enhancerLvl4 = 'enhancerLvl4';
+  static const darkTheme = 'darkTheme';
+  static const primaryClassColor = 'primaryClassColor';
+  static const envelopeX = 'envelopeX';
+  static const envelopeV = 'envelopeV';
+  static const initialPage = 'initialPage';
+  static const currentCharacterIndex = 'currentCharacterIndex';
+  static const generalExpanded = 'generalExpanded';
+  static const questAndNotesExpanded = 'questAndNotesExpanded';
+  static const perksAndMasteriesExpanded = 'perksAndMasteriesExpanded';
+  static const townDetailsExpanded = 'townDetailsExpanded';
+  static const partyDetailsExpanded = 'partyDetailsExpanded';
+  static const targetCardLvl = 'targetCardLvl';
+  static const previousEnhancements = 'enhancementsOnTargetAction';
+  static const enhancementKey = 'enhancementKey';
+  static const enhancementTypeIndex = 'enhancementType';
+  static const disableMultiTargetSwitch = 'disableMultiTargetsSwitch';
+  static const temporaryEnhancementMode = 'temporaryEnhancementMode';
+  static const multipleTargetsSwitch = 'multipleTargetsSelected';
+  static const gameEdition = 'gameEdition';
+  static const legacyGloomhavenMode = 'gloomhavenMode';
+  static const lostNonPersistent = 'lostNonPersistent';
+  static const persistent = 'persistent';
+  static const hideCustomClassesWarningMessage =
+      'hideCustomClassesWarningMessage';
+  static const showUpdate450Dialog = 'showUpdate450Dialog';
+  static const useDefaultFonts = 'useDefaultFonts';
+  static const hailsDiscount = 'hailsDiscount';
+  static const isUSRegion = 'isUSRegion';
+  static const activeCampaignId = 'activeCampaignId';
+  static const activePartyId = 'activePartyId';
+  static const showAllCharacters = 'showAllCharacters';
+}
+
+/// Top-level category names in a backup's prefs map.
+abstract final class _Categories {
+  static const settings = 'settings';
+  static const town = 'town';
+  static const calculator = 'calculator';
+  static const enhancerLevels = 'enhancerLevels';
+  static const classUnlocks = 'classUnlocks';
+}
+
 class SharedPrefs {
   static late SharedPreferences _sharedPrefs;
 
@@ -16,194 +69,181 @@ class SharedPrefs {
   Future<void> init() async =>
       _sharedPrefs = await SharedPreferences.getInstance();
 
-  void remove(String key) => _sharedPrefs.remove(key);
+  void _remove(String key) => _sharedPrefs.remove(key);
 
   void removeAll() => _sharedPrefs.clear();
 
-  bool get clearSharedPrefs => _sharedPrefs.getBool('clearOldPrefs') ?? true;
+  bool get clearSharedPrefs =>
+      _sharedPrefs.getBool(_Keys.clearSharedPrefs) ?? true;
 
   set clearSharedPrefs(bool value) =>
-      _sharedPrefs.setBool('clearOldPrefs', value);
+      _sharedPrefs.setBool(_Keys.clearSharedPrefs, value);
 
-  bool get partyBoon => _sharedPrefs.getBool('partyBoon') ?? false;
+  bool get partyBoon => _sharedPrefs.getBool(_Keys.partyBoon) ?? false;
 
-  set partyBoon(bool value) => _sharedPrefs.setBool('partyBoon', value);
+  set partyBoon(bool value) => _sharedPrefs.setBool(_Keys.partyBoon, value);
 
   bool get showRetiredCharacters =>
-      _sharedPrefs.getBool('showRetiredCharacters') ?? true;
+      _sharedPrefs.getBool(_Keys.showRetiredCharacters) ?? true;
 
   set showRetiredCharacters(bool value) =>
-      _sharedPrefs.setBool('showRetiredCharacters', value);
+      _sharedPrefs.setBool(_Keys.showRetiredCharacters, value);
 
-  bool get enhancerLvl1 => _sharedPrefs.getBool('enhancerLvl1') ?? false;
+  // Enhancer levels are plain writes. The rule that keeps them consistent
+  // (a level implies the ones below it) lives in EnhancementCalculatorModel.
 
-  set enhancerLvl1(bool value) {
-    if (!value) {
-      enhancerLvl2 = false;
-      enhancerLvl3 = false;
-      enhancerLvl4 = false;
-    }
-    _sharedPrefs.setBool('enhancerLvl1', value);
-  }
+  bool get enhancerLvl1 => _sharedPrefs.getBool(_Keys.enhancerLvl1) ?? false;
 
-  bool get enhancerLvl2 => _sharedPrefs.getBool('enhancerLvl2') ?? false;
+  set enhancerLvl1(bool value) =>
+      _sharedPrefs.setBool(_Keys.enhancerLvl1, value);
 
-  set enhancerLvl2(bool value) {
-    if (value) {
-      enhancerLvl1 = true;
-    } else {
-      enhancerLvl3 = false;
-      enhancerLvl4 = false;
-    }
-    _sharedPrefs.setBool('enhancerLvl2', value);
-  }
+  bool get enhancerLvl2 => _sharedPrefs.getBool(_Keys.enhancerLvl2) ?? false;
 
-  bool get enhancerLvl3 => _sharedPrefs.getBool('enhancerLvl3') ?? false;
+  set enhancerLvl2(bool value) =>
+      _sharedPrefs.setBool(_Keys.enhancerLvl2, value);
 
-  set enhancerLvl3(bool value) {
-    if (value) {
-      enhancerLvl2 = true;
-      enhancerLvl1 = true;
-    } else {
-      enhancerLvl4 = false;
-    }
-    _sharedPrefs.setBool('enhancerLvl3', value);
-  }
+  bool get enhancerLvl3 => _sharedPrefs.getBool(_Keys.enhancerLvl3) ?? false;
 
-  bool get enhancerLvl4 => _sharedPrefs.getBool('enhancerLvl4') ?? false;
+  set enhancerLvl3(bool value) =>
+      _sharedPrefs.setBool(_Keys.enhancerLvl3, value);
 
-  set enhancerLvl4(bool value) {
-    if (value) {
-      enhancerLvl3 = true;
-      enhancerLvl2 = true;
-      enhancerLvl1 = true;
-    }
-    _sharedPrefs.setBool('enhancerLvl4', value);
-  }
+  bool get enhancerLvl4 => _sharedPrefs.getBool(_Keys.enhancerLvl4) ?? false;
 
-  bool get darkTheme => _sharedPrefs.getBool('darkTheme') ?? false;
+  set enhancerLvl4(bool value) =>
+      _sharedPrefs.setBool(_Keys.enhancerLvl4, value);
 
-  set darkTheme(bool value) => _sharedPrefs.setBool('darkTheme', value);
+  bool get darkTheme => _sharedPrefs.getBool(_Keys.darkTheme) ?? false;
+
+  set darkTheme(bool value) => _sharedPrefs.setBool(_Keys.darkTheme, value);
 
   int get primaryClassColor =>
-      _sharedPrefs.getInt('primaryClassColor') ?? 0xff4e7ec1;
+      _sharedPrefs.getInt(_Keys.primaryClassColor) ?? 0xff4e7ec1;
 
   set primaryClassColor(int value) =>
-      _sharedPrefs.setInt('primaryClassColor', value);
+      _sharedPrefs.setInt(_Keys.primaryClassColor, value);
 
-  bool get envelopeX => _sharedPrefs.getBool('envelopeX') ?? false;
+  bool get envelopeX => _sharedPrefs.getBool(_Keys.envelopeX) ?? false;
 
-  set envelopeX(bool value) => _sharedPrefs.setBool('envelopeX', value);
+  set envelopeX(bool value) => _sharedPrefs.setBool(_Keys.envelopeX, value);
 
-  bool get envelopeV => _sharedPrefs.getBool('envelopeV') ?? false;
+  bool get envelopeV => _sharedPrefs.getBool(_Keys.envelopeV) ?? false;
 
-  set envelopeV(bool value) => _sharedPrefs.setBool('envelopeV', value);
+  set envelopeV(bool value) => _sharedPrefs.setBool(_Keys.envelopeV, value);
 
   int get initialPage =>
-      _sharedPrefs.getInt('initialPage') ?? kCharactersPageIndex;
+      _sharedPrefs.getInt(_Keys.initialPage) ?? kCharactersPageIndex;
 
-  set initialPage(int value) => _sharedPrefs.setInt('initialPage', value);
+  set initialPage(int value) => _sharedPrefs.setInt(_Keys.initialPage, value);
 
   int get currentCharacterIndex =>
-      _sharedPrefs.getInt('currentCharacterIndex') ?? 0;
+      _sharedPrefs.getInt(_Keys.currentCharacterIndex) ?? 0;
 
   set currentCharacterIndex(int value) =>
-      _sharedPrefs.setInt('currentCharacterIndex', value);
+      _sharedPrefs.setInt(_Keys.currentCharacterIndex, value);
 
-  bool get generalExpanded => _sharedPrefs.getBool('generalExpanded') ?? true;
+  bool get generalExpanded =>
+      _sharedPrefs.getBool(_Keys.generalExpanded) ?? true;
 
   set generalExpanded(bool value) =>
-      _sharedPrefs.setBool('generalExpanded', value);
+      _sharedPrefs.setBool(_Keys.generalExpanded, value);
 
   bool get questAndNotesExpanded =>
-      _sharedPrefs.getBool('questAndNotesExpanded') ?? true;
+      _sharedPrefs.getBool(_Keys.questAndNotesExpanded) ?? true;
 
   set questAndNotesExpanded(bool value) =>
-      _sharedPrefs.setBool('questAndNotesExpanded', value);
+      _sharedPrefs.setBool(_Keys.questAndNotesExpanded, value);
 
   bool get perksAndMasteriesExpanded =>
-      _sharedPrefs.getBool('perksAndMasteriesExpanded') ?? true;
+      _sharedPrefs.getBool(_Keys.perksAndMasteriesExpanded) ?? true;
 
   set perksAndMasteriesExpanded(bool value) =>
-      _sharedPrefs.setBool('perksAndMasteriesExpanded', value);
+      _sharedPrefs.setBool(_Keys.perksAndMasteriesExpanded, value);
 
   bool get townDetailsExpanded =>
-      _sharedPrefs.getBool('townDetailsExpanded') ?? true;
+      _sharedPrefs.getBool(_Keys.townDetailsExpanded) ?? true;
 
   set townDetailsExpanded(bool value) =>
-      _sharedPrefs.setBool('townDetailsExpanded', value);
+      _sharedPrefs.setBool(_Keys.townDetailsExpanded, value);
 
   bool get partyDetailsExpanded =>
-      _sharedPrefs.getBool('partyDetailsExpanded') ?? true;
+      _sharedPrefs.getBool(_Keys.partyDetailsExpanded) ?? true;
 
   set partyDetailsExpanded(bool value) =>
-      _sharedPrefs.setBool('partyDetailsExpanded', value);
+      _sharedPrefs.setBool(_Keys.partyDetailsExpanded, value);
 
-  int get targetCardLvl => _sharedPrefs.getInt('targetCardLvl') ?? 0;
+  int get targetCardLvl => _sharedPrefs.getInt(_Keys.targetCardLvl) ?? 0;
 
-  set targetCardLvl(int value) => _sharedPrefs.setInt('targetCardLvl', value);
+  set targetCardLvl(int value) =>
+      _sharedPrefs.setInt(_Keys.targetCardLvl, value);
 
   int get previousEnhancements =>
-      _sharedPrefs.getInt('enhancementsOnTargetAction') ?? 0;
+      _sharedPrefs.getInt(_Keys.previousEnhancements) ?? 0;
 
   set previousEnhancements(int value) =>
-      _sharedPrefs.setInt('enhancementsOnTargetAction', value);
+      _sharedPrefs.setInt(_Keys.previousEnhancements, value);
 
   /// Selected enhancement as an [Enhancement.key]; null means no selection.
-  String? get enhancementKey => _sharedPrefs.getString('enhancementKey');
+  String? get enhancementKey => _sharedPrefs.getString(_Keys.enhancementKey);
 
   set enhancementKey(String? value) {
     if (value == null) {
-      _sharedPrefs.remove('enhancementKey');
+      _remove(_Keys.enhancementKey);
     } else {
-      _sharedPrefs.setString('enhancementKey', value);
+      _sharedPrefs.setString(_Keys.enhancementKey, value);
     }
   }
 
-  /// Legacy selection stored as a list index, superseded by [enhancementKey].
-  /// Still read so existing users and old backups keep their selection; index
-  /// 0 was ambiguous (Move or no selection) and is treated as no selection.
-  int get enhancementTypeIndex => _sharedPrefs.getInt('enhancementType') ?? 0;
+  /// Legacy selection stored as a list index, superseded by [enhancementKey];
+  /// null when absent. Still read so existing users and old backups keep
+  /// their selection; index 0 was ambiguous (Move or no selection) and is
+  /// treated as no selection.
+  int? get enhancementTypeIndex =>
+      _sharedPrefs.getInt(_Keys.enhancementTypeIndex);
 
-  set enhancementTypeIndex(int value) =>
-      _sharedPrefs.setInt('enhancementType', value);
+  set enhancementTypeIndex(int? value) {
+    if (value == null) {
+      _remove(_Keys.enhancementTypeIndex);
+    } else {
+      _sharedPrefs.setInt(_Keys.enhancementTypeIndex, value);
+    }
+  }
 
   bool get disableMultiTargetSwitch =>
-      _sharedPrefs.getBool('disableMultiTargetsSwitch') ?? false;
+      _sharedPrefs.getBool(_Keys.disableMultiTargetSwitch) ?? false;
 
   set disableMultiTargetSwitch(bool value) =>
-      _sharedPrefs.setBool('disableMultiTargetsSwitch', value);
+      _sharedPrefs.setBool(_Keys.disableMultiTargetSwitch, value);
 
   bool get temporaryEnhancementMode =>
-      _sharedPrefs.getBool('temporaryEnhancementMode') ?? false;
+      _sharedPrefs.getBool(_Keys.temporaryEnhancementMode) ?? false;
 
   set temporaryEnhancementMode(bool value) =>
-      _sharedPrefs.setBool('temporaryEnhancementMode', value);
+      _sharedPrefs.setBool(_Keys.temporaryEnhancementMode, value);
 
   bool get multipleTargetsSwitch =>
-      _sharedPrefs.getBool('multipleTargetsSelected') ?? false;
+      _sharedPrefs.getBool(_Keys.multipleTargetsSwitch) ?? false;
 
   set multipleTargetsSwitch(bool value) =>
-      _sharedPrefs.setBool('multipleTargetsSelected', value);
+      _sharedPrefs.setBool(_Keys.multipleTargetsSwitch, value);
 
   /// Game edition for enhancement calculator
   /// Migrates from legacy gloomhavenMode boolean if present
   GameEdition get gameEdition {
     // Check for new gameEdition key first
-    final editionIndex = _sharedPrefs.getInt('gameEdition');
+    final editionIndex = _sharedPrefs.getInt(_Keys.gameEdition);
     if (editionIndex != null && editionIndex < GameEdition.values.length) {
       return GameEdition.values[editionIndex];
     }
 
     // Migrate from legacy gloomhavenMode boolean
-    final legacyMode = _sharedPrefs.getBool('gloomhavenMode');
+    final legacyMode = _sharedPrefs.getBool(_Keys.legacyGloomhavenMode);
     if (legacyMode != null) {
       final edition = legacyMode
           ? GameEdition.gloomhaven
           : GameEdition.frosthaven;
       // Save migrated value and remove legacy key
-      _sharedPrefs.setInt('gameEdition', edition.index);
-      _sharedPrefs.remove('gloomhavenMode');
+      _sharedPrefs.setInt(_Keys.gameEdition, edition.index);
+      _remove(_Keys.legacyGloomhavenMode);
       return edition;
     }
 
@@ -212,29 +252,29 @@ class SharedPrefs {
   }
 
   set gameEdition(GameEdition value) =>
-      _sharedPrefs.setInt('gameEdition', value.index);
+      _sharedPrefs.setInt(_Keys.gameEdition, value.index);
 
   bool get lostNonPersistent =>
-      _sharedPrefs.getBool('lostNonPersistent') ?? false;
+      _sharedPrefs.getBool(_Keys.lostNonPersistent) ?? false;
 
   set lostNonPersistent(bool value) =>
-      _sharedPrefs.setBool('lostNonPersistent', value);
+      _sharedPrefs.setBool(_Keys.lostNonPersistent, value);
 
-  bool get persistent => _sharedPrefs.getBool('persistent') ?? false;
+  bool get persistent => _sharedPrefs.getBool(_Keys.persistent) ?? false;
 
-  set persistent(bool value) => _sharedPrefs.setBool('persistent', value);
+  set persistent(bool value) => _sharedPrefs.setBool(_Keys.persistent, value);
 
   bool get hideCustomClassesWarningMessage =>
-      _sharedPrefs.getBool('hideCustomClassesWarningMessage') ?? false;
+      _sharedPrefs.getBool(_Keys.hideCustomClassesWarningMessage) ?? false;
 
   set hideCustomClassesWarningMessage(bool value) =>
-      _sharedPrefs.setBool('hideCustomClassesWarningMessage', value);
+      _sharedPrefs.setBool(_Keys.hideCustomClassesWarningMessage, value);
 
   bool get showUpdate450Dialog =>
-      _sharedPrefs.getBool('showUpdate450Dialog') ?? true;
+      _sharedPrefs.getBool(_Keys.showUpdate450Dialog) ?? true;
 
   set showUpdate450Dialog(bool value) =>
-      _sharedPrefs.setBool('showUpdate450Dialog', value);
+      _sharedPrefs.setBool(_Keys.showUpdate450Dialog, value);
 
   bool getPlayerClassIsUnlocked(String classCode) =>
       _sharedPrefs.getBool(classCode) ?? false;
@@ -243,48 +283,78 @@ class SharedPrefs {
     _sharedPrefs.setBool(classCode, value);
   }
 
-  bool get useDefaultFonts => _sharedPrefs.getBool('useDefaultFonts') ?? false;
+  bool get useDefaultFonts =>
+      _sharedPrefs.getBool(_Keys.useDefaultFonts) ?? false;
 
   set useDefaultFonts(bool value) =>
-      _sharedPrefs.setBool('useDefaultFonts', value);
+      _sharedPrefs.setBool(_Keys.useDefaultFonts, value);
 
-  bool get hailsDiscount => _sharedPrefs.getBool('hailsDiscount') ?? false;
+  bool get hailsDiscount => _sharedPrefs.getBool(_Keys.hailsDiscount) ?? false;
 
-  set hailsDiscount(bool value) => _sharedPrefs.setBool('hailsDiscount', value);
+  set hailsDiscount(bool value) =>
+      _sharedPrefs.setBool(_Keys.hailsDiscount, value);
 
-  bool get isUSRegion => _sharedPrefs.getBool('isUSRegion') ?? false;
+  bool get isUSRegion => _sharedPrefs.getBool(_Keys.isUSRegion) ?? false;
 
-  set isUSRegion(bool value) => _sharedPrefs.setBool('isUSRegion', value);
+  set isUSRegion(bool value) => _sharedPrefs.setBool(_Keys.isUSRegion, value);
+
+  // ===========================================================================
+  // Calculator Reset
+  // ===========================================================================
+
+  /// Clears the selected enhancement in both the current and legacy formats.
+  void clearEnhancementSelection() {
+    enhancementKey = null;
+    enhancementTypeIndex = null;
+  }
+
+  /// Clears the per-card calculator inputs: card level, previous
+  /// enhancements, the selected enhancement, multi-target and the lost and
+  /// persistent modifiers.
+  ///
+  /// Edition, party boon, temporary mode, Hail's discount and enhancer levels
+  /// describe the player's campaign rather than the card being enhanced, so
+  /// they survive a reset.
+  void resetCalculatorInputs() {
+    _remove(_Keys.targetCardLvl);
+    _remove(_Keys.previousEnhancements);
+    clearEnhancementSelection();
+    _remove(_Keys.disableMultiTargetSwitch);
+    _remove(_Keys.multipleTargetsSwitch);
+    _remove(_Keys.lostNonPersistent);
+    _remove(_Keys.persistent);
+  }
 
   // ===========================================================================
   // Town / Campaign / Party State
   // ===========================================================================
 
-  String? get activeCampaignId => _sharedPrefs.getString('activeCampaignId');
+  String? get activeCampaignId =>
+      _sharedPrefs.getString(_Keys.activeCampaignId);
 
   set activeCampaignId(String? value) {
     if (value == null) {
-      _sharedPrefs.remove('activeCampaignId');
+      _remove(_Keys.activeCampaignId);
     } else {
-      _sharedPrefs.setString('activeCampaignId', value);
+      _sharedPrefs.setString(_Keys.activeCampaignId, value);
     }
   }
 
-  String? get activePartyId => _sharedPrefs.getString('activePartyId');
+  String? get activePartyId => _sharedPrefs.getString(_Keys.activePartyId);
 
   set activePartyId(String? value) {
     if (value == null) {
-      _sharedPrefs.remove('activePartyId');
+      _remove(_Keys.activePartyId);
     } else {
-      _sharedPrefs.setString('activePartyId', value);
+      _sharedPrefs.setString(_Keys.activePartyId, value);
     }
   }
 
   bool get showAllCharacters =>
-      _sharedPrefs.getBool('showAllCharacters') ?? true;
+      _sharedPrefs.getBool(_Keys.showAllCharacters) ?? true;
 
   set showAllCharacters(bool value) =>
-      _sharedPrefs.setBool('showAllCharacters', value);
+      _sharedPrefs.setBool(_Keys.showAllCharacters, value);
 
   // ===========================================================================
   // Backup Export / Import
@@ -303,41 +373,42 @@ class SharedPrefs {
     }
 
     return {
-      'settings': {
-        'darkTheme': darkTheme,
-        'useDefaultFonts': useDefaultFonts,
-        'primaryClassColor': primaryClassColor,
-        'showRetiredCharacters': showRetiredCharacters,
-        'hideCustomClassesWarningMessage': hideCustomClassesWarningMessage,
-        'envelopeX': envelopeX,
-        'envelopeV': envelopeV,
-        'showAllCharacters': showAllCharacters,
+      _Categories.settings: {
+        _Keys.darkTheme: darkTheme,
+        _Keys.useDefaultFonts: useDefaultFonts,
+        _Keys.primaryClassColor: primaryClassColor,
+        _Keys.showRetiredCharacters: showRetiredCharacters,
+        _Keys.hideCustomClassesWarningMessage: hideCustomClassesWarningMessage,
+        _Keys.envelopeX: envelopeX,
+        _Keys.envelopeV: envelopeV,
+        _Keys.showAllCharacters: showAllCharacters,
       },
       if (kTownSheetEnabled)
-        'town': {
-          if (activeCampaignId != null) 'activeCampaignId': activeCampaignId,
-          if (activePartyId != null) 'activePartyId': activePartyId,
+        _Categories.town: {
+          if (activeCampaignId != null)
+            _Keys.activeCampaignId: activeCampaignId,
+          if (activePartyId != null) _Keys.activePartyId: activePartyId,
         },
-      'calculator': {
-        'gameEdition': gameEdition.index,
-        'enhancementKey': enhancementKey,
-        'enhancementsOnTargetAction': previousEnhancements,
-        'targetCardLvl': targetCardLvl,
-        'disableMultiTargetsSwitch': disableMultiTargetSwitch,
-        'multipleTargetsSelected': multipleTargetsSwitch,
-        'temporaryEnhancementMode': temporaryEnhancementMode,
-        'partyBoon': partyBoon,
-        'lostNonPersistent': lostNonPersistent,
-        'persistent': persistent,
-        'hailsDiscount': hailsDiscount,
+      _Categories.calculator: {
+        _Keys.gameEdition: gameEdition.index,
+        _Keys.enhancementKey: enhancementKey,
+        _Keys.previousEnhancements: previousEnhancements,
+        _Keys.targetCardLvl: targetCardLvl,
+        _Keys.disableMultiTargetSwitch: disableMultiTargetSwitch,
+        _Keys.multipleTargetsSwitch: multipleTargetsSwitch,
+        _Keys.temporaryEnhancementMode: temporaryEnhancementMode,
+        _Keys.partyBoon: partyBoon,
+        _Keys.lostNonPersistent: lostNonPersistent,
+        _Keys.persistent: persistent,
+        _Keys.hailsDiscount: hailsDiscount,
       },
-      'enhancerLevels': {
-        'enhancerLvl1': enhancerLvl1,
-        'enhancerLvl2': enhancerLvl2,
-        'enhancerLvl3': enhancerLvl3,
-        'enhancerLvl4': enhancerLvl4,
+      _Categories.enhancerLevels: {
+        _Keys.enhancerLvl1: enhancerLvl1,
+        _Keys.enhancerLvl2: enhancerLvl2,
+        _Keys.enhancerLvl3: enhancerLvl3,
+        _Keys.enhancerLvl4: enhancerLvl4,
       },
-      'classUnlocks': classUnlocks,
+      _Categories.classUnlocks: classUnlocks,
     };
   }
 
@@ -349,8 +420,8 @@ class SharedPrefs {
 
   /// Writes settings already validated by [BackupPrefs.parse].
   ///
-  /// Enhancer levels are written directly to bypass cascade logic, since
-  /// backup data is already self-consistent.
+  /// Enhancer levels are written exactly as stored, without re-applying the
+  /// calculator's level rule, since backup data is already self-consistent.
   void applyBackupPrefs(BackupPrefs prefs) {
     for (final MapEntry(:key, :value) in prefs.values.entries) {
       switch (value) {
@@ -362,7 +433,7 @@ class SharedPrefs {
           _sharedPrefs.setString(key, value);
       }
     }
-    prefs.removals.forEach(remove);
+    prefs.removals.forEach(_remove);
 
     // Class unlocks — reset all locked classes first, then apply backup
     final unlocks = prefs.classUnlocks;
@@ -402,30 +473,30 @@ class BackupPrefs {
   static const _maxPreviousEnhancements = 3;
 
   static const _settingsBools = [
-    'darkTheme',
-    'useDefaultFonts',
-    'showRetiredCharacters',
-    'hideCustomClassesWarningMessage',
-    'envelopeX',
-    'envelopeV',
-    'showAllCharacters',
+    _Keys.darkTheme,
+    _Keys.useDefaultFonts,
+    _Keys.showRetiredCharacters,
+    _Keys.hideCustomClassesWarningMessage,
+    _Keys.envelopeX,
+    _Keys.envelopeV,
+    _Keys.showAllCharacters,
   ];
 
   static const _calculatorBools = [
-    'disableMultiTargetsSwitch',
-    'multipleTargetsSelected',
-    'temporaryEnhancementMode',
-    'partyBoon',
-    'lostNonPersistent',
-    'persistent',
-    'hailsDiscount',
+    _Keys.disableMultiTargetSwitch,
+    _Keys.multipleTargetsSwitch,
+    _Keys.temporaryEnhancementMode,
+    _Keys.partyBoon,
+    _Keys.lostNonPersistent,
+    _Keys.persistent,
+    _Keys.hailsDiscount,
   ];
 
   static const _enhancerLevels = [
-    'enhancerLvl1',
-    'enhancerLvl2',
-    'enhancerLvl3',
-    'enhancerLvl4',
+    _Keys.enhancerLvl1,
+    _Keys.enhancerLvl2,
+    _Keys.enhancerLvl3,
+    _Keys.enhancerLvl4,
   ];
 
   /// Validates a backup's prefs map. Throws a [BackupException] if any value
@@ -438,75 +509,92 @@ class BackupPrefs {
     final values = <String, Object>{};
     final removals = <String>{};
 
-    final settings = _category(data, 'settings');
+    final settings = _category(data, _Categories.settings);
     if (settings != null) {
       for (final key in _settingsBools) {
-        _put<bool>(values, settings, 'settings', key);
+        _put<bool>(values, settings, _Categories.settings, key);
       }
-      _put<int>(values, settings, 'settings', 'primaryClassColor');
+      _put<int>(
+        values,
+        settings,
+        _Categories.settings,
+        _Keys.primaryClassColor,
+      );
     }
 
-    final town = kTownSheetEnabled ? _category(data, 'town') : null;
+    final town = kTownSheetEnabled ? _category(data, _Categories.town) : null;
     if (town != null) {
-      for (final key in ['activeCampaignId', 'activePartyId']) {
+      for (final key in [_Keys.activeCampaignId, _Keys.activePartyId]) {
         if (!town.containsKey(key)) continue;
-        final id = _typed<String?>(town, 'town', key);
+        final id = _typed<String?>(town, _Categories.town, key);
         id == null ? removals.add(key) : values[key] = id;
       }
     }
 
-    final calculator = _category(data, 'calculator');
+    final calculator = _category(data, _Categories.calculator);
     if (calculator != null) {
-      final edition = _typed<int?>(calculator, 'calculator', 'gameEdition');
+      final edition = _typed<int?>(
+        calculator,
+        _Categories.calculator,
+        _Keys.gameEdition,
+      );
       if (edition != null &&
           edition >= 0 &&
           edition < GameEdition.values.length) {
-        values['gameEdition'] = edition;
+        values[_Keys.gameEdition] = edition;
       }
       // Each format clears the other so the restored selection always wins:
       // the key takes precedence over the legacy index when both are present.
-      if (calculator.containsKey('enhancementKey')) {
-        final key = _typed<String?>(calculator, 'calculator', 'enhancementKey');
-        key == null
-            ? removals.add('enhancementKey')
-            : values['enhancementKey'] = key;
-        removals.add('enhancementType');
-      } else if (calculator.containsKey('enhancementType')) {
-        values['enhancementType'] = _typed<int>(
+      if (calculator.containsKey(_Keys.enhancementKey)) {
+        final key = _typed<String?>(
           calculator,
-          'calculator',
-          'enhancementType',
+          _Categories.calculator,
+          _Keys.enhancementKey,
         );
-        removals.add('enhancementKey');
+        key == null
+            ? removals.add(_Keys.enhancementKey)
+            : values[_Keys.enhancementKey] = key;
+        removals.add(_Keys.enhancementTypeIndex);
+      } else if (calculator.containsKey(_Keys.enhancementTypeIndex)) {
+        values[_Keys.enhancementTypeIndex] = _typed<int>(
+          calculator,
+          _Categories.calculator,
+          _Keys.enhancementTypeIndex,
+        );
+        removals.add(_Keys.enhancementKey);
       }
       _putInRange(
         values,
         calculator,
-        'enhancementsOnTargetAction',
+        _Keys.previousEnhancements,
         _maxPreviousEnhancements,
       );
-      _putInRange(values, calculator, 'targetCardLvl', _maxTargetCardLvl);
+      _putInRange(values, calculator, _Keys.targetCardLvl, _maxTargetCardLvl);
       for (final key in _calculatorBools) {
-        _put<bool>(values, calculator, 'calculator', key);
+        _put<bool>(values, calculator, _Categories.calculator, key);
       }
     }
 
-    final enhancerLevels = _category(data, 'enhancerLevels');
+    final enhancerLevels = _category(data, _Categories.enhancerLevels);
     if (enhancerLevels != null) {
       for (final key in _enhancerLevels) {
-        _put<bool>(values, enhancerLevels, 'enhancerLevels', key);
+        _put<bool>(values, enhancerLevels, _Categories.enhancerLevels, key);
       }
     }
 
     Map<String, bool>? classUnlocks;
-    final unlocks = _category(data, 'classUnlocks');
+    final unlocks = _category(data, _Categories.classUnlocks);
     if (unlocks != null) {
       // Only locked classes this version knows are written; any other key
       // would become a stray pref.
       classUnlocks = {
         for (final pc in PlayerClasses.playerClasses)
           if (pc.locked && unlocks.containsKey(pc.classCode))
-            pc.classCode: _typed<bool>(unlocks, 'classUnlocks', pc.classCode),
+            pc.classCode: _typed<bool>(
+              unlocks,
+              _Categories.classUnlocks,
+              pc.classCode,
+            ),
       };
     }
 
@@ -551,7 +639,7 @@ class BackupPrefs {
     int max,
   ) {
     if (!calculator.containsKey(key)) return;
-    final value = _typed<int>(calculator, 'calculator', key);
+    final value = _typed<int>(calculator, _Categories.calculator, key);
     if (value >= 0 && value <= max) values[key] = value;
   }
 }

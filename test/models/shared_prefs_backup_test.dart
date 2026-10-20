@@ -209,7 +209,7 @@ void main() {
         });
 
         expect(prefs.enhancementKey, 'charPlusOne:Attack');
-        expect(prefs.enhancementTypeIndex, 0);
+        expect(prefs.enhancementTypeIndex, isNull);
       });
 
       test('null enhancementKey clears the stored selection', () async {
@@ -224,7 +224,7 @@ void main() {
         });
 
         expect(prefs.enhancementKey, isNull);
-        expect(prefs.enhancementTypeIndex, 0);
+        expect(prefs.enhancementTypeIndex, isNull);
       });
 
       test('round-trip preserves all values', () async {
@@ -335,12 +335,12 @@ void main() {
         expect(prefs.getPlayerClassIsUnlocked(ClassCodes.summoner), isFalse);
       });
 
-      test('enhancer levels bypass cascade — writes exact values', () async {
+      test('enhancer levels are written exactly as stored', () async {
         await _initPrefs();
         final prefs = SharedPrefs();
 
-        // Import inconsistent state: lvl4=true but lvl1=false
-        // Without cascade bypass, setting lvl4=true would set lvl1-3=true
+        // Import inconsistent state: lvl4=true but lvl1=false. The calculator
+        // model's level rule would turn lvl1-3 on; import must not apply it.
         prefs.importFromBackup({
           'enhancerLevels': {
             'enhancerLvl1': false,

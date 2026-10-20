@@ -147,7 +147,16 @@ void main() {
           SharedPrefs().enhancementKey,
           EnhancementData.enhancements[1].key,
         );
-        expect(SharedPrefs().enhancementTypeIndex, 0);
+        expect(SharedPrefs().enhancementTypeIndex, isNull);
+      });
+
+      test('legacy index 0 means no selection and is removed', () async {
+        SharedPreferences.setMockInitialValues({'enhancementType': 0});
+        await SharedPrefs().init();
+
+        expect(EnhancementCalculatorModel().enhancement, isNull);
+        expect(SharedPrefs().enhancementKey, isNull);
+        expect(SharedPrefs().enhancementTypeIndex, isNull);
       });
 
       test('key takes precedence over a legacy index', () async {
@@ -172,7 +181,7 @@ void main() {
         model.resetCost();
 
         expect(SharedPrefs().enhancementKey, isNull);
-        expect(SharedPrefs().enhancementTypeIndex, 0);
+        expect(SharedPrefs().enhancementTypeIndex, isNull);
       });
     });
 
@@ -1270,15 +1279,49 @@ void main() {
         expect(model.persistent, isFalse);
       });
 
-      test('clears SharedPrefs keys', () async {
-        await _setupPrefs();
+      test('removes the per-card input keys', () async {
+        SharedPreferences.setMockInitialValues({
+          'gameEdition': GameEdition.frosthaven.index,
+          'targetCardLvl': 2,
+          'enhancementsOnTargetAction': 1,
+          'enhancementKey': EnhancementData.enhancements[1].key,
+          'enhancementType': 3,
+          'disableMultiTargetsSwitch': true,
+          'multipleTargetsSelected': true,
+          'lostNonPersistent': true,
+          'persistent': true,
+        });
+        await SharedPrefs().init();
         final model = EnhancementCalculatorModel();
 
-        model.cardLevel = 2;
         model.resetCost();
 
-        expect(SharedPrefs().targetCardLvl, 0);
-        expect(SharedPrefs().previousEnhancements, 0);
+        final prefs = await SharedPreferences.getInstance();
+        expect(prefs.getKeys(), unorderedEquals(['gameEdition']));
+      });
+
+      test('keeps edition, party boon, discount and enhancer levels', () async {
+        await _setupPrefs(
+          edition: GameEdition.frosthaven,
+          partyBoon: true,
+          hailsDiscount: true,
+          temporaryEnhancementMode: true,
+          enhancerLvl3: true,
+        );
+        final model = EnhancementCalculatorModel();
+
+        model.resetCost();
+
+        expect(model.edition, GameEdition.frosthaven);
+        expect(model.partyBoon, isTrue);
+        expect(model.hailsDiscount, isTrue);
+        expect(model.temporaryEnhancementMode, isTrue);
+        expect(model.enhancerLvl3, isTrue);
+        expect(SharedPrefs().partyBoon, isTrue);
+        expect(SharedPrefs().hailsDiscount, isTrue);
+        expect(SharedPrefs().temporaryEnhancementMode, isTrue);
+        expect(SharedPrefs().enhancerLvl1, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isTrue);
       });
 
       test('notifies once', () async {
@@ -1552,7 +1595,9 @@ void main() {
         model.enhancerLvl2 = true;
 
         expect(model.enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl1, isTrue);
         expect(SharedPrefs().enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isFalse);
       });
 
       test('enhancerLvl3 setter cascades to lvl2', () async {
@@ -1563,6 +1608,11 @@ void main() {
 
         expect(model.enhancerLvl3, isTrue);
         expect(model.enhancerLvl2, isTrue);
+        expect(model.enhancerLvl4, isFalse);
+        expect(SharedPrefs().enhancerLvl1, isTrue);
+        expect(SharedPrefs().enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isTrue);
+        expect(SharedPrefs().enhancerLvl4, isFalse);
       });
 
       test('enhancerLvl4 setter cascades to lvl2 and lvl3', () async {
@@ -1574,6 +1624,10 @@ void main() {
         expect(model.enhancerLvl4, isTrue);
         expect(model.enhancerLvl3, isTrue);
         expect(model.enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl1, isTrue);
+        expect(SharedPrefs().enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isTrue);
+        expect(SharedPrefs().enhancerLvl4, isTrue);
       });
 
       test('disabling enhancerLvl2 cascades to clear lvl3 and lvl4', () async {
@@ -1587,6 +1641,67 @@ void main() {
         expect(model.enhancerLvl2, isFalse);
         expect(model.enhancerLvl3, isFalse);
         expect(model.enhancerLvl4, isFalse);
+        expect(SharedPrefs().enhancerLvl1, isTrue);
+        expect(SharedPrefs().enhancerLvl2, isFalse);
+        expect(SharedPrefs().enhancerLvl3, isFalse);
+        expect(SharedPrefs().enhancerLvl4, isFalse);
+      });
+
+      test('disabling enhancerLvl3 keeps lvl2 and clears lvl4', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven, enhancerLvl4: true);
+        final model = EnhancementCalculatorModel();
+
+        model.enhancerLvl3 = false;
+
+        expect(model.enhancerLvl2, isTrue);
+        expect(model.enhancerLvl3, isFalse);
+        expect(model.enhancerLvl4, isFalse);
+        expect(SharedPrefs().enhancerLvl2, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isFalse);
+        expect(SharedPrefs().enhancerLvl4, isFalse);
+      });
+
+      test('enabling a lower level keeps higher levels', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven, enhancerLvl4: true);
+        final model = EnhancementCalculatorModel();
+
+        model.enhancerLvl2 = true;
+
+        expect(model.enhancerLvl3, isTrue);
+        expect(model.enhancerLvl4, isTrue);
+      });
+
+      test('keeps levels restored without reloadFromPrefs', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+
+        // A restore wrote new levels, but the model was never reloaded.
+        SharedPrefs().importFromBackup({
+          'enhancerLevels': {
+            'enhancerLvl1': true,
+            'enhancerLvl2': true,
+            'enhancerLvl3': true,
+            'enhancerLvl4': true,
+          },
+        });
+
+        model.enhancerLvl2 = true;
+
+        expect(model.enhancerLvl3, isTrue);
+        expect(model.enhancerLvl4, isTrue);
+        expect(SharedPrefs().enhancerLvl3, isTrue);
+        expect(SharedPrefs().enhancerLvl4, isTrue);
+      });
+
+      test('a toggle that cascades notifies once', () async {
+        await _setupPrefs(edition: GameEdition.frosthaven);
+        final model = EnhancementCalculatorModel();
+        int notifyCount = 0;
+        model.addListener(() => notifyCount++);
+
+        model.enhancerLvl4 = true;
+
+        expect(notifyCount, 1);
       });
     });
 
