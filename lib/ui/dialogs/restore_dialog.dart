@@ -99,12 +99,17 @@ class RestoreDialog {
     BuildContext context,
     String contents,
   ) async {
+    // Read before the first await, while the context is known to be mounted.
+    final calculatorModel = context.read<EnhancementCalculatorModel>();
     showLoaderDialog(context);
 
     var restored = false;
     try {
       await DatabaseHelper.instance.backupService.restoreBackup(contents);
       restored = true;
+      // Sync the calculator before anything below can return early or throw,
+      // so it never computes costs from the pre-restore settings.
+      calculatorModel.reloadFromPrefs();
       SharedPrefs().initialPage = kCharactersPageIndex;
       if (!context.mounted) return;
 
@@ -117,9 +122,6 @@ class RestoreDialog {
           useDefaultFonts: prefs.useDefaultFonts,
         ),
       );
-
-      // Refresh calculator model from restored SharedPrefs
-      context.read<EnhancementCalculatorModel>().reloadFromPrefs();
 
       // Sync showRetired with restored value
       final charactersModel = context.read<CharactersModel>();

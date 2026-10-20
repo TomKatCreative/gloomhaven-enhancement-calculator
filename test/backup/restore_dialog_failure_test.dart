@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations_en.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
+import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_config.dart';
+import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/restore_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +27,14 @@ class _FailingLoadDatabaseHelper extends FakeDatabaseHelper {
   }
 }
 
+/// A theme that fails to apply, standing in for any refresh step after the
+/// restore committed.
+class _FailingThemeProvider extends MockThemeProvider {
+  @override
+  void updateThemeConfig(ThemeConfig config) =>
+      throw StateError('theme failed');
+}
+
 /// Which error message [RestoreDialog.performRestore] shows, depending on
 /// whether the backup had already been applied when something failed.
 void main() {
@@ -40,13 +51,16 @@ void main() {
   Future<void> runRestore(
     WidgetTester tester,
     String contents,
-    FakeDatabaseHelper databaseHelper,
-  ) async {
+    FakeDatabaseHelper databaseHelper, {
+    EnhancementCalculatorModel? calculatorModel,
+    ThemeProvider? themeProvider,
+  }) async {
     await tester.pumpWidget(
-      ChangeNotifierProvider(
-        create: (_) => EnhancementCalculatorModel(),
+      ChangeNotifierProvider.value(
+        value: calculatorModel ?? EnhancementCalculatorModel(),
         child: wrapWithProviders(
           withLocalization: true,
+          themeProvider: themeProvider,
           charactersModel: createTestCharactersModel(
             databaseHelper: databaseHelper,
           ),
@@ -99,5 +113,34 @@ void main() {
       find.textContaining(l10n.restoreAppliedErrorMessage('').trim()),
       findsOneWidget,
     );
+  });
+
+  testWidgets('the calculator syncs with restored prefs when a later step '
+      'fails', (tester) async {
+    final backup = (await tester.runAsync(() async {
+      await freshAppDatabase();
+      SharedPrefs().enhancerLvl1 = true;
+      SharedPrefs().enhancerLvl2 = true;
+      final contents = await generate();
+      SharedPrefs().enhancerLvl1 = false;
+      SharedPrefs().enhancerLvl2 = false;
+      return contents;
+    }))!;
+    final calculatorModel = EnhancementCalculatorModel();
+    expect(calculatorModel.enhancerLvl2, isFalse);
+
+    await runRestore(
+      tester,
+      backup,
+      FakeDatabaseHelper(),
+      calculatorModel: calculatorModel,
+      themeProvider: _FailingThemeProvider(),
+    );
+
+    expect(
+      find.textContaining(l10n.restoreAppliedErrorMessage('').trim()),
+      findsOneWidget,
+    );
+    expect(calculatorModel.enhancerLvl2, isTrue);
   });
 }
