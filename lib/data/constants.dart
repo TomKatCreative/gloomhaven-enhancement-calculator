@@ -194,3 +194,7 @@ const bool kTownSheetEnabled = false;
 const int kTownPageIndex = 0;
 const int kCharactersPageIndex = kTownSheetEnabled ? 1 : 0;
 const int kCalculatorPageIndex = kTownSheetEnabled ? 2 : 1;
+
+/// Theme seed colour (ARGB) used when there is no character to take a colour
+/// from, and the default for the saved primary class colour.
+const int kDefaultSeedColor = 0xff4e7ec1;

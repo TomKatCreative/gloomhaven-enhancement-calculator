@@ -64,22 +64,22 @@ class EditionToggle extends StatelessWidget {
             segments: [
               ButtonSegment(
                 value: GameEdition.gloomhaven,
-                label: const Text('GH'),
+                label: Text(GameEdition.gloomhaven.shortLabel),
                 tooltip: l10n.gloomhaven,
               ),
               ButtonSegment(
                 value: GameEdition.gloomhaven2e,
-                label: const Text('GH2e'),
+                label: Text(GameEdition.gloomhaven2e.shortLabel),
                 tooltip: 'Gloomhaven 2nd Edition',
               ),
               ButtonSegment(
                 value: GameEdition.frosthaven,
-                label: const Text('FH'),
+                label: Text(GameEdition.frosthaven.shortLabel),
                 tooltip: l10n.frosthaven,
               ),
               ButtonSegment(
                 value: GameEdition.jawsOfTheLion,
-                label: const Text('JotL'),
+                label: Text(GameEdition.jawsOfTheLion.shortLabel),
                 tooltip: l10n.jawsOfTheLion,
               ),
             ],

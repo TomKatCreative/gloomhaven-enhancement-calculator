@@ -157,20 +157,20 @@ class CheckmarksAndRetirementsRow extends StatelessWidget {
                 child: Stack(
                   alignment: Alignment.centerRight,
                   children: [
-                    // We use 16 here because it's the widest of the numbers
-                    // between 0-18
+                    // 16 is the widest of the possible checkmark counts
                     const Opacity(opacity: 0, child: Text('16')),
                     Text('${character.checkMarks}'),
                   ],
                 ),
               ),
-              const Text('/18'),
+              const Text('/${Character.maxCheckMarks}'),
               IconButton(
                 iconSize: iconSizeSmall,
                 constraints: const BoxConstraints(),
                 padding: const EdgeInsets.all(tinyPadding),
                 icon: const Icon(Icons.add_circle_outline),
-                onPressed: character.checkMarks < 18 && !isRetired
+                onPressed:
+                    character.checkMarks < Character.maxCheckMarks && !isRetired
                     ? () => charactersModel.increaseCheckmark(character)
                     : null,
               ),

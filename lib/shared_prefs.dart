@@ -117,7 +117,7 @@ class SharedPrefs {
   set darkTheme(bool value) => _sharedPrefs.setBool(_Keys.darkTheme, value);
 
   int get primaryClassColor =>
-      _sharedPrefs.getInt(_Keys.primaryClassColor) ?? 0xff4e7ec1;
+      _sharedPrefs.getInt(_Keys.primaryClassColor) ?? kDefaultSeedColor;
 
   set primaryClassColor(int value) =>
       _sharedPrefs.setInt(_Keys.primaryClassColor, value);

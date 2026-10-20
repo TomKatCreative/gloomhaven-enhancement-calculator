@@ -241,18 +241,18 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
           padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
         ),
         showSelectedIcon: false,
-        segments: const [
+        segments: [
           ButtonSegment<GameEdition>(
             value: GameEdition.gloomhaven,
-            label: Text('GH'),
+            label: Text(GameEdition.gloomhaven.shortLabel),
           ),
           ButtonSegment<GameEdition>(
             value: GameEdition.gloomhaven2e,
-            label: Text('GH2e'),
+            label: Text(GameEdition.gloomhaven2e.shortLabel),
           ),
           ButtonSegment<GameEdition>(
             value: GameEdition.frosthaven,
-            label: Text('FH'),
+            label: Text(GameEdition.frosthaven.shortLabel),
           ),
         ],
         selected: {enhancementCalculatorModel.edition},

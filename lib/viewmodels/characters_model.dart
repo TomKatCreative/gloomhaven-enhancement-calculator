@@ -42,6 +42,7 @@ import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.
 import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quest_service.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
+import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
@@ -319,10 +320,10 @@ class CharactersModel with ChangeNotifier {
 
   void updateThemeForCharacter(ThemeProvider themeProvider) {
     if (characters.isEmpty) {
-      themeProvider.updateSeedColor(const Color(0xff4e7ec1));
+      themeProvider.updateSeedColor(const Color(kDefaultSeedColor));
     } else if (currentCharacter != null) {
       if (currentCharacter!.isRetired) {
-        final retiredColor = SharedPrefs().darkTheme
+        final retiredColor = themeProvider.useDarkMode
             ? Colors.white
             : Colors.black;
         themeProvider.updateSeedColor(retiredColor);
@@ -369,7 +370,7 @@ class CharactersModel with ChangeNotifier {
   }
 
   void increaseCheckmark(Character character) {
-    if (character.checkMarks < 18) {
+    if (character.checkMarks < Character.maxCheckMarks) {
       updateCharacter(character..checkMarks += 1);
     }
   }

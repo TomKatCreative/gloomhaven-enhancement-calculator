@@ -89,6 +89,9 @@ const String columnCharacterPartyId = 'PartyId';
 /// maxPerks = (level - 1) + (checkMarks / 3) + retirements + masteryCount
 /// ```
 class Character {
+  /// Battle-goal checkmarks a character can hold (6 perks' worth).
+  static const int maxCheckMarks = 18;
+
   int? id;
   late String uuid;
   late String name;
@@ -256,7 +259,7 @@ class Character {
   static int maximumPerks(Character character) {
     int sum = 0;
     sum += level(character.xp) - 1;
-    sum += ((character.checkMarks - 1) / 3).round();
+    sum += character.checkMarks ~/ 3;
     if (!character.isJawsOfTheLion) {
       sum += character.previousRetirements;
     }
@@ -275,11 +278,7 @@ class Character {
   ///
   /// Every 3 check marks grants 1 additional perk. This getter returns
   /// the current progress within the current cycle.
-  int get checkMarkProgress => checkMarks != 0
-      ? checkMarks % 3 == 0
-            ? 3
-            : checkMarks % 3
-      : 0;
+  int get checkMarkProgress => checkMarks == 0 ? 0 : (checkMarks - 1) % 3 + 1;
 
   /// Count of perks currently selected for this character.
   int get numOfSelectedPerks => characterPerks.fold(

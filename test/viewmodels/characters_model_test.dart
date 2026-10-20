@@ -316,6 +316,21 @@ void main() {
       expect(mockTheme.lastSeedColor, equals(Colors.black));
     });
 
+    test('uses white for a retired character in dark mode', () async {
+      final character = TestData.createCharacter(isRetired: false);
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+      mockTheme.updateDarkMode(true);
+      // The theme provider, not the saved pref, decides the colour.
+      SharedPrefs().darkTheme = false;
+      mockTheme.reset();
+
+      await model.retireCurrentCharacter();
+
+      expect(mockTheme.lastSeedColor, equals(Colors.white));
+    });
+
     test('updates theme to class color when unretiring', () async {
       final character = TestData.createCharacter(isRetired: true);
       fakeDb.characters = [character];

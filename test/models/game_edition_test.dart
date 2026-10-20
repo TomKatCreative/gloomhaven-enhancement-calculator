@@ -91,6 +91,15 @@ void main() {
       });
     });
 
+    group('shortLabel', () {
+      test('abbreviates every edition', () {
+        expect(GameEdition.gloomhaven.shortLabel, 'GH');
+        expect(GameEdition.gloomhaven2e.shortLabel, 'GH2e');
+        expect(GameEdition.frosthaven.shortLabel, 'FH');
+        expect(GameEdition.jawsOfTheLion.shortLabel, 'JotL');
+      });
+    });
+
     group('Jaws of the Lion (no enhancement features)', () {
       test('supportsPartyBoon is false', () {
         expect(GameEdition.jawsOfTheLion.supportsPartyBoon, isFalse);

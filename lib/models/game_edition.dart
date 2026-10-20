@@ -74,4 +74,19 @@ enum GameEdition {
         return 'Jaws of the Lion';
     }
   }
+
+  /// Abbreviation shown on the edition toggles (not localized, like the
+  /// box art).
+  String get shortLabel {
+    switch (this) {
+      case GameEdition.gloomhaven:
+        return 'GH';
+      case GameEdition.gloomhaven2e:
+        return 'GH2e';
+      case GameEdition.frosthaven:
+        return 'FH';
+      case GameEdition.jawsOfTheLion:
+        return 'JotL';
+    }
+  }
 }

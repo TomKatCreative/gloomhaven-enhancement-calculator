@@ -452,6 +452,25 @@ void main() {
       expect(perks3 - perks0, equals(1));
       expect(perks6 - perks3, equals(1));
     });
+
+    test('every 3 checkmarks grant a perk, across the full range', () {
+      const perksFromCheckMarks = [
+        0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 5, 6, //
+      ];
+      final base = Character.maximumPerks(
+        TestData.createCharacter(checkMarks: 0),
+      );
+      for (var checkMarks = 0; checkMarks <= 18; checkMarks++) {
+        expect(
+          Character.maximumPerks(
+                TestData.createCharacter(checkMarks: checkMarks),
+              ) -
+              base,
+          perksFromCheckMarks[checkMarks],
+          reason: '$checkMarks checkmarks',
+        );
+      }
+    });
   });
 
   group('Character Model - Level Calculation', () {
@@ -554,6 +573,19 @@ void main() {
       final character = TestData.createCharacter(checkMarks: 4);
 
       expect(character.checkMarkProgress, equals(1));
+    });
+
+    test('checkMarkProgress cycles 1-3 across the full range', () {
+      const progress = [
+        0, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3, //
+      ];
+      for (var checkMarks = 0; checkMarks <= 18; checkMarks++) {
+        expect(
+          TestData.createCharacter(checkMarks: checkMarks).checkMarkProgress,
+          progress[checkMarks],
+          reason: '$checkMarks checkmarks',
+        );
+      }
     });
 
     test('pocketItemsAllowed calculation at various levels', () {
