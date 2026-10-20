@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:gloomhaven_enhancement_calc/data/perks/perks_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 
@@ -602,6 +604,43 @@ void main() {
       );
 
       expect(character.shouldShowMasteries, isFalse);
+    });
+
+    // The getter is derived from MasteriesRepository. This pins which class ×
+    // variant pairs show masteries, so a change to the repository that adds
+    // or removes them for an existing class is a reviewed diff here. A newly
+    // added mastery-less class also fails, and belongs in the base list.
+    test('matches the known mastery rule for every class and variant', () {
+      // Base variants of the GH, JotL and Crimson Scales classes, and the
+      // custom classes without masteries. Every other variant with perks
+      // (Frosthaven crossover, Gloomhaven 2e) has masteries.
+      const baseWithoutMasteries = {
+        ...{'br', 'ti', 'sw', 'sc', 'ch', 'mt', 'sk', 'qm', 'su', 'ns'},
+        ...{'ph', 'be', 'ss', 'ds', 'sb', 'el', 'bt', 'bs', 'dv'},
+        ...{'dl', 'hc', 'rg', 'vw'},
+        ...{'aa', 'af', 'bb', 'bp', 'cg', 'ct', 'fk', 'hf', 'hp'},
+        ...{'incarnate', 'ln', 'mf', 'rimehearth', 'rm', 'shardrender'},
+        ...{'scr', 'ssl', 'tempest', 'thornreaper', 'vanquisher'},
+        ...{'bm', 'fb', 'rw'},
+      };
+
+      for (final pc in PlayerClasses.playerClasses) {
+        for (final variant in Variant.values) {
+          if (PerksRepository.getPerkIds(pc.classCode, variant).isEmpty) {
+            continue;
+          }
+          final character = TestData.createCharacter(
+            playerClass: pc,
+            variant: variant,
+          );
+          expect(
+            character.shouldShowMasteries,
+            variant != Variant.base ||
+                !baseWithoutMasteries.contains(pc.classCode),
+            reason: '${pc.classCode}/${variant.name}',
+          );
+        }
+      }
     });
   });
 

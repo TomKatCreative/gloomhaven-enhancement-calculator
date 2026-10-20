@@ -27,8 +27,8 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
+import 'package:gloomhaven_enhancement_calc/data/masteries/masteries_repository.dart';
 import 'package:gloomhaven_enhancement_calc/data/personal_quests/personal_quests_repository.dart';
-import 'package:gloomhaven_enhancement_calc/data/player_classes/character_constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/player_classes/player_class_constants.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/character_mastery.dart';
 import 'package:gloomhaven_enhancement_calc/models/mastery/mastery.dart';
@@ -303,9 +303,6 @@ class Character {
   /// Full display name including race and variant name (e.g., "Inox Brute").
   String get classSubtitle => playerClass.getFullDisplayName(variant);
 
-  // TODO: modify this to include Custom and Crimson Scales once they have masteries
-  // for now, have to manually add the Custom Classes that have masteries but aren't
-  // yet Frosthaven Crossover versions
   /// Whether this character should be treated as a Jaws of the Lion character.
   ///
   /// Determined solely by the game mode chosen at creation
@@ -317,14 +314,12 @@ class Character {
   /// are hidden on the sheet.
   bool get isJawsOfTheLion => jawsOfTheLionEdition;
 
-  bool get shouldShowMasteries =>
-      playerClass.classCode == ClassCodes.vimthreader ||
-      playerClass.classCode == ClassCodes.core ||
-      playerClass.classCode == ClassCodes.dome ||
-      playerClass.classCode == ClassCodes.skitterclaw ||
-      playerClass.classCode == ClassCodes.alchemancer ||
-      playerClass.category == ClassCategory.frosthaven ||
-      variant == Variant.frosthavenCrossover ||
-      variant == Variant.gloomhaven2E ||
-      playerClass.category == ClassCategory.mercenaryPacks;
+  /// Whether this character's class and variant have masteries.
+  ///
+  /// Derived from [MasteriesRepository], so a class or variant that gains
+  /// masteries there shows them without a second list to update.
+  bool get shouldShowMasteries => MasteriesRepository.getMasteryIds(
+    playerClass.classCode,
+    variant,
+  ).isNotEmpty;
 }
