@@ -138,8 +138,11 @@ lib/ui/widgets/calculator/
 ├── cost_display.dart               # Standardized cost chip with strikethrough
 ├── card_level_body.dart            # SfSlider for card level selection
 ├── previous_enhancements_body.dart # Segmented button (0-3)
-└── enhancement_type_body.dart      # Dropdown selector
+├── enhancement_type_body.dart      # Dropdown selector
+└── enhancement_icon.dart           # EnhancementIcon: element stack or SVG with +1 badge
 ```
+
+`EnhancementIcon(enhancement:, size:)` is the one place that draws an enhancement's icon. The type body, the selector screen and the cost chip all use it, so the "Element" stack and the +1 badge stay consistent.
 
 Note: The Card Details section (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single `SectionCard` with internal dividers. The `CalculatorToggleGroupCard` renders a `Column` of toggle rows (no longer wraps in its own `Card`, since the outer `SectionCard` provides the container).
 

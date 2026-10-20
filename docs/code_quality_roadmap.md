@@ -108,13 +108,15 @@ Each item is its own branch. Each removes a rule or list that is currently maint
 
 **Done:** Behaviour-preserving only: a temporary differential test compared the old and new calculator across about 3 million input combinations (every edition, enhancement, flag, card level 0–8 and 0–3 previous enhancements) for totals, per-part costs and every breakdown field, plus eligibility, availability and `enhancementSelected` side effects, with zero differences. One correction to the planned fix: `totalCost` is *not* `breakdown.last.value`. The enhancement cost is clamped at 0 before penalties without a breakdown step, so a discount step can show a negative value (FH Pull, lost + Enhancer L2 + Hail's shows −5g, total 0). Both instead run through a shared `_compute`. The `25`/`75` copies in `card_details_card.dart` now use the constants too. `(cost * 0.8).ceil()` was kept as is; it is exact for every total from 0 to 2000.
 
-### CQ-9 ⬜ Shared enhancement icon widget
+### CQ-9 ✅ Shared enhancement icon widget
 
 **Files:** `lib/ui/screens/enhancement_type_selector_screen.dart:247-262`, `lib/ui/widgets/expandable_cost_chip.dart:455-477`, `lib/ui/widgets/calculator/enhancement_type_body.dart:63-99`, `lib/models/enhancement_cost_calculator.dart:269-272`
 
 The "is +1" check and icon builder (including `enhancement.name == 'Element'`) are copied 3–4 times and have already drifted: only one copy guards a null `assetKey`, and the sizes differ.
 
 **Fix:** Add an `Enhancement.isPlusOne` getter and one `EnhancementIcon(enhancement:, size:)` widget in `lib/ui/widgets/calculator/`.
+
+**Done:** `Enhancement.isPlusOne` replaces the four category checks (including the cost breakdown's "+1 Move" label), and `EnhancementIcon` in `lib/ui/widgets/calculator/enhancement_icon.dart` replaces the three icon builders. `Enhancement.assetKey` is now required and non-nullable, because every enhancement has one, so a missing icon is a compile error rather than a runtime guard. Each call site draws the Element stack and the SVG at the same size, so the selector list's Element icon dropped from 32 to 26 to match its row.
 
 ### CQ-10 ⬜ `Resource` enum for Characters resource columns
 
@@ -144,13 +146,15 @@ Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFr
 
 **Pairs with:** CQ-3 (both freeze migration inputs).
 
-### CQ-13 ⬜ Small shared constants and getters
+### CQ-13 ✅ Small shared constants and getters
 
 - **`GameEdition.shortLabel`:** 'GH', 'GH2e' and 'FH' are hardcoded in `ghc_animated_app_bar.dart:245-258` and `edition_toggle.dart:64-84`.
 - **`kDefaultSeedColor`:** `0xff4e7ec1` appears in `characters_model.dart:374`, `shared_prefs.dart:86` and `player_class_constants.dart:13`.
 - **`maxCheckmarks`:** the `18` in `characters_model.dart:420`.
 - **Retired colour:** `characters_model.dart:378` reads `SharedPrefs().darkTheme` instead of `themeProvider.useDarkMode`.
 - **Checkmark math:** `character.dart:254` `((checkMarks - 1) / 3).round()` equals `checkMarks ~/ 3` for values ≥ 0. Simplify it and `checkMarkProgress` the same way.
+
+**Done:** `GameEdition.shortLabel` feeds both edition toggles, `kDefaultSeedColor` (in `constants.dart`) is the empty-roster seed and the saved-colour default, and `Character.maxCheckMarks` replaces the three hardcoded 18s (the model and the checkmark row). The retired colour reads `themeProvider.useDarkMode`; both are written together, so the colour is unchanged. Checkmark perks use `checkMarks ~/ 3` and `checkMarkProgress` lost its nested ternary; new tests pin both across 0–18. `player_class_constants.dart` keeps its literal, since that is one class's own colour, not the default.
 
 ### CQ-14 ⬜ Duplicated UI layout values
 

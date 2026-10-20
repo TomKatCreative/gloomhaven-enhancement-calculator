@@ -106,7 +106,7 @@ Represents a player's character instance with stats, resources, and progression.
 | `level` | `int` | Current level (1-9) based on XP thresholds |
 | `xpForNextLevel` | `int?` | XP needed to level up (null at max level) |
 | `pocketItemsAllowed` | `int` | Level / 2, rounded up |
-| `checkMarkProgress` | `int` | Current progress toward next perk (0-2) |
+| `checkMarkProgress` | `int` | Checkmarks toward the next perk: 0 with none, otherwise 1–3 (3 means a perk was just completed) |
 | `numOfSelectedPerks` | `int` | Count of selected perks |
 | `shouldShowTraits` | `bool` | Whether to display class traits |
 | `shouldShowMasteries` | `bool` | Whether the class/variant has masteries (derived from `MasteriesRepository`) |
@@ -119,7 +119,7 @@ Represents a player's character instance with stats, resources, and progression.
 |--------|---------|-------------|
 | `level(int xp)` | `int` | Convert XP to level using thresholds |
 | `xpForNextLevel(int currentLevel)` | `int?` | XP needed for next level |
-| `maximumPerks(level, checkMarks, retirements, masteries)` | `int` | Max perks available: `(level - 1) + (checkMarks / 3) + retirements + achievedMasteries`. The `retirements` term is excluded for JotL (no retirement mechanic) |
+| `maximumPerks(level, checkMarks, retirements, masteries)` | `int` | Max perks available: `(level - 1) + (checkMarks ~/ 3) + retirements + achievedMasteries`. The `retirements` term is excluded for JotL (no retirement mechanic) |
 
 ### Level Thresholds
 
@@ -138,8 +138,8 @@ Represents a player's character instance with stats, resources, and progression.
 ### Check Mark Progression
 
 - Every 3 check marks = 1 additional perk
-- Maximum 18 check marks (6 perks from check marks)
-- `checkMarkProgress` returns 0, 1, or 2 (progress toward next perk)
+- Maximum 18 check marks (`Character.maxCheckMarks`; 6 perks from check marks)
+- `checkMarkProgress` returns 0 with no check marks, otherwise 1, 2 or 3
 
 ### Color Handling
 
@@ -241,7 +241,7 @@ Represents an enhancement option for the calculator.
 | `name` | `String` | required | Display name |
 | `ghCost` | `int` | 0 | Gloomhaven cost |
 | `fhCost` | `int?` | null | Frosthaven/GH2E cost (fallback to ghCost) |
-| `assetKey` | `String?` | null | SVG asset identifier |
+| `assetKey` | `String` | required | SVG asset identifier. Every enhancement has one; draw it with `EnhancementIcon` |
 | `excludedEditions` | `Set<GameEdition>` | `{}` | Editions the enhancement does not exist in (Disarm: all but GH; Ward: GH) |
 
 ### Getters
@@ -249,6 +249,7 @@ Represents an enhancement option for the calculator.
 | Getter | Type | Description |
 |--------|------|-------------|
 | `cost` | `int` | Edition-specific cost with fallback |
+| `isPlusOne` | `bool` | True for `charPlusOne`, `summonPlusOne` and `target`: shown with a +1 badge and labelled "+1 Name" in the cost breakdown |
 | `isAvailableIn(GameEdition)` | `bool` | False if the edition is in `excludedEditions`. `EnhancementData.isAvailableInEdition` delegates here |
 | `key` | `String` | Stable persistence ID, `'<category>:<name>'` (e.g. `charPlusOne:Move`). Survives reordering of `EnhancementData.enhancements`; look it up with `EnhancementData.byKey(key)` (null if unknown) |
 
@@ -466,6 +467,7 @@ Enum representing game editions with edition-specific rules.
 | Getter | Type | Description |
 |--------|------|-------------|
 | `displayName` | `String` | Human-readable edition name (e.g., "Gloomhaven 2e") |
+| `shortLabel` | `String` | Toggle abbreviation: GH, GH2e, FH, JotL (not localized) |
 
 ### Edition-Specific Properties
 
