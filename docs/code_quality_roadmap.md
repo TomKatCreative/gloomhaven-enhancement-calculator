@@ -238,12 +238,14 @@ Remove from both `app_en.arb` and `app_pt.arb`, then run `flutter gen-l10n`: `ap
 
 These are independent and can be picked up opportunistically.
 
-### CQ-19 ⬜ Theme builder
+### CQ-19 ✅ Theme builder
 
 **File:** `lib/theme/app_theme_builder.dart`
 
 - `_buildDefaultTextTheme` and `_buildCustomTextTheme` (:259-366) are about 50 identical lines. Merge them into one `_buildTextTheme(bodyFont, displayFont, displayLetterSpacing)`.
 - The theme cache is keyed by `config.hashCode`, so a hash collision returns the wrong theme. Key it by `ThemeConfig`, which already defines `==`.
+
+**Done:** One `_buildTextTheme(brightness, bodyFont:, displayFont:, displayLetterSpacing:)` replaces both builders. Default fonts pass Inter for both fonts and no spacing; custom fonts pass Nyala, PirataOne and 1.5, so every style is unchanged. Both caches are now `Map<ThemeConfig, ThemeData>`. A test forces two different configs to share a hash code and checks that each gets its own theme; it fails against the old hash-keyed cache. New tests also pin each font setup and the light-only display shadow.
 
 ### CQ-20 ⬜ Provider wiring in `main.dart`
 
