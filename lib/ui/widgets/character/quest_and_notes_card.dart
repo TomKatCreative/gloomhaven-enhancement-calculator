@@ -39,13 +39,13 @@ class _QuestAndNotesCardState extends State<QuestAndNotesCard> {
     final theme = Theme.of(context);
     final primaryColor = theme.contrastedPrimary;
     final l10n = AppLocalizations.of(context);
-    final model = context.watch<CharactersModel>();
+    final isEditMode = context.watchCharacterPage(widget.character);
     final hasQuestAssigned = widget.character.personalQuest != null;
     // JotL has no personal quests — show only the notes section.
     final showQuestSection =
         !widget.character.isJawsOfTheLion &&
         (hasQuestAssigned || !widget.character.isRetired);
-    final hasNotes = widget.character.notes.isNotEmpty || model.isEditMode;
+    final hasNotes = widget.character.notes.isNotEmpty || isEditMode;
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,
@@ -142,7 +142,7 @@ class _NotesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     CharactersModel charactersModel = context.read<CharactersModel>();
     final isEditMode =
-        context.watch<CharactersModel>().isEditMode && !character.isRetired;
+        context.watchCharacterPage(character) && !character.isRetired;
 
     return isEditMode
         ? TextFormField(

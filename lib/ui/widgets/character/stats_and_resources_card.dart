@@ -37,8 +37,9 @@ class _StatsAndResourcesCardState extends State<StatsAndResourcesCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final model = context.watch<CharactersModel>();
-    final canEdit = model.isEditMode && !widget.character.isRetired;
+    final canEdit =
+        context.watchCharacterPage(widget.character) &&
+        !widget.character.isRetired;
 
     return CollapsibleSectionCard(
       sectionKey: widget.sectionKey,

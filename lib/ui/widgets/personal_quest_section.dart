@@ -32,7 +32,8 @@ class PersonalQuestSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = context.watch<CharactersModel>();
+    final isEditMode = context.watchCharacterPage(character);
+    final model = context.read<CharactersModel>();
     final quest = character.personalQuest;
 
     // No quest assigned: show select button (hidden for retired characters)
@@ -46,7 +47,12 @@ class PersonalQuestSection extends StatelessWidget {
       );
     }
 
-    return QuestContent(character: character, quest: quest, model: model);
+    return QuestContent(
+      character: character,
+      quest: quest,
+      model: model,
+      isEditMode: isEditMode,
+    );
   }
 }
 

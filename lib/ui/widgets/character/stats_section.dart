@@ -89,7 +89,7 @@ class _StatsSectionState extends State<StatsSection> {
   Widget build(BuildContext context) {
     final charactersModel = context.read<CharactersModel>();
     final isEditMode =
-        context.watch<CharactersModel>().isEditMode &&
+        context.watchCharacterPage(widget.character) &&
         !widget.character.isRetired;
 
     // Edit mode: Show XP and Gold with external labels, plus Battle Goals and Pocket
@@ -285,12 +285,10 @@ class _StatsSectionState extends State<StatsSection> {
                     widget.character.xp.toString(),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
-                  Consumer<CharactersModel>(
-                    builder: (_, charactersModel, _) => Text(
-                      ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                  Text(
+                    ' / ${Character.xpForNextLevel(Character.level(widget.character.xp))}',
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -421,7 +419,7 @@ class ResourcesContent extends StatelessWidget {
     final theme = Theme.of(context);
     final charactersModel = context.read<CharactersModel>();
     final isEditMode = context.select<CharactersModel, bool>(
-      (m) => m.isEditMode,
+      (m) => m.isEditMode && m.currentCharacter?.uuid == character.uuid,
     );
     final canEdit = isEditMode && !character.isRetired;
     final iconColor = ColorUtils.ensureContrast(

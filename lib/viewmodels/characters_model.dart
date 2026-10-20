@@ -53,6 +53,7 @@ import 'package:gloomhaven_enhancement_calc/models/perk/character_perk.dart';
 import 'package:gloomhaven_enhancement_calc/models/player_class.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 /// Manages character data, CRUD operations, and list navigation.
@@ -96,6 +97,23 @@ class CharactersModel with ChangeNotifier {
   bool showRetired;
   bool _isEditMode = false;
 
+  /// Bumped on every notification except a page swipe or an edit-mode
+  /// toggle, i.e. whenever character data changes.
+  ///
+  /// Character pages stay mounted across swipes. A swipe changes nothing they
+  /// draw and only the current page shows edit mode, so page widgets watch
+  /// this plus their own page's edit mode (see
+  /// [CharacterPageWatch.watchCharacterPage]) rather than the whole model,
+  /// which rebuilt every visited page on each swipe.
+  int get revision => _revision;
+  int _revision = 0;
+
+  @override
+  void notifyListeners() {
+    _revision++;
+    super.notifyListeners();
+  }
+
   // ===========================================================================
   // Section expansion state (passthrough to SharedPrefs, no notify needed)
   // ===========================================================================
@@ -114,7 +132,8 @@ class CharactersModel with ChangeNotifier {
 
   set isEditMode(bool value) {
     _isEditMode = value;
-    notifyListeners();
+    // Skips the revision bump: see [revision].
+    super.notifyListeners();
   }
 
   @override
@@ -239,7 +258,8 @@ class CharactersModel with ChangeNotifier {
     charScrollOffsetNotifier.value = 0.0;
     _setCurrentCharacter(index: index);
     _isEditMode = false;
-    notifyListeners();
+    // Skips the revision bump: see [revision].
+    super.notifyListeners();
   }
 
   Future<void> createCharacter(
@@ -324,17 +344,11 @@ class CharactersModel with ChangeNotifier {
     if (characters.isEmpty) {
       themeProvider.updateSeedColor(const Color(kDefaultSeedColor));
     } else if (currentCharacter != null) {
-      if (currentCharacter!.isRetired) {
-        final retiredColor = themeProvider.useDarkMode
-            ? Colors.white
-            : Colors.black;
-        themeProvider.updateSeedColor(retiredColor);
-      } else {
-        final characterColor = Color(
-          currentCharacter!.playerClass.primaryColor,
-        );
-        themeProvider.updateSeedColor(characterColor);
-      }
+      themeProvider.updateSeedColor(
+        currentCharacter!.getEffectiveColor(
+          themeProvider.useDarkMode ? Brightness.dark : Brightness.light,
+        ),
+      );
     }
   }
 
@@ -479,5 +493,22 @@ class CharactersModel with ChangeNotifier {
     character.partyId = partyId;
     await databaseHelper.assignCharacterToParty(character.uuid, partyId);
     notifyListeners();
+  }
+}
+
+extension CharacterPageWatch on BuildContext {
+  /// Use instead of `watch<CharactersModel>()` inside [character]'s page, and
+  /// `read<CharactersModel>()` for the model itself.
+  ///
+  /// Rebuilds on every change to character data and when this page enters or
+  /// leaves edit mode, but not on a swipe or another page's edit-mode toggle.
+  /// Returns whether this page is in edit mode.
+  bool watchCharacterPage(Character character) {
+    return select<CharactersModel, (bool, int)>(
+      (m) => (
+        m.isEditMode && m.currentCharacter?.uuid == character.uuid,
+        m.revision,
+      ),
+    ).$1;
   }
 }

@@ -24,7 +24,8 @@ class MasteryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CharactersModel charactersModel = context.watch<CharactersModel>();
+    final isEditMode = context.watchCharacterPage(character);
+    final charactersModel = context.read<CharactersModel>();
     final characterMastery = _findCharacterMastery();
 
     return CheckableRow(
@@ -33,7 +34,7 @@ class MasteryRow extends StatelessWidget {
         if (characterMastery != null)
           ConditionalCheckbox(
             value: characterMastery.characterMasteryAchieved,
-            isEditMode: charactersModel.isEditMode,
+            isEditMode: isEditMode,
             isRetired: character.isRetired,
             onChanged: (bool value) => charactersModel.toggleMastery(
               characterMasteries: character.characterMasteries,

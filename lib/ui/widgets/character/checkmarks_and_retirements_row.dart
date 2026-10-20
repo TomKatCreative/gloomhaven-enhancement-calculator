@@ -17,7 +17,8 @@ class CheckmarksAndRetirementsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final charactersModel = context.watch<CharactersModel>();
+    context.watchCharacterPage(character);
+    final charactersModel = context.read<CharactersModel>();
     final theme = Theme.of(context);
     final isRetired = character.isRetired;
 

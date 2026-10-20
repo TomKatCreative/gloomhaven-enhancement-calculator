@@ -1342,4 +1342,51 @@ void main() {
       );
     });
   });
+
+  group('revision', () {
+    Future<CharactersModel> loadedModel() async {
+      fakeDb.characters = [
+        TestData.createCharacter(uuid: 'a'),
+        TestData.createCharacter(uuid: 'b'),
+      ];
+      final model = createModel();
+      await model.loadCharacters();
+      return model;
+    }
+
+    test('a page swipe notifies without bumping it', () async {
+      final model = await loadedModel();
+      final before = model.revision;
+      var notified = 0;
+      model.addListener(() => notified++);
+
+      model.onPageChanged(1);
+
+      expect(notified, 1);
+      expect(model.revision, before);
+    });
+
+    test('an edit-mode toggle notifies without bumping it', () async {
+      final model = await loadedModel();
+      final before = model.revision;
+      var notified = 0;
+      model.addListener(() => notified++);
+
+      model.isEditMode = true;
+      model.isEditMode = false;
+
+      expect(notified, 2);
+      expect(model.revision, before);
+    });
+
+    test('a character data change bumps it', () async {
+      final model = await loadedModel();
+      final before = model.revision;
+
+      await model.updateCharacter(model.currentCharacter!..gold = 10);
+      await model.retireCurrentCharacter();
+
+      expect(model.revision, before + 2);
+    });
+  });
 }

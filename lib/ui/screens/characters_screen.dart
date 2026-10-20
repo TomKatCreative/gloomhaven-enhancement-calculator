@@ -3,6 +3,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/create_character_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/character_page_theme.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,15 @@ class _CharactersScreenState extends State<CharactersScreen>
   }
 
   Widget _buildContent(BuildContext context, CharactersModel charactersModel) {
-    if (context.watch<CharactersModel>().characters.isEmpty) {
+    // Only the visible character list matters here. Rebuilding re-runs build
+    // on every kept-alive CharacterScreen in the PageView, so swipes, edit
+    // mode and edits to a character's data must not trigger it. Character
+    // has identity equality, so a reload (e.g. restoring a backup of the same
+    // characters) still rebuilds and hands the pages the new objects.
+    context.select<CharactersModel, (int, bool)>(
+      (m) => (Object.hashAll(m.characters), m.retiredCharactersAreHidden),
+    );
+    if (charactersModel.characters.isEmpty) {
       final l10n = AppLocalizations.of(context);
       final textTheme = Theme.of(context).textTheme;
 
@@ -82,7 +91,15 @@ class _CharactersScreenState extends State<CharactersScreen>
             constraints: BoxConstraints(
               maxWidth: ResponsiveLayout.characterMaxWidth(context),
             ),
-            child: CharacterScreen(character: character),
+            child: CharacterPageTheme(
+              character: character,
+              // Pages aren't keyed by index, so after a delete or a filter
+              // change a State would otherwise carry over to another character.
+              child: CharacterScreen(
+                key: ValueKey(character.uuid),
+                character: character,
+              ),
+            ),
           );
         },
       );

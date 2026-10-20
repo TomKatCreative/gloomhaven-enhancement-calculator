@@ -90,6 +90,15 @@ class AppThemeBuilder {
       hoverColor: Colors.transparent,
       splashFactory: NoSplash.splashFactory,
 
+      // MaterialApp's defaults, set explicitly. A nested Theme with no
+      // selection colors inherits the app's, and every Text depends on them,
+      // so each character page (see CharacterPageTheme) would rebuild all its
+      // text whenever the app color changes on a swipe.
+      textSelectionTheme: TextSelectionThemeData(
+        selectionColor: colorScheme.primary.withValues(alpha: 0.4),
+        cursorColor: colorScheme.primary,
+      ),
+
       // Component themes
       inputDecorationTheme: InputDecorationTheme(
         // Hint text style

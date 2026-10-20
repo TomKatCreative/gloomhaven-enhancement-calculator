@@ -24,16 +24,20 @@ class QuestContent extends StatelessWidget {
     required this.character,
     required this.quest,
     required this.model,
+    required this.isEditMode,
     super.key,
   });
   final Character character;
   final PersonalQuest quest;
   final CharactersModel model;
 
+  /// Whether this character's page is in edit mode.
+  final bool isEditMode;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isEditMode = model.isEditMode && !character.isRetired;
+    final isEditMode = this.isEditMode && !character.isRetired;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

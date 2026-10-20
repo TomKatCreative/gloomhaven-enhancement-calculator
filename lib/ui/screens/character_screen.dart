@@ -42,20 +42,25 @@ class _CharacterScreenState extends State<CharacterScreen>
   // The model's offset notifier drives the app bar, which belongs to whichever
   // page is current, so only the current page writes to it.
   late final ValueNotifier<double> _appBarOffsetNotifier;
+  late final CharactersModel _charactersModel;
   bool _isCurrentPage = false;
   bool _isScrollSpyEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    _appBarOffsetNotifier = context
-        .read<CharactersModel>()
-        .charScrollOffsetNotifier;
+    _charactersModel = context.read<CharactersModel>();
+    _appBarOffsetNotifier = _charactersModel.charScrollOffsetNotifier;
     _scrollController.addListener(_onScroll);
+    // A listener rather than a select: becoming current changes nothing this
+    // page draws, so it must not rebuild the page on every swipe.
+    _charactersModel.addListener(_syncCurrentPage);
+    _syncCurrentPage();
   }
 
   @override
   void dispose() {
+    _charactersModel.removeListener(_syncCurrentPage);
     _scrollController.dispose();
     _scrollOffsetNotifier.dispose();
     _activeSectionNotifier.dispose();
@@ -72,8 +77,9 @@ class _CharacterScreenState extends State<CharacterScreen>
 
   /// Hands this page's offset to the app bar when the page becomes current,
   /// since a kept-alive page may come back already scrolled.
-  void _syncCurrentPage(CharactersModel model) {
-    final isCurrent = model.currentCharacter?.uuid == widget.character.uuid;
+  void _syncCurrentPage() {
+    final isCurrent =
+        _charactersModel.currentCharacter?.uuid == widget.character.uuid;
     if (isCurrent == _isCurrentPage) return;
     _isCurrentPage = isCurrent;
     if (!isCurrent) return;
@@ -178,8 +184,7 @@ class _CharacterScreenState extends State<CharacterScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    final model = context.watch<CharactersModel>();
-    _syncCurrentPage(model);
+    final isEditMode = context.watchCharacterPage(widget.character);
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
     final hasQuestOrNotes =
         !widget.character.isRetired ||
@@ -196,8 +201,7 @@ class _CharacterScreenState extends State<CharacterScreen>
         ListenableBuilder(
           listenable: _scrollOffsetNotifier,
           builder: (context, _) {
-            final isFixedHeader =
-                model.isEditMode && !widget.character.isRetired;
+            final isFixedHeader = isEditMode && !widget.character.isRetired;
             final headerHeight = CharacterHeaderDelegate.viewModeMaxHeight(
               widget.character,
             );
@@ -226,7 +230,7 @@ class _CharacterScreenState extends State<CharacterScreen>
                 pinned: true,
                 delegate: CharacterHeaderDelegate(
                   character: widget.character,
-                  isEditMode: model.isEditMode,
+                  isEditMode: isEditMode,
                   scrollOffsetNotifier: _scrollOffsetNotifier,
                 ),
               ),
@@ -240,7 +244,7 @@ class _CharacterScreenState extends State<CharacterScreen>
                   onSectionTapped: _scrollToSection,
                   hasMasteries: hasMasteries,
                   hasQuestOrNotes: hasQuestOrNotes,
-                  isEditMode: model.isEditMode && !widget.character.isRetired,
+                  isEditMode: isEditMode && !widget.character.isRetired,
                 ),
               ),
               // STATS & RESOURCES
