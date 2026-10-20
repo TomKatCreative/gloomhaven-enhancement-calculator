@@ -40,6 +40,10 @@ class ThemeProvider extends ChangeNotifier {
     if (_config.seedColor == color) return;
 
     _config = _config.copyWith(seedColor: color);
+    // This runs on every character swipe. The write is left in place on
+    // purpose: SharedPreferences updates its in-memory cache synchronously
+    // and persists asynchronously, so it never blocks the frame, and it is
+    // what gives the next cold start the right color before characters load.
     SharedPrefs().primaryClassColor = color.toARGB32();
     _rebuildThemes();
     _updateSystemUI();

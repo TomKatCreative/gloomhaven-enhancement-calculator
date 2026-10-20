@@ -46,23 +46,35 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final appModel = context.watch<AppModel>();
-    final charactersModel = context.watch<CharactersModel>();
-    final enhancementModel = context.watch<EnhancementCalculatorModel>();
-    final townModel = context.watch<TownModel>();
+    // Select only what the FAB needs, so changes elsewhere in these models
+    // (e.g. every calculator tap) don't rebuild the whole Scaffold.
+    final page = context.select<AppModel, int>((m) => m.page);
+    final hasCharacters = context.select<CharactersModel, bool>(
+      (m) => m.characters.isNotEmpty,
+    );
+    final charactersEditMode = context.select<CharactersModel, bool>(
+      (m) => m.isEditMode,
+    );
+    final calculatorFabHidden = context
+        .select<EnhancementCalculatorModel, bool>(
+          (m) => m.isSheetExpanded || !m.showCost,
+        );
+    // TownModel is lazy; only subscribe to it when the Town tab exists.
+    final hasCampaigns =
+        kTownSheetEnabled &&
+        context.select<TownModel, bool>((m) => m.campaigns.isNotEmpty);
+    final townEditMode =
+        kTownSheetEnabled &&
+        context.select<TownModel, bool>((m) => m.isEditMode);
 
     // Hide FAB when:
     // - On town page with no campaigns
     // - On characters page with no characters (empty state has inline button)
     // - On enhancement calculator page when cost chip is expanded or nothing to clear
     final hideFab =
-        (kTownSheetEnabled &&
-            appModel.page == kTownPageIndex &&
-            townModel.campaigns.isEmpty) ||
-        (appModel.page == kCharactersPageIndex &&
-            charactersModel.characters.isEmpty) ||
-        (appModel.page == kCalculatorPageIndex &&
-            (enhancementModel.isSheetExpanded || !enhancementModel.showCost));
+        (kTownSheetEnabled && page == kTownPageIndex && !hasCampaigns) ||
+        (page == kCharactersPageIndex && !hasCharacters) ||
+        (page == kCalculatorPageIndex && calculatorFabHidden);
 
     return Scaffold(
       // this is necessary to make notched FAB background transparent, effectively
@@ -73,12 +85,11 @@ class _HomeState extends State<Home> {
         physics: const NeverScrollableScrollPhysics(),
         controller: context.read<AppModel>().pageController,
         onPageChanged: (index) {
-          charactersModel.isEditMode = false;
-          if (kTownSheetEnabled) townModel.isEditMode = false;
+          context.read<CharactersModel>().isEditMode = false;
+          if (kTownSheetEnabled) context.read<TownModel>().isEditMode = false;
           context.read<AppModel>().page = index;
           // Reset the cost chip's expanded state when navigating between pages
           context.read<EnhancementCalculatorModel>().isSheetExpanded = false;
-          setState(() {});
         },
         children: [
           if (kTownSheetEnabled) const TownScreen(),
@@ -116,10 +127,10 @@ class _HomeState extends State<Home> {
           scale: hideFab ? 0.0 : 1.0,
           duration: animationDuration,
           child: _buildFab(
-            appModel,
-            charactersModel,
-            enhancementModel,
-            townModel,
+            page: page,
+            hasCampaigns: hasCampaigns,
+            townEditMode: townEditMode,
+            charactersEditMode: charactersEditMode,
           ),
         ),
       ),
@@ -127,30 +138,29 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildFab(
-    AppModel appModel,
-    CharactersModel charactersModel,
-    EnhancementCalculatorModel enhancementModel,
-    TownModel townModel,
-  ) {
+  Widget _buildFab({
+    required int page,
+    required bool hasCampaigns,
+    required bool townEditMode,
+    required bool charactersEditMode,
+  }) {
     // Town page: edit mode toggle FAB
-    if (kTownSheetEnabled &&
-        appModel.page == kTownPageIndex &&
-        townModel.campaigns.isNotEmpty) {
+    if (kTownSheetEnabled && page == kTownPageIndex && hasCampaigns) {
       return FloatingActionButton(
         heroTag: null,
-        onPressed: () => townModel.isEditMode = !townModel.isEditMode,
-        child: Icon(
-          townModel.isEditMode ? Icons.edit_off_rounded : Icons.edit_rounded,
-        ),
+        onPressed: () {
+          final townModel = context.read<TownModel>();
+          townModel.isEditMode = !townModel.isEditMode;
+        },
+        child: Icon(townEditMode ? Icons.edit_off_rounded : Icons.edit_rounded),
       );
     }
 
     // Calculator page: clear FAB
-    if (appModel.page == kCalculatorPageIndex) {
+    if (page == kCalculatorPageIndex) {
       return FloatingActionButton(
         heroTag: null,
-        onPressed: () => enhancementModel.resetCost(),
+        onPressed: () => context.read<EnhancementCalculatorModel>().resetCost(),
         child: const Icon(Icons.clear_rounded),
       );
     }
@@ -158,11 +168,12 @@ class _HomeState extends State<Home> {
     // Characters page: edit mode toggle FAB
     return FloatingActionButton(
       heroTag: null,
-      onPressed: () => charactersModel.isEditMode = !charactersModel.isEditMode,
+      onPressed: () {
+        final charactersModel = context.read<CharactersModel>();
+        charactersModel.isEditMode = !charactersModel.isEditMode;
+      },
       child: Icon(
-        charactersModel.isEditMode
-            ? Icons.edit_off_rounded
-            : Icons.edit_rounded,
+        charactersEditMode ? Icons.edit_off_rounded : Icons.edit_rounded,
       ),
     );
   }
