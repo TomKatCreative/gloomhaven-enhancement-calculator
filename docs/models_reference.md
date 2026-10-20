@@ -566,7 +566,7 @@ Represents a personal quest card with retirement requirements.
 
 ### Serialization
 
-- `toMap()` only, used by the v18 migration to seed the legacy `PersonalQuestsTable` (dropped in v19)
+- No serializer on the model. The v18 migration seeds the legacy `PersonalQuestsTable` (dropped in v19) through the `toLegacyRow()` extension in `lib/data/migrations/legacy_definition_rows.dart`
 - Definitions (requirements, unlock class, unlock envelope) come from `PersonalQuestsRepository`, not the DB
 
 ---

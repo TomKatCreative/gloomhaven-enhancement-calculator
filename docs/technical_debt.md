@@ -100,12 +100,16 @@ Code that is no longer needed but remains in the repo.
 | `masteries_repository_legacy.dart` | 394 | Only referenced by DB migrations v5-v17 |
 | `legacy_perk.dart` | ~37 | Only referenced by dead legacy repositories |
 | `legacy_mastery.dart` | small | Only referenced by dead legacy repositories |
+| `perk_and_mastery_constants.dart` | ~50 | Frozen text fragments for `perks_repository_legacy.dart` |
+| `legacy_definition_rows.dart` | ~55 | Column constants and `toLegacyRow` serializers for the v8–v18 definition tables |
+
+All of these live in `lib/data/migrations/`.
 
 These legacy files are **required for database migration** from older schema versions (v5–v17). They cannot be removed without breaking upgrades for users on older app versions. The migration code references them to populate/transform definition tables before v19 drops those tables.
 
 ### ~~Unused `fromMap()` Constructors~~ — RESOLVED
 
-> **Deleted** (2026-02-16): Removed `Perk.fromMap()` and `Mastery.fromMap()`. Both hardcoded `number = 0` and were never called since definitions moved to repositories. `toMap()` methods kept (used by migrations). `LabeledTextField` also removed (dead code) — file renamed to `section_label.dart` containing only the used `SectionLabel` widget.
+> **Deleted** (2026-02-16): Removed `Perk.fromMap()` and `Mastery.fromMap()`. Both hardcoded `number = 0` and were never called since definitions moved to repositories. `toMap()` methods kept (used by migrations); CQ-12 later moved them to `toLegacyRow` extensions in `lib/data/migrations/`. `LabeledTextField` also removed (dead code) — file renamed to `section_label.dart` containing only the used `SectionLabel` widget.
 
 ---
 

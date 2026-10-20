@@ -138,13 +138,15 @@ Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFr
 
 **Done:** Every stored key string now lives once, in a private `_Keys` holder in `shared_prefs.dart` (named after its property, so historical mismatches like `previousEnhancements` → `enhancementsOnTargetAction` are visible), and backup category names in `_Categories`. `SharedPrefs` and `BackupPrefs` share them because Dart privacy is per file. No key string is used outside that file: `remove` is private, `enhancementTypeIndex` is `int?` with null removing the key (the `enhancementKey` pattern), and `resetCost` calls the new `resetCalculatorInputs()`, which documents which settings deliberately survive a reset. The dead `'enhancementCost'` removal is gone; very old installs may keep that stray key, which is harmless because backup export is an allowlist. The level rule moved into `EnhancementCalculatorModel._setEnhancerLevel`, which computes all four levels and writes them once, reading the untouched levels from prefs so a restore that skipped `reloadFromPrefs` is not undone by the next toggle. The four persisted bools were kept rather than collapsed to one level number, because restored backups can hold non-contiguous levels and deriving a number from them would change their costs. Tests still use literal key strings on purpose, so they pin the on-disk format. New tests check the persisted levels after each cascade, a single notify per toggle, and that `resetCost` removes exactly the per-card keys and keeps the campaign settings.
 
-### CQ-12 ⬜ Derive mastery and legacy data instead of duplicating it
+### CQ-12 ✅ Derive mastery and legacy data instead of duplicating it
 
 - ~~**`shouldShowMasteries`**~~: moved to [DI-3](data_integrity_roadmap.md#di-3) step 5, because reconciliation depends on it.
 - **`lib/data/migrations/perks_repository_legacy.dart:7`:** the "frozen" legacy data depends on `PerkAndMasteryConstants`, which the live `masteries_repository.dart` still uses, so editing it for current masteries silently changes migration data. A near-duplicate, `PerkTextConstants`, also exists. Switch masteries to `PerkTextConstants`, then move `PerkAndMasteryConstants` into `lib/data/migrations/` as migration-only.
 - Move migration-only serializers (`Perk.toMap`, `Mastery.toMap`, `PersonalQuest.toMap` and the legacy table-column constants) out of the live models into `lib/data/migrations/`.
 
 **Pairs with:** CQ-3 (both freeze migration inputs).
+
+**Done:** `masteries_repository.dart` now uses `PerkTextConstants`; its five constants have the same values, so no mastery text changed. `PerkAndMasteryConstants`, `legacy_perk.dart` and `legacy_mastery.dart` moved into `lib/data/migrations/` and are marked migration-only, so nothing live imports them. The live `Perk`, `Mastery` and `PersonalQuest` models lost their `toMap` and the dropped tables' column constants. Those now live in `lib/data/migrations/legacy_definition_rows.dart` as `toLegacyRow` extensions, renamed so a migration call site reads as writing a legacy row. The migration steps changed only in imports and that method name. The full migration harness passes unchanged, and `test/data/migrations/legacy_definition_rows_test.dart` pins each row shape with literal column names (it replaces the old `PersonalQuest.toMap` test).
 
 ### CQ-13 ✅ Small shared constants and getters
 
