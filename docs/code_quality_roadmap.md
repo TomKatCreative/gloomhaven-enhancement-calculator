@@ -156,10 +156,12 @@ Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFr
 
 **Done:** `GameEdition.shortLabel` feeds both edition toggles, `kDefaultSeedColor` (in `constants.dart`) is the empty-roster seed and the saved-colour default, and `Character.maxCheckMarks` replaces the three hardcoded 18s (the model and the checkmark row). The retired colour reads `themeProvider.useDarkMode`; both are written together, so the colour is unchanged. Checkmark perks use `checkMarks ~/ 3` and `checkMarkProgress` lost its nested ternary; new tests pin both across 0–18. `player_class_constants.dart` keeps its literal, since that is one class's own colour, not the default.
 
-### CQ-14 ⬜ Duplicated UI layout values
+### CQ-14 ✅ Duplicated UI layout values
 
 - **Class-icon backdrop:** `character_screen.dart:180-187` and `character_header_delegates.dart:113-117` both use `right: -32, top: -45, +75, width: 260` and must stay in sync. Extract a `ClassIconBackdrop` widget or named constants.
 - **Scroll-tint animation:** the `TweenAnimationBuilder` + `Color.lerp(surface, getTintedBackground)` + 300ms pattern is copied in `ghc_app_bar.dart:114-122`, `ghc_animated_app_bar.dart:321-325` and `character_header_delegates.dart:88-100,408-428`. Extract a `ScrollTintBuilder` next to `AppBarUtils` and add a `tintAnimationDuration` constant.
+
+**Done:** `ClassIconBackdrop` (`lib/ui/widgets/character/class_icon_backdrop.dart`) owns the backdrop's position, its 15%→0 fade and its contrast-adjusted colour, and both the screen and the header delegate draw it. In edit mode the screen passes a collapse progress of 1 (invisible) instead of swapping in an empty box. `ScrollTintBuilder` (next to `AppBarUtils`) replaces the tint animation in four places, not three: `GHCAppBar` had it too and uses the builder's progress for elevation. `tintAnimationDuration` (300ms) is kept separate from `animationDuration` (250ms) so the timing doesn't change. A new key makes the tint jump straight to the new state rather than fade, as before. New widget tests pin the backdrop geometry, fade and colour, and the tint's start, fade, fade-back and key reset.
 
 ---
 

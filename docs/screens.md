@@ -414,7 +414,7 @@ Displays and edits a single character's stats, perks, masteries, and resources. 
 
 ### Architecture
 
-Uses a `Stack` with a background `ClassIconSvg` and a `CustomScrollView` with slivers for efficient scrolling and pinned headers. The background icon extends through both the header and chip nav bar, fading as the header collapses. A `ListenableBuilder` with a `ValueNotifier<double>` isolates icon opacity rebuilds from the rest of the widget tree.
+Uses a `Stack` with a background `ClassIconBackdrop` (`lib/ui/widgets/character/class_icon_backdrop.dart`) and a `CustomScrollView` with slivers for efficient scrolling and pinned headers. The background icon extends through both the header and chip nav bar, fading as the header collapses. A `ListenableBuilder` with a `ValueNotifier<double>` isolates icon opacity rebuilds from the rest of the widget tree.
 
 ```
 ┌─────────────────────────────────────┐
@@ -464,8 +464,8 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 - Expands to a dynamic height based on content: base 172px + 32px for the traits row (or the italic "Jaws of the Lion" label that replaces it for JotL characters — view mode only) + 28px for retired label (via `viewModeMaxHeight()`)
 - Collapses to 56px (name only) on scroll; expanded content wrapped in `OverflowBox` for smooth collapse transitions
 - In edit mode with non-retired character: stays at 90px (name `TextFormField`)
-- Contains its own clipped `ClassIconSvg` (matching the Stack background icon position) so the opaque surface blocks scrolling content while the icon appears seamless
-- **Background tint**: Once content scrolls behind the pinned headers (scroll offset > collapse range), the `Material` background transitions from `surface` to an 8% primary tint via `TweenAnimationBuilder` (300ms). Resets instantly on character switch via `ValueKey(character.uuid)`.
+- Contains its own clipped `ClassIconBackdrop` (the same widget as the Stack background icon, so position, fade and colour always match) so the opaque surface blocks scrolling content while the icon appears seamless
+- **Background tint**: Once content scrolls behind the pinned headers (scroll offset > collapse range), the `Material` background transitions from `surface` to an 8% primary tint via `ScrollTintBuilder` (300ms). Resets instantly on character switch via `ValueKey(character.uuid)`.
 
 ### Chip Nav Bar
 
@@ -474,7 +474,7 @@ The `questAndNotes` chip is **conditional** — hidden for retired characters wi
 - **Scroll-spy**: `_onScroll` listener updates `_activeSection` based on which section key is closest to the top
 - **Tap-to-scroll**: `_scrollToSection` uses `Scrollable.ensureVisible` to compute target offset, then animates smoothly
 - Pinned below the character header
-- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `TweenAnimationBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`CharacterHeaderDelegate`) also tint in sync using the same pattern.
+- **Background**: In view mode (and retired edit mode), transparent when not overlapping content (lets Stack background icon show through); transitions to an 8% primary tint (`AppBarUtils.getTintedBackground`) when content scrolls behind it. Opacity follows scroll position directly (transparent as long as header is expanding), while the tint fades in smoothly via `ScrollTintBuilder` (300ms). In edit mode (non-retired), always opaque — tint animates in/out based on `overlapsContent`. The app bar (`GHCAnimatedAppBar`) and character header (`CharacterHeaderDelegate`) also tint in sync using the same pattern.
 
 ### Section Cards
 

@@ -136,30 +136,27 @@ Pinned headers throughout the app use an M3-inspired scroll-aware tint to indica
 |-----------|------|----------|
 | Character header (`CharacterHeaderDelegate`) | `character_header_delegates.dart` | Transparent when expanded; tints when content scrolls behind pinned header |
 | Chip nav bar (`SectionNavBarDelegate`) | `character_header_delegates.dart` | Same — transparent when header expanding, tints when content overlaps |
-| Calculator page app bar | `enhancement_calculator_screen.dart` | Tints when `CustomScrollView` content scrolls behind pinned app bar |
-| Main app bar (`GHCAnimatedAppBar`) | `ghc_animated_app_bar.dart` | Tints in sync with character header on characters page; title flips vertically on page transitions |
+| Main app bar (`GHCAnimatedAppBar`) | `ghc_animated_app_bar.dart` | Tints in sync with the character header on the characters page, and when calculator content scrolls under it on the calculator page; title flips vertically on page transitions |
+| Pushed-route app bar (`GHCAppBar`) | `ghc_app_bar.dart` | Tints (and gains elevation) once its scroll controller leaves the top |
 
 ### Animation Pattern
 
-All tinted headers use the same `TweenAnimationBuilder<double>` pattern:
+All four use **`ScrollTintBuilder`** (`lib/ui/widgets/app_bar_utils.dart`), which fades from `surface` to `getTintedBackground` over `tintAnimationDuration` (300ms, easeInOut) while `tinted` is true. The builder receives the blended colour and the raw progress (`GHCAppBar` uses it for elevation):
 
 ```dart
-TweenAnimationBuilder<double>(
-  key: ValueKey(character.uuid),  // resets on character switch
-  tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
-  duration: const Duration(milliseconds: 300),
-  curve: Curves.easeInOut,
-  builder: (context, tintProgress, child) {
-    final tinted = AppBarUtils.getTintedBackground(colorScheme);
-    final color = Color.lerp(surface, tinted, tintProgress)!;
-    // ...
+ScrollTintBuilder(
+  key: ValueKey(character.uuid),  // new character: jump to its state, no fade
+  tinted: overlapsContent,
+  builder: (context, background, progress, child) {
+    return Material(color: background, child: child);
   },
+  child: content,
 )
 ```
 
 ### Edit Mode Behavior
 
-- **View mode** (and retired edit mode): Background opacity follows scroll position directly (transparent as long as header is expanding). Tint color fades in/out smoothly via the 300ms animation.
+- **View mode** (and retired edit mode): Background opacity follows scroll position directly (transparent as long as header is expanding). Tint color fades in/out smoothly via `ScrollTintBuilder`.
 - **Edit mode** (non-retired): Always opaque. Tint animates in/out based on `overlapsContent` only.
 
 ---
