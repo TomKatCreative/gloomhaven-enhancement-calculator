@@ -102,6 +102,9 @@ const double dividerThickness = 1.0;
 /// 250ms
 const Duration animationDuration = Duration(milliseconds: 250);
 
+/// 300ms — App bar and header tint fading in as content scrolls under them
+const Duration tintAnimationDuration = Duration(milliseconds: 300);
+
 // Blur - backdrop blur sigma for expanded sections over the class icon
 
 /// 12.0

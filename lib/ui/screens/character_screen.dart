@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/character_header_delegates.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/class_icon_backdrop.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/perks_and_masteries_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/quest_and_notes_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/character/stats_and_resources_card.dart';
@@ -186,49 +185,33 @@ class _CharacterScreenState extends State<CharacterScreen>
         !widget.character.isRetired ||
         widget.character.personalQuest != null ||
         widget.character.notes.isNotEmpty;
-    final theme = Theme.of(context);
 
     return Stack(
       children: [
         // Background class icon — extends through transparent header and nav bar.
-        // Fades from 15% → 0% opacity as the header collapses. `range` is the
-        // header's collapse distance (maxExtent − minExtent); `progress` is how
-        // far through that range the user has scrolled. Hidden in edit mode
-        // (non-retired) where the header + chip bar are fully opaque.
-        Positioned(
-          right: -32,
-          top: -45,
-          height:
-              CharacterHeaderDelegate.viewModeMaxHeight(widget.character) +
-              chipBarHeight +
-              75,
-          width: 260,
-          child: ListenableBuilder(
-            listenable: _scrollOffsetNotifier,
-            child: ClassIconSvg(
-              playerClass: widget.character.playerClass,
-              color: ColorUtils.ensureContrast(
-                widget.character.getEffectiveColor(theme.brightness),
-                theme.colorScheme.surface,
-              ),
-            ),
-            builder: (context, child) {
-              final isFixedHeader =
-                  model.isEditMode && !widget.character.isRetired;
-              if (isFixedHeader) {
-                return const Opacity(opacity: 0, child: SizedBox.shrink());
-              }
-              final range =
-                  CharacterHeaderDelegate.viewModeMaxHeight(widget.character) -
-                  CharacterHeaderDelegate.minHeight;
-              final offset = _scrollOffsetNotifier.value;
-              final progress = (offset / range).clamp(0.0, 1.0);
-              return Opacity(
-                opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
-                child: child,
-              );
-            },
-          ),
+        // Fades out as the header collapses. `range` is the header's collapse
+        // distance (maxExtent − minExtent); `progress` is how far through that
+        // range the user has scrolled. Hidden in edit mode (non-retired) where
+        // the header + chip bar are fully opaque.
+        ListenableBuilder(
+          listenable: _scrollOffsetNotifier,
+          builder: (context, _) {
+            final isFixedHeader =
+                model.isEditMode && !widget.character.isRetired;
+            final headerHeight = CharacterHeaderDelegate.viewModeMaxHeight(
+              widget.character,
+            );
+            final range = headerHeight - CharacterHeaderDelegate.minHeight;
+            final progress = (_scrollOffsetNotifier.value / range).clamp(
+              0.0,
+              1.0,
+            );
+            return ClassIconBackdrop(
+              character: widget.character,
+              headerHeight: headerHeight,
+              collapseProgress: isFixedHeader ? 1.0 : progress,
+            );
+          },
         ),
         NotificationListener<ScrollMetricsNotification>(
           onNotification: (notification) {

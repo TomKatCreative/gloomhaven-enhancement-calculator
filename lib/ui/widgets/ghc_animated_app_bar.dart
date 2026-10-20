@@ -314,21 +314,15 @@ class _GHCAnimatedAppBarState extends State<GHCAnimatedAppBar>
         (isOnCharactersPage && !_isScrolledToTop) ||
         (isOnCalcPage && !_isCalcScrolledToTop);
 
-    return TweenAnimationBuilder<double>(
+    return ScrollTintBuilder(
       key: ValueKey(uuid),
-      tween: Tween<double>(end: showTint ? 1.0 : 0.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      builder: (context, tintProgress, _) {
+      tinted: showTint,
+      builder: (context, background, _, _) {
         return AppBar(
           automaticallyImplyLeading: false,
           elevation: 0,
           scrolledUnderElevation: 0,
-          backgroundColor: Color.lerp(
-            colorScheme.surface,
-            AppBarUtils.getTintedBackground(colorScheme),
-            tintProgress,
-          ),
+          backgroundColor: background,
           centerTitle: true,
           title: AnimatedBuilder(
             animation: _flipAnimation,

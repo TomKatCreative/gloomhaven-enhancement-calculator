@@ -7,6 +7,7 @@ import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/character.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/app_bar_utils.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/character/class_icon_backdrop.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/class_icon_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:provider/provider.dart';
@@ -72,8 +73,6 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final range = maxExtent - minExtent;
     final progress = range > 0 ? (shrinkOffset / range).clamp(0.0, 1.0) : 0.0;
 
@@ -85,20 +84,11 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
       valueListenable: scrollOffsetNotifier,
       builder: (context, scrollOffset, child) {
         final isContentBehind = scrollOffset > range;
-        return TweenAnimationBuilder<double>(
+        return ScrollTintBuilder(
           key: ValueKey(character.uuid),
-          tween: Tween<double>(end: isContentBehind ? 1.0 : 0.0),
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          builder: (context, tintProgress, child) {
-            return Material(
-              color: Color.lerp(
-                colorScheme.surface,
-                AppBarUtils.getTintedBackground(colorScheme),
-                tintProgress,
-              ),
-              child: child,
-            );
+          tinted: isContentBehind,
+          builder: (context, background, _, child) {
+            return Material(color: background, child: child);
           },
           child: child,
         );
@@ -110,21 +100,10 @@ class CharacterHeaderDelegate extends SliverPersistentHeaderDelegate {
             // Faded class icon background (matches Stack icon position/size).
             // Hidden in edit mode where the header is fully opaque.
             if (!isEditMode || character.isRetired)
-              Positioned(
-                right: -32,
-                top: -45,
-                height: maxExtent + chipBarHeight + 75,
-                width: 260,
-                child: Opacity(
-                  opacity: (0.15 * (1 - progress)).clamp(0.0, 0.15),
-                  child: ClassIconSvg(
-                    playerClass: character.playerClass,
-                    color: ColorUtils.ensureContrast(
-                      character.getEffectiveColor(theme.brightness),
-                      colorScheme.surface,
-                    ),
-                  ),
-                ),
+              ClassIconBackdrop(
+                character: character,
+                headerHeight: maxExtent,
+                collapseProgress: progress,
               ),
             // Content
             Padding(
@@ -394,7 +373,7 @@ class SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
 
     // Opacity follows scroll position directly (no animation delay) so the
     // bar goes transparent as soon as the header starts re-expanding.
-    // Tint color still fades in smoothly via TweenAnimationBuilder.
+    // Tint color still fades in smoothly via ScrollTintBuilder.
     // Header collapse range: maxHeight − 56. In edit mode (fixed header) = 0.
     final headerRange = isEditMode
         ? 0.0
@@ -405,22 +384,15 @@ class SectionNavBarDelegate extends SliverPersistentHeaderDelegate {
       valueListenable: scrollOffsetNotifier,
       builder: (context, scrollOffset, child) {
         final isOpaque = isEditMode || scrollOffset >= headerRange;
-        return TweenAnimationBuilder<double>(
+        return ScrollTintBuilder(
           key: ValueKey(character.uuid),
-          tween: Tween<double>(end: overlapsContent ? 1.0 : 0.0),
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          builder: (context, tintProgress, child) {
-            final color = isOpaque
-                ? Color.lerp(
-                    theme.colorScheme.surface,
-                    AppBarUtils.getTintedBackground(theme.colorScheme),
-                    tintProgress,
-                  )
-                : Colors.transparent;
+          tinted: overlapsContent,
+          builder: (context, background, _, child) {
             return Container(
               height: chipBarHeight,
-              decoration: BoxDecoration(color: color),
+              decoration: BoxDecoration(
+                color: isOpaque ? background : Colors.transparent,
+              ),
               child: child,
             );
           },

@@ -107,21 +107,16 @@ class _GHCAppBarState extends State<GHCAppBar> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final baseColor = colorScheme.surface;
-    final scrolledColor = AppBarUtils.getTintedBackground(colorScheme);
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(end: _isScrolledToTop ? 0.0 : 1.0),
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      builder: (context, progress, child) {
+    return ScrollTintBuilder(
+      tinted: !_isScrolledToTop,
+      builder: (context, background, progress, _) {
         return AppBar(
           automaticallyImplyLeading: false,
           centerTitle: false,
           elevation: progress * 4.0,
           scrolledUnderElevation: 0,
-          backgroundColor: Color.lerp(baseColor, scrolledColor, progress),
+          backgroundColor: background,
           leading: IconButton(
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(
