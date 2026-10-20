@@ -81,11 +81,10 @@ class CharactersModel with ChangeNotifier {
     initialPage: SharedPrefs().currentCharacterIndex,
   );
   bool isScrolledToTop = true;
-  ScrollController charScreenScrollController = ScrollController();
   ScrollController enhancementCalcScrollController = ScrollController();
 
-  /// Notifier for the character screen's current scroll offset.
-  /// Updated by [CharacterScreen] on both user scrolls and metrics corrections
+  /// Notifier for the current character page's scroll offset.
+  /// Updated by the current [CharacterScreen] on both user scrolls and metrics corrections
   /// (e.g. section collapse). Listened to by [GHCAnimatedAppBar] for tint.
   final ValueNotifier<double> charScrollOffsetNotifier = ValueNotifier<double>(
     0,
@@ -118,7 +117,6 @@ class CharactersModel with ChangeNotifier {
   @override
   void dispose() {
     pageController.dispose();
-    charScreenScrollController.dispose();
     enhancementCalcScrollController.dispose();
     charScrollOffsetNotifier.dispose();
     super.dispose();

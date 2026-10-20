@@ -33,32 +33,56 @@ class _CharacterScreenState extends State<CharacterScreen>
     CharacterSection.general,
   );
 
-  late ScrollController _scrollController;
-  late ValueNotifier<double> _scrollOffsetNotifier;
+  // Each page owns its scroll state: pages are kept alive across swipes, so a
+  // shared controller would end up attached to several scroll views at once.
+  final ScrollController _scrollController = ScrollController();
+
+  // This page's offset, driving its own header, chip bar and background icon.
+  final ValueNotifier<double> _scrollOffsetNotifier = ValueNotifier(0);
+
+  // The model's offset notifier drives the app bar, which belongs to whichever
+  // page is current, so only the current page writes to it.
+  late final ValueNotifier<double> _appBarOffsetNotifier;
+  bool _isCurrentPage = false;
   bool _isScrollSpyEnabled = true;
 
   @override
   void initState() {
     super.initState();
-    final model = context.read<CharactersModel>();
-    _scrollController = model.charScreenScrollController;
-    _scrollOffsetNotifier = model.charScrollOffsetNotifier;
+    _appBarOffsetNotifier = context
+        .read<CharactersModel>()
+        .charScrollOffsetNotifier;
     _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _scrollOffsetNotifier.dispose();
     _activeSectionNotifier.dispose();
     super.dispose();
   }
 
   void _onScroll() {
-    // Guard against brief multi-attachment during character transitions
-    if (_scrollController.positions.length != 1) return;
+    if (!_scrollController.hasClients) return;
     _scrollOffsetNotifier.value = _scrollController.offset;
+    if (_isCurrentPage) _appBarOffsetNotifier.value = _scrollController.offset;
     if (!_isScrollSpyEnabled) return;
     _updateActiveSection();
+  }
+
+  /// Hands this page's offset to the app bar when the page becomes current,
+  /// since a kept-alive page may come back already scrolled.
+  void _syncCurrentPage(CharactersModel model) {
+    final isCurrent = model.currentCharacter?.uuid == widget.character.uuid;
+    if (isCurrent == _isCurrentPage) return;
+    _isCurrentPage = isCurrent;
+    if (!isCurrent) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _isCurrentPage) {
+        _appBarOffsetNotifier.value = _scrollOffsetNotifier.value;
+      }
+    });
   }
 
   void _updateActiveSection() {
@@ -156,6 +180,7 @@ class _CharacterScreenState extends State<CharacterScreen>
   Widget build(BuildContext context) {
     super.build(context);
     final model = context.watch<CharactersModel>();
+    _syncCurrentPage(model);
     final hasMasteries = widget.character.characterMasteries.isNotEmpty;
     final hasQuestOrNotes =
         !widget.character.isRetired ||

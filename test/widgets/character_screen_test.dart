@@ -1315,4 +1315,117 @@ void main() {
       expect(find.text('(retired)'), findsWidgets);
     });
   });
+
+  // ────────────────────────────────────────────────────────────────────────
+  // Section chips across swiped pages
+  // ────────────────────────────────────────────────────────────────────────
+
+  group('Section chips after swiping', () {
+    late Character first;
+    late Character second;
+    late CharactersModel model;
+
+    Future<void> pumpTwoPages(WidgetTester tester) async {
+      first = TestData.createCharacter(uuid: 'a', name: 'First');
+      second = TestData.createCharacter(uuid: 'b', name: 'Second');
+      fakeDb.characters = [first, second];
+      model = CharactersModel(
+        databaseHelper: fakeDb,
+        themeProvider: mockTheme,
+        showRetired: true,
+      );
+      await model.loadCharacters();
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<MockThemeProvider>.value(value: mockTheme),
+            ChangeNotifierProvider<CharactersModel>.value(value: model),
+            ChangeNotifierProvider<TownModel>(
+              create: (_) => TownModel(databaseHelper: fakeDb),
+            ),
+          ],
+          child: MaterialApp(
+            theme: testThemeData(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            home: Scaffold(
+              body: PageView(
+                controller: model.pageController,
+                onPageChanged: model.onPageChanged,
+                children: [
+                  CharacterScreen(character: first),
+                  CharacterScreen(character: second),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> swipe(WidgetTester tester, double dx) async {
+      await tester.fling(find.byType(PageView), Offset(dx, 0), 1000);
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> tapPerksChip(WidgetTester tester) async {
+      await tester.tap(find.widgetWithText(ChoiceChip, 'Perks').hitTestable());
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('chip scrolls the current page once two pages are alive', (
+      tester,
+    ) async {
+      await pumpTwoPages(tester);
+
+      // Swiping keeps the first page alive alongside the second.
+      await swipe(tester, -400);
+      expect(model.currentCharacter, same(second));
+
+      await tapPerksChip(tester);
+
+      expect(tester.takeException(), isNull);
+      expect(model.charScrollOffsetNotifier.value, greaterThan(0));
+    });
+
+    testWidgets('app bar offset follows the current page across swipes', (
+      tester,
+    ) async {
+      await pumpTwoPages(tester);
+
+      await tapPerksChip(tester);
+      final firstOffset = model.charScrollOffsetNotifier.value;
+      expect(firstOffset, greaterThan(0));
+
+      await swipe(tester, -400);
+      expect(model.currentCharacter, same(second));
+      expect(model.charScrollOffsetNotifier.value, 0);
+
+      // Scrolling the kept-alive first page while it isn't current must not
+      // reach the app bar.
+      final firstPageScrollable = tester
+          .stateList<ScrollableState>(
+            find.descendant(
+              of: find.byWidgetPredicate(
+                (w) => w is CharacterScreen && w.character == first,
+                skipOffstage: false,
+              ),
+              matching: find.byType(Scrollable, skipOffstage: false),
+              skipOffstage: false,
+            ),
+          )
+          .firstWhere((s) => s.axisDirection == AxisDirection.down);
+      final offstageOffset = firstOffset / 2;
+      firstPageScrollable.position.jumpTo(offstageOffset);
+      await tester.pump();
+      expect(model.charScrollOffsetNotifier.value, 0);
+
+      // Coming back, the first page republishes its current offset.
+      await swipe(tester, 400);
+      expect(model.currentCharacter, same(first));
+      expect(model.charScrollOffsetNotifier.value, offstageOffset);
+    });
+  });
 }
