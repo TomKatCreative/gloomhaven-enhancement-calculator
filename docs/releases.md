@@ -2,6 +2,31 @@
 
 Reverse-chronological log of production releases with commit references.
 
+## Unreleased
+
+Draft notes for the next release. Add to these as work lands on `dev`; the release copies the user-facing lines into `changelog_screen.dart`.
+
+**User-facing (draft changelog lines):**
+- Restoring a backup is now safe: the file is fully checked first, and if anything goes wrong your existing data is left unchanged.
+- If the app can't open its database, it now shows a recovery screen with options to export the database and contact the developer, instead of a broken screen.
+- Installing an older version over a newer one no longer deletes your data. The app asks you to update instead.
+- Characters from older versions that were missing mastery checkboxes now show them.
+- Fixed perk selections that could shift to the wrong perks for characters created before version 4.1.
+- Removed hidden mastery data left over from version 4.0.
+- The enhancement calculator now remembers the selected enhancement after relaunch.
+- Swiping between characters is smoother.
+
+**Internal:**
+- Database schema v21: no column changes. The migration reconciles every character's perk/mastery rows with its class and variant (`reconcileCharacterRows`), which also runs inside the restore transaction (DI-3).
+- Restore validates the whole backup and its prefs before writing, then wipes and inserts in one transaction; `MetaData` is no longer overwritten (DI-1).
+- Legacy-row repairs run before the v6→v7 and v7→v8 steps; downgrades throw `DatabaseTooNewException` instead of deleting the file; new `DatabaseOpenErrorView` (DI-2).
+- v7→v8 perk IDs are mapped from the frozen legacy layout (CQ-3). Calculator selection is persisted by stable key, with a one-time migration from the old index (CQ-2).
+- `Character.shouldShowMasteries` is derived from `MasteriesRepository`.
+- Migration and backup test harness covering every schema back to v1, plus real backup fixtures.
+- CI enforces `pubspec.lock`, runs `flutter analyze` and `flutter test`, pins Flutter, and smoke-tests the release APK on an emulator before uploading. R8 keep rules added for `package:jni`.
+- Toolchain: Gradle 9.8.2, AGP 9.4.1, Kotlin 2.4.21; smooth_page_indicator 3.0, Syncfusion sliders 35.1.
+- Code-quality phase 1: dead code, unused l10n keys and unused dependencies removed; the unmounted element tracker removed; bottom-nav page indices centralized.
+
 ## v4.6.1 — Blank-Screen Crash Fix
 
 - **Tag:** `v4.6.1`

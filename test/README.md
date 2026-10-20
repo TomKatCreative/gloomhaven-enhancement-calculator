@@ -44,7 +44,7 @@ test/
 
 ## Migration & Backup Harness
 
-`test/migration/` and `test/backup/` upgrade frozen databases from every historical schema (v1–v19) through the app's real open path and restore real backup files from `test/fixtures/backups/`. Known data bugs are `skip:`ped tests (`flutter test --run-skipped test/migration test/backup`). The same suites run on device via `integration_test/migration_on_device_test.dart`. See `docs/database_migration_testing.md` before changing the schema.
+`test/migration/` and `test/backup/` upgrade frozen databases from every historical schema (v1–v20) through the app's real open path and restore real backup files from `test/fixtures/backups/`. Fixed data bugs keep their tests as regression checks; a newly found bug is added as a `skip:`ped test (run with `flutter test --run-skipped test/migration test/backup`). The same suites run on device via `integration_test/migration_on_device_test.dart`. See `docs/database_migration_testing.md` before changing the schema.
 
 ## Test Infrastructure
 
