@@ -195,6 +195,90 @@ void main() {
       expect(tooltip, findsOneWidget);
     });
   });
+
+  group('Retire Snackbar', () {
+    testWidgets('says "retired" after retiring an active character', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(isRetired: false);
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+      model.isEditMode = true;
+
+      await tester.pumpWidget(
+        _buildTestApp(model: model, themeProvider: mockTheme),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('${character.name} retired'), findsOneWidget);
+      expect(find.text('${character.name} unretired'), findsNothing);
+    });
+
+    testWidgets('says "unretired" after unretiring a retired character', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(isRetired: true);
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+      model.isEditMode = true;
+
+      await tester.pumpWidget(
+        _buildTestApp(model: model, themeProvider: mockTheme),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.work_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('${character.name} unretired'), findsOneWidget);
+      expect(find.text('${character.name} retired'), findsNothing);
+    });
+
+    testWidgets('offers a "Show" action only when retired are hidden', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(isRetired: false);
+      fakeDb.characters = [character];
+      final model = createModel(showRetired: false);
+      await model.loadCharacters();
+      model.isEditMode = true;
+
+      await tester.pumpWidget(
+        _buildTestApp(model: model, themeProvider: mockTheme),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(SnackBarAction, 'Show'), findsOneWidget);
+    });
+
+    testWidgets('has no "Show" action when retired are already shown', (
+      tester,
+    ) async {
+      final character = TestData.createCharacter(isRetired: false);
+      fakeDb.characters = [character];
+      final model = createModel();
+      await model.loadCharacters();
+      model.isEditMode = true;
+
+      await tester.pumpWidget(
+        _buildTestApp(model: model, themeProvider: mockTheme),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.work_off_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SnackBarAction), findsNothing);
+    });
+  });
 }
 
 /// Builds a minimal test app with GHCAnimatedAppBar in a Scaffold.
