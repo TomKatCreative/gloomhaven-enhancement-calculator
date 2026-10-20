@@ -308,7 +308,7 @@ List<Widget> _enhancementIcons(List<Enhancement> enhancements) {
         (e) => Padding(
           padding: const EdgeInsets.only(right: tinyPadding),
           child: ThemedSvg(
-            assetKey: e.assetKey!,
+            assetKey: e.assetKey,
             height: iconSizeLarge,
             width: iconSizeLarge,
           ),

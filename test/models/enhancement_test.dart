@@ -10,6 +10,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.charPlusOne,
           'Move',
+          assetKey: 'MOVE',
           ghCost: 30,
         );
 
@@ -20,6 +21,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.target,
           'Target',
+          assetKey: 'MOVE',
           ghCost: 50,
           fhCost: 75,
         );
@@ -31,6 +33,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.charPlusOne,
           'Move',
+          assetKey: 'MOVE',
           ghCost: 30,
         );
 
@@ -41,6 +44,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.target,
           'Target',
+          assetKey: 'MOVE',
           ghCost: 50,
           fhCost: 75,
         );
@@ -52,6 +56,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.charPlusOne,
           'Attack',
+          assetKey: 'MOVE',
           ghCost: 50,
         );
 
@@ -169,9 +174,31 @@ void main() {
     });
   });
 
+  group('Enhancement.isPlusOne', () {
+    const plusOneCategories = {
+      EnhancementCategory.charPlusOne,
+      EnhancementCategory.summonPlusOne,
+      EnhancementCategory.target,
+    };
+
+    for (final category in EnhancementCategory.values) {
+      test(
+        'is ${plusOneCategories.contains(category)} for ${category.name}',
+        () {
+          final enhancement = Enhancement(category, 'Test', assetKey: 'MOVE');
+          expect(enhancement.isPlusOne, plusOneCategories.contains(category));
+        },
+      );
+    }
+  });
+
   group('Enhancement.isAvailableIn', () {
     test('defaults to every edition', () {
-      final enhancement = Enhancement(EnhancementCategory.charPlusOne, 'Test');
+      final enhancement = Enhancement(
+        EnhancementCategory.charPlusOne,
+        'Test',
+        assetKey: 'MOVE',
+      );
       for (final edition in GameEdition.values) {
         expect(enhancement.isAvailableIn(edition), isTrue);
       }
@@ -181,6 +208,7 @@ void main() {
       final enhancement = Enhancement(
         EnhancementCategory.posEffect,
         'Test',
+        assetKey: 'MOVE',
         excludedEditions: {GameEdition.gloomhaven},
       );
       expect(enhancement.isAvailableIn(GameEdition.gloomhaven), isFalse);

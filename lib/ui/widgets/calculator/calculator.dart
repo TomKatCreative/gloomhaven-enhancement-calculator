@@ -6,6 +6,7 @@ export 'card_level_body.dart';
 export 'cost_display.dart';
 export 'cost_marker.dart';
 export 'discounts_card.dart';
+export 'enhancement_icon.dart';
 export 'enhancement_type_body.dart';
 export 'enhancement_type_card.dart';
 export 'info_button_config.dart';

@@ -6,7 +6,7 @@ class Enhancement {
   final String name;
   final int ghCost;
   final int? fhCost;
-  final String? assetKey;
+  final String assetKey;
 
   /// Editions this enhancement does not exist in. Empty means every edition.
   final Set<GameEdition> excludedEditions;
@@ -14,7 +14,7 @@ class Enhancement {
   Enhancement(
     this.category,
     this.name, {
-    this.assetKey,
+    required this.assetKey,
     this.ghCost = 0,
     this.fhCost,
     this.excludedEditions = const {},
@@ -23,6 +23,13 @@ class Enhancement {
   /// Stable identifier used to persist the selection. Unlike a position in
   /// [EnhancementData.enhancements], it survives reordering of that list.
   String get key => '${category.name}:$name';
+
+  /// Whether this is a +1 to a stat (character, summon or target), shown with
+  /// a +1 badge and labelled "+1 Name".
+  bool get isPlusOne =>
+      category == EnhancementCategory.charPlusOne ||
+      category == EnhancementCategory.summonPlusOne ||
+      category == EnhancementCategory.target;
 
   /// Whether this enhancement exists in [edition].
   bool isAvailableIn(GameEdition edition) =>

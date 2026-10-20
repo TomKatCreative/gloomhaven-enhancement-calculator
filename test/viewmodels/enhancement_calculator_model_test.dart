@@ -293,6 +293,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.charPlusOne,
           'Test',
+          assetKey: 'MOVE',
           ghCost: 10,
         );
 
@@ -699,6 +700,7 @@ void main() {
         final enhancement = Enhancement(
           EnhancementCategory.charPlusOne,
           'Cheap',
+          assetKey: 'MOVE',
           ghCost: 5,
         );
 

@@ -4,12 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
-import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/calculation_step.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/enhancement_icon.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
-import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
 /// A floating chip that displays the total enhancement cost and can expand
@@ -328,7 +326,10 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
           mainAxisSize: MainAxisSize.min,
           children: [
             if (widget.enhancement != null) ...[
-              _buildEnhancementIcon(widget.enhancement!, 26),
+              EnhancementIcon(
+                enhancement: widget.enhancement!,
+                size: iconSizeMedium,
+              ),
               const SizedBox(width: smallPadding),
             ],
             Text(
@@ -385,7 +386,10 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (widget.enhancement != null) ...[
-                      _buildEnhancementIcon(widget.enhancement!, iconSizeLarge),
+                      EnhancementIcon(
+                        enhancement: widget.enhancement!,
+                        size: iconSizeLarge,
+                      ),
                       const SizedBox(width: mediumPadding),
                     ],
                     Text(
@@ -449,30 +453,5 @@ class _ExpandableCostChipState extends State<ExpandableCostChip>
         ),
       ),
     );
-  }
-
-  /// Builds the appropriate icon for the enhancement.
-  Widget _buildEnhancementIcon(Enhancement enhancement, double size) {
-    if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: size);
-    }
-
-    if (enhancement.assetKey == null) {
-      return SizedBox(width: size, height: size);
-    }
-
-    return ThemedSvg(
-      assetKey: enhancement.assetKey!,
-      width: size,
-      height: size,
-      showPlusOneOverlay: _isPlusOneEnhancement(enhancement),
-    );
-  }
-
-  /// Returns true if the enhancement is a +1 type (character, summon, or target).
-  bool _isPlusOneEnhancement(Enhancement enhancement) {
-    return enhancement.category == EnhancementCategory.charPlusOne ||
-        enhancement.category == EnhancementCategory.summonPlusOne ||
-        enhancement.category == EnhancementCategory.target;
   }
 }

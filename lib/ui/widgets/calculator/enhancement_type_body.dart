@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/enhancement_icon.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_type_selector_screen.dart';
-import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
@@ -60,17 +58,10 @@ class EnhancementTypeBody extends StatelessWidget {
     Enhancement enhancement,
   ) {
     final theme = Theme.of(context);
-    final isPlusOne =
-        enhancement.category == EnhancementCategory.charPlusOne ||
-        enhancement.category == EnhancementCategory.target ||
-        enhancement.category == EnhancementCategory.summonPlusOne;
-
     return Row(
       children: [
-        if (enhancement.assetKey != null) ...[
-          _buildEnhancementIcon(enhancement, isPlusOne),
-          const SizedBox(width: 12),
-        ],
+        EnhancementIcon(enhancement: enhancement, size: iconSizeLarge),
+        const SizedBox(width: 12),
         Flexible(
           child: Text(
             enhancement.name,
@@ -83,18 +74,6 @@ class EnhancementTypeBody extends StatelessWidget {
           CostDisplay(config: costConfig!),
         ],
       ],
-    );
-  }
-
-  Widget _buildEnhancementIcon(Enhancement enhancement, bool isPlusOne) {
-    if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: iconSizeLarge);
-    }
-
-    return ThemedSvg(
-      assetKey: enhancement.assetKey!,
-      width: iconSizeLarge,
-      showPlusOneOverlay: isPlusOne,
     );
   }
 }

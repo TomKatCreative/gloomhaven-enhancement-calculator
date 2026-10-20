@@ -258,11 +258,7 @@ class EnhancementCostCalculator {
   int _baseCostStep(Enhancement enh, List<CalculationStep>? steps) {
     final baseCost = enh.cost(edition: edition);
     if (steps != null) {
-      final isPlusOne =
-          enh.category == EnhancementCategory.charPlusOne ||
-          enh.category == EnhancementCategory.summonPlusOne ||
-          enh.category == EnhancementCategory.target;
-      final enhancementName = isPlusOne ? '+1 ${enh.name}' : enh.name;
+      final enhancementName = enh.isPlusOne ? '+1 ${enh.name}' : enh.name;
       steps.add(
         CalculationStep(
           description: 'Base cost ($enhancementName)',

@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/models/enhancement.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/enhancement_icon.dart';
 import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
-import 'package:gloomhaven_enhancement_calc/ui/widgets/element_stack_icon.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_search_app_bar.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/search_section_header.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/strikethrough_text.dart';
-import 'package:gloomhaven_enhancement_calc/utils/themed_svg.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 import 'package:provider/provider.dart';
 
@@ -223,7 +222,7 @@ class _EnhancementTypeSelectorScreenState
       selected: isSelected,
       selectedTileColor: colorScheme.primaryContainer.withValues(alpha: 0.3),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: _buildEnhancementIcon(enhancement),
+      leading: EnhancementIcon(enhancement: enhancement, size: iconSizeMedium),
       title: Text(enhancement.name, style: theme.textTheme.bodyLarge),
       trailing: _buildCostDisplay(
         context,
@@ -236,28 +235,6 @@ class _EnhancementTypeSelectorScreenState
         widget.onSelected(enhancement);
         Navigator.of(context).pop(enhancement);
       },
-    );
-  }
-
-  /// Builds the icon for an enhancement.
-  ///
-  /// Special cases:
-  /// - "Element" shows a stacked element icon
-  /// - +1 stat enhancements show a +1 overlay badge
-  Widget _buildEnhancementIcon(Enhancement enhancement) {
-    final isPlusOne =
-        enhancement.category == EnhancementCategory.charPlusOne ||
-        enhancement.category == EnhancementCategory.target ||
-        enhancement.category == EnhancementCategory.summonPlusOne;
-
-    if (enhancement.name == 'Element') {
-      return ElementStackIcon(size: iconSizeLarge);
-    }
-
-    return ThemedSvg(
-      assetKey: enhancement.assetKey!,
-      width: iconSizeMedium,
-      showPlusOneOverlay: isPlusOne,
     );
   }
 
