@@ -922,6 +922,30 @@ const Map<String, AssetConfig> assets = {
   'xp': AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme()),
 };
 
+/// Punctuation stripped from asset keys before lookup.
+final _keyPunctuation = RegExp(
+  r"[,.:()"
+  "'"
+  '"'
+  "]",
+);
+
+/// XP values such as xp8 or xp10, which all share the XP icon.
+final _xpPattern = RegExp(r'^xp\d+$');
+
+/// Numeric tokens such as +1, -1 or 2x.
+final _numericStart = RegExp(r'^[+-]?\d');
+
+const _xpAsset = AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme());
+
+String _cleanKey(String element) => element.replaceAll(_keyPunctuation, '');
+
+/// Looks up an already-cleaned key, including the XP pattern.
+AssetConfig? _lookup(String cleanElement) {
+  if (_xpPattern.hasMatch(cleanElement)) return _xpAsset;
+  return assets[cleanElement];
+}
+
 /// Get asset configuration for a given asset key.
 ///
 /// This function cleans the input string and returns the appropriate
@@ -932,32 +956,14 @@ const Map<String, AssetConfig> assets = {
 ///
 /// Throws [AssertionError] if no configuration is found.
 AssetConfig getAssetConfig(String element) {
-  // Clean the input string - remove punctuation
-  String cleanElement = element.replaceAll(
-    RegExp(
-      r"[,.:()"
-      "'"
-      '"'
-      "]",
-    ),
-    '',
-  );
-
-  // Handle XP pattern (xp8, xp10, etc.)
-  if (RegExp(r'^xp\d+$').hasMatch(cleanElement)) {
-    return const AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme());
-  }
-
-  // Check assets by key
-  final asset = assets[cleanElement];
-  if (asset != null) {
-    return asset;
-  }
+  final cleanElement = _cleanKey(element);
+  final asset = _lookup(cleanElement);
+  if (asset != null) return asset;
 
   // No configuration found - this indicates a missing asset definition
   throw AssertionError(
     'No asset configuration found for "$cleanElement". '
-    'Add it to standardAssets in asset_config.dart.',
+    'Add it to assets in asset_config.dart.',
   );
 }
 
@@ -967,33 +973,18 @@ AssetConfig getAssetConfig(String element) {
 /// text that may contain icons). Use [getAssetConfig] when you know the
 /// asset should exist.
 AssetConfig? tryGetAssetConfig(String element) {
-  // Clean the input string - remove punctuation
-  String cleanElement = element.replaceAll(
-    RegExp(
-      r"[,.:()"
-      "'"
-      '"'
-      "]",
-    ),
-    '',
-  );
+  final cleanElement = _cleanKey(element);
 
   // Skip all-lowercase words to prevent matching class codes
   // that happen to be English words (e.g., 'be', 'hive', 'core')
   // Intentional icon tokens use UPPERCASE (ATTACK, MOVE) or PascalCase (Berserker)
   if (cleanElement.isNotEmpty &&
       cleanElement == cleanElement.toLowerCase() &&
-      !RegExp(r'^[+-]?\d').hasMatch(cleanElement) && // Allow +1, -1, 2x
+      !_numericStart.hasMatch(cleanElement) && // Allow +1, -1, 2x
       !cleanElement.startsWith('xp')) {
     // Allow xp8, xp10
     return null;
   }
 
-  // Handle XP pattern (xp8, xp10, etc.)
-  if (RegExp(r'^xp\d+$').hasMatch(cleanElement)) {
-    return const AssetConfig('ui/xp.svg', themeMode: CurrentColorTheme());
-  }
-
-  // Check assets by key
-  return assets[cleanElement];
+  return _lookup(cleanElement);
 }
