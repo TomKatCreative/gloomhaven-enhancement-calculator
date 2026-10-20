@@ -29,8 +29,8 @@ The app uses Provider with five main models set up in `main.dart`:
 │  └────────┬─────────────────────┘                           │
 │           │                                                 │
 │  ┌────────▼─────────────────────┐                           │
-│  │    CharactersModel           │  ← ProxyProvider          │
-│  │    (depends on ThemeProvider)│                           │
+│  │    CharactersModel           │  ← reads ThemeProvider    │
+│  │    (writes seed color to it) │    once, in create        │
 │  └──────────────────────────────┘                           │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -283,7 +283,7 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 
 ### Dependencies
 
-- `ThemeProvider` (via ProxyProvider) - for color sync
+- `ThemeProvider` (read once in `create`) - for color sync
 - `DatabaseHelper` (singleton) - for persistence
 - `PersonalQuestService` (created internally) - for quest operations
 
@@ -501,16 +501,21 @@ void enhancementSelected(Enhancement selected) {
 }
 ```
 
-### ProxyProvider Pattern
+### ThemeProvider Dependency
 
-`CharactersModel` depends on `ThemeProvider`, set up via `ProxyProvider`:
+`CharactersModel` writes the selected character's color into `ThemeProvider` but never reacts to theme changes, so it is a plain `ChangeNotifierProvider` that reads `ThemeProvider` once when created:
 
 ```dart
-ProxyProvider<ThemeProvider, CharactersModel>(
-  update: (context, themeProvider, previous) =>
-    previous ?? CharactersModel(themeProvider),
+ChangeNotifierProvider(
+  create: (context) => CharactersModel(
+    showRetired: SharedPrefs().showRetiredCharacters,
+    databaseHelper: DatabaseHelper.instance,
+    themeProvider: context.read<ThemeProvider>(),
+  ),
 )
 ```
+
+`ThemeProvider` must stay declared before it in the `MultiProvider`. The root `Builder` in `GloomhavenApp` is the only `MaterialApp` listener: it `context.watch`es `ThemeProvider` and rebuilds `MaterialApp` with the new themes.
 
 ### Scroll Controller Sharing
 

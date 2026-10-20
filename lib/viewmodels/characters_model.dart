@@ -9,7 +9,9 @@
 ///
 /// ## Provider Dependencies
 ///
-/// This model depends on [ThemeProvider] via ProxyProvider for color sync.
+/// This model is handed [ThemeProvider] at creation (a plain
+/// `ChangeNotifierProvider` in `main.dart` reads it once) and pushes the
+/// selected character's color into it.
 /// It also uses [DatabaseHelper] singleton for SQLite persistence.
 ///
 /// ## Character Filtering

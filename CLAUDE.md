@@ -32,7 +32,7 @@ git diff lib/ui/screens/file.dart --stat
 
 ### State Management: Provider + ChangeNotifier
 
-Models are registered in `main.dart` (`CharactersModel` via ProxyProvider).
+Models are registered in `main.dart`; `CharactersModel` is handed `ThemeProvider` at creation and pushes character colors into it.
 
 ### Data Persistence
 
