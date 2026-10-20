@@ -68,12 +68,14 @@ The fake always calls `_generateCharacterMasteries`. The real `database_helper.d
 
 **Fix:** Guard the call with `if (character.shouldShowMasteries)` and re-run the viewmodel tests.
 
-### CQ-6 🟨 Small latent correctness issues
+### CQ-6 ✅ Small latent correctness issues
 
 - **`lib/models/character.dart:157`:** `id = map[columnCharacterId] ?? ''` puts a String into `int?`, which throws a TypeError instead of falling back. Use `as int?`.
 - **`lib/ui/widgets/character/stats_section.dart:422-423`:** `ResourcesContent` reads `isEditMode` with `context.read` in `build`. It only updates because the parent watches the whole model, so narrowing the parent to a `Selector` (as the perf work is doing) would break edit mode. Use `context.select<CharactersModel, bool>((m) => m.isEditMode)`.
 - **`lib/data/perks/perks_repository.dart:58-59`:** `getPerksForCharacter` mutates the shared static `Perk` objects (`variant`, `classCode`) before copying them. The copy already sets both fields, so delete the mutation.
-- ⬜ **`lib/ui/dialogs/restore_dialog.dart:105-138`** (added 2026-10-20 from the CQ-11 persistence review): after the restore commits, the calculator syncs with the restored prefs only through `reloadFromPrefs()`. The `context.mounted` guard right after `restored = true` and an exception from `updateThemeConfig` both skip it, and the `catch` reloads characters only. The calculator then computes costs from its pre-restore cache until the next launch. The restored prefs on disk survive (since CQ-11, enhancer toggles read the untouched levels from disk). Call `reloadFromPrefs()` right after `restored = true`, using a model read before the `await`, and add a `restore_dialog` test.
+- ✅ **`lib/ui/dialogs/restore_dialog.dart:105-138`** (added 2026-10-20 from the CQ-11 persistence review): after the restore commits, the calculator syncs with the restored prefs only through `reloadFromPrefs()`. The `context.mounted` guard right after `restored = true` and an exception from `updateThemeConfig` both skip it, and the `catch` reloads characters only. The calculator then computes costs from its pre-restore cache until the next launch. The restored prefs on disk survive (since CQ-11, enhancer toggles read the untouched levels from disk). Call `reloadFromPrefs()` right after `restored = true`, using a model read before the `await`, and add a `restore_dialog` test.
+
+**Done (restore sync):** `performRestore` reads the calculator model before its first await and calls `reloadFromPrefs()` right after the restore commits, before the `context.mounted` guard and the theme refresh. `restore_dialog_failure_test` restores a backup through a theme provider that throws and checks the calculator picked up the restored enhancer levels.
 
 ---
 

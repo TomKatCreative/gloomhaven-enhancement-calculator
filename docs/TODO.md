@@ -67,12 +67,6 @@ Remaining candidates are thin wrappers, tightly coupled to CRUD/theme sync. Like
 - Scroll controllers, navigation logic
 - Perk/mastery toggle (~13 lines each, 2 methods)
 
-### SharedPrefs enhancer level cascade
-
-**File:** `lib/shared_prefs.dart`
-
-Move cascade validation logic (setting lvl4 triggers lvl3/2/1) out of property setters into a dedicated validator. Keeps persistence layer dumb.
-
 ### SectionCard / CollapsibleSectionCard deduplication
 
 **File:** `lib/ui/widgets/section_card.dart`
@@ -239,3 +233,7 @@ Backup/restore extracted to `DatabaseBackupService` (`lib/data/database_backup_s
 ### Database query boilerplate
 
 Generic `_queryAndMap<T>()` helper added; all 6 query methods delegate to it.
+
+### SharedPrefs enhancer level cascade
+
+Done in CQ-11: the `SharedPrefs` enhancer setters are plain writes, and the rule lives in `EnhancementCalculatorModel._setEnhancerLevel`.
