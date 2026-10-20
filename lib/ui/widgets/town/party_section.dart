@@ -181,44 +181,26 @@ class _PartySectionState extends State<PartySection> {
               itemBuilder: (_) => [
                 PopupMenuItem(
                   value: PartyAction.rename,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(l10n.renameParty),
-                      const SizedBox(width: largePadding),
-                      Icon(
-                        Icons.edit_rounded,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
+                  child: ListTile(
+                    title: Text(l10n.renameParty),
+                    trailing: const Icon(Icons.edit_rounded),
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
                 PopupMenuItem(
                   value: PartyAction.switchParty,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(l10n.switchAction),
-                      const SizedBox(width: largePadding),
-                      Icon(
-                        Icons.swap_horiz_rounded,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
+                  child: ListTile(
+                    title: Text(l10n.switchAction),
+                    trailing: const Icon(Icons.swap_horiz_rounded),
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
                 PopupMenuItem(
                   value: PartyAction.deleteParty,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(l10n.delete),
-                      const SizedBox(width: largePadding),
-                      Icon(
-                        Icons.delete_rounded,
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ],
+                  child: ListTile(
+                    title: Text(l10n.delete),
+                    trailing: const Icon(Icons.delete_rounded),
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ],
