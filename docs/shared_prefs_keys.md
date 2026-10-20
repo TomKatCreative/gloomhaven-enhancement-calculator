@@ -73,7 +73,7 @@ prefs.setPlayerClassIsUnlocked('br', true);
 | `gameEdition` | int | 0 | Selected game edition (enum index) |
 | `enhancementKey` | String? | null | Selected enhancement as `Enhancement.key` (`'<category>:<name>'`, e.g. `charPlusOne:Move`) |
 | `enhancementType` | int? | null | **Legacy.** Selected enhancement as a list index (0 = no selection). Read once, migrated to `enhancementKey`, then removed |
-| `enhancementsOnTargetAction` | int | 0 | Previous enhancement count (0-9) |
+| `enhancementsOnTargetAction` | int | 0 | Previous enhancement count (0-3) |
 | `targetCardLvl` | int | 0 | Card level (0-indexed, displayed as 1-9) |
 
 ### Toggle States

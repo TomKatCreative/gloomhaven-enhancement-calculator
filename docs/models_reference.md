@@ -72,18 +72,10 @@ Represents a player's character instance with stats, resources, and progression.
 | `variant` | `Variant` | base | Class variant (affects perks/masteries) |
 | `partyId` | `String?` | null | FK to Party (nullable — unassigned characters have null) |
 
-**Frosthaven Resources** (all default 0):
-| Field | Type | Description |
-|-------|------|-------------|
-| `resourceHide` | `int` | Hides for crafting |
-| `resourceMetal` | `int` | Metal for crafting |
-| `resourceLumber` | `int` | Lumber for crafting |
-| `resourceArrowvine` | `int` | Arrowvine herb |
-| `resourceAxenut` | `int` | Axenut herb |
-| `resourceRockroot` | `int` | Rockroot herb |
-| `resourceFlamefruit` | `int` | Flamefruit herb |
-| `resourceCorpsecap` | `int` | Corpsecap herb |
-| `resourceSnowthistle` | `int` | Snowthistle herb |
+**Frosthaven Resources:**
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `resources` | `Map<Resource, int>` | every `Resource` → 0 | Count of each crafting resource. The constructor takes `Map<Resource, int> resources = const {}` and merges it over the zero-filled map, so every `Resource` always has an entry. Each `Resource` maps to its own Characters column (`Resource.column`) in `toMap`/`fromMap` |
 
 **Personal Quest Fields:**
 | Field | Type | Default | Description |
@@ -146,6 +138,21 @@ Represents a player's character instance with stats, resources, and progression.
 `getEffectiveColor()` returns:
 - Neutral gray if character is retired
 - `playerClass.primaryColor` otherwise
+
+---
+
+## Resource
+
+> **File**: `lib/models/resource.dart`
+
+Enum of the nine Frosthaven crafting resources, used as the key of `Character.resources`. Values are declared in Characters-table column order (`hide`, `metal`, `lumber`, `arrowvine`, `axenut`, `rockroot`, `flamefruit`, `corpsecap`, `snowthistle`) because the create-table SQL is generated from `Resource.values`.
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `column` | `String` | Characters table column holding the count (e.g. `ResourceWood` for `lumber`) |
+| `assetKey` | `String` | `asset_config.dart` icon key (e.g. `LUMBER`) |
+| `label(AppLocalizations l10n)` | `String` | Localized resource name |
+| `displayOrder` | `List<Resource>` | Static: the order the Resources section shows them in (materials, then herbs alphabetically) |
 
 ---
 
@@ -255,17 +262,21 @@ Represents an enhancement option for the calculator.
 
 ### EnhancementCategory Enum
 
-Defined in `lib/models/enhancement_category.dart`:
+Defined in `lib/data/enhancement_data.dart`:
 
 | Value | Description | Example Enhancements |
 |-------|-------------|---------------------|
 | `charPlusOne` | +1 character stats | +1 Move, +1 Attack, +1 Range |
-| `summonPlusOne` | +1 summon stats | +1 Summon Move, +1 Summon Attack |
-| `negativeConditions` | Negative status effects | Poison, Wound, Muddle |
-| `positiveConditions` | Positive status effects | Strengthen, Bless |
-| `element` | Element infusions | Fire, Ice, Earth, etc. |
-| `hex` | Hex targeting | Add Hex |
-| `other` | Miscellaneous | Jump, Specific Element |
+| `target` | +1 Target | Target |
+| `summonPlusOne` | +1 summon stats | +1 Summon Move, +1 Summon HP |
+| `posEffect` | Positive conditions | Strengthen, Bless, Regenerate, Ward |
+| `negEffect` | Negative conditions | Poison, Wound, Muddle, Curse |
+| `jump` | Jump | Jump |
+| `specElem` | Specific element | Element |
+| `anyElem` | Any (wild) element | Wild Element |
+| `hex` | Attack hex (cost by existing hex count) | 2–13 hexes |
+
+`sectionTitle(AppLocalizations l10n)` returns the localized section header the category is listed under (Character, Summon, Effect, Existing Hexes); `sectionAssetKey` returns the section icon key (`plus_one` for the +1 categories, `hex` for hex, otherwise null).
 
 ---
 
@@ -301,7 +312,7 @@ All fields are `final`. Construct a new instance when inputs change.
 |--------|------|-------------|
 | `totalCost` | `int` | Final calculated total cost |
 | `showCost` | `bool` | Whether any input is set |
-| `breakdown` | `List<CalculationStep>` | Step-by-step cost breakdown. Step values are running totals; the enhancement cost's clamp at 0 is not recorded, so read the total from `totalCost` |
+| `breakdown` | `List<CalculationStep>` | Step-by-step cost breakdown. Steps carry a `CalculationStepKind`, not display text (see [CalculationStep](#calculationstep)). Step values are running totals; the enhancement cost's clamp at 0 is not recorded, so read the total from `totalCost` |
 
 ### Methods
 
@@ -317,6 +328,23 @@ The totals and the breakdown share one set of private step builders, so the two 
 ### Rule Constants
 
 `static const` fields hold every number in the cost rules: `multiTargetMultiplier` (2), `lostDivisor` (2), `persistentMultiplier` (3), `enhancerL2Discount` (10), `hailsDiscountAmount` (5), `costPerCardLevel` (25), `partyBoonDiscountPerLevel` (5), `enhancerL3DiscountPerLevel` (10), `costPerPreviousEnhancement` (75), `enhancerL4DiscountPerEnhancement` (25), `temporaryEnhancementDiscount` (20) and `temporaryEnhancementMultiplier` (0.8). `CardDetailsCard` uses the per-level and per-enhancement values for its before-discount figures.
+
+---
+
+## CalculationStep
+
+> **File**: `lib/models/calculation_step.dart`
+
+One step of `EnhancementCostCalculator.breakdown`. Holds no display text: the UI turns it into localized strings via the `title(l10n)` and `modifierText(l10n)` extensions in `lib/ui/widgets/calculator/calculation_step_text.dart`.
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `kind` | `CalculationStepKind` | required | What the step represents (`baseCost`, `multipleTargets`, `lostAction`, `lostNonPersistentAction`, `persistentAction`, `enhancerLevel2`, `hailsDiscount`, `cardLevel`, `previousEnhancements`, `temporaryEnhancement`) |
+| `value` | `int` | required | Running total or the step's value |
+| `formula` | `String?` | null | How the value was calculated (e.g. `x2`, `+75g`) |
+| `enhancementName` | `String?` | null | Enhancement display name, for `baseCost` |
+| `count` | `int?` | null | Printed card level for `cardLevel`, or enhancement count for `previousEnhancements` |
+| `modifiers` | `List<CalculationModifier>` | `[]` | Discounts applied within the step, in display order. Each has a `kind` (`CalculationModifierKind`: `partyBoon`, `enhancerLevel3`, `enhancerLevel4`, `temporaryEnhancement`) and an `amount` in gold |
 
 ---
 
@@ -396,9 +424,9 @@ Links a character to a perk with selection state.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `characterUuid` | `String` | FK to Character |
-| `perkId` | `String` | FK to Perk |
-| `isSelected` | `bool` | Whether perk is checked |
+| `associatedCharacterUuid` | `String` | FK to Character |
+| `associatedPerkId` | `String` | FK to Perk |
+| `characterPerkIsSelected` | `bool` | Whether perk is checked |
 
 ---
 
@@ -434,7 +462,7 @@ The `Character.shouldShowMasteries` getter determines display. It is derived fro
 
 ## CharacterMastery (Join Table)
 
-> **File**: `lib/models/character_mastery.dart`
+> **File**: `lib/models/mastery/character_mastery.dart`
 
 Links a character to a mastery with achievement state.
 
@@ -442,9 +470,9 @@ Links a character to a mastery with achievement state.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `characterUuid` | `String` | FK to Character |
-| `masteryId` | `String` | FK to Mastery |
-| `isAchieved` | `bool` | Whether mastery is completed |
+| `associatedCharacterUuid` | `String` | FK to Character |
+| `associatedMasteryId` | `String` | FK to Mastery |
+| `characterMasteryAchieved` | `bool` | Whether mastery is completed |
 
 ---
 

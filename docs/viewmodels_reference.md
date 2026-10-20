@@ -148,7 +148,7 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 | `_enhancerLvl4` | `bool` | false | Cached enhancer level 4 state |
 | `_enhancement` | `Enhancement?` | null | Currently selected enhancement. Persisted as `Enhancement.key` (`enhancementKey` pref) and read via `_enhancementFromPrefs()`; an unknown key yields `null`. Falls back to the legacy `enhancementType` index (bounds-checked — an out-of-range index from older builds yields `null` instead of a `RangeError` during construction) and migrates it to a key. `resetCost()` and unavailable-in-edition selections clear both formats |
 | `_cardLevel` | `int` | 0 | Target card level (0-8, displayed as 1-9) |
-| `_previousEnhancements` | `int` | 0 | Count of previous enhancements (0-9) |
+| `_previousEnhancements` | `int` | 0 | Count of previous enhancements (0-3) |
 | `_multipleTargets` | `bool` | false | Multi-target multiplier enabled |
 | `_lostNonPersistent` | `bool` | false | Lost action modifier (GH2E/FH) |
 | `_persistent` | `bool` | false | Persistent modifier (FH only) |
@@ -197,7 +197,11 @@ Each setter writes through to SharedPrefs, invalidates the cached calculator and
 | `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore); enhancement selection is read through the bounds-checked `_enhancementFromPrefs()` helper (tolerates an out-of-range persisted index) |
 | `enhancementSelected(Enhancement)` | Handle enhancement selection with validation; one notify |
 | `gameVersionToggled()` | Handle edition change with modifier validation and re-check the selection; one notify |
-| `getCalculationBreakdown()` | Generate step-by-step cost breakdown |
+| `getCalculationBreakdown()` | Generate step-by-step cost breakdown (`List<CalculationStep>`) |
+| `enhancementCost(Enhancement?)` | Base cost of any enhancement with multipliers and flat discounts (lets the type selector preview costs). Thin wrapper over `EnhancementCostCalculator.enhancementCost` |
+| `cardLevelPenalty(int level)` | Card level penalty with discounts. Wrapper over `EnhancementCostCalculator.cardLevelPenalty` |
+| `previousEnhancementsPenalty(int count)` | Previous enhancements penalty with discounts. Wrapper over `EnhancementCostCalculator.previousEnhancementsPenalty` |
+| `eligibleForMultipleTargets(Enhancement, {edition})` | Static; delegates to `EnhancementCostCalculator.eligibleForMultipleTargets` |
 
 ### Cost Calculation Flow
 
@@ -307,7 +311,7 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | Getter | Returns | Description |
 |--------|---------|-------------|
 | `characters` | `List<Character>` | Filtered list (respects showRetired) |
-| `isEditMode` | `bool` | Current edit mode state |
+| `isEditMode` | `bool` | Current edit mode state (also a setter — see [Edit Mode](#edit-mode)) |
 | `retiredCharactersAreHidden` | `bool` | Inverse of showRetired |
 
 ### Section Expansion State (passthrough to SharedPrefs)
@@ -356,22 +360,22 @@ These are simple getter/setter pairs that read/write directly to SharedPrefs wit
 
 | Method | Description |
 |--------|-------------|
-| `togglePerk(perkIndex, isSelected)` | Update perk selection state |
-| `toggleMastery(masteryIndex, isAchieved)` | Update mastery achievement state |
-| `increaseCheckmark()` | Increment check marks (max 18) |
-| `decreaseCheckmark()` | Decrement check marks (min 0) |
+| `togglePerk({characterPerks, perk, value})` | Set `characterPerkIsSelected` on every matching `CharacterPerk` and save |
+| `toggleMastery({characterMasteries, mastery, value})` | Set `characterMasteryAchieved` on every matching `CharacterMastery` and save |
+| `increaseCheckmark(Character)` | Increment check marks (max `Character.maxCheckMarks`, 18) |
+| `decreaseCheckmark(Character)` | Decrement check marks (min 0) |
 
 ### Theme Synchronization
 
 | Method | Description |
 |--------|-------------|
-| `updateThemeForCharacter(Character?)` | Sync theme color to character's class color |
+| `updateThemeForCharacter(ThemeProvider)` | Sync the theme seed color to the current character's class color (black/white when retired, default seed when there are no characters) |
 
 ### Edit Mode
 
-| Method | Description |
-|--------|-------------|
-| `setEditMode(bool)` | Enable/disable edit mode |
+| Property | Description |
+|----------|-------------|
+| `isEditMode` | Getter/setter pair; the setter (`model.isEditMode = true`) updates the state and notifies listeners. There is no `setEditMode` method |
 
 ### Toggle Retired Visibility Logic
 
@@ -418,7 +422,7 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 | `parties` | `List<Party>` | [] | Parties for active campaign |
 | `activeCampaign` | `Campaign?` | null | Currently selected campaign |
 | `activeParty` | `Party?` | null | Currently selected party |
-| `isEditMode` | `bool` | false | Edit mode state |
+| `isEditMode` | `bool` | false | Edit mode state (property setter, notifies) |
 
 ### Section Expansion State (passthrough to SharedPrefs)
 
@@ -432,7 +436,7 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 | Method | Description |
 |--------|-------------|
 | `loadCampaigns()` | Load all campaigns from database, restore active selection from SharedPrefs |
-| `createCampaign(name, edition, startingProsperity)` | Create campaign and set as active |
+| `createCampaign({name, edition, startingProsperityCheckmarks})` | Create campaign and set as active |
 | `setActiveCampaign(Campaign)` | Switch active campaign, load its parties |
 | `renameCampaign(String name)` | Rename the active campaign |
 | `deleteActiveCampaign()` | Delete active campaign and its parties |
@@ -457,10 +461,13 @@ Manages campaign and party CRUD operations, prosperity/reputation state, and act
 
 | Method | Description |
 |--------|-------------|
-| `createParty(name, startingReputation)` | Create party in active campaign, set as active |
+| `createParty({name, startingReputation})` | Create party in active campaign, set as active |
 | `setActiveParty(Party)` | Switch active party |
 | `renameParty(String name)` | Rename the active party |
 | `deleteActiveParty()` | Delete active party and unlink characters |
+| `updatePartyLocation(String location)` | Set the active party's scenario location and save |
+| `updatePartyNotes(String notes)` | Set the active party's notes and save |
+| `toggleAchievement(String achievement)` | Add the achievement to the active party if absent, remove it if present, and save |
 
 ### Reputation Methods
 

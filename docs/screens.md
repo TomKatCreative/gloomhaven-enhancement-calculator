@@ -229,8 +229,16 @@ SettingsSectionHeader(title: AppLocalizations.of(context).gameplay)
 The settings screen includes a persistent bottom sheet with:
 - Support links (Discord, Instagram, Email)
 - Buy Me a Coffee button (Android US region only)
-- Version number and changelog link
+- Version number and changelog link (pushes `ChangelogScreen`)
 - License link
+
+---
+
+## Changelog Screen
+
+> **File**: `lib/ui/screens/changelog_screen.dart`
+
+Pushed from the Settings bottom sheet's changelog link. A `GHCAppBar` (localized `changelog` title, tinted by its own `ScrollController`) over a `ListView` of private `_VersionSection` widgets, newest first, each showing `v<version>`, the release date and a bulleted list of changes. Entries are hand-written, hardcoded English strings.
 
 ---
 
@@ -265,7 +273,7 @@ The main container/shell for the app, managing navigation between Town, Characte
 
 - Loads characters on init via `CharactersModel.loadCharacters()`
 - Loads campaigns on init via `TownModel.loadCampaigns()` (only when `kTownSheetEnabled`)
-- Shows update dialogs (v4.4.0) if flag set in SharedPrefs
+- Shows `Update450Dialog` after the first frame while `SharedPrefs().showUpdate450Dialog` is true
 - Uses `FutureBuilder` with loading spinner while characters load
 - If the database can't be opened, shows `DatabaseOpenErrorView` (`lib/ui/widgets/database_open_error_view.dart`) instead: export the raw DB file, email the developer, and see error details. A database from a newer app version (`DatabaseTooNewException`) gets an "update the app" message.
 
@@ -277,7 +285,7 @@ The FAB visibility and action changes based on context:
 |------|-----------|----------|--------|
 | Town (0) | No campaigns exist | Hidden | - |
 | Town (0) | Campaigns exist | Visible | Toggle edit mode |
-| Characters (1) | No characters exist | Visible | Create character |
+| Characters (1) | No characters exist | Hidden | - (empty state has an inline create button) |
 | Characters (1) | Characters exist | Visible | Toggle edit mode |
 | Calculator (2) | Cost sheet expanded OR no cost | Hidden | - |
 | Calculator (2) | Has cost to clear | Visible | Reset cost |
@@ -293,7 +301,7 @@ When switching pages:
 
 - `NeverScrollableScrollPhysics` on PageView (nav bar triggers `animateToPage` for smooth slide transitions)
 - `ScaffoldMessengerKey` for snackbars
-- Watches all four main models: `AppModel`, `CharactersModel`, `EnhancementCalculatorModel`, `TownModel`
+- Uses `context.select` for only the values the FAB needs (page, has characters/campaigns, edit modes, calculator `isSheetExpanded || !showCost`), so unrelated model changes (e.g. every calculator tap) don't rebuild the Scaffold. `TownModel` is only selected when `kTownSheetEnabled`
 - `AnimatedSwitcher` for smooth FAB icon transitions
 - App bar title uses a card-flip animation (vertical `rotateX`) synced with page slide transitions
 
@@ -360,7 +368,7 @@ Controlled by `townModel.isEditMode` (toggled via FAB):
 
 Party switching uses an inline bottom sheet built in `_showPartySwitcher()` (in `town_screen.dart`), triggered by the swap icon in the `PartySection` header:
 
-- **1 party**: Trailing icon is `group_add_rounded` → opens `CreatePartyScreen`
+- **1 party**: Trailing icon is `group_add_rounded` → opens `CreatePartySheet`
 - **2+ parties**: Trailing icon is `swap_horiz_rounded` → opens bottom sheet with party list + "Create new" button
 - **Bottom sheet pattern**: Title row ("Switch party" + "Create" button), divider, `ListTile` per party (active highlighted)
 
@@ -390,7 +398,7 @@ await CreateCampaignScreen.show(context, townModel);
 
 > **File**: `lib/ui/screens/create_party_sheet.dart`
 
-Pushed route for creating a new party within the active campaign.
+Modal bottom sheet (`showModalBottomSheet`, scroll-controlled) for creating a new party within the active campaign. `show()` returns `true` when a party was created.
 
 ### Invocation
 
@@ -603,19 +611,19 @@ Multiple markers can combine (e.g., `‡*` = Hail's + Building 44).
 
 ### Card Sections
 
-**Enhancement Type Card** (`_EnhancementTypeCard`):
+**Enhancement Type Card** (`EnhancementTypeCard`, `lib/ui/widgets/calculator/enhancement_type_card.dart`):
 - Info button for category details
 - Enhancement selection opens `EnhancementTypeSelectorScreen`
 - Shows base cost, discounted cost, and applicable markers
 
-**Card Details Group Card** (`_CardDetailsGroupCard`):
+**Card Details Group Card** (`CardDetailsGroupCard`, `lib/ui/widgets/calculator/card_details_card.dart`):
 - Card Level slider (1-9) with base penalty (25×level)
-- Previous Enhancements segmented buttons (0-9) with penalty (75×count)
+- Previous Enhancements segmented buttons (0-3) with penalty (75×count)
 - Multiple Targets toggle (×2 for eligible enhancements)
 - Lost/Non-Persistent toggle (GH2E/FH: ×0.5)
 - Persistent toggle (FH only: ×3)
 
-**Discounts Group Card** (`DiscountsGroupCard`, stateless):
+**Discounts Group Card** (`DiscountsGroupCard`, stateless, `lib/ui/widgets/calculator/discounts_card.dart`):
 - Toggle items for each discount type
 - Building 44 toggle opens `EnhancerDialog` for level configuration
 

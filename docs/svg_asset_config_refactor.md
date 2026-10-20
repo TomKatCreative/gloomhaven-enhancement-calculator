@@ -41,8 +41,8 @@ ClassCodes.tinkerer: AssetConfig('class_icons/tinkerer.svg', ...),
 // ... all 71 classes
 
 // resources/
-'lumber': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
-'metal': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
+'LUMBER': AssetConfig('resources/lumber.svg', themeMode: CurrentColorTheme()),
+'METAL': AssetConfig('resources/metal.svg', themeMode: CurrentColorTheme()),
 // ... all 9 resources
 ```
 
@@ -65,8 +65,7 @@ Uses `playerClass.classCode` as the asset key automatically.
 
 ### 4. Updated Resource Icon References
 
-Resource data is defined in `lib/models/resource_field.dart` as a `List<ResourceFieldData>`.
-Each entry has a `name` (e.g., `'Lumber'`) and a derived `assetKey` getter (`name.toUpperCase()` → `'LUMBER'`).
+Resources are the `Resource` enum in `lib/models/resource.dart`. Each value carries its Characters table `column` and its `assetKey` (e.g. `Resource.lumber` → `'LUMBER'`); the localized name comes from `label(l10n)`.
 Asset keys use UPPERCASE convention to match the standard icon token pattern (e.g., `ATTACK`, `MOVE`).
 
 ### 5. Updated UI Files
@@ -115,11 +114,8 @@ Asset keys use UPPERCASE convention to match the standard icon token pattern (e.
      themeMode: CurrentColorTheme(),
    ),
    ```
-3. Add a `ResourceFieldData` entry in `resource_field.dart`:
+3. Add a value to the `Resource` enum in `lib/models/resource.dart` with its column name and asset key, a `label()` case (plus the `app_en.arb`/`app_pt.arb` strings), and a slot in `Resource.displayOrder`:
    ```dart
-   ResourceFieldData(
-     name: 'Resourcename',
-     getter: (character) => character.resourceName,
-     setter: (character, value) => character.resourceName = value,
-   ),
+   resourcename(columnResourceName, 'RESOURCENAME'),
    ```
+4. A new resource is a new Characters column, so it also needs a schema migration (see `docs/database_migration_testing.md#adding-a-migration`). `Character.resources`, `toMap` and `fromMap` pick it up from `Resource.values` automatically.

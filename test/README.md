@@ -22,13 +22,16 @@ test/
 │   ├── test_data.dart              # Factory methods for test fixtures
 │   └── test_helpers.dart           # MockThemeProvider, wrapWithProviders(), etc.
 ├── models/
-│   ├── calculation_step_test.dart  # CalculationStep data class
+│   ├── calculation_step_test.dart  # CalculationStep + localized step text
 │   ├── character_mastery_test.dart # CharacterMastery model
 │   ├── character_perk_test.dart    # CharacterPerk model
 │   ├── character_test.dart         # Character model (level, XP, gold, retirement)
 │   ├── enhancement_data_test.dart  # EnhancementData static list & availability
 │   ├── enhancement_test.dart       # Enhancement cost logic & EnhancementCategory
-│   └── game_edition_test.dart      # GameEdition enum flags & display names
+│   ├── game_edition_test.dart      # GameEdition enum flags & display names
+│   └── resource_test.dart          # Resource enum & Character.resources
+├── utils/
+│   └── asset_config_test.dart      # getAssetConfig / tryGetAssetConfig lookup
 ├── viewmodels/
 │   ├── characters_model_test.dart          # Character CRUD, perk/mastery state
 │   └── enhancement_calculator_model_test.dart  # Calculator cost logic
@@ -36,7 +39,10 @@ test/
     ├── calculator_toggle_group_card_test.dart   # Toggle group card component
     ├── character_screen_test.dart               # Full character screen integration
     ├── cost_display_test.dart                   # Cost display component
+    ├── add_subtract_dialog_test.dart            # AddSubtractDialog
+    ├── custom_class_warning_dialog_test.dart    # CustomClassWarningDialog
     ├── enhancement_calculator_screen_test.dart  # Full calculator screen
+    ├── home_test.dart                           # Home rebuild scope
     ├── mastery_widgets_test.dart                # MasteryRow & MasteriesSection
     ├── perk_widgets_test.dart                   # PerkRow & PerksSection
     └── retirement_widgets_test.dart             # RetirementSection
@@ -154,12 +160,19 @@ MaterialApp(
 | File | What it covers |
 |------|----------------|
 | `character_test.dart` | Constructor defaults, `level()` static method, XP thresholds, gold formulas per edition, retirement state |
-| `character_perk_test.dart` | Constructor, `fromMap()` parsing, `isSelected` boolean mapping |
+| `character_perk_test.dart` | Constructor, `fromMap()` parsing, `characterPerkIsSelected` boolean mapping |
 | `character_mastery_test.dart` | Constructor and field mapping |
 | `game_edition_test.dart` | All 6 boolean flags (`supportsPartyBoon`, `hasLostModifier`, `hasPersistentModifier`, `hasEnhancerLevels`, `multiTargetAppliesToAll`) across all 3 editions, plus `displayName` |
 | `enhancement_test.dart` | `cost(edition:)` returns correct cost per edition, `fhCost` fallback to `ghCost`, specific enhancement costs from `EnhancementData`, `EnhancementCategory.sectionTitle` and `sectionAssetKey` |
 | `enhancement_data_test.dart` | Category counts, `isAvailableInEdition` (Disarm GH-only, Ward GH2E/FH-only), hex cost progression, all enhancements have `assetKey` |
-| `calculation_step_test.dart` | Constructor, nullable `formula`/`modifier` fields, negative values |
+| `calculation_step_test.dart` | Constructor defaults (optional `formula`, `enhancementName`, `count`, empty `modifiers`), negative values; `CalculationStepText`: every `CalculationStepKind` has a title, titles fill in name/count, previous-enhancements pluralization in English and Portuguese, `modifierText` one modifier per line and null without modifiers |
+| `resource_test.dart` | `Resource.displayOrder` lists every resource once in sheet order, `column` values match the persisted Characters columns, every `assetKey` has an icon, every resource has a label in each locale; `Character` `toMap` writes one column per resource, `fromMap` defaults missing columns to 0, constructor fills unspecified resources with 0 |
+
+### Utils
+
+| File | What it covers |
+|------|----------------|
+| `asset_config_test.dart` | `getAssetConfig`: strips punctuation, maps any `xpN` to the XP icon, accepts lowercase keys (class codes), throws for unknown keys. `tryGetAssetConfig`: strips punctuation, skips all-lowercase words, still matches numeric tokens and `xp` values, returns null for unknown keys |
 
 ### ViewModels (2 files)
 
@@ -172,10 +185,13 @@ MaterialApp(
 
 | File | What it covers |
 |------|----------------|
-| `retirement_widgets_test.dart` | RetirementSection visibility, retire/unretire buttons, confirmation dialog |
+| `retirement_widgets_test.dart` | RetirementSection visibility, retire/unretire buttons, confirmation dialog, retire/unretire snackbar text and "Show" action |
 | `perk_widgets_test.dart` | PerkRow rendering, checkbox toggling, grouped perks, PerksSection list, rebuild on state change |
 | `mastery_widgets_test.dart` | MasteryRow rendering, checkbox toggling, MasteriesSection visibility by class |
 | `character_screen_test.dart` | Full screen integration: section headers, XP/gold/checkmark inputs, perk and mastery sections, retired character disabled state |
 | `cost_display_test.dart` | `CostDisplayConfig` logic (`hasDiscount`, `displayCost`), rendering base cost, strikethrough + discounted cost, marker text |
 | `calculator_toggle_group_card_test.dart` | Toggle item rendering, dividers, switch state, disabled state, `onChanged`/`onTap` callbacks, custom trailing widget, info button enabled/disabled |
+| `add_subtract_dialog_test.dart` | Label casing (acronyms kept), localized text in Portuguese, add returns the sum, subtract floors at 0 |
+| `custom_class_warning_dialog_test.dart` | Localized text in Portuguese, Continue returns `true`, Cancel returns `false`, "Don't show again" persists the preference |
+| `home_test.dart` | Home rebuild scope: a calculator change that keeps the FAB state does not rebuild `Home`; one that hides the FAB rebuilds it once |
 | `enhancement_calculator_screen_test.dart` | Section headers, info button state, card level label, previous enhancements segmented button, modifier toggle visibility per edition, discount toggle visibility per edition, cost chip appearance, cost recalculation on toggle |

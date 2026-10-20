@@ -136,15 +136,20 @@ lib/ui/widgets/calculator/
 ├── calculator_toggle_group_card.dart # Column of toggle rows (used in Discounts section)
 ├── info_button_config.dart         # Configuration for info buttons
 ├── cost_display.dart               # Standardized cost chip with strikethrough
+├── cost_marker.dart                # costMarker(): composes discount marker suffixes
 ├── card_level_body.dart            # SfSlider for card level selection
 ├── previous_enhancements_body.dart # Segmented button (0-3)
 ├── enhancement_type_body.dart      # Dropdown selector
+├── enhancement_type_card.dart      # EnhancementTypeCard section
+├── card_details_card.dart          # CardDetailsGroupCard section
+├── discounts_card.dart             # DiscountsGroupCard section
+├── calculation_step_text.dart      # Localized title(l10n)/modifierText(l10n) for CalculationStep (not exported by the barrel)
 └── enhancement_icon.dart           # EnhancementIcon: element stack or SVG with +1 badge
 ```
 
 `EnhancementIcon(enhancement:, size:)` is the one place that draws an enhancement's icon. The type body, the selector screen and the cost chip all use it, so the "Element" stack and the +1 badge stay consistent. It also pins the icon colour to `onSurface`, so a selected `ListTile` (or any other inherited `IconTheme`) never tints it with the theme colour.
 
-Note: The Card Details section (`_CardDetailsGroupCard` in `enhancement_calculator_screen.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single `SectionCard` with internal dividers. The `CalculatorToggleGroupCard` renders a `Column` of toggle rows (no longer wraps in its own `Card`, since the outer `SectionCard` provides the container).
+Note: The Card Details section (`CardDetailsGroupCard` in `card_details_card.dart`) combines Card Level, Previous Enhancements, and modifier toggles in a single `SectionCard` with internal dividers. The `CalculatorToggleGroupCard` renders a `Column` of toggle rows (no longer wraps in its own `Card`, since the outer `SectionCard` provides the container).
 
 ### CalculatorToggleGroupCard
 

@@ -43,9 +43,36 @@ if (proceed == true) {
 ```
 
 **Features:**
+- Returns `true` (Continue), `false` (Cancel) or `null` (dismissed)
 - Discord server link for community content
-- "Don't show again" checkbox (persisted to SharedPreferences)
+- "Don't show again" checkbox (persisted to `SharedPrefs().hideCustomClassesWarningMessage`)
 - Custom stateful behavior for checkbox management
+- Fully localized (`customClasses`, `customClassesWarningBody`, `discordServer`, `dontShowAgain`, `cancel`, `continue_`)
+- Shown from `ClassSelectorScreen` when picking a custom class
+
+## AddSubtractDialog
+
+Dialog for adding to or subtracting from a numeric stat. Used by the XP and gold `Icons.exposure` buttons in `StatsSection`.
+
+**Usage:**
+```dart
+final value = await showDialog<int?>(
+  context: context,
+  builder: (_) => AddSubtractDialog(
+    character.xp,                    // current value
+    AppLocalizations.of(context).xp, // label
+  ),
+);
+if (value != null) {
+  // Caller clamps and saves the new value
+}
+```
+
+**Features:**
+- Digits-only, autofocused input; the add/subtract buttons are disabled until something is entered
+- Pops with `currentValue ± input`, floored at 0 (no `show()` helper; returns `null` when dismissed)
+- Shows the current value below the input
+- Fully localized (`adjustValue`, `addSubtractPrompt`, `currentValue`, `add`, `subtract`). The label is lowercased mid-sentence unless it is an acronym such as XP
 
 ## EnvelopePuzzleDialog
 
@@ -140,6 +167,16 @@ EnhancerDialog.show(
 - Frosthaven-specific feature (only shown when edition = Frosthaven)
 - Uses `ImageFiltered` with blur for spoiler prevention on locked levels
 - AlertDialog with centered title, scrollable content, and close button
+
+## Update450Dialog
+
+One-time "What's new in 4.5.0" announcement, shown by `Home` after the first frame while `SharedPrefs().showUpdate450Dialog` is true (default `true`).
+
+**Features:**
+- Sets `showUpdate450Dialog = false` in `initState`, so it appears only once
+- Scrollable bullet list of release notes, with a "Buy Me a Coffee" mention in debug builds or on Android in the US region
+- Single "Got it!" button
+- Text is hardcoded English (not localized)
 
 ## Best Practices
 

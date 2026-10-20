@@ -118,7 +118,7 @@ The "is +1" check and icon builder (including `enhancement.name == 'Element'`) a
 
 **Done:** `Enhancement.isPlusOne` replaces the four category checks (including the cost breakdown's "+1 Move" label), and `EnhancementIcon` in `lib/ui/widgets/calculator/enhancement_icon.dart` replaces the three icon builders. `Enhancement.assetKey` is now required and non-nullable, because every enhancement has one, so a missing icon is a compile error rather than a runtime guard. Each call site draws the Element stack and the SVG at the same size, so the selector list's Element icon dropped from 32 to 26 to match its row.
 
-### CQ-10 ⬜ `Resource` enum for Characters resource columns
+### CQ-10 ✅ `Resource` enum for Characters resource columns
 
 **Files:** `lib/models/character.dart:41-219`, `lib/data/database_helper.dart:91-117`, `lib/data/database_backup_service.dart:94-113`, `lib/ui/widgets/character/resource_field.dart`, `resource_card.dart:67`
 
@@ -127,6 +127,8 @@ The 9 resources are listed by hand in the column constants, fields, constructor,
 **Fix:** Add one `Resource` enum (column name, asset key, l10n getter) and have the columns, backup defaults and UI loop over it. At minimum, generate the backup defaults from the same list. This needs a careful look at backup/restore compatibility, so run the `persistence` reviewer on it.
 
 **Enables:** localizing resource names (part of CQ-24).
+
+**Done:** `lib/models/resource.dart` defines `Resource` (column, asset key, `label(l10n)`) and replaces `ResourceFieldData`. `Character` holds `Map<Resource, int> resources`, pre-filled with 0, instead of nine fields. `fromMap`/`toMap`, the create-table column list and the backup `_patchRow` defaults all loop over `Resource.values`. The enum is declared in column order because the migration tests compare the create-table SQL byte for byte. The sheet uses `Resource.displayOrder`, which keeps the old order. The `columnResource*` constants stay, because the shipped v7 migration uses them. The `persistence` reviewer found no issues: the SQL, `toMap` keys and backup patching are unchanged. `test/models/resource_test.dart` pins the column names, display order, icons, labels and map defaults.
 
 ### CQ-11 ✅ SharedPreferences key constants
 
@@ -269,13 +271,15 @@ Do this together with or after CQ-8.
 
 **Done:** Every public mutation now notifies exactly once. Side effects go through private `_write*` helpers that persist and assign without notifying. `enhancementSelected` and `gameVersionToggled` share a non-notifying `_applyEnhancement`. `calculateCost` was removed rather than re-documented: once the build-time call was gone it had no callers, and keeping it public would invite that call back. The `enhancement=` and `disableMultiTargetsSwitch=` setters, which skipped notifying and were only used inside the model, are gone too. The same redundant rebuilds were also in the UI, so `EnhancementCalculatorScreen` and `DiscountsGroupCard` are now stateless: the Party Boon `setState`, the `onSettingChanged` callback and the post-dialog `setState` were all covered by the screen's `watch`. New tests pin the notify count at 1 for every side-effect path and check that the side effects still reach SharedPrefs. Because the screen no longer drops the cache on every build, each setter now has a test that reads the cost first, mutates, and expects the new cost.
 
-### CQ-22 ⬜ `asset_config.dart` lookup duplication
+### CQ-22 ✅ `asset_config.dart` lookup duplication
 
 **File:** `lib/utils/asset_config.dart:922-999`
 
 `getAssetConfig` and `tryGetAssetConfig` duplicate the key-cleaning logic and recompile two regexes on every call. That runs per word in the tokenizer and per `ThemedSvg` build, which is on the perk-row rebuild path. Extract one `_cleanKey` with `static final` RegExps and make `getAssetConfig` the `tryGet…` lookup plus a throw. The assertion message also references a non-existent `standardAssets`.
 
-### CQ-29 ⬜ Home rebuild scope and Provider leftovers
+**Done:** The punctuation, XP and numeric regexes are now top-level `final`s, so each is compiled once instead of on every call. `_cleanKey` and `_lookup` (the XP pattern plus the map lookup) are shared by both functions. `getAssetConfig` is not a wrapper around `tryGetAssetConfig` as first suggested, because `tryGet` skips all-lowercase words and `getAssetConfig` must accept lowercase keys such as class codes, `hex` and `plus_one`. The assertion message now points to `assets`. The new `test/utils/asset_config_test.dart` pins punctuation stripping, XP mapping, lowercase handling and unknown keys, and passes against both the old and new code.
+
+### CQ-29 ✅ Home rebuild scope and Provider leftovers
 
 Found during CQ-20 (2026-10-20). None of these change what the user sees.
 
@@ -286,28 +290,34 @@ Found during CQ-20 (2026-10-20). None of these change what the user sees.
 
 Add a widget test that counts `Home` builds on a calculator change before and after, so the rebuild-scope win is pinned.
 
+**Done:** `Home` now `context.select`s the six values the FAB needs (page, whether there are characters, characters edit mode, whether the calculator hides the FAB, and the two town values) and `context.read`s the models inside the callbacks, so a calculator tap that leaves the FAB alone no longer rebuilds the `Scaffold`. The town selects in `Home` and the `TownModel` watch in `GHCAnimatedAppBar` sit behind `kTownSheetEnabled`, so the lazy provider is never created while the flag is off. The `setState` in `onPageChanged` is gone, because `Home` selects `AppModel.page`. The seed-colour write stays, with a comment explaining why: `SharedPreferences` updates its cache synchronously and persists asynchronously, so the write never blocks a frame, and it gives the next cold start the right colour before characters load. `test/widgets/home_test.dart` counts `Home` rebuilds through `debugOnRebuildDirtyWidget`. A card-level change that keeps the cost visible causes 0 rebuilds (the old code caused 1), and expanding the cost sheet causes exactly 1.
+
 ---
 
 ## Phase 5 — Localization gaps
 
-### CQ-23 ⬜ Hardcoded English UI strings
+### CQ-23 ✅ Hardcoded English UI strings
 
 - **`ghc_animated_app_bar.dart:153-155,165,186`:** the delete-character dialog body, confirm and cancel labels, and the "X deleted" snackbars. Use `l10n.delete`/`l10n.cancel` and add keys with placeholders.
 - **`lib/ui/dialogs/custom_class_warning_dialog.dart`:** the whole dialog.
 - **`previous_enhancements_body.dart:20`:** `Text('None')`.
 - **`edition_toggle.dart:73`:** the `'Gloomhaven 2nd Edition'` tooltip.
 
-### CQ-24 ⬜ Calculator and resource text
+**Done:** Twelve keys were added to both ARBs. The app bar's delete dialog, "X deleted" snackbars (character and campaign share `itemDeleted`), the "Show" snackbar action and the "New character" tooltip are localized. So is the retire snackbar, which used to build "retired" by appending `d` to the lowercased verb and so read wrongly in Portuguese; it now uses `characterRetired`/`characterUnretired`. The custom-class dialog, the `None` segment and the GH2e tooltip are localized too. `test/widgets/custom_class_warning_dialog_test.dart` checks the dialog renders in Portuguese and that its buttons and checkbox still work.
+
+### CQ-24 ✅ Calculator and resource text
 
 - **Calculator breakdown descriptions** ("Base cost", "Card level", "Multiple targets", "Party Boon", …) in `enhancement_cost_calculator.dart`, shown in `expandable_cost_chip.dart:423`. Have the calculator return step identifiers and let the UI map them through `AppLocalizations`. `multipleTargets` already exists in the ARB. **Depends on:** CQ-8.
 - **`EnhancementCategory.sectionTitle`** (`enhancement_data.dart:17-31`).
 - **Resource names** ('Lumber', 'Metal', …) in `resource_card.dart:67`. **Depends on:** CQ-10.
 
+**Done:** `CalculationStep` now carries a `CalculationStepKind`, plus `enhancementName`, `count` and a list of `CalculationModifier`s (kind and amount), instead of English `description`/`modifier` strings. `calculation_step_text.dart` maps them through `AppLocalizations`, with a proper plural for previous enhancements. Formulas stay as numbers and `g`. `EnhancementCategory.sectionTitle` takes `l10n`. The cost chip's "Close" tooltip is localized too. Resource names come from CQ-10's `Resource.label`. The existing breakdown tests now assert through the English mapping, so they confirm the rendered text is unchanged. "Hail's Discount" gets its own `stepHailsDiscount` key rather than reusing the toggle's sentence-case `hailsDiscount`, so the breakdown text is identical.
+
 ---
 
 ## Phase 6 — Design-constant sweep
 
-### CQ-25 ⬜ Replace hardcoded sizes and durations with `constants.dart`
+### CQ-25 ✅ Replace hardcoded sizes and durations with `constants.dart`
 
 About 50 non-0/1 numeric literals remain in `lib/ui`, plus repeated `Duration(milliseconds: 300)` (`expandable_cost_chip.dart:66,293`, `characters_model.dart:395`). Hot spots:
 
@@ -324,17 +334,21 @@ About 50 non-0/1 numeric literals remain in `lib/ui`, plus repeated `Duration(mi
 
 Also reopen the "Hardcoded Magic Numbers" item in `docs/technical_debt.md:71`, which is marked RESOLVED but isn't.
 
-### CQ-26 ⬜ Party popup menu convention
+**Done:** Every listed site, plus the theme builder's type scale, now uses a named constant, and nothing renders differently. Values that matched an existing constant use it. `48` in the calculator is `kMinInteractiveDimension`, the `IconButton` width it was aligning with. For values with no match, new constants were added to `constants.dart`: `compactPadding` (6), `focusedBorderThickness`, `expandAnimationDuration`, `pageAnimationDuration`, the shadow blur radii and offset, `iconSizeChevron`, `fontSizeCharacterName`, `switchSlotWidth`, `statDividerHeight`, `xpLabelWidth`, `progressFieldWidth`, `stepperFieldWidth`, `settingsBottomClearance` and `dialogCheckboxSpacing`. The confetti timings are file-private named consts. Some literals were left on purpose: `diagnostic_error_view.dart`, which is dependency-free by design; glyph-alignment nudges inside stacked icons; and the `GOAL` icon's documented one-time exception. The `technical_debt.md` entry now records the re-audit.
+
+### CQ-26 ✅ Party popup menu convention
 
 **File:** `lib/ui/widgets/town/party_section.dart:182-222`
 
 The menu uses `Row(Text, SizedBox, Icon)` instead of `ListTile(title:, trailing:, contentPadding: EdgeInsets.zero)`. It is behind the Town flag, so fix it before Town ships.
 
+**Done:** All three items are now `ListTile(title:, trailing:, contentPadding: EdgeInsets.zero)`. The explicit `onSurfaceVariant` icon colour was dropped because that is already `ListTile`'s default trailing-icon colour in Material 3.
+
 ---
 
 ## Phase 7 — Docs sync
 
-### CQ-27 ⬜ Reference docs out of date
+### CQ-27 ✅ Reference docs out of date
 
 - **`docs/models_reference.md`:**
   - The `EnhancementCategory` section (:252-264) has the wrong file path (the enum lives in `enhancement_data.dart`) and the wrong values.
@@ -352,7 +366,18 @@ The menu uses `Row(Text, SizedBox, Icon)` instead of `ListTile(title:, trailing:
 - **`docs/calculator_widgets.md:144`:** stale `_CardDetailsGroupCard` reference.
 - **`docs/dialogs.md`:** missing `AddSubtractDialog` and `Update450Dialog`.
 
-### CQ-28 ⬜ Stale comments and CLAUDE.md
+**Done:** Every listed item is fixed. The reference docs also now cover this round's changes: `Resource` and `Character.resources`, `CalculationStep` kinds and their l10n extensions, `sectionTitle(l10n)`, and `Home`'s `select` scope. The same pass fixed some stale entries that weren't listed:
+- `CharactersModel` and `TownModel` signatures.
+- The Home FAB table, which said the FAB shows when there are no characters.
+- The `0-9` range in `shared_prefs_keys.md`.
+- The resource how-to in `svg_asset_config_refactor.md`.
+- `test/README.md` rows for the new tests.
+
+Documenting the dialogs turned up English that was still hardcoded in `AddSubtractDialog`. It is now localized, and `test/widgets/add_subtract_dialog_test.dart` covers it. `Update450Dialog` stays English on purpose: it is a one-time 4.5.0 release note. `test/README.md`'s header counts (454 tests in 16 files) are long out of date and were left alone.
+
+### CQ-28 ✅ Stale comments and CLAUDE.md
 
 - `lib/models/character.dart:120-125` and `lib/data/database_helper.dart:253-256` still say a JotL *class* makes a character JotL. Reword both to say only the persisted game-mode flag counts.
 - In CLAUDE.md, the v19 note says "24 GH + 23 FH quests", but the repository has 105 quests across 5 editions.
+
+**Done:** The `jawsOfTheLionEdition` doc in `character.dart`, the v20 step comment in `database_helper.dart` and the `addJawsOfTheLionColumn` doc in `database_migrations.dart` now say that only the persisted flag makes a character JotL. CLAUDE.md's v19 note now says the repository holds 105 quests across 5 editions.

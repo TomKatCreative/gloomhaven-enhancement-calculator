@@ -71,8 +71,10 @@ Patterns that aren't single-file problems but affect the codebase broadly.
 ### ~~Hardcoded Magic Numbers~~ — RESOLVED
 
 > **Audited 2026-04-29**: The values flagged previously in `expandable_cost_chip.dart` (and the since-removed element tracker sheet) (`0.065`, `0.14`, `100.0`, `56.0`, `468.0`, etc.) are now defined as named file-private `static const` fields with semantic names (e.g., `_collapsedSize`, `_cardMaxWidth`, `_blurFadeThreshold`, `_chipHeight`). These satisfy the constants policy — local naming is the correct encapsulation for widget-specific values.
+>
+> **Re-audited 2026-10-20 (CQ-25):** the 2026-04-29 audit missed about 50 inline literals across `lib/ui`, so this item was not really resolved until CQ-25 swept them into `constants.dart` (or file-private named consts for one-off timings). The theme builder's type scale now uses the `fontSize*` constants. What is left is deliberate: `DiagnosticErrorView` (dependency-free by design), the glyph-alignment nudges in `element_stack_icon.dart` and the stats-row icon overlays (`stats_section.dart`, `card_details_card.dart`), and the `GOAL` icon, which carries an explicit one-time-exception comment.
 
-### `asset_config.dart` (995 lines)
+### `asset_config.dart` (990 lines)
 
 400+ asset definitions with no way to detect unused assets and no path validation.
 
