@@ -55,6 +55,20 @@ Future<void> _setupPrefs({
   await SharedPrefs().init();
 }
 
+/// Sets up SharedPreferences with a seeded multi-target state.
+Future<void> _setupMultiTargetPrefs(
+  GameEdition edition, {
+  bool multipleTargets = false,
+  bool switchDisabled = false,
+}) async {
+  SharedPreferences.setMockInitialValues({
+    'gameEdition': edition.index,
+    'multipleTargetsSelected': multipleTargets,
+    'disableMultiTargetsSwitch': switchDisabled,
+  });
+  await SharedPrefs().init();
+}
+
 void main() {
   group('EnhancementCalculatorModel', () {
     group('Initial State', () {
@@ -1023,18 +1037,28 @@ void main() {
         expect(model.disableMultiTargetsSwitch, isTrue);
       });
 
-      test('Target forces multipleTargets OFF in GH2E', () async {
-        await _setupPrefs(edition: GameEdition.gloomhaven2e);
-        final model = EnhancementCalculatorModel();
+      // Each case below seeds the opposite of the expected multi-target state,
+      // so a test fails if enhancementSelected stops setting it.
+      for (final edition in [
+        GameEdition.gloomhaven2e,
+        GameEdition.frosthaven,
+      ]) {
+        test('Target forces multipleTargets OFF in ${edition.name}', () async {
+          await _setupMultiTargetPrefs(edition, multipleTargets: true);
+          final model = EnhancementCalculatorModel();
 
-        model.enhancementSelected(_findEnhancement('Target'));
+          model.enhancementSelected(_findEnhancement('Target'));
 
-        expect(model.multipleTargets, isFalse);
-        expect(model.disableMultiTargetsSwitch, isTrue);
-      });
+          expect(model.multipleTargets, isFalse);
+          expect(model.disableMultiTargetsSwitch, isTrue);
+        });
+      }
 
       test('Hex forces multipleTargets OFF and disables switch', () async {
-        await _setupPrefs(edition: GameEdition.gloomhaven);
+        await _setupMultiTargetPrefs(
+          GameEdition.gloomhaven,
+          multipleTargets: true,
+        );
         final model = EnhancementCalculatorModel();
 
         model.enhancementSelected(_findEnhancement('2 hexes'));
@@ -1043,24 +1067,50 @@ void main() {
         expect(model.disableMultiTargetsSwitch, isTrue);
       });
 
-      test('Element in GH leaves switch enabled', () async {
-        await _setupPrefs(edition: GameEdition.gloomhaven);
-        final model = EnhancementCalculatorModel();
+      for (final name in ['Element', 'Wild Element']) {
+        test('$name in GH re-enables switch', () async {
+          await _setupMultiTargetPrefs(
+            GameEdition.gloomhaven,
+            switchDisabled: true,
+          );
+          final model = EnhancementCalculatorModel();
 
-        model.enhancementSelected(_findEnhancement('Element'));
+          model.enhancementSelected(_findEnhancement(name));
 
-        expect(model.disableMultiTargetsSwitch, isFalse);
-      });
+          expect(model.disableMultiTargetsSwitch, isFalse);
+        });
 
-      test('Element in GH2E disables switch and forces off', () async {
-        await _setupPrefs(edition: GameEdition.gloomhaven2e);
-        final model = EnhancementCalculatorModel();
+        for (final edition in [
+          GameEdition.gloomhaven2e,
+          GameEdition.frosthaven,
+        ]) {
+          test(
+            '$name in ${edition.name} disables switch and forces off',
+            () async {
+              await _setupMultiTargetPrefs(edition, multipleTargets: true);
+              final model = EnhancementCalculatorModel();
 
-        model.enhancementSelected(_findEnhancement('Element'));
+              model.enhancementSelected(_findEnhancement(name));
 
-        expect(model.multipleTargets, isFalse);
-        expect(model.disableMultiTargetsSwitch, isTrue);
-      });
+              expect(model.multipleTargets, isFalse);
+              expect(model.disableMultiTargetsSwitch, isTrue);
+            },
+          );
+        }
+      }
+
+      for (final edition in [GameEdition.gloomhaven, GameEdition.frosthaven]) {
+        test('Summon in ${edition.name} re-enables switch', () async {
+          await _setupMultiTargetPrefs(edition, switchDisabled: true);
+          final model = EnhancementCalculatorModel();
+
+          model.enhancementSelected(
+            _findEnhancementByCategory('HP', EnhancementCategory.summonPlusOne),
+          );
+
+          expect(model.disableMultiTargetsSwitch, isFalse);
+        });
+      }
 
       test('Summon clears persistent', () async {
         SharedPreferences.setMockInitialValues({
@@ -1077,12 +1127,26 @@ void main() {
         expect(model.persistent, isFalse);
       });
 
-      test('default enhancement enables multi-target switch', () async {
-        await _setupPrefs();
+      test('default enhancement re-enables multi-target switch', () async {
+        await _setupMultiTargetPrefs(
+          GameEdition.gloomhaven,
+          switchDisabled: true,
+        );
         final model = EnhancementCalculatorModel();
 
         model.enhancementSelected(_findEnhancement('Wound'));
 
+        expect(model.disableMultiTargetsSwitch, isFalse);
+      });
+
+      test('selecting Wound after a hex re-enables the switch', () async {
+        await _setupPrefs();
+        final model = EnhancementCalculatorModel();
+
+        model.enhancementSelected(_findEnhancement('2 hexes'));
+        expect(model.disableMultiTargetsSwitch, isTrue);
+
+        model.enhancementSelected(_findEnhancement('Wound'));
         expect(model.disableMultiTargetsSwitch, isFalse);
       });
 
