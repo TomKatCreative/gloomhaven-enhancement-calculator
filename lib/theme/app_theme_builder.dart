@@ -5,24 +5,24 @@ import 'package:gloomhaven_enhancement_calc/theme/theme_extensions.dart';
 import 'package:gloomhaven_enhancement_calc/utils/color_utils.dart';
 
 class AppThemeBuilder {
-  // Content-addressed theme cache. The key is `ThemeConfig.hashCode`, and
-  // ThemeConfig is immutable with `==` defined over all theme inputs
-  // (seedColor, useDarkMode, useDefaultFonts). A given config always
-  // produces the same theme, so the cache cannot go stale — no
-  // invalidation API is needed.
-  static final Map<int, ThemeData> _lightThemeCache = {};
-  static final Map<int, ThemeData> _darkThemeCache = {};
+  // Content-addressed theme cache, keyed by the config itself. ThemeConfig is
+  // immutable with `==` defined over all theme inputs (seedColor, useDarkMode,
+  // useDefaultFonts), so two configs that merely share a hash code never share
+  // a theme. A given config always produces the same theme, so the cache
+  // cannot go stale — no invalidation API is needed.
+  static final Map<ThemeConfig, ThemeData> _lightThemeCache = {};
+  static final Map<ThemeConfig, ThemeData> _darkThemeCache = {};
 
   static ThemeData buildLightTheme(ThemeConfig config) {
     return _lightThemeCache.putIfAbsent(
-      config.hashCode,
+      config,
       () => _buildTheme(config: config, brightness: Brightness.light),
     );
   }
 
   static ThemeData buildDarkTheme(ThemeConfig config) {
     return _darkThemeCache.putIfAbsent(
-      config.hashCode,
+      config,
       () => _buildTheme(config: config, brightness: Brightness.dark),
     );
   }
@@ -70,8 +70,13 @@ class AppThemeBuilder {
     );
 
     final textTheme = config.useDefaultFonts
-        ? _buildDefaultTextTheme(brightness)
-        : _buildCustomTextTheme(brightness);
+        ? _buildTextTheme(brightness, bodyFont: inter, displayFont: inter)
+        : _buildTextTheme(
+            brightness,
+            bodyFont: nyala,
+            displayFont: pirataOne,
+            displayLetterSpacing: 1.5,
+          );
 
     return ThemeData(
       useMaterial3: true,
@@ -246,113 +251,64 @@ class AppThemeBuilder {
     );
   }
 
-  /// Builds the complete M3 TextTheme for default fonts mode (Inter).
+  /// Builds the complete M3 TextTheme.
   ///
   /// Based on M3 type scale, scaled up for better readability in this app.
   /// Display/Headline sizes kept at M3 defaults; Body/Label/Title scaled ~1.3x.
-  static TextTheme _buildDefaultTextTheme(Brightness brightness) {
+  /// [displayFont] is used only for displayMedium (character names); every
+  /// other style uses [bodyFont].
+  static TextTheme _buildTextTheme(
+    Brightness brightness, {
+    required String bodyFont,
+    required String displayFont,
+    double? displayLetterSpacing,
+  }) {
     final shadow = _textShadow(brightness);
 
     return TextTheme(
       // Display - large hero text (M3 defaults)
-      displayLarge: const TextStyle(fontSize: 59, fontFamily: inter),
+      displayLarge: TextStyle(fontSize: 59, fontFamily: bodyFont),
       displayMedium: TextStyle(
         fontSize: 47,
-        fontFamily: inter,
+        fontFamily: displayFont,
+        letterSpacing: displayLetterSpacing,
         shadows: shadow,
       ),
-      displaySmall: const TextStyle(fontSize: 38, fontFamily: inter),
+      displaySmall: TextStyle(fontSize: 38, fontFamily: bodyFont),
       // Headline - screen/section titles (M3 defaults)
-      headlineLarge: const TextStyle(fontSize: 34, fontFamily: inter),
-      headlineMedium: const TextStyle(fontSize: 30, fontFamily: inter),
-      headlineSmall: const TextStyle(fontSize: 26, fontFamily: inter),
+      headlineLarge: TextStyle(fontSize: 34, fontFamily: bodyFont),
+      headlineMedium: TextStyle(fontSize: 30, fontFamily: bodyFont),
+      headlineSmall: TextStyle(fontSize: 26, fontFamily: bodyFont),
       // Title - smaller titles, emphasized text (scaled up)
-      titleLarge: const TextStyle(fontSize: 24, fontFamily: inter),
-      titleMedium: const TextStyle(
+      titleLarge: TextStyle(fontSize: 24, fontFamily: bodyFont),
+      titleMedium: TextStyle(
         fontSize: 20,
-        fontFamily: inter,
+        fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
-      titleSmall: const TextStyle(
+      titleSmall: TextStyle(
         fontSize: 18,
-        fontFamily: inter,
+        fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
       // Body - main reading text (scaled up for readability)
-      bodyLarge: const TextStyle(fontSize: 24, fontFamily: inter),
-      bodyMedium: const TextStyle(fontSize: 22, fontFamily: inter),
-      bodySmall: const TextStyle(fontSize: 20, fontFamily: inter),
+      bodyLarge: TextStyle(fontSize: 24, fontFamily: bodyFont),
+      bodyMedium: TextStyle(fontSize: 22, fontFamily: bodyFont),
+      bodySmall: TextStyle(fontSize: 20, fontFamily: bodyFont),
       // Label - buttons, captions, annotations (scaled up)
-      labelLarge: const TextStyle(
+      labelLarge: TextStyle(
         fontSize: 18,
-        fontFamily: inter,
+        fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
-      labelMedium: const TextStyle(
+      labelMedium: TextStyle(
         fontSize: 16,
-        fontFamily: inter,
+        fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
-      labelSmall: const TextStyle(
+      labelSmall: TextStyle(
         fontSize: 14,
-        fontFamily: inter,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  /// Builds the complete M3 TextTheme for custom fonts mode.
-  ///
-  /// Based on M3 type scale, scaled up for better readability in this app.
-  /// - displayMedium: PirataOne (decorative game font for character names)
-  /// - All others: Nyala (readable game-themed font)
-  static TextTheme _buildCustomTextTheme(Brightness brightness) {
-    final shadow = _textShadow(brightness);
-
-    return TextTheme(
-      // Display
-      displayLarge: const TextStyle(fontSize: 59, fontFamily: nyala),
-      displayMedium: TextStyle(
-        fontSize: 47,
-        fontFamily: pirataOne,
-        letterSpacing: 1.5,
-        shadows: shadow,
-      ),
-      displaySmall: const TextStyle(fontSize: 38, fontFamily: nyala),
-      // Headline
-      headlineLarge: const TextStyle(fontSize: 34, fontFamily: nyala),
-      headlineMedium: const TextStyle(fontSize: 30, fontFamily: nyala),
-      headlineSmall: const TextStyle(fontSize: 26, fontFamily: nyala),
-      // Title
-      titleLarge: const TextStyle(fontSize: 24, fontFamily: nyala),
-      titleMedium: const TextStyle(
-        fontSize: 20,
-        fontFamily: nyala,
-        fontWeight: FontWeight.w500,
-      ),
-      titleSmall: const TextStyle(
-        fontSize: 18,
-        fontFamily: nyala,
-        fontWeight: FontWeight.w500,
-      ),
-      // Body
-      bodyLarge: const TextStyle(fontSize: 24, fontFamily: nyala),
-      bodyMedium: const TextStyle(fontSize: 22, fontFamily: nyala),
-      bodySmall: const TextStyle(fontSize: 20, fontFamily: nyala),
-      // Label
-      labelLarge: const TextStyle(
-        fontSize: 18,
-        fontFamily: nyala,
-        fontWeight: FontWeight.w500,
-      ),
-      labelMedium: const TextStyle(
-        fontSize: 16,
-        fontFamily: nyala,
-        fontWeight: FontWeight.w500,
-      ),
-      labelSmall: const TextStyle(
-        fontSize: 14,
-        fontFamily: nyala,
+        fontFamily: bodyFont,
         fontWeight: FontWeight.w500,
       ),
     );
