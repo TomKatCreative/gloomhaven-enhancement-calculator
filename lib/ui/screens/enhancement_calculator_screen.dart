@@ -8,23 +8,15 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_cost_chip.dart
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
-class EnhancementCalculatorScreen extends StatefulWidget {
+class EnhancementCalculatorScreen extends StatelessWidget {
   const EnhancementCalculatorScreen({super.key});
 
-  @override
-  State<EnhancementCalculatorScreen> createState() =>
-      _EnhancementCalculatorScreenState();
-}
-
-class _EnhancementCalculatorScreenState
-    extends State<EnhancementCalculatorScreen> {
   @override
   Widget build(BuildContext context) {
     final enhancementCalculatorModel = context
         .watch<EnhancementCalculatorModel>();
     // Watch ThemeProvider to rebuild when theme changes
     final themeProvider = context.watch<ThemeProvider>();
-    enhancementCalculatorModel.calculateCost(notify: false);
     final darkTheme = themeProvider.useDarkMode;
     final edition = enhancementCalculatorModel.edition;
 
@@ -69,7 +61,6 @@ class _EnhancementCalculatorScreenState
                   edition: edition,
                   enhancementCalculatorModel: enhancementCalculatorModel,
                   darkTheme: darkTheme,
-                  onSettingChanged: () => setState(() {}),
                 ),
               ],
             ),

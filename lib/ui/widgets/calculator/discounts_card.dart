@@ -8,25 +8,20 @@ import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator.dar
 import 'package:gloomhaven_enhancement_calc/ui/widgets/section_card.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/enhancement_calculator_model.dart';
 
-class DiscountsGroupCard extends StatefulWidget {
+/// Rebuilt by the parent screen, which watches the model, so toggles here
+/// need no local state.
+class DiscountsGroupCard extends StatelessWidget {
   final dynamic edition;
   final EnhancementCalculatorModel enhancementCalculatorModel;
   final bool darkTheme;
-  final VoidCallback onSettingChanged;
 
   const DiscountsGroupCard({
     super.key,
     required this.edition,
     required this.enhancementCalculatorModel,
     required this.darkTheme,
-    required this.onSettingChanged,
   });
 
-  @override
-  State<DiscountsGroupCard> createState() => _DiscountsGroupCardState();
-}
-
-class _DiscountsGroupCardState extends State<DiscountsGroupCard> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -36,16 +31,13 @@ class _DiscountsGroupCardState extends State<DiscountsGroupCard> {
       ToggleGroupItem(
         infoConfig: InfoButtonConfig.titleMessage(
           title: Strings.temporaryEnhancement,
-          message: Strings.temporaryEnhancementInfoBody(
-            context,
-            widget.darkTheme,
-          ),
+          message: Strings.temporaryEnhancementInfoBody(context, darkTheme),
         ),
         title: '${AppLocalizations.of(context).temporaryEnhancement} \u2020',
         subtitle: AppLocalizations.of(context).variant,
-        value: widget.enhancementCalculatorModel.temporaryEnhancementMode,
+        value: enhancementCalculatorModel.temporaryEnhancementMode,
         onChanged: (value) {
-          widget.enhancementCalculatorModel.temporaryEnhancementMode = value;
+          enhancementCalculatorModel.temporaryEnhancementMode = value;
         },
       ),
 
@@ -53,46 +45,40 @@ class _DiscountsGroupCardState extends State<DiscountsGroupCard> {
       ToggleGroupItem(
         infoConfig: InfoButtonConfig.titleMessage(
           title: Strings.hailsDiscountTitle,
-          message: Strings.hailsDiscountInfoBody(context, widget.darkTheme),
+          message: Strings.hailsDiscountInfoBody(context, darkTheme),
         ),
         title: '${AppLocalizations.of(context).hailsDiscount} \u2021',
-        value: widget.enhancementCalculatorModel.hailsDiscount,
+        value: enhancementCalculatorModel.hailsDiscount,
         onChanged: (value) {
-          widget.enhancementCalculatorModel.hailsDiscount = value;
+          enhancementCalculatorModel.hailsDiscount = value;
         },
       ),
 
       // Scenario 114 Reward (Party Boon) - Gloomhaven/GH2E only
-      if (widget.edition.supportsPartyBoon)
+      if (edition.supportsPartyBoon)
         ToggleGroupItem(
           infoConfig: InfoButtonConfig.titleMessage(
             title: Strings.scenario114RewardTitle,
-            message: Strings.scenario114RewardInfoBody(
-              context,
-              widget.darkTheme,
-            ),
+            message: Strings.scenario114RewardInfoBody(context, darkTheme),
           ),
           title: '${AppLocalizations.of(context).scenario114Reward} \u00A7',
           subtitle: AppLocalizations.of(context).forgottenCirclesSpoilers,
-          value: widget.enhancementCalculatorModel.partyBoon,
+          value: enhancementCalculatorModel.partyBoon,
           onChanged: (value) {
-            setState(() {
-              widget.enhancementCalculatorModel.partyBoon = value;
-            });
-            widget.onSettingChanged();
+            enhancementCalculatorModel.partyBoon = value;
           },
         ),
 
       // Building 44 (Enhancer) - Frosthaven only
-      if (widget.edition.hasEnhancerLevels)
+      if (edition.hasEnhancerLevels)
         ToggleGroupItem(
           infoConfig: InfoButtonConfig.titleMessage(
             title: Strings.building44Title,
-            message: Strings.building44InfoBody(context, widget.darkTheme),
+            message: Strings.building44InfoBody(context, darkTheme),
           ),
           title: '${AppLocalizations.of(context).building44} \u002A',
           subtitle: AppLocalizations.of(context).frosthavenSpoilers,
-          value: widget.enhancementCalculatorModel.hasAnyEnhancerUpgrades,
+          value: enhancementCalculatorModel.hasAnyEnhancerUpgrades,
           trailingWidget: SizedBox(
             width: 60, // Match Switch width for alignment
             child: Center(
@@ -120,10 +106,7 @@ class _DiscountsGroupCardState extends State<DiscountsGroupCard> {
   void _showEnhancerDialog(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (_) => EnhancerDialog(model: widget.enhancementCalculatorModel),
-    ).then((_) {
-      setState(() {}); // Refresh to update Building 44 toggle state
-      widget.onSettingChanged();
-    });
+      builder: (_) => EnhancerDialog(model: enhancementCalculatorModel),
+    );
   }
 }

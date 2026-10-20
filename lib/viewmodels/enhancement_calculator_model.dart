@@ -16,6 +16,10 @@
 /// it on any state change. Computed properties ([totalCost], [showCost],
 /// [getCalculationBreakdown]) delegate to the cached calculator.
 ///
+/// Every public mutation notifies listeners exactly once. Side effects such
+/// as clearing the persistent modifier go through private `_write*` helpers,
+/// which persist and assign without notifying.
+///
 /// ## State Persistence
 ///
 /// All calculator state is persisted via [SharedPrefs] for session continuity.
@@ -39,7 +43,6 @@ import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 /// Manages enhancement calculator state and delegates cost calculations
 /// to [EnhancementCostCalculator].
 ///
-/// Use [calculateCost] to recalculate after state changes.
 /// Use [getCalculationBreakdown] to get step-by-step cost breakdown for UI.
 class EnhancementCalculatorModel with ChangeNotifier {
   EnhancementCalculatorModel() {
@@ -86,6 +89,12 @@ class EnhancementCalculatorModel with ChangeNotifier {
       _cachedCalculator ??= _buildCalculator();
 
   void _invalidateCalculator() => _cachedCalculator = null;
+
+  /// Invalidates the cached calculator and notifies listeners once.
+  void _changed() {
+    _invalidateCalculator();
+    notifyListeners();
+  }
 
   EnhancementCostCalculator _buildCalculator() {
     return EnhancementCostCalculator(
@@ -162,7 +171,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
   set partyBoon(bool value) {
     SharedPrefs().partyBoon = value;
     _partyBoon = value;
-    calculateCost();
+    _changed();
   }
 
   /// Returns the enhancer level 2 state.
@@ -174,7 +183,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     // SharedPrefs cascade may have changed lvl3/4, re-read them
     _enhancerLvl3 = SharedPrefs().enhancerLvl3;
     _enhancerLvl4 = SharedPrefs().enhancerLvl4;
-    calculateCost();
+    _changed();
   }
 
   /// Returns the enhancer level 3 state.
@@ -186,7 +195,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     // SharedPrefs cascade may have changed lvl2/4, re-read them
     _enhancerLvl2 = SharedPrefs().enhancerLvl2;
     _enhancerLvl4 = SharedPrefs().enhancerLvl4;
-    calculateCost();
+    _changed();
   }
 
   /// Returns the enhancer level 4 state.
@@ -198,7 +207,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     // SharedPrefs cascade may have changed lvl2/3, re-read them
     _enhancerLvl2 = SharedPrefs().enhancerLvl2;
     _enhancerLvl3 = SharedPrefs().enhancerLvl3;
-    calculateCost();
+    _changed();
   }
 
   /// Whether the party boon currently affects cost calculation.
@@ -247,7 +256,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
   set cardLevel(int cardLevel) {
     SharedPrefs().targetCardLvl = cardLevel;
     _cardLevel = cardLevel;
-    calculateCost();
+    _changed();
   }
 
   int get previousEnhancements => _previousEnhancements;
@@ -255,39 +264,26 @@ class EnhancementCalculatorModel with ChangeNotifier {
   set previousEnhancements(int previousEnhancements) {
     SharedPrefs().previousEnhancements = previousEnhancements;
     _previousEnhancements = previousEnhancements;
-    calculateCost();
+    _changed();
   }
 
   Enhancement? get enhancement => _enhancement;
 
-  set enhancement(Enhancement? enhancement) {
-    if (enhancement != null) {
-      SharedPrefs().enhancementKey = enhancement.key;
-    }
-    _enhancement = enhancement;
-  }
-
   bool get multipleTargets => _multipleTargets;
 
   set multipleTargets(bool value) {
-    SharedPrefs().multipleTargetsSwitch = value;
-    _multipleTargets = value;
-    calculateCost();
+    _writeMultipleTargets(value);
+    _changed();
   }
 
   bool get disableMultiTargetsSwitch => _disableMultiTargetsSwitch;
-
-  set disableMultiTargetsSwitch(bool value) {
-    SharedPrefs().disableMultiTargetSwitch = value;
-    _disableMultiTargetsSwitch = value;
-  }
 
   bool get temporaryEnhancementMode => _temporaryEnhancementMode;
 
   set temporaryEnhancementMode(bool value) {
     SharedPrefs().temporaryEnhancementMode = value;
     _temporaryEnhancementMode = value;
-    calculateCost();
+    _changed();
   }
 
   bool get hailsDiscount => _hailsDiscount;
@@ -295,29 +291,56 @@ class EnhancementCalculatorModel with ChangeNotifier {
   set hailsDiscount(bool value) {
     SharedPrefs().hailsDiscount = value;
     _hailsDiscount = value;
-    calculateCost();
+    _changed();
   }
 
   bool get lostNonPersistent => _lostNonPersistent;
 
   set lostNonPersistent(bool value) {
     if (value) {
-      persistent = false;
+      _writePersistent(false);
     }
-    SharedPrefs().lostNonPersistent = value;
-    _lostNonPersistent = value;
-    calculateCost();
+    _writeLost(value);
+    _changed();
   }
 
   bool get persistent => _persistent;
 
   set persistent(bool value) {
     if (value) {
-      lostNonPersistent = false;
+      _writeLost(false);
     }
+    _writePersistent(value);
+    _changed();
+  }
+
+  // ===========================================================================
+  // Private writers (persist and assign without notifying)
+  // ===========================================================================
+
+  void _writeEnhancement(Enhancement enhancement) {
+    SharedPrefs().enhancementKey = enhancement.key;
+    _enhancement = enhancement;
+  }
+
+  void _writeMultipleTargets(bool value) {
+    SharedPrefs().multipleTargetsSwitch = value;
+    _multipleTargets = value;
+  }
+
+  void _writeDisableMultiTargets(bool value) {
+    SharedPrefs().disableMultiTargetSwitch = value;
+    _disableMultiTargetsSwitch = value;
+  }
+
+  void _writeLost(bool value) {
+    SharedPrefs().lostNonPersistent = value;
+    _lostNonPersistent = value;
+  }
+
+  void _writePersistent(bool value) {
     SharedPrefs().persistent = value;
     _persistent = value;
-    calculateCost();
   }
 
   // ===========================================================================
@@ -354,17 +377,6 @@ class EnhancementCalculatorModel with ChangeNotifier {
   // State mutation methods
   // ===========================================================================
 
-  /// Invalidates the cached calculator and optionally notifies listeners.
-  ///
-  /// Call this after external state changes (e.g. EnhancerDialog writing
-  /// directly to SharedPrefs) to pick up the new values.
-  void calculateCost({bool notify = true}) {
-    _invalidateCalculator();
-    if (notify) {
-      notifyListeners();
-    }
-  }
-
   /// Resets all calculator state to defaults and clears SharedPrefs.
   void resetCost() {
     _cardLevel = 0;
@@ -382,8 +394,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     SharedPrefs().remove('enhancementCost');
     SharedPrefs().remove('lostNonPersistent');
     SharedPrefs().remove('persistent');
-    _invalidateCalculator();
-    notifyListeners();
+    _changed();
   }
 
   /// Re-reads all fields from SharedPrefs and recalculates.
@@ -408,29 +419,36 @@ class EnhancementCalculatorModel with ChangeNotifier {
     _temporaryEnhancementMode = SharedPrefs().temporaryEnhancementMode;
     _hailsDiscount = SharedPrefs().hailsDiscount;
 
-    calculateCost();
+    _changed();
   }
 
   /// Handles edition change with modifier validation.
   void gameVersionToggled() {
     // Clear persistent if switching to an edition that doesn't support it
-    if (!_gameEdition.hasPersistentModifier && persistent) {
-      persistent = false;
+    if (!_gameEdition.hasPersistentModifier && _persistent) {
+      _writePersistent(false);
     }
 
     // Clear lostNonPersistent if switching to an edition that doesn't support it
-    if (!_gameEdition.hasLostModifier && lostNonPersistent) {
-      lostNonPersistent = false;
+    if (!_gameEdition.hasLostModifier && _lostNonPersistent) {
+      _writeLost(false);
     }
 
-    if (enhancement != null) {
-      enhancementSelected(enhancement!);
+    final selected = _enhancement;
+    if (selected != null) {
+      _applyEnhancement(selected);
     }
-    notifyListeners();
+    _changed();
   }
 
   /// Handles enhancement selection with edition-specific validation.
   void enhancementSelected(Enhancement selectedEnhancement) {
+    _applyEnhancement(selectedEnhancement);
+    _changed();
+  }
+
+  /// Applies [selectedEnhancement] and its side effects without notifying.
+  void _applyEnhancement(Enhancement selectedEnhancement) {
     final edition = _gameEdition;
 
     // Handle the case where the user has an enhancement selected that's not
@@ -438,7 +456,6 @@ class EnhancementCalculatorModel with ChangeNotifier {
     if (!EnhancementData.isAvailableInEdition(selectedEnhancement, edition)) {
       _enhancement = null;
       _clearPersistedEnhancement();
-      notifyListeners();
       return;
     }
 
@@ -448,25 +465,24 @@ class EnhancementCalculatorModel with ChangeNotifier {
     );
     if (selectedEnhancement.category == EnhancementCategory.target) {
       // Target always targets multiple: the multiplier applies in GH only
-      multipleTargets = eligible;
-      disableMultiTargetsSwitch = true;
+      _writeMultipleTargets(eligible);
+      _writeDisableMultiTargets(true);
     } else if (!eligible) {
       // Hex, and elements outside GH
-      multipleTargets = false;
-      disableMultiTargetsSwitch = true;
+      _writeMultipleTargets(false);
+      _writeDisableMultiTargets(true);
     } else {
-      disableMultiTargetsSwitch = false;
+      _writeDisableMultiTargets(false);
     }
 
     if (selectedEnhancement.category == EnhancementCategory.summonPlusOne) {
-      persistent = false;
+      _writePersistent(false);
       // GH2E: "not a summon action" - summon stats never get lost discount
       // FH: Lost discount can apply if action is lost but not persistent
       if (!edition.hasPersistentModifier) {
-        lostNonPersistent = false;
+        _writeLost(false);
       }
     }
-    enhancement = selectedEnhancement;
-    calculateCost();
+    _writeEnhancement(selectedEnhancement);
   }
 }
