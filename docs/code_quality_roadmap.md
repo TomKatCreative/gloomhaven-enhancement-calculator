@@ -11,7 +11,7 @@ Findings from the whole-codebase review on 2026-10-07, grouped into shippable ch
 | 1 | Correctness bugs | CQ-1 – CQ-6 |
 | 2 | Single source of truth (drift) | CQ-7 – CQ-14 |
 | 3 | Dead code and feature removal | CQ-15 – CQ-18 |
-| 4 | Simplify complex code | CQ-19 – CQ-22 |
+| 4 | Simplify complex code | CQ-19 – CQ-22, CQ-29 |
 | 5 | Localization gaps | CQ-23 – CQ-24 |
 | 6 | Design-constant sweep | CQ-25 – CQ-26 |
 | 7 | Docs sync | CQ-27 – CQ-28 |
@@ -247,13 +247,15 @@ These are independent and can be picked up opportunistically.
 
 **Done:** One `_buildTextTheme(brightness, bodyFont:, displayFont:, displayLetterSpacing:)` replaces both builders. Default fonts pass Inter for both fonts and no spacing; custom fonts pass Nyala, PirataOne and 1.5, so every style is unchanged. Both caches are now `Map<ThemeConfig, ThemeData>`. A test forces two different configs to share a hash code and checks that each gets its own theme; it fails against the old hash-keyed cache. New tests also pin each font setup and the light-only display shadow.
 
-### CQ-20 ⬜ Provider wiring in `main.dart`
+### CQ-20 ✅ Provider wiring in `main.dart`
 
 **File:** `lib/main.dart:113-127`
 
 - The `ChangeNotifierProxyProvider<ThemeProvider, CharactersModel>` `update` returns the previous model, so the proxy does nothing. Use a plain `ChangeNotifierProvider` with `context.read<ThemeProvider>()` in `create`, and update the `CharactersModel` doc.
 - The `Builder` both `context.watch`es `ThemeProvider` and wraps an `AnimatedBuilder` on the same listenable, so it subscribes twice. Pick one.
 - `themeAnimationCurve` is a no-op with `Duration.zero`.
+
+**Done:** `CharactersModel` is a plain `ChangeNotifierProvider` that reads `ThemeProvider` in `create`. No behaviour changed: provider only notifies after an `update` that returns a different instance, and this one always returned the same model, so the proxy only re-ran on theme changes and did nothing. Both provider types are lazy and dispose the same way. The `AnimatedBuilder` is gone, leaving `context.watch` as the single listener; the two had rebuilt `MaterialApp` in the same frame, so this removes a redundant listener rather than a second build. `themeAnimationCurve` is gone too, since every curve ends at the same value under `Duration.zero`; the comment says to restore it if the fade comes back. There is no new test because `GloomhavenApp` hardcodes `DatabaseHelper.instance` and `SharedPrefs()`, so it can't be pumped in a test, and a test of a copied provider tree would pass regardless of `main.dart`.
 
 ### CQ-21 ✅ Calculator model rebuild churn
 
@@ -272,6 +274,17 @@ Do this together with or after CQ-8.
 **File:** `lib/utils/asset_config.dart:922-999`
 
 `getAssetConfig` and `tryGetAssetConfig` duplicate the key-cleaning logic and recompile two regexes on every call. That runs per word in the tokenizer and per `ThemedSvg` build, which is on the perk-row rebuild path. Extract one `_cleanKey` with `static final` RegExps and make `getAssetConfig` the `tryGet…` lookup plus a throw. The assertion message also references a non-existent `standardAssets`.
+
+### CQ-29 ⬜ Home rebuild scope and Provider leftovers
+
+Found during CQ-20 (2026-10-20). None of these change what the user sees.
+
+- **`lib/ui/screens/home.dart:49-52`:** `Home` `context.watch`es all four models, so any change to `AppModel`, `CharactersModel`, `EnhancementCalculatorModel` or `TownModel` rebuilds the whole home `Scaffold`, including its `PageView` and the characters `FutureBuilder`. The build only needs a handful of values for `hideFab` and `_buildFab`: the current page, whether characters and campaigns are empty, edit mode, and the calculator's `isSheetExpanded` and `showCost`. Switch to `context.select` for those and `context.read` inside the FAB callbacks. This is the most valuable item here, because calculator taps currently rebuild `Home`.
+- **`home.dart:52`, `ghc_animated_app_bar.dart:278`:** `TownModel` is watched even while `kTownSheetEnabled` is false. Its provider is lazy, but these `watch` calls force it to be created and subscribed for a hidden feature. Guard the reads behind the flag.
+- **`home.dart:83`:** the `setState(() {})` in `onPageChanged` is redundant, since `AppModel.page=` already calls `notifyListeners()` and `Home` watches `AppModel`. Remove it (re-check once the `select` change above lands, which may stop `Home` watching the whole model).
+- **`lib/theme/theme_provider.dart:43`:** `updateSeedColor` writes `SharedPrefs().primaryClassColor` on every character swipe. It's cheap, but it's a disk write mid-swipe. Consider persisting only when the swipe settles, or leave it and note why.
+
+Add a widget test that counts `Home` builds on a calculator change before and after, so the rebuild-scope win is pinned.
 
 ---
 
