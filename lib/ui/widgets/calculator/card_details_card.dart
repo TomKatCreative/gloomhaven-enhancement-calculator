@@ -4,6 +4,7 @@ import 'package:gloomhaven_enhancement_calc/data/constants.dart';
 import 'package:gloomhaven_enhancement_calc/data/enhancement_data.dart';
 import 'package:gloomhaven_enhancement_calc/data/strings.dart';
 import 'package:gloomhaven_enhancement_calc/l10n/app_localizations.dart';
+import 'package:gloomhaven_enhancement_calc/models/enhancement_cost_calculator.dart';
 import 'package:gloomhaven_enhancement_calc/ui/dialogs/info_dialog.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/ghc_divider.dart';
@@ -86,7 +87,7 @@ class _CardLevelSection extends StatelessWidget {
     final partyBoon = model.partyBoonApplies;
     final enhancerLvl3 = model.enhancerLvl3Applies;
     final level = model.cardLevel;
-    final baseCost = 25 * level;
+    final baseCost = EnhancementCostCalculator.costPerCardLevel * level;
     final actualCost = model.cardLevelPenalty(level);
 
     return Padding(
@@ -162,7 +163,8 @@ class _PreviousEnhancementsSection extends StatelessWidget {
     final theme = Theme.of(context);
     final enhancerLvl4 = model.enhancerLvl4Applies;
     final selected = model.previousEnhancements;
-    final baseCost = 75 * selected;
+    final baseCost =
+        EnhancementCostCalculator.costPerPreviousEnhancement * selected;
     final actualCost = model.previousEnhancementsPenalty(selected);
 
     return Padding(

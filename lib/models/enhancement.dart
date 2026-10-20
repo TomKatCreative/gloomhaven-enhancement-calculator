@@ -8,17 +8,25 @@ class Enhancement {
   final int? fhCost;
   final String? assetKey;
 
+  /// Editions this enhancement does not exist in. Empty means every edition.
+  final Set<GameEdition> excludedEditions;
+
   Enhancement(
     this.category,
     this.name, {
     this.assetKey,
     this.ghCost = 0,
     this.fhCost,
+    this.excludedEditions = const {},
   });
 
   /// Stable identifier used to persist the selection. Unlike a position in
   /// [EnhancementData.enhancements], it survives reordering of that list.
   String get key => '${category.name}:$name';
+
+  /// Whether this enhancement exists in [edition].
+  bool isAvailableIn(GameEdition edition) =>
+      !excludedEditions.contains(edition);
 
   int cost({required GameEdition edition}) {
     switch (edition) {

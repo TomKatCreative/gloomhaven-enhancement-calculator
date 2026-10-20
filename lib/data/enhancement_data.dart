@@ -171,6 +171,8 @@ class EnhancementData {
       ghCost: 75,
       assetKey: 'WARD',
       fhCost: 75,
+      // Ward is available in GH2E and Frosthaven, not original GH
+      excludedEditions: {GameEdition.gloomhaven},
     ),
     Enhancement(
       EnhancementCategory.posEffect,
@@ -226,6 +228,12 @@ class EnhancementData {
       'Disarm',
       ghCost: 150,
       assetKey: 'DISARM',
+      // Disarm is only available in original Gloomhaven
+      excludedEditions: {
+        GameEdition.gloomhaven2e,
+        GameEdition.frosthaven,
+        GameEdition.jawsOfTheLion,
+      },
     ),
     Enhancement(
       EnhancementCategory.jump,
@@ -332,16 +340,5 @@ class EnhancementData {
   static bool isAvailableInEdition(
     Enhancement enhancement,
     GameEdition edition,
-  ) {
-    switch (enhancement.name) {
-      case 'Disarm':
-        // Disarm is only available in original Gloomhaven
-        return edition == GameEdition.gloomhaven;
-      case 'Ward':
-        // Ward is available in GH2E and Frosthaven, not original GH
-        return edition != GameEdition.gloomhaven;
-      default:
-        return true;
-    }
-  }
+  ) => enhancement.isAvailableIn(edition);
 }

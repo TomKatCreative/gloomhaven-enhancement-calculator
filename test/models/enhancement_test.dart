@@ -169,6 +169,26 @@ void main() {
     });
   });
 
+  group('Enhancement.isAvailableIn', () {
+    test('defaults to every edition', () {
+      final enhancement = Enhancement(EnhancementCategory.charPlusOne, 'Test');
+      for (final edition in GameEdition.values) {
+        expect(enhancement.isAvailableIn(edition), isTrue);
+      }
+    });
+
+    test('excludes only the listed editions', () {
+      final enhancement = Enhancement(
+        EnhancementCategory.posEffect,
+        'Test',
+        excludedEditions: {GameEdition.gloomhaven},
+      );
+      expect(enhancement.isAvailableIn(GameEdition.gloomhaven), isFalse);
+      expect(enhancement.isAvailableIn(GameEdition.gloomhaven2e), isTrue);
+      expect(enhancement.isAvailableIn(GameEdition.frosthaven), isTrue);
+    });
+  });
+
   group('EnhancementCategory', () {
     group('sectionTitle', () {
       test('charPlusOne returns Character', () {

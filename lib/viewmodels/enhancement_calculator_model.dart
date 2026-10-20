@@ -434,8 +434,7 @@ class EnhancementCalculatorModel with ChangeNotifier {
     final edition = _gameEdition;
 
     // Handle the case where the user has an enhancement selected that's not
-    // available in the current edition (e.g., Disarm in GH2E/FH, Ward in GH,
-    // Regenerate in GH2E)
+    // available in the current edition (e.g., Disarm in GH2E/FH, Ward in GH)
     if (!EnhancementData.isAvailableInEdition(selectedEnhancement, edition)) {
       _enhancement = null;
       _clearPersistedEnhancement();
@@ -443,38 +442,29 @@ class EnhancementCalculatorModel with ChangeNotifier {
       return;
     }
 
-    switch (selectedEnhancement.category) {
-      case EnhancementCategory.target:
-        // Target: multi-target applies in GH only
-        multipleTargets = edition.multiTargetAppliesToAll;
-        disableMultiTargetsSwitch = true;
-        break;
-      case EnhancementCategory.hex:
-        multipleTargets = false;
-        disableMultiTargetsSwitch = true;
-        break;
-      case EnhancementCategory.anyElem:
-      case EnhancementCategory.specElem:
-        // Elements: multi-target applies in GH only
-        if (!edition.multiTargetAppliesToAll) {
-          multipleTargets = false;
-          disableMultiTargetsSwitch = true;
-        } else {
-          disableMultiTargetsSwitch = false;
-        }
-        break;
-      case EnhancementCategory.summonPlusOne:
-        persistent = false;
-        // GH2E: "not a summon action" - summon stats never get lost discount
-        // FH: Lost discount can apply if action is lost but not persistent
-        if (!edition.hasPersistentModifier) {
-          lostNonPersistent = false;
-        }
-        disableMultiTargetsSwitch = false;
-        break;
-      default:
-        disableMultiTargetsSwitch = false;
-        break;
+    final eligible = eligibleForMultipleTargets(
+      selectedEnhancement,
+      edition: edition,
+    );
+    if (selectedEnhancement.category == EnhancementCategory.target) {
+      // Target always targets multiple: the multiplier applies in GH only
+      multipleTargets = eligible;
+      disableMultiTargetsSwitch = true;
+    } else if (!eligible) {
+      // Hex, and elements outside GH
+      multipleTargets = false;
+      disableMultiTargetsSwitch = true;
+    } else {
+      disableMultiTargetsSwitch = false;
+    }
+
+    if (selectedEnhancement.category == EnhancementCategory.summonPlusOne) {
+      persistent = false;
+      // GH2E: "not a summon action" - summon stats never get lost discount
+      // FH: Lost discount can apply if action is lost but not persistent
+      if (!edition.hasPersistentModifier) {
+        lostNonPersistent = false;
+      }
     }
     enhancement = selectedEnhancement;
     calculateCost();

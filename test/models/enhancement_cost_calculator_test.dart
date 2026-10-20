@@ -935,6 +935,80 @@ void main() {
         expect(steps.last.value, calc.totalCost);
       });
 
+      test('a negative enhancement cost is clamped in the total only', () {
+        // FH Pull: 20 / 2 = 10 - 10 - 5 = -5. The Hail's step shows -5, but
+        // the total clamps the enhancement cost to 0.
+        final calc = EnhancementCostCalculator(
+          edition: GameEdition.frosthaven,
+          enhancement: _find('Pull'),
+          lostNonPersistent: true,
+          enhancerLvl2: true,
+          hailsDiscount: true,
+        );
+        expect(calc.breakdown.last.description, "Hail's Discount");
+        expect(calc.breakdown.last.value, -5);
+        expect(calc.totalCost, 0);
+      });
+
+      test('clamped enhancement cost carries into the penalties', () {
+        final calc = EnhancementCostCalculator(
+          edition: GameEdition.frosthaven,
+          enhancement: _find('Pull'),
+          lostNonPersistent: true,
+          enhancerLvl2: true,
+          hailsDiscount: true,
+          cardLevel: 1,
+        );
+        // 0 (clamped) + 25, not -5 + 25
+        expect(calc.breakdown.last.value, 25);
+        expect(calc.totalCost, 25);
+      });
+
+      test('totals agree with the breakdown for every enhancement', () {
+        for (final edition in GameEdition.values) {
+          for (final enhancement in EnhancementData.enhancements) {
+            final calc = EnhancementCostCalculator(
+              edition: edition,
+              enhancement: enhancement,
+              multipleTargets: true,
+              lostNonPersistent: true,
+              hailsDiscount: true,
+              enhancerLvl2: true,
+              cardLevel: 2,
+              previousEnhancements: 1,
+              partyBoon: true,
+              enhancerLvl3: true,
+              enhancerLvl4: true,
+              temporaryEnhancementMode: true,
+            );
+            final reason = '${enhancement.key} $edition';
+            expect(calc.breakdown.last.value, calc.totalCost, reason: reason);
+            final penalties =
+                calc.cardLevelPenalty(2) + calc.previousEnhancementsPenalty(1);
+            expect(
+              calc.totalCost,
+              ((calc.enhancementCost(enhancement) + penalties) * 0.8).ceil(),
+              reason: reason,
+            );
+          }
+        }
+      });
+
+      test('rule values match docs/enhancement_rules.md', () {
+        expect(EnhancementCostCalculator.multiTargetMultiplier, 2);
+        expect(EnhancementCostCalculator.lostDivisor, 2);
+        expect(EnhancementCostCalculator.persistentMultiplier, 3);
+        expect(EnhancementCostCalculator.enhancerL2Discount, 10);
+        expect(EnhancementCostCalculator.hailsDiscountAmount, 5);
+        expect(EnhancementCostCalculator.costPerCardLevel, 25);
+        expect(EnhancementCostCalculator.partyBoonDiscountPerLevel, 5);
+        expect(EnhancementCostCalculator.enhancerL3DiscountPerLevel, 10);
+        expect(EnhancementCostCalculator.costPerPreviousEnhancement, 75);
+        expect(EnhancementCostCalculator.enhancerL4DiscountPerEnhancement, 25);
+        expect(EnhancementCostCalculator.temporaryEnhancementDiscount, 20);
+        expect(EnhancementCostCalculator.temporaryEnhancementMultiplier, 0.8);
+      });
+
       test('immutability: same instance returns same results', () {
         final calc = EnhancementCostCalculator(
           edition: GameEdition.gloomhaven,
