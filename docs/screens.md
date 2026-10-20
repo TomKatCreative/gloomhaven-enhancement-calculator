@@ -553,7 +553,7 @@ Renders inline — the parent (`QuestAndNotesCard`) provides the card wrapper. T
 - Bottom padding (`fabBottomClearance`) keeps the last section clear of the FAB
 - `ValueKey` on form fields keyed to character UUID
 - Responsive max-width constraints via `ResponsiveLayout` (phones: fills screen, tablets: capped)
-- Scroll controller from `CharactersModel` for app bar animations
+- Owns its own `ScrollController` and offset notifier (pages stay alive across swipes, so a shared controller would attach to several scroll views); only the current page writes its offset to `CharactersModel.charScrollOffsetNotifier`, which drives the app bar tint, and a page re-publishes its offset when it becomes current
 
 ---
 

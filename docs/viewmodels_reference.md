@@ -299,9 +299,8 @@ Personal quest operations are delegated to `PersonalQuestService` (`lib/data/per
 | `databaseHelper` | `DatabaseHelper` | singleton | SQLite access |
 | `themeProvider` | `ThemeProvider` | injected | Theme controller |
 | `pageController` | `PageController` | created | Character PageView control |
-| `charScreenScrollController` | `ScrollController` | created | Character sheet scroll |
 | `enhancementCalcScrollController` | `ScrollController` | created | Calculator scroll |
-| `charScrollOffsetNotifier` | `ValueNotifier<double>` | 0 | Character screen scroll offset (drives app bar & header tint) |
+| `charScrollOffsetNotifier` | `ValueNotifier<double>` | 0 | Current character page's scroll offset (drives app bar tint) |
 | `showRetired` | `bool` | from prefs | Show/hide retired characters |
 | `_isEditMode` | `bool` | false | Edit mode state |
 | `isScrolledToTop` | `bool` | true | Scroll position tracking |
@@ -518,4 +517,4 @@ ProxyProvider<ThemeProvider, CharactersModel>(
 
 ### Scroll Controller Sharing
 
-Both scroll controllers (`charScreenScrollController`, `enhancementCalcScrollController`) are owned by `CharactersModel` and passed to child widgets for coordinated scroll behavior and app bar animations. `charScrollOffsetNotifier` is a `ValueNotifier<double>` updated by `CharacterScreen._onScroll()` (which fires on both user scrolls and `ScrollMetricsNotification` from section collapse). `GHCAnimatedAppBar` and the character header/chip bar delegates listen to it for tint updates — this ensures tint clears even when Flutter's `correctPixels()` clamps the offset without firing `ScrollController` listeners.
+`enhancementCalcScrollController` is owned by `CharactersModel`. Each `CharacterScreen` owns its own `ScrollController` and offset notifier (pages are kept alive across swipes, so a shared controller would attach to several scroll views and break chip navigation); its header, chip bar and background icon listen to that page-local notifier. `charScrollOffsetNotifier` mirrors the offset of the **current** page only — `CharacterScreen._onScroll()` writes to it when the page is current (on both user scrolls and `ScrollMetricsNotification` from section collapse), and a page re-publishes its offset when it becomes current. `GHCAnimatedAppBar` listens to it for tint — this ensures tint clears even when Flutter's `correctPixels()` clamps the offset without firing `ScrollController` listeners.
