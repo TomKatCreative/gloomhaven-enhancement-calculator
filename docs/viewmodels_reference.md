@@ -161,16 +161,16 @@ The model caches an `EnhancementCostCalculator` instance, invalidating it on any
 
 ### Getters and Setters
 
-All state properties have getter/setter pairs that write-through to SharedPrefs and trigger `calculateCost()`. UI files should use these instead of accessing SharedPrefs directly.
+Each setter writes through to SharedPrefs, invalidates the cached calculator and notifies listeners **exactly once**, side effects included. Side effects (clearing lost/persistent, locking the multi-target switch) go through private `_write*` helpers that persist and assign without notifying, so a tap never triggers a cascade of rebuilds. UI files should use these setters instead of accessing SharedPrefs directly.
 
 | Property | Type | Setter behavior |
 |----------|------|-----------------|
 | `edition` / `gameEdition=` | `GameEdition` | Write to SharedPrefs, update cache, run `gameVersionToggled()` |
-| `partyBoon` | `bool` | Write to SharedPrefs, update cache, `calculateCost()` |
-| `enhancerLvl2` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl3/4, `calculateCost()` |
-| `enhancerLvl3` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/4, `calculateCost()` |
-| `enhancerLvl4` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/3, `calculateCost()` |
-| `enhancement` | `Enhancement?` | Current enhancement selection |
+| `partyBoon` | `bool` | Write to SharedPrefs, update cache, notify |
+| `enhancerLvl2` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl3/4, notify |
+| `enhancerLvl3` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/4, notify |
+| `enhancerLvl4` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/3, notify |
+| `enhancement` | `Enhancement?` | Read-only; set through `enhancementSelected()` |
 | `cardLevel` | `int` | Card level (0-indexed internally) |
 | `previousEnhancements` | `int` | Previous enhancement count |
 | `multipleTargets` | `bool` | Multi-target state |
@@ -178,7 +178,7 @@ All state properties have getter/setter pairs that write-through to SharedPrefs 
 | `persistent` | `bool` | Persistent modifier state (clears lost) |
 | `temporaryEnhancementMode` | `bool` | Temporary mode state |
 | `hailsDiscount` | `bool` | Hail's discount state |
-| `disableMultiTargetsSwitch` | `bool` | Multi-target toggle lock |
+| `disableMultiTargetsSwitch` | `bool` | Read-only multi-target toggle lock, set by `enhancementSelected()` |
 | `isSheetExpanded` | `bool` | Cost chip expansion |
 
 ### Computed Getters
@@ -195,11 +195,10 @@ All state properties have getter/setter pairs that write-through to SharedPrefs 
 
 | Method | Description |
 |--------|-------------|
-| `calculateCost({notify})` | Recalculate total cost, optionally notify listeners |
 | `resetCost()` | Clear all calculator input fields and reset to defaults |
 | `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore); enhancement selection is read through the bounds-checked `_enhancementFromPrefs()` helper (tolerates an out-of-range persisted index) |
-| `enhancementSelected(Enhancement?)` | Handle enhancement selection with validation |
-| `gameVersionToggled()` | Handle edition change with modifier validation |
+| `enhancementSelected(Enhancement)` | Handle enhancement selection with validation; one notify |
+| `gameVersionToggled()` | Handle edition change with modifier validation and re-check the selection; one notify |
 | `getCalculationBreakdown()` | Generate step-by-step cost breakdown |
 
 ### Cost Calculation Flow
@@ -493,14 +492,14 @@ set cardLevel(int value) {
 }
 ```
 
-### Conditional Notification
+### One Notification per Action
 
-Some methods accept a `notify` parameter to batch updates:
+When an action has side effects, apply them with private helpers that don't notify, then notify once at the end. `EnhancementCalculatorModel` does this:
 
 ```dart
-void calculateCost({bool notify = true}) {
-  // ... calculation logic
-  if (notify) notifyListeners();
+void enhancementSelected(Enhancement selected) {
+  _applyEnhancement(selected); // may clear lost/persistent, lock multi-target
+  _changed(); // invalidate cached calculator + notifyListeners()
 }
 ```
 

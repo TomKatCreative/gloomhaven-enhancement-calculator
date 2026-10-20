@@ -615,7 +615,7 @@ Multiple markers can combine (e.g., `‡*` = Hail's + Building 44).
 - Lost/Non-Persistent toggle (GH2E/FH: ×0.5)
 - Persistent toggle (FH only: ×3)
 
-**Discounts Group Card** (`_DiscountsGroupCard`):
+**Discounts Group Card** (`DiscountsGroupCard`, stateless):
 - Toggle items for each discount type
 - Building 44 toggle opens `EnhancerDialog` for level configuration
 
@@ -639,7 +639,7 @@ The `ExpandableCostChip` widget shows:
 ### Key Features
 
 - Watches both `EnhancementCalculatorModel` and `ThemeProvider`
-- Dynamic calculation via `model.calculateCost(notify: false)`
+- Stateless; rebuilds when the model notifies (once per user action). Costs come from the model's cached calculator, which its setters invalidate
 - All toggles trigger cost recalculation
 - Info buttons use `InfoDialog` with rich text from `Strings`
 - Bottom padding adjusts for cost chip visibility

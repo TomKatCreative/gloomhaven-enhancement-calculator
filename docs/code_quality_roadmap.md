@@ -240,7 +240,7 @@ These are independent and can be picked up opportunistically.
 - The `Builder` both `context.watch`es `ThemeProvider` and wraps an `AnimatedBuilder` on the same listenable, so it subscribes twice. Pick one.
 - `themeAnimationCurve` is a no-op with `Duration.zero`.
 
-### CQ-21 ⬜ Calculator model rebuild churn
+### CQ-21 ✅ Calculator model rebuild churn
 
 **Files:** `lib/ui/screens/enhancement_calculator_screen.dart:27`, `lib/viewmodels/enhancement_calculator_model.dart`
 
@@ -249,6 +249,8 @@ These are independent and can be picked up opportunistically.
 - The `calculateCost` doc mentions "EnhancerDialog writing directly to SharedPrefs", which no longer happens.
 
 Do this together with or after CQ-8.
+
+**Done:** Every public mutation now notifies exactly once. Side effects go through private `_write*` helpers that persist and assign without notifying. `enhancementSelected` and `gameVersionToggled` share a non-notifying `_applyEnhancement`. `calculateCost` was removed rather than re-documented: once the build-time call was gone it had no callers, and keeping it public would invite that call back. The `enhancement=` and `disableMultiTargetsSwitch=` setters, which skipped notifying and were only used inside the model, are gone too. The same redundant rebuilds were also in the UI, so `EnhancementCalculatorScreen` and `DiscountsGroupCard` are now stateless: the Party Boon `setState`, the `onSettingChanged` callback and the post-dialog `setState` were all covered by the screen's `watch`. New tests pin the notify count at 1 for every side-effect path and check that the side effects still reach SharedPrefs. Because the screen no longer drops the cache on every build, each setter now has a test that reads the cost first, mutates, and expects the new cost.
 
 ### CQ-22 ⬜ `asset_config.dart` lookup duplication
 

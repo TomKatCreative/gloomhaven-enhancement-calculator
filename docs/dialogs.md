@@ -129,7 +129,7 @@ EnhancerDialog.show(
   - **Level 3**: Reduces card level penalties
   - **Level 4**: Reduces previous enhancement penalties
 - State persisted via SharedPrefs (enhancerLvl2/3/4 keys)
-- Triggers `model.calculateCost()` on checkbox changes
+- Writes through the model's `enhancerLvl2/3/4` setters, which recalculate and notify; the calculator screen underneath rebuilds from that
 - Cascading level logic enforced in SharedPrefs setters (see `docs/shared_prefs_keys.md`)
 
 **Internal Widgets:**

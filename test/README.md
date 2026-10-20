@@ -166,7 +166,7 @@ MaterialApp(
 | File | What it covers |
 |------|----------------|
 | `characters_model_test.dart` | Character CRUD, loading, selection, perk toggling, mastery toggling, checkmarks, retirement, theme sync, retired character filtering |
-| `enhancement_calculator_model_test.dart` | Base cost, multi-target multiplier (edition-specific eligibility), lost modifier (halving), persistent modifier (tripling), flat discounts (Enhancer L2, Hail's), card level penalty (with Party Boon/Enhancer L3), previous enhancements penalty (with temp mode/Enhancer L4), end-to-end `calculateCost()`, `enhancementSelected()` side effects, `gameVersionToggled()`, `resetCost()`, `getCalculationBreakdown()` steps, `enhancerLvl*Applies` getters |
+| `enhancement_calculator_model_test.dart` | Base cost, multi-target multiplier (edition-specific eligibility), lost modifier (halving), persistent modifier (tripling), flat discounts (Enhancer L2, Hail's), card level penalty (with Party Boon/Enhancer L3), previous enhancements penalty (with temp mode/Enhancer L4), end-to-end `totalCost`, `enhancementSelected()` side effects, `gameVersionToggled()`, `resetCost()`, `getCalculationBreakdown()` steps, `enhancerLvl*Applies` getters, exactly one notify per action (with SharedPrefs write-through of side effects), every setter refreshing an already-computed cost |
 
 ### Widgets (8 files)
 
