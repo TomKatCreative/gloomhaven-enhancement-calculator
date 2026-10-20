@@ -64,5 +64,32 @@ void main() {
       expect(svg.assetKey, wound.assetKey);
       expect(svg.showPlusOneOverlay, isFalse);
     });
+
+    testWidgets('keeps onSurface inside a selected ListTile', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ListTile(
+              selected: true,
+              leading: EnhancementIcon(
+                enhancement: _find('Shield'),
+                size: iconSizeMedium,
+              ),
+              title: const Text('Shield'),
+            ),
+          ),
+        ),
+      );
+
+      final context = tester.element(find.byType(ThemedSvg));
+      expect(
+        IconTheme.of(context).color,
+        Theme.of(context).colorScheme.onSurface,
+      );
+      expect(
+        IconTheme.of(context).color,
+        isNot(Theme.of(context).colorScheme.primary),
+      );
+    });
   });
 }
