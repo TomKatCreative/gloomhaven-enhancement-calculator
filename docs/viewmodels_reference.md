@@ -167,9 +167,7 @@ Each setter writes through to SharedPrefs, invalidates the cached calculator and
 |----------|------|-----------------|
 | `edition` / `gameEdition=` | `GameEdition` | Write to SharedPrefs, update cache, run `gameVersionToggled()` |
 | `partyBoon` | `bool` | Write to SharedPrefs, update cache, notify |
-| `enhancerLvl2` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl3/4, notify |
-| `enhancerLvl3` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/4, notify |
-| `enhancerLvl4` | `bool` | Write to SharedPrefs, update cache, re-read cascaded lvl2/3, notify |
+| `enhancerLvl2` / `enhancerLvl3` / `enhancerLvl4` | `bool` | Via `_setEnhancerLevel(level, value)`: turning a level on turns on every lower level, turning it off turns off every higher level; writes all four levels (L1 included) to SharedPrefs, updates the cache, notifies once |
 | `enhancement` | `Enhancement?` | Read-only; set through `enhancementSelected()` |
 | `cardLevel` | `int` | Card level (0-indexed internally) |
 | `previousEnhancements` | `int` | Previous enhancement count |
@@ -195,7 +193,7 @@ Each setter writes through to SharedPrefs, invalidates the cached calculator and
 
 | Method | Description |
 |--------|-------------|
-| `resetCost()` | Clear all calculator input fields and reset to defaults |
+| `resetCost()` | Clear the per-card inputs (card level, previous enhancements, selection, multi-target, lost, persistent) via `SharedPrefs().resetCalculatorInputs()`; edition, party boon, temporary mode, Hail's discount and enhancer levels are kept |
 | `reloadFromPrefs()` | Re-read all fields from SharedPrefs (e.g. after backup restore); enhancement selection is read through the bounds-checked `_enhancementFromPrefs()` helper (tolerates an out-of-range persisted index) |
 | `enhancementSelected(Enhancement)` | Handle enhancement selection with validation; one notify |
 | `gameVersionToggled()` | Handle edition change with modifier validation and re-check the selection; one notify |

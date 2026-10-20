@@ -68,11 +68,12 @@ The fake always calls `_generateCharacterMasteries`. The real `database_helper.d
 
 **Fix:** Guard the call with `if (character.shouldShowMasteries)` and re-run the viewmodel tests.
 
-### CQ-6 ✅ Small latent correctness issues
+### CQ-6 🟨 Small latent correctness issues
 
 - **`lib/models/character.dart:157`:** `id = map[columnCharacterId] ?? ''` puts a String into `int?`, which throws a TypeError instead of falling back. Use `as int?`.
 - **`lib/ui/widgets/character/stats_section.dart:422-423`:** `ResourcesContent` reads `isEditMode` with `context.read` in `build`. It only updates because the parent watches the whole model, so narrowing the parent to a `Selector` (as the perf work is doing) would break edit mode. Use `context.select<CharactersModel, bool>((m) => m.isEditMode)`.
 - **`lib/data/perks/perks_repository.dart:58-59`:** `getPerksForCharacter` mutates the shared static `Perk` objects (`variant`, `classCode`) before copying them. The copy already sets both fields, so delete the mutation.
+- ⬜ **`lib/ui/dialogs/restore_dialog.dart:105-138`** (added 2026-10-20 from the CQ-11 persistence review): after the restore commits, the calculator syncs with the restored prefs only through `reloadFromPrefs()`. The `context.mounted` guard right after `restored = true` and an exception from `updateThemeConfig` both skip it, and the `catch` reloads characters only. The calculator then computes costs from its pre-restore cache until the next launch. The restored prefs on disk survive (since CQ-11, enhancer toggles read the untouched levels from disk). Call `reloadFromPrefs()` right after `restored = true`, using a model read before the `await`, and add a `restore_dialog` test.
 
 ---
 
@@ -123,13 +124,15 @@ The 9 resources are listed by hand in the column constants, fields, constructor,
 
 **Enables:** localizing resource names (part of CQ-24).
 
-### CQ-11 ⬜ SharedPreferences key constants
+### CQ-11 ✅ SharedPreferences key constants
 
 **Files:** `lib/shared_prefs.dart`, `lib/viewmodels/enhancement_calculator_model.dart:367-374`
 
 Each key string appears 3–4 times (getter/setter, `exportForBackup`, `importFromBackup`, calculator reset). `resetCost` removes `'enhancementCost'`, which nothing writes. The enhancer-level cascade rule (L2 implies L1, and so on) lives in `shared_prefs.dart:37-68` rather than the model.
 
 **Fix:** Add private `static const _kFoo` key constants and reset helpers on `SharedPrefs`, drop the dead key, and consider moving the cascade rule into the calculator model. Pair with CQ-2 if convenient, since both touch the same keys.
+
+**Done:** Every stored key string now lives once, in a private `_Keys` holder in `shared_prefs.dart` (named after its property, so historical mismatches like `previousEnhancements` → `enhancementsOnTargetAction` are visible), and backup category names in `_Categories`. `SharedPrefs` and `BackupPrefs` share them because Dart privacy is per file. No key string is used outside that file: `remove` is private, `enhancementTypeIndex` is `int?` with null removing the key (the `enhancementKey` pattern), and `resetCost` calls the new `resetCalculatorInputs()`, which documents which settings deliberately survive a reset. The dead `'enhancementCost'` removal is gone; very old installs may keep that stray key, which is harmless because backup export is an allowlist. The level rule moved into `EnhancementCalculatorModel._setEnhancerLevel`, which computes all four levels and writes them once, reading the untouched levels from prefs so a restore that skipped `reloadFromPrefs` is not undone by the next toggle. The four persisted bools were kept rather than collapsed to one level number, because restored backups can hold non-contiguous levels and deriving a number from them would change their costs. Tests still use literal key strings on purpose, so they pin the on-disk format. New tests check the persisted levels after each cascade, a single notify per toggle, and that `resetCost` removes exactly the per-card keys and keeps the campaign settings.
 
 ### CQ-12 ⬜ Derive mastery and legacy data instead of duplicating it
 

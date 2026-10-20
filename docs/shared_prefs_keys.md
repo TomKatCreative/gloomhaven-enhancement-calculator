@@ -6,7 +6,7 @@ This document provides a comprehensive reference for all SharedPreferences keys 
 
 ## Overview
 
-The app uses a singleton `SharedPrefs` class with getter/setter properties backed by SharedPreferences. All keys are accessed via instance properties rather than string literals.
+The app uses a singleton `SharedPrefs` class with getter/setter properties backed by SharedPreferences. All keys are accessed via instance properties rather than string literals. The stored key strings are private constants in `_Keys` (named after the property; several values differ for historical reasons, e.g. `previousEnhancements` → `enhancementsOnTargetAction`) and never appear outside `shared_prefs.dart`.
 
 ```dart
 // Usage
@@ -72,7 +72,7 @@ prefs.setPlayerClassIsUnlocked('br', true);
 |-----|------|---------|-------------|
 | `gameEdition` | int | 0 | Selected game edition (enum index) |
 | `enhancementKey` | String? | null | Selected enhancement as `Enhancement.key` (`'<category>:<name>'`, e.g. `charPlusOne:Move`) |
-| `enhancementType` | int | 0 | **Legacy.** Selected enhancement as a list index (0 = no selection). Read once, migrated to `enhancementKey`, then removed |
+| `enhancementType` | int? | null | **Legacy.** Selected enhancement as a list index (0 = no selection). Read once, migrated to `enhancementKey`, then removed |
 | `enhancementsOnTargetAction` | int | 0 | Previous enhancement count (0-9) |
 | `targetCardLvl` | int | 0 | Card level (0-indexed, displayed as 1-9) |
 
@@ -107,49 +107,14 @@ The enhancer levels (Building 44) implement a **cascading lock system** where hi
 | `enhancerLvl3` | bool | false | Level 3 (reduces card level penalties) |
 | `enhancerLvl4` | bool | false | Level 4 (reduces previous enhancement penalties) |
 
-### Cascading Logic
+### Level Rule
 
-**Upgrading (setting true)**: Automatically enables all lower levels
+The `SharedPrefs` setters are plain writes. `EnhancementCalculatorModel._setEnhancerLevel` keeps the levels contiguous (no L3 without L1–L2) and writes all four keys:
 
-```dart
-// Setting Level 3 = true
-enhancerLvl3 = true;
-// Cascade: Lvl2 → true, Lvl1 → true
+- **Turning a level on** turns on every lower level (L3 on → L1, L2 on). Higher levels are unchanged.
+- **Turning a level off** turns off every higher level (L2 off → L3, L4 off). Lower levels are unchanged.
 
-// Setting Level 4 = true
-enhancerLvl4 = true;
-// Cascade: Lvl3 → true, Lvl2 → true, Lvl1 → true
-```
-
-**Downgrading (setting false)**: Automatically disables all higher levels
-
-```dart
-// Setting Level 2 = false
-enhancerLvl2 = false;
-// Cascade: Lvl3 → false, Lvl4 → false
-
-// Setting Level 1 = false
-enhancerLvl1 = false;
-// Cascade: Lvl2 → false, Lvl3 → false, Lvl4 → false
-```
-
-### Implementation Detail
-
-```dart
-set enhancerLvl2(bool value) {
-  _prefs.setBool('enhancerLvl2', value);
-  if (value) {
-    // Upgrading: enable lower level
-    enhancerLvl1 = true;
-  } else {
-    // Downgrading: disable higher levels
-    enhancerLvl3 = false;
-    enhancerLvl4 = false;
-  }
-}
-```
-
-This ensures users can only have contiguous levels (can't have L3 without L1-L2).
+The enhancer dialog only toggles L2–L4. `enhancerLvl1` is written on every L2–L4 toggle, so it stays in backups. The untouched levels are read from SharedPrefs, not the model cache, so a restore that skipped `reloadFromPrefs()` is not overwritten by the next toggle.
 
 ---
 
@@ -248,7 +213,8 @@ This ensures one-time automatic migration for users upgrading from older app ver
 | Method | Description |
 |--------|-------------|
 | `init()` | Async initialization (call in main.dart) |
-| `remove(String key)` | Delete single preference |
+| `clearEnhancementSelection()` | Remove `enhancementKey` and the legacy `enhancementType` |
+| `resetCalculatorInputs()` | Remove the per-card calculator inputs (card level, previous enhancements, selection, both multi-target keys, lost, persistent) for `resetCost()`; edition, party boon, temporary mode, Hail's discount and enhancer levels are kept |
 | `removeAll()` | Clear all preferences |
 | `getPlayerClassIsUnlocked(String classCode)` | Query per-class unlock |
 | `setPlayerClassIsUnlocked(String classCode, bool value)` | Set per-class unlock |
@@ -324,9 +290,9 @@ Old backups (2 elements) are fully supported — the third element is simply abs
 | `isUSRegion` | Device-specific locale detection |
 | `gloomhavenMode` | Legacy key (migrated to `gameEdition`) |
 
-### Enhancer Level Cascade Bypass
+### Enhancer Levels on Import
 
-During import, enhancer levels are written directly via `_sharedPrefs.setBool()` instead of using the property setters. This bypasses the cascading logic (where setting lvl3=true auto-enables lvl1 and lvl2) because the backup data is already self-consistent.
+Import writes enhancer levels exactly as stored. It does not go through the calculator model, so the level rule (where turning on lvl3 also turns on lvl1 and lvl2) is not applied, because the backup data is already self-consistent.
 
 ### Methods
 
