@@ -8,6 +8,7 @@ import 'package:gloomhaven_enhancement_calc/models/game_edition.dart';
 import 'package:gloomhaven_enhancement_calc/shared_prefs.dart';
 import 'package:gloomhaven_enhancement_calc/theme/theme_provider.dart';
 import 'package:gloomhaven_enhancement_calc/ui/screens/enhancement_calculator_screen.dart';
+import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/calculator_toggle_group_card.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/calculator/cost_display.dart';
 import 'package:gloomhaven_enhancement_calc/ui/widgets/expandable_cost_chip.dart';
 import 'package:gloomhaven_enhancement_calc/viewmodels/characters_model.dart';
@@ -344,6 +345,30 @@ void main() {
             .element(find.byType(EnhancementCalculatorScreen))
             .read<EnhancementCalculatorModel>();
         expect(model.hailsDiscount, isTrue);
+      });
+
+      testWidgets('toggling Party Boon updates its switch', (tester) async {
+        await tester.pumpWidget(await buildCalculatorScreen());
+        await tester.pumpAndSettle();
+
+        final boonFinder = find.textContaining('Scenario 114 reward');
+        await tester.ensureVisible(boonFinder);
+        await tester.pumpAndSettle();
+        final boonSwitch = find.descendant(
+          of: find.ancestor(
+            of: boonFinder,
+            matching: find.byType(ToggleGroupRow),
+          ),
+          matching: find.byType(Switch),
+        );
+        expect(tester.widget<Switch>(boonSwitch).value, isFalse);
+
+        await tester.tap(boonFinder);
+        await tester.pumpAndSettle();
+
+        // The card has no local state, so this only passes if the screen's
+        // watch of the model rebuilds it
+        expect(tester.widget<Switch>(boonSwitch).value, isTrue);
       });
     });
 

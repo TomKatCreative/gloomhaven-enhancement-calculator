@@ -857,7 +857,7 @@ void main() {
       });
     });
 
-    group('calculateCost() - End-to-End', () {
+    group('totalCost - End-to-End', () {
       test('enhancement only: totalCost = enhancementCost', () async {
         await _setupPrefs();
         final model = EnhancementCalculatorModel();
@@ -976,15 +976,15 @@ void main() {
         expect(model.totalCost, 104);
       });
 
-      test('notifyListeners called on calculateCost', () async {
+      test('setting cardLevel notifies once', () async {
         await _setupPrefs();
         final model = EnhancementCalculatorModel();
         int notifyCount = 0;
         model.addListener(() => notifyCount++);
 
-        model.cardLevel = 1; // triggers calculateCost which notifies
+        model.cardLevel = 1;
 
-        expect(notifyCount, greaterThan(0));
+        expect(notifyCount, 1);
       });
 
       test('complex FH calculation with enhancer levels', () async {
@@ -1223,7 +1223,7 @@ void main() {
         expect(EnhancementCalculatorModel().enhancement, isNull);
       });
 
-      test('calls notifyListeners', () async {
+      test('notifies once', () async {
         await _setupPrefs();
         final model = EnhancementCalculatorModel();
         int notifyCount = 0;
@@ -1231,7 +1231,7 @@ void main() {
 
         model.gameEdition = GameEdition.gloomhaven;
 
-        expect(notifyCount, greaterThan(0));
+        expect(notifyCount, 1);
       });
 
       test('edition getter returns cached value', () async {
@@ -1281,7 +1281,7 @@ void main() {
         expect(SharedPrefs().previousEnhancements, 0);
       });
 
-      test('calls notifyListeners', () async {
+      test('notifies once', () async {
         await _setupPrefs();
         final model = EnhancementCalculatorModel();
         int notifyCount = 0;
@@ -1289,7 +1289,7 @@ void main() {
 
         model.resetCost();
 
-        expect(notifyCount, greaterThan(0));
+        expect(notifyCount, 1);
       });
     });
 
@@ -1515,7 +1515,7 @@ void main() {
         model.partyBoon = true;
 
         expect(model.partyBoon, isTrue);
-        expect(notifyCount, greaterThan(0));
+        expect(notifyCount, 1);
         // With party boon: 25 - 5 = 20
         expect(model.cardLevelPenalty(1), 20);
       });
@@ -1672,6 +1672,265 @@ void main() {
         model.reloadFromPrefs();
 
         expect(model.enhancement, isNull);
+      });
+    });
+
+    group('notifies once per change', () {
+      /// Builds a model from [values] and counts its notifications.
+      Future<(EnhancementCalculatorModel, int Function())> countingModel(
+        Map<String, Object> values,
+      ) async {
+        SharedPreferences.setMockInitialValues(values);
+        await SharedPrefs().init();
+        final model = EnhancementCalculatorModel();
+        var count = 0;
+        model.addListener(() => count++);
+        return (model, () => count);
+      }
+
+      test('selecting Target in GH', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.gloomhaven.index,
+        });
+
+        model.enhancementSelected(_findEnhancement('Target'));
+
+        expect(count(), 1);
+        expect(SharedPrefs().multipleTargetsSwitch, isTrue);
+        expect(SharedPrefs().disableMultiTargetSwitch, isTrue);
+      });
+
+      test('selecting a summon in GH2E with lost and persistent on', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.gloomhaven2e.index,
+          'lostNonPersistent': true,
+          'persistent': true,
+        });
+
+        model.enhancementSelected(
+          _findEnhancementByCategory('HP', EnhancementCategory.summonPlusOne),
+        );
+
+        expect(count(), 1);
+        expect(SharedPrefs().lostNonPersistent, isFalse);
+        expect(SharedPrefs().persistent, isFalse);
+      });
+
+      test('switching FH to GH with persistent on and Ward selected', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.frosthaven.index,
+          'persistent': true,
+          'enhancementKey': _findEnhancement('Ward').key,
+        });
+        expect(model.enhancement?.name, 'Ward');
+
+        model.gameEdition = GameEdition.gloomhaven;
+
+        expect(count(), 1);
+        expect(model.persistent, isFalse);
+        expect(SharedPrefs().persistent, isFalse);
+        expect(model.enhancement, isNull);
+        expect(SharedPrefs().enhancementKey, isNull);
+      });
+
+      test('switching GH2E to GH with lost on', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.gloomhaven2e.index,
+          'lostNonPersistent': true,
+        });
+
+        model.gameEdition = GameEdition.gloomhaven;
+
+        expect(count(), 1);
+        expect(SharedPrefs().lostNonPersistent, isFalse);
+      });
+
+      test('setting persistent while lost is on', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.frosthaven.index,
+          'lostNonPersistent': true,
+        });
+
+        model.persistent = true;
+
+        expect(count(), 1);
+        expect(model.lostNonPersistent, isFalse);
+        expect(SharedPrefs().lostNonPersistent, isFalse);
+        expect(SharedPrefs().persistent, isTrue);
+      });
+
+      test('setting lost while persistent is on', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.frosthaven.index,
+          'persistent': true,
+        });
+
+        model.lostNonPersistent = true;
+
+        expect(count(), 1);
+        expect(model.persistent, isFalse);
+        expect(SharedPrefs().persistent, isFalse);
+        expect(SharedPrefs().lostNonPersistent, isTrue);
+      });
+
+      test('reloadFromPrefs', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.gloomhaven.index,
+        });
+
+        model.reloadFromPrefs();
+
+        expect(count(), 1);
+      });
+
+      test('enhancer level setters, including a cascade', () async {
+        final (model, count) = await countingModel({
+          'gameEdition': GameEdition.frosthaven.index,
+        });
+
+        model.enhancerLvl2 = true;
+        expect(count(), 1);
+        model.enhancerLvl3 = true;
+        expect(count(), 2);
+        model.enhancerLvl4 = true;
+        expect(count(), 3);
+        model.enhancerLvl2 = false;
+        expect(count(), 4);
+        expect(model.hasAnyEnhancerUpgrades, isFalse);
+      });
+    });
+
+    group('setters refresh an already-computed cost', () {
+      final attackKey = _findEnhancementByCategory(
+        'Attack',
+        EnhancementCategory.charPlusOne,
+      ).key;
+
+      /// Seeds [values], reads the cost once so the calculator is cached,
+      /// applies [mutate], and checks the cost changed and matches a model
+      /// built fresh from the prefs the mutation wrote.
+      Future<void> expectFreshCost(
+        Map<String, Object> values,
+        void Function(EnhancementCalculatorModel model) mutate,
+      ) async {
+        SharedPreferences.setMockInitialValues(values);
+        await SharedPrefs().init();
+        final model = EnhancementCalculatorModel();
+        final before = model.totalCost;
+
+        mutate(model);
+
+        expect(model.totalCost, isNot(before));
+        expect(model.totalCost, EnhancementCalculatorModel().totalCost);
+      }
+
+      Map<String, Object> seed(
+        GameEdition edition, [
+        Map<String, Object> extra = const {},
+      ]) => {
+        'gameEdition': edition.index,
+        'enhancementKey': attackKey,
+        ...extra,
+      };
+
+      test('enhancementSelected', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.enhancementSelected(
+            _findEnhancementByCategory('Move', EnhancementCategory.charPlusOne),
+          ),
+        );
+      });
+
+      test('cardLevel', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.cardLevel = 2,
+        );
+      });
+
+      test('previousEnhancements', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.previousEnhancements = 1,
+        );
+      });
+
+      test('multipleTargets', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.multipleTargets = true,
+        );
+      });
+
+      test('hailsDiscount', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.hailsDiscount = true,
+        );
+      });
+
+      test('temporaryEnhancementMode', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven),
+          (m) => m.temporaryEnhancementMode = true,
+        );
+      });
+
+      test('partyBoon', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven, {'targetCardLvl': 1}),
+          (m) => m.partyBoon = true,
+        );
+      });
+
+      test('lostNonPersistent', () async {
+        await expectFreshCost(
+          seed(GameEdition.frosthaven),
+          (m) => m.lostNonPersistent = true,
+        );
+      });
+
+      test('persistent', () async {
+        await expectFreshCost(
+          seed(GameEdition.frosthaven),
+          (m) => m.persistent = true,
+        );
+      });
+
+      test('enhancerLvl2', () async {
+        await expectFreshCost(
+          seed(GameEdition.frosthaven),
+          (m) => m.enhancerLvl2 = true,
+        );
+      });
+
+      test('enhancerLvl3', () async {
+        await expectFreshCost(
+          seed(GameEdition.frosthaven, {'targetCardLvl': 1}),
+          (m) => m.enhancerLvl3 = true,
+        );
+      });
+
+      test('enhancerLvl4', () async {
+        await expectFreshCost(
+          seed(GameEdition.frosthaven, {'enhancementsOnTargetAction': 1}),
+          (m) => m.enhancerLvl4 = true,
+        );
+      });
+
+      test('gameEdition clearing the lost modifier', () async {
+        await expectFreshCost(
+          seed(GameEdition.gloomhaven2e, {'lostNonPersistent': true}),
+          (m) => m.gameEdition = GameEdition.gloomhaven,
+        );
+      });
+
+      test('reloadFromPrefs after an external write', () async {
+        await expectFreshCost(seed(GameEdition.gloomhaven), (m) {
+          SharedPrefs().hailsDiscount = true;
+          m.reloadFromPrefs();
+        });
       });
     });
   });
